@@ -5,4 +5,4 @@ Careta Fleet Management System
 2. install all libraries in the requirements.txt.
 3. there are two servers running (one for the backend and one for the frontend).
 4. to run for the backend, just run "python3 manage.py runserver" on the backend directory.
-5. to run for the frontend, just run "npm start" on the frontend directory.
+5. to run for the frontend, just run "npm start" on the frontend directory. pauul
