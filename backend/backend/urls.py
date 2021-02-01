@@ -28,4 +28,5 @@ router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance')
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
+    path('api/',  include('careta.urls')),
 ]
