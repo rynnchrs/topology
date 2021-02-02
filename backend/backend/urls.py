@@ -24,6 +24,7 @@ router.register(r'careta', views.CarView, 'careta')     # add this
 router.register(r'careta-contract', views.ContractView, 'careta-contract')     # add this
 router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
 router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance')
+router.register(r'users', views.AccountViewSet, 'users')
 
 
 urlpatterns = [

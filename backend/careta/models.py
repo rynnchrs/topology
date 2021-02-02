@@ -8,10 +8,10 @@ from django.contrib.auth.models import User
 # add this
 
 class UserInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE)
+    user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
     Gender_List=[
+        ('M', 'Male'),
         ('F', 'Female'),
-        ('M', 'Male')
     ]
     company = models.CharField(max_length=50)
     position = models.CharField(max_length=20)
@@ -20,6 +20,9 @@ class UserInfo(models.Model):
     phone = PhoneField(blank=True, help_text='Contact phone number')
     address = models.CharField(max_length=100)
     date_created = DateField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.user.username
 
 class Permissions(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE)

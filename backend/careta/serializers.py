@@ -1,53 +1,68 @@
 # todo/serializers.py
+from django.db.models import fields
 from rest_framework import serializers
 from .models import Car, Contract, TPL, Insurance, UserInfo, Permissions
 from django.contrib.auth.models import User
+import django.contrib.auth.password_validation as validators
+from django.core import exceptions
+class UserInfoSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserInfo
+        fields = ['id','company','position','gender','birthday','phone','address']
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    Gender_List=[
-        ('M', 'Female'),
-        ('F', 'Male')
-    ]
-    company = serializers.CharField(max_length=50)
-    position = serializers.CharField(max_length=20)
-    gender = serializers.CharField(max_length=2, source='get_gender_display')
-    birthday = serializers.DateField(input_formats=None)
-    phone = serializers.IntegerField(max_value=None, min_value=None)
-    address = serializers.CharField(max_length=100)
+    user_info = UserInfoSerializer()
     class Meta:
         model = User
-        fields = ['username','email','first_name','last_name','password','password2','company','position','gender','birthday','phone','address']
-        extra_kwargs = {'password': {'write_only': True}}
-    def save(self):
-        user = User(
-                username=self.validated_data['username'],
-                email=self.validated_data['email'],
-                first_name=self.validated_data['first_name'],
-                last_name=self.validated_data['last_name']
+        fields = ['id','username','email','first_name','last_name','password','user_info']
+        extra_kwargs = {
+            'user_info': {'validators': []},
+            'password': {'write_only': True}
+        }
+    def validate(self, data):
+        password = data.get('password')
+        errors = dict() 
+        try:
+            validators.validate_password(password=password, user=User)
+        except exceptions.ValidationError as e:
+            errors['password'] = list(e.messages)
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(UserSerializer, self).validate(data)
 
-            )
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-
-        if password != password2:
-            raise serializers.ValidationError({'password': 'Passwords must match.'})
-        
-        user.set_password(password)
-        user.save()
-        info = UserInfo.objects.create(
-            user = User.objects.get(username=user.username),
-            company = self.initial_data['company'],
-            position = self.initial_data['position'],
-            gender = self.initial_data['gender'],
-            birthday = self.initial_data['birthday'],
-            phone = self.initial_data['phone'],
-            address = self.initial_data['address'],
-            )
-        info.save()  
+    def create(self, validated_data):
+        user_data = validated_data.pop('user_info')
+        user = User.objects.create(**validated_data)
+        UserInfo.objects.create(user=user, **user_data)
         return user
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user_info")
+        user_info = instance.user_info
         
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.password = validated_data.get('password', instance.password)
+        instance.set_password(instance.password)
+        instance.save()
+
+        user_info.company = user_data.get('company', user_info.company)
+        user_info.position = user_data.get('position', user_info.position)
+        user_info.gender = user_data.get('gender', user_info.gender)
+        user_info.birthday = user_data.get('birthday', user_info.birthday)
+        user_info.phone = user_data.get('phone', user_info.phone)
+        user_info.address = user_data.get('address', user_info.address)
+        user_info.save()
+        return instance
+
+
+
+
+   
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car

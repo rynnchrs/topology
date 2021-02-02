@@ -11,7 +11,8 @@ Careta Fleet Management System
 api sample:
 login = api/token/
 register = api/register/
+update = api/users/id
 
 superuser:
-    username = admin
-    password = password
+username = admin
+password = password

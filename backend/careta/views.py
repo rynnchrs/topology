@@ -1,18 +1,22 @@
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, TPLSerializer, InsuranceSerializer  , UserSerializer# add this
-from .models import Car, Contract, TPL, Insurance  # add this
+from .serializers import CarSerializer, ContractSerializer, TPLSerializer, InsuranceSerializer, UserInfoSerializer  , UserSerializer# add this
+from .models import Car, Contract, TPL, Insurance, UserInfo  # add this
 from rest_framework import generics
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = UserSerializer
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            return Response(serializer.data)
+        return Response(serializer.error_messages)
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(serializer.data)
+class AccountViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
