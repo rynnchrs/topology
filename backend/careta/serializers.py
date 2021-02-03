@@ -1,17 +1,19 @@
 # todo/serializers.py
 from django.db.models import fields
 from rest_framework import serializers
-from .models import Car, Contract, TPL, Insurance, UserInfo, Permissions
-from django.contrib.auth.models import User
-import django.contrib.auth.password_validation as validators
-from django.core import exceptions
-class UserInfoSerializer(serializers.ModelSerializer):
+from .models import Car, Contract, TPL, Insurance, UserInfo, Permission # add this
+
+from django.contrib.auth.models import User # add this
+import django.contrib.auth.password_validation as validators    # add this
+
+class UserInfoSerializer(serializers.ModelSerializer):  # add this
     
     class Meta:
         model = UserInfo
         fields = ['id','company','position','gender','birthday','phone','address']
-
-class UserSerializer(serializers.ModelSerializer):
+        
+        
+class UserSerializer(serializers.ModelSerializer):  # add this
     user_info = UserInfoSerializer()
     class Meta:
         model = User
@@ -20,24 +22,21 @@ class UserSerializer(serializers.ModelSerializer):
             'user_info': {'validators': []},
             'password': {'write_only': True}
         }
-    def validate(self, data):
-        password = data.get('password')
-        errors = dict() 
-        try:
-            validators.validate_password(password=password, user=User)
-        except exceptions.ValidationError as e:
-            errors['password'] = list(e.messages)
-        if errors:
-            raise serializers.ValidationError(errors)
-        return super(UserSerializer, self).validate(data)
+        lookup_field = 'username'
+    def validate_password(self, data):      # add this
+        validators.validate_password(password=data, user=User)
+        return data
 
-    def create(self, validated_data):
+    def create(self, validated_data):       # add this
         user_data = validated_data.pop('user_info')
+        password = validated_data['password']
         user = User.objects.create(**validated_data)
+        user.set_password(password)
         UserInfo.objects.create(user=user, **user_data)
+        user.save()
         return user
     
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):     # add this
         user_data = validated_data.pop("user_info")
         user_info = instance.user_info
         
@@ -46,7 +45,6 @@ class UserSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.password = validated_data.get('password', instance.password)
-        instance.set_password(instance.password)
         instance.save()
 
         user_info.company = user_data.get('company', user_info.company)
@@ -58,10 +56,14 @@ class UserSerializer(serializers.ModelSerializer):
         user_info.save()
         return instance
 
-
-
-
-   
+class PermissionSerializer(serializers.ModelSerializer):    # add this
+    class Meta:
+        model = Permission
+        fields = ['id','user','slug','can_view_users','can_add_users','can_edit_users','can_delete_users',
+                  'can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory','can_view_reports',
+                  'can_add_reports','can_edit_reports','can_delete_reports','can_view_task','can_add_task','can_edit_task',
+                  'can_delete_task']
+        lookup_field = 'slug'
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:

@@ -23,12 +23,13 @@ router = routers.DefaultRouter()                      # add this
 router.register(r'careta', views.CarView, 'careta')     # add this
 router.register(r'careta-contract', views.ContractView, 'careta-contract')     # add this
 router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
-router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance')
-router.register(r'users', views.AccountViewSet, 'users')
+router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance') # add this
+router.register(r'users', views.UserView, 'users') # add this
+router.register(r'permission', views.PermissionView, 'permission') # add this
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
-    path('api/',  include('careta.urls')),
+    path('api/',  include('careta.urls')), # add this
 ]

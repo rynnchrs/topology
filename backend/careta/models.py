@@ -3,19 +3,20 @@ import datetime
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import AutoField, BooleanField, CharField, DateField, DateTimeField
 from phone_field import PhoneField
-from django.contrib.auth.models import User
 # Create your models here.
 # add this
+from django.contrib.auth.models import User
 
 class UserInfo(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
+    slug = models.CharField(max_length=30)
     Gender_List=[
         ('M', 'Male'),
         ('F', 'Female'),
     ]
     company = models.CharField(max_length=50)
     position = models.CharField(max_length=20)
-    gender = models.CharField(max_length=2, choices=Gender_List)
+    gender = models.CharField(max_length=1, choices=Gender_List)
     birthday = models.DateField(auto_now=False, auto_now_add=False)
     phone = PhoneField(blank=True, help_text='Contact phone number')
     address = models.CharField(max_length=100)
@@ -24,8 +25,14 @@ class UserInfo(models.Model):
     def __str__(self):
         return self.user.username
 
-class Permissions(models.Model):
+class Permission(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE)
+    slug = models.CharField(max_length=30)
+    
+    can_view_users = BooleanField(default=False)
+    can_add_users = BooleanField(default=False)
+    can_edit_users = BooleanField(default=False)
+    can_delete_users = BooleanField(default=False)
 
     can_view_inventory = BooleanField(default=False)
     can_add_inventory = BooleanField(default=False)
@@ -36,11 +43,16 @@ class Permissions(models.Model):
     can_add_reports = BooleanField(default=False)
     can_edit_reports = BooleanField(default=False)
     can_delete_reports = BooleanField(default=False)
-    
+
+    can_view_task = BooleanField(default=False)
+    can_add_task = BooleanField(default=False)
+    can_edit_task = BooleanField(default=False)
+    can_delete_task = BooleanField(default=False)
+
     date_created = DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
