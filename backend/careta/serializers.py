@@ -6,14 +6,14 @@ from .models import Car, Contract, TPL, Insurance, UserInfo, Permission # add th
 from django.contrib.auth.models import User # add this
 import django.contrib.auth.password_validation as validators    # add this
 
-class UserInfoSerializer(serializers.ModelSerializer):  # add this
+class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
     
     class Meta:
         model = UserInfo
         fields = ['id','company','position','gender','birthday','phone','address']
         
         
-class UserSerializer(serializers.ModelSerializer):  # add this
+class UserSerializer(serializers.ModelSerializer):  # user serializer
     user_info = UserInfoSerializer()
     class Meta:
         model = User
@@ -23,11 +23,11 @@ class UserSerializer(serializers.ModelSerializer):  # add this
             'password': {'write_only': True}
         }
         lookup_field = 'username'
-    def validate_password(self, data):      # add this
+    def validate_password(self, data):      # validate password
         validators.validate_password(password=data, user=User)
         return data
 
-    def create(self, validated_data):       # add this
+    def create(self, validated_data):       # Creating User
         user_data = validated_data.pop('user_info')
         password = validated_data['password']
         user = User.objects.create(**validated_data)
@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):  # add this
         user.save()
         return user
     
-    def update(self, instance, validated_data):     # add this
+    def update(self, instance, validated_data):     # Updating User Info
         user_data = validated_data.pop("user_info")
         user_info = instance.user_info
         
@@ -56,14 +56,37 @@ class UserSerializer(serializers.ModelSerializer):  # add this
         user_info.save()
         return instance
 
-class PermissionSerializer(serializers.ModelSerializer):    # add this
+class PermissionSerializer(serializers.ModelSerializer):    # permission serializer
     class Meta:
         model = Permission
         fields = ['id','user','slug','can_view_users','can_add_users','can_edit_users','can_delete_users',
                   'can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory','can_view_reports',
                   'can_add_reports','can_edit_reports','can_delete_reports','can_view_task','can_add_task','can_edit_task',
                   'can_delete_task']
-        lookup_field = 'slug'
+
+class PermissionUserSerializer(serializers.ModelSerializer):    # user permission serializer
+    class Meta:
+        model = Permission
+        fields = ['id','slug','can_view_users','can_add_users','can_edit_users','can_delete_users']
+        extra_kwargs = {'slug': {'read_only': True},}
+
+class PermissionInventorySerializer(serializers.ModelSerializer):    # inventory permission serializer
+    class Meta:
+        model = Permission
+        fields = ['id','slug','can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory']
+        extra_kwargs = {'slug': {'read_only': True},}
+
+class PermissionReportSerializer(serializers.ModelSerializer):    # report permission serializer
+    class Meta:
+        model = Permission
+        fields = ['id','slug','can_view_reports','can_add_reports','can_edit_reports','can_delete_reports']
+        extra_kwargs = {'slug': {'read_only': True},}
+
+class PermissionTaskSerializer(serializers.ModelSerializer):    # task permission serializer
+    class Meta:
+        model = Permission
+        fields = ['id','slug','can_view_task','can_add_task','can_edit_task','can_delete_task']
+        extra_kwargs = {'slug': {'read_only': True},}
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:

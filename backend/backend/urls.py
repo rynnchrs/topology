@@ -24,9 +24,13 @@ router.register(r'careta', views.CarView, 'careta')     # add this
 router.register(r'careta-contract', views.ContractView, 'careta-contract')     # add this
 router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
 router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance') # add this
-router.register(r'users', views.UserView, 'users') # add this
-router.register(r'permission', views.PermissionView, 'permission') # add this
 
+router.register(r'users', views.UserView, 'users') # users api
+router.register(r'permission', views.PermissionView, 'permission') # permission api
+router.register(r'permission/user', views.PermissionUserView, 'permission-user') # user permission api
+router.register(r'permission/inventory', views.PermissionInventoryView, 'permission-user') # inventory permission api
+router.register(r'permission/report', views.PermissionReportView, 'permission-user')    # report permission api
+router.register(r'permission/task', views.PermissionTaskView, 'permission-user')    # task permission api
 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this

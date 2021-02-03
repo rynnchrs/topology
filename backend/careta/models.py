@@ -5,54 +5,54 @@ from django.db.models.fields import AutoField, BooleanField, CharField, DateFiel
 from phone_field import PhoneField
 # Create your models here.
 # add this
-from django.contrib.auth.models import User # add this
+from django.contrib.auth.models import User # authenticate User
 
-class UserInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info') # add this
-    slug = models.CharField(max_length=30) # add this
+class UserInfo(models.Model):  # User Info Model
+    user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info') 
+    slug = models.CharField(max_length=30) 
     Gender_List=[
         ('M', 'Male'),
         ('F', 'Female'),
     ]
-    company = models.CharField(max_length=50) # add this
-    position = models.CharField(max_length=20) # add this
-    gender = models.CharField(max_length=1, choices=Gender_List)    # add this
-    birthday = models.DateField(auto_now=False, auto_now_add=False) # add this
-    phone = PhoneField(blank=True, help_text='Contact phone number')    # add this
-    address = models.CharField(max_length=100)  # add this
-    date_created = DateField(auto_now_add=True) # add this
+    company = models.CharField(max_length=50) 
+    position = models.CharField(max_length=20)
+    gender = models.CharField(max_length=1, choices=Gender_List)   
+    birthday = models.DateField(auto_now=False, auto_now_add=False) 
+    phone = PhoneField(blank=True, help_text='Contact phone number')   
+    address = models.CharField(max_length=100) 
+    date_created = DateField(auto_now_add=True)
     
-    def __str__(self):  # add this
-        return self.user.username   # add this
+    def __str__(self):  
+        return self.user.username   
 
-class Permission(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE)    # add this
-    slug = models.CharField(max_length=30)  # add this
+class Permission(models.Model):         # permission Model
+    user = models.OneToOneField(User, on_delete=CASCADE)   
+    slug = models.CharField(max_length=30)  
     
-    can_view_users = BooleanField(default=False)    # add this
-    can_add_users = BooleanField(default=False) # add this
-    can_edit_users = BooleanField(default=False)    # add this
-    can_delete_users = BooleanField(default=False)  # add this
+    can_view_users = BooleanField(default=False)    
+    can_add_users = BooleanField(default=False) 
+    can_edit_users = BooleanField(default=False)   
+    can_delete_users = BooleanField(default=False)  
 
-    can_view_inventory = BooleanField(default=False)    # add this
-    can_add_inventory = BooleanField(default=False) # add this
-    can_edit_inventory = BooleanField(default=False)    # add this
-    can_delete_inventory = BooleanField(default=False)  # add this
+    can_view_inventory = BooleanField(default=False)    
+    can_add_inventory = BooleanField(default=False) 
+    can_edit_inventory = BooleanField(default=False)    
+    can_delete_inventory = BooleanField(default=False)  
 
-    can_view_reports = BooleanField(default=False)  # add this
-    can_add_reports = BooleanField(default=False)   # add this
-    can_edit_reports = BooleanField(default=False)  # add this
-    can_delete_reports = BooleanField(default=False)    # add this
+    can_view_reports = BooleanField(default=False) 
+    can_add_reports = BooleanField(default=False)   
+    can_edit_reports = BooleanField(default=False) 
+    can_delete_reports = BooleanField(default=False)    
 
-    can_view_task = BooleanField(default=False) # add this
-    can_add_task = BooleanField(default=False)  # add this
-    can_edit_task = BooleanField(default=False) # add this
-    can_delete_task = BooleanField(default=False)   # add this
+    can_view_task = BooleanField(default=False) 
+    can_add_task = BooleanField(default=False)  
+    can_edit_task = BooleanField(default=False) 
+    can_delete_task = BooleanField(default=False)  
 
-    date_created = DateField(auto_now_add=True) # add this
+    date_created = DateField(auto_now_add=True) 
 
-    def __str__(self):  # add this
-        return self.user.username   # add this
+    def __str__(self):  
+        return self.user.username   
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)

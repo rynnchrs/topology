@@ -1,9 +1,10 @@
-from django.urls import path # add this
+from django.urls import path, include # add this
 from rest_framework_simplejwt import views as jwt_views # add this
-from .views import RegisterView, BlacklistTokenView # add this
+from .views import RegisterView, BlacklistTokenView , PermissionUserView # add this
 urlpatterns = [
-    path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'), # add this
-    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'), # add this
-    path('logout/blacklist/', BlacklistTokenView.as_view(), name='blacklist'), # add this
-    path('register/', RegisterView.as_view(), name='register') # add this
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'), # login api
+    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'), # refresh token
+    path('logout/blacklist/', BlacklistTokenView.as_view(), name='blacklist'), # logout api
+    path('register/', RegisterView.as_view(), name='register'), # register api
 ]
