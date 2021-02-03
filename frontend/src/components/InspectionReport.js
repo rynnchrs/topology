@@ -20,7 +20,8 @@ import {Editor} from 'primereact/editor';
 import {ToggleButton} from 'primereact/togglebutton';
 import {SelectButton} from 'primereact/selectbutton';
 import {Button} from 'primereact/button';
-import {SplitButton} from 'primereact/splitbutton';
+import { SplitButton } from 'primereact/splitbutton';
+
 
 export class InspectionReport extends Component {
 
@@ -192,22 +193,18 @@ export class InspectionReport extends Component {
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <center><h1>Vehicle Inspection Report (Careta)</h1></center>
+                        <h1>Vehicle Inspection Report (Careta)</h1>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-4">
-                                <InputText placeholder="Supplier Name"/>
+                                <InputText placeholder="Body No." />
                             </div>
                             <div className="p-col-12 p-md-4">
                                 <InputText placeholder="Mileage"/>
-                            </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                            </div>
+                        </div>
+                        <div className="p-grid">
                             <div className="p-col-12 p-md-4">
                                 <InputText placeholder="Make/Model"/>
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <InputText placeholder="VIN" />
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <InputText placeholder="Body No."/>
                             </div>
                             <div className="p-col-12 p-md-4">
                                 <InputText placeholder="Location"/>
@@ -217,7 +214,7 @@ export class InspectionReport extends Component {
                 </div>
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <h1>Interior/Exterior</h1>
+                        <h1>Exterior</h1>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-3">
                                 <center><label>Checked and Ok</label></center>
@@ -231,99 +228,99 @@ export class InspectionReport extends Component {
                             <div className="p-col-12 p-md-3"></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="eb_ok" inputId="rb1" onChange={event => this.setState({radioValue1: event.value})} checked={this.state.radioValue1 === "eb_ok"}/></center>
+                                <center><Checkbox value="cl_ok" inputId="rb1" onChange={event => this.setState({radioValue1: event.value})} checked={this.state.radioValue1 === "cl_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="eb_ma" inputId="rb2" onChange={event => this.setState({radioValue1: event.value})} checked={this.state.radioValue1 === "eb_ma"}/></center>
+                                <center><Checkbox value="cl_ma" inputId="rb2" onChange={event => this.setState({radioValue1: event.value})} checked={this.state.radioValue1 === "cl_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="eb_ra" inputId="rb3" onChange={event => this.setState({radioValue1: event.value})} checked={this.state.radioValue1 === "eb_ra"}/></center>
+                                <center><Checkbox value="cl_ra" inputId="rb3" onChange={event => this.setState({radioValue1: event.value})} checked={this.state.radioValue1 === "cl_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Exterior Body</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Cleanliness</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="wg_ok" inputId="rb1" onChange={event => this.setState({radioValue2: event.value})} checked={this.state.radioValue2 === "wg_ok"}/></center>
+                                <center><Checkbox value="cr_ok" inputId="rb1" onChange={event => this.setState({radioValue2: event.value})} checked={this.state.radioValue2 === "cr_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="wg_ma" inputId="rb2" onChange={event => this.setState({radioValue2: event.value})} checked={this.state.radioValue2 === "wg_ma"}/></center>
+                                <center><Checkbox value="cr_ma" inputId="rb2" onChange={event => this.setState({radioValue2: event.value})} checked={this.state.radioValue2 === "cr_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="wg_ra" inputId="rb3" onChange={event => this.setState({radioValue2: event.value})} checked={this.state.radioValue2 === "wg_ra"}/></center>
+                                <center><Checkbox value="cr_ra" inputId="rb3" onChange={event => this.setState({radioValue2: event.value})} checked={this.state.radioValue2 === "cr_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Windshield / Gas</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Condition Rust</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="w_ok" inputId="rb1" onChange={event => this.setState({radioValue3: event.value})} checked={this.state.radioValue3 === "w_ok"}/></center>
+                                <center><Checkbox value="dli_ok" inputId="rb1" onChange={event => this.setState({radioValue3: event.value})} checked={this.state.radioValue3 === "dli_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="w_ma" inputId="rb2" onChange={event => this.setState({radioValue3: event.value})} checked={this.state.radioValue3 === "w_ma"}/></center>
+                                <center><Checkbox value="dli_ma" inputId="rb2" onChange={event => this.setState({ radioValue3: event.value })} checked={this.state.radioValue3 === "dli_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="w_ra" inputId="rb3" onChange={event => this.setState({radioValue3: event.value})} checked={this.state.radioValue3 === "w_ra"}/></center>
+                                <center><Checkbox value="dli_ra" inputId="rb3" onChange={event => this.setState({ radioValue3: event.value })} checked={this.state.radioValue3 === "dli_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Wipers</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Decals/Livery Intact</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="l_ok" inputId="rb1" onChange={event => this.setState({radioValue4: event.value})} checked={this.state.radioValue4 === "l_ok"}/></center>
+                                <center><Checkbox value="wd_ok" inputId="rb1" onChange={event => this.setState({radioValue4: event.value})} checked={this.state.radioValue4 === "wd_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="l_ma" inputId="rb2" onChange={event => this.setState({radioValue4: event.value})} checked={this.state.radioValue4 === "l_ma"}/></center>
+                                <center><Checkbox value="wd_ma" inputId="rb2" onChange={event => this.setState({radioValue4: event.value})} checked={this.state.radioValue4 === "wd_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="l_ra" inputId="rb3" onChange={event => this.setState({radioValue4: event.value})} checked={this.state.radioValue4 === "l_ra"}/></center>
+                                <center><Checkbox value="wd_ra" inputId="rb3" onChange={event => this.setState({radioValue4: event.value})} checked={this.state.radioValue4 === "wd_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Lights (Head,Break,Turn)</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Windows/Windscreen</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="il_ok" inputId="rb1" onChange={event => this.setState({radioValue5: event.value})} checked={this.state.radioValue5 === "il_ok"}/></center>
+                                <center><Checkbox value="rd_ok" inputId="rb1" onChange={event => this.setState({radioValue5: event.value})} checked={this.state.radioValue5 === "rd_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="il_ma" inputId="rb2" onChange={event => this.setState({radioValue5: event.value})} checked={this.state.radioValue5 === "il_ma"}/></center>
+                                <center><Checkbox value="rd_ma" inputId="rb2" onChange={event => this.setState({radioValue5: event.value})} checked={this.state.radioValue5 === "rd_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="il_ra" inputId="rb3" onChange={event => this.setState({radioValue5: event.value})} checked={this.state.radioValue5 === "il_ra"}/></center>
+                                <center><Checkbox value="rd_ra" inputId="rb3" onChange={event => this.setState({radioValue5: event.value})} checked={this.state.radioValue5 === "rd_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Interior Lights</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Rear Door</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="ac_ok" inputId="rb1" onChange={event => this.setState({radioValue6: event.value})} checked={this.state.radioValue6 === "ac_ok"}/></center>
+                                <center><Checkbox value="mi_ok" inputId="rb1" onChange={event => this.setState({radioValue6: event.value})} checked={this.state.radioValue6 === "mi_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="ac_ma" inputId="rb2" onChange={event => this.setState({radioValue6: event.value})} checked={this.state.radioValue6 === "ac_ma"}/></center>
+                                <center><Checkbox value="mi_ma" inputId="rb2" onChange={event => this.setState({radioValue6: event.value})} checked={this.state.radioValue6 === "mi_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="ac_ra" inputId="rb3" onChange={event => this.setState({radioValue6: event.value})} checked={this.state.radioValue6 === "ac_ra"}/></center>
+                                <center><Checkbox value="mi_ra" inputId="rb3" onChange={event => this.setState({radioValue6: event.value})} checked={this.state.radioValue6 === "mi_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>AC Operations</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Mirrors</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="h_ok" inputId="rb1" onChange={event => this.setState({radioValue7: event.value})} checked={this.state.radioValue7 === "h_ok"}/></center>
+                                <center><Checkbox value="rr_ok" inputId="rb1" onChange={event => this.setState({radioValue7: event.value})} checked={this.state.radioValue7 === "rr_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="h_ma" inputId="rb2" onChange={event => this.setState({radioValue7: event.value})} checked={this.state.radioValue7 === "h_ma"}/></center>
+                                <center><Checkbox value="rr_ma" inputId="rb2" onChange={event => this.setState({radioValue7: event.value})} checked={this.state.radioValue7 === "rr_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="h_ra" inputId="rb3" onChange={event => this.setState({radioValue7: event.value})} checked={this.state.radioValue7 === "h_ra"}/></center>
+                                <center><Checkbox value="rr_ra" inputId="rb3" onChange={event => this.setState({radioValue7: event.value})} checked={this.state.radioValue7 === "rr_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Heating</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Roof Rack</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="oie_ok" inputId="rb1" onChange={event => this.setState({radioValue8: event.value})} checked={this.state.radioValue8 === "oie_ok"}/></center>
+                                <center><Checkbox value="rs_ok" inputId="rb1" onChange={event => this.setState({radioValue8: event.value})} checked={this.state.radioValue8 === "rs_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="oie_ma" inputId="rb2" onChange={event => this.setState({radioValue8: event.value})} checked={this.state.radioValue8 === "oie_ma"}/></center>
+                                <center><Checkbox value="rs_ma" inputId="rb2" onChange={event => this.setState({radioValue8: event.value})} checked={this.state.radioValue8 === "rs_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="oie_ra" inputId="rb3" onChange={event => this.setState({radioValue8: event.value})} checked={this.state.radioValue8 === "oie_ra"}/></center>
+                                <center><Checkbox value="rs_ra" inputId="rb3" onChange={event => this.setState({radioValue8: event.value})} checked={this.state.radioValue8 === "rs_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Others</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Rear Step</label></div>
                         </div>
                     </div>
                 </div>
 
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <h1>Underhood</h1>
+                        <h1>Interior</h1>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-3">
                                 <center><label>Checked and Ok</label></center>
@@ -337,26 +334,26 @@ export class InspectionReport extends Component {
                             <div className="p-col-12 p-md-3"></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="eo_ok" inputId="rb1" onChange={event => this.setState({radioValue9: event.value})} checked={this.state.radioValue9 === "eo_ok"}/></center>
+                                <center><Checkbox value="se_ok" inputId="rb1" onChange={event => this.setState({radioValue9: event.value})} checked={this.state.radioValue9 === "se_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="eo_ma" inputId="rb2" onChange={event => this.setState({radioValue9: event.value})} checked={this.state.radioValue9 === "eo_ma"}/></center>
+                                <center><Checkbox value="se_ma" inputId="rb2" onChange={event => this.setState({radioValue9: event.value})} checked={this.state.radioValue9 === "se_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="eo_ra" inputId="rb3" onChange={event => this.setState({radioValue9: event.value})} checked={this.state.radioValue9 === "eo_ra"}/></center>
+                                <center><Checkbox value="se_ra" inputId="rb3" onChange={event => this.setState({radioValue9: event.value})} checked={this.state.radioValue9 === "se_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Engine Oil</label></center></div>
+                            <div className="p-col-12 p-md-3"><label>Seats</label></div>
 
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="bf_ok" inputId="rb1" onChange={event => this.setState({radioValue10: event.value})} checked={this.state.radioValue10 === "bf_ok"}/></center>
+                                <center><Checkbox value="sb_ok" inputId="rb1" onChange={event => this.setState({radioValue10: event.value})} checked={this.state.radioValue10 === "sb_ok"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="bf_ma" inputId="rb2" onChange={event => this.setState({radioValue10: event.value})} checked={this.state.radioValue10 === "bf_ma"}/></center>
+                                <center><Checkbox value="sb_ma" inputId="rb2" onChange={event => this.setState({radioValue10: event.value})} checked={this.state.radioValue10 === "sb_ma"}/></center>
                             </div>
                             <div className="p-col-12 p-md-3">
-                                <center><Checkbox value="bf_ra" inputId="rb3" onChange={event => this.setState({radioValue10: event.value})} checked={this.state.radioValue10 === "bf_ra"}/></center>
+                                <center><Checkbox value="sb_ra" inputId="rb3" onChange={event => this.setState({radioValue10: event.value})} checked={this.state.radioValue10 === "sb_ra"}/></center>
                             </div>
-                            <div className="p-col-12 p-md-3"><center><label>Brake Fluid</label></center></div>
+                            <div className="p-col-12 p-md-3"><center><label>Seat Belts</label></center></div>
 
                             <div className="p-col-12 p-md-3">
                                 <center><Checkbox value="psf_ok" inputId="rb1" onChange={event => this.setState({radioValue11: event.value})} checked={this.state.radioValue11 === "psf_ok"}/></center>
