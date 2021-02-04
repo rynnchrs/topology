@@ -8,16 +8,19 @@ Careta Fleet Management System
 5. to run for the frontend, just run "npm start" on the frontend directory.
 
 
-api sample
+api sample:
 login: api/token/
-register: api/register/
-update: api/users/(?P<username>[^/.]+)
-permission: api/permision/(?P<username>[^/.]+)
+register = api/register/
+update = api/users/(?P[^/.]+) logout = api/logout/blacklist/ permission = api/permision/(?P[^/.]+)
+user permission = api/permision/user/(?P[^/.]+)
+inventory permission = api/permision/(?P[^/.]+)
+reports permission = api/permision/(?P[^/.]+)
+task permission = api/permision/(?P[^/.]+)
 
-super_user
+super_user:
 username = admin
 password = password
 
-sample_user
-username: pedro
-password: userpassword
+sample_user:
+username = pedro
+password = userpassword
