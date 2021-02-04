@@ -23,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
             'password': {'write_only': True}
         }
         lookup_field = 'username'
+        
     def validate_password(self, data):      # validate password
         validators.validate_password(password=data, user=User)
         return data
@@ -45,6 +46,7 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.password = validated_data.get('password', instance.password)
+        instance.set_password(instance.password)
         instance.save()
 
         user_info.company = user_data.get('company', user_info.company)
