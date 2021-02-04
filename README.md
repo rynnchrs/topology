@@ -8,19 +8,39 @@ Careta Fleet Management System
 5. to run for the frontend, just run "npm start" on the frontend directory.
 
 
-api sample:
-login: api/token/
-register = api/register/
-update = api/users/(?P[^/.]+) logout = api/logout/blacklist/ permission = api/permision/(?P[^/.]+)
-user permission = api/permision/user/(?P[^/.]+)
-inventory permission = api/permision/(?P[^/.]+)
-reports permission = api/permision/(?P[^/.]+)
-task permission = api/permision/(?P[^/.]+)
 
-super_user:
-username = admin
-password = password
+api sample:  
+login = api/login/    
+register = api/register/  
+logout = api/logout/blacklist  
 
-sample_user:
-username = pedro
-password = userpassword
+user list = api/users/  
+user create = api/users/  
+user retrive = api/users/(?P<format>[a-z0-9]+)  
+user update = api/users/(?P<format>[a-z0-9]+)  
+user delete = api/users/(?P<format>[a-z0-9]+)  
+  
+permission list = api/permission/  
+permission create = api/permission/  
+permission retrive = api/permission/(?P<format>[a-z0-9]+)  
+
+permission user delete = api/permission/user/(?P<format>[a-z0-9]+)  
+permission user update = api/permission/user/(?P<format>[a-z0-9]+)  
+  
+permission inventory delete = api/permission/inventory/(?P<format>[a-z0-9]+)  
+permission inventory update = api/permission/inventory/(?P<format>[a-z0-9]+)  
+ 
+permission reports delete = api/permission/report/(?P<format>[a-z0-9]+)  
+permission reports update = api/permission/report/(?P<format>[a-z0-9]+)  
+  
+permission task delete = api/permission/report/(?P<format>[a-z0-9]+)  
+permission task update = api/permission/report/(?P<format>[a-z0-9]+)  
+  
+super_user:  
+username = admin  
+password = password  
+  
+sample_user:  
+username = pedro  
+password = userpassword  
+
