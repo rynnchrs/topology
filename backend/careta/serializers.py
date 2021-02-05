@@ -38,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
         user.save()
         return user
 
-class UpdateUserSerializer(serializers.ModelSerializer):  # user serializer
+class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializer
     user_info = UserInfoSerializer()
     password = serializers.CharField(required=False, write_only=True)
     class Meta:
@@ -64,7 +64,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user serializer
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
 
-        if password is not None:
+        if password is not None:    # set password if not null
             instance.set_password(password)
         instance.save()
 
