@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
+import { FileUpload } from 'primereact/fileupload';
+import axios from "axios";
 
-{/*I added Driver Inspection Report tab under Report tab in App.js*/ }
+{/*I added Image upload table below*/ }
 
 export class DriverInspectionReport extends Component {
 
@@ -51,11 +53,13 @@ export class DriverInspectionReport extends Component {
             radioValue39: null,
             radioValue40: null,
             radioValue41: null,
-
+            selectedFile: undefined,
+            text: "No File Chosen",
+            
         };
 
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
-
+        
     }
 
     onCheckboxChange(event) {
@@ -66,13 +70,32 @@ export class DriverInspectionReport extends Component {
             selected.splice(selected.indexOf(event.value), 1);
         this.setState({ checkboxValue: selected });
     }
+
+    //This will get the filename/filepath that can be use in post request*
+    fileSelect = event => {
+        console.log(event.target.files.length);
+        this.state.text = '';
+        for (let i = 0; i < event.target.files.length; i++) {
+            //console.log(i);
+            //console.log(event.target.files[i].name);
+            this.state.text = this.state.text + event.target.files[i].name + "\n";
+        }
+        this.setState({
+            text: this.state.text
+        });
+    };
+
+    onUpload = (event) => {
+        console.log(event.target.files);
+    }
+
     
     render() {
         return (
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <center><h1>Fleet Vehicle Inspection Checklist</h1></center>
+                        <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6">
                                 <InputText placeholder="Body No." /> 
@@ -93,15 +116,27 @@ export class DriverInspectionReport extends Component {
                 </div>
                 {/*This is space in website UI for upload image display from PrimeReact. */}
                 {/*Other table UI like Exterior, Interior, etc. can be change depends on this space. */}
-                <div className="p-col-12 p-lg-6"> 
+                <div className="p-col-12 p-lg-12"> 
                     <div className="card card-w-title">
+                        <h1>Upload Image File</h1>
                         <div className="p-grid">
-                            <center><label>Upload Image</label></center>
+                            <div className="p-col-12 p-md-4">
+                                <b><p style={{ whiteSpace: 'pre' }}> {this.state.text} </p></b>
+                                {/*This is choose button i created instead of default upload UI in primereact for some reason like i cant hide upload button which 
+                                 will be use in submit button at the bottom of the webpage*/}
+                                <input style={{ display: 'none' }} type="file" onChange={this.fileSelect} ref={fileInput => this.fileInput = fileInput} multiple/>
+                                <Button onClick={() => this.fileInput.click()} label="Choose File"> </Button>
+                                {/*<FileUpload mode="basic" name="demo[]" url="./upload.php" onChange={this.fileSelect} multiple accept="image*//*" maxFileSize={1000000}
+                                    emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />*/}
+                                
+                            </div>
+                            <div className="p-col-12 p-md-4"></div>
+                            <div className="p-col-12 p-md-4"></div>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-col-12 p-lg-6">
+                <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
                         <h1>Exterior</h1>
                         <div className="p-grid">
@@ -180,7 +215,7 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-                <div className="p-col-12 p-lg-6">
+                <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
                         <h1>Interior</h1>
                         <div className="p-grid">
@@ -227,7 +262,7 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-                <div className="p-col-12 p-lg-6">
+                <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
                         <h1>Engine Bay</h1>
                         <div className="p-grid">
@@ -301,7 +336,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="mb_not" inputId="rb2" onChange={event => this.setState({ radioValue18: event.value })} checked={this.state.radioValue18 === "mb_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Main Beam</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Main Beam</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="db_ok" inputId="rb1" onChange={event => this.setState({ radioValue19: event.value })} checked={this.state.radioValue19 === "db_ok"} /></center>
@@ -309,7 +344,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="db_not" inputId="rb2" onChange={event => this.setState({ radioValue19: event.value })} checked={this.state.radioValue19 === "db_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Dipped Beam</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Dipped Beam</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="sl_ok" inputId="rb1" onChange={event => this.setState({ radioValue20: event.value })} checked={this.state.radioValue20 === "sl_ok"} /></center>
@@ -317,7 +352,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="sl_not" inputId="rb2" onChange={event => this.setState({ radioValue20: event.value })} checked={this.state.radioValue20 === "sl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Side Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Side Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="tl_ok" inputId="rb1" onChange={event => this.setState({ radioValue21: event.value })} checked={this.state.radioValue21 === "tl_ok"} /></center>
@@ -325,7 +360,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="tl_not" inputId="rb2" onChange={event => this.setState({ radioValue21: event.value })} checked={this.state.radioValue21 === "tl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Tail Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Tail Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="i_ok" inputId="rb1" onChange={event => this.setState({ radioValue22: event.value })} checked={this.state.radioValue22 === "i_ok"} /></center>
@@ -333,7 +368,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="i_not" inputId="rb2" onChange={event => this.setState({ radioValue22: event.value })} checked={this.state.radioValue22 === "i_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Indicators</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Indicators</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="bl_ok" inputId="rb1" onChange={event => this.setState({ radioValue23: event.value })} checked={this.state.radioValue23 === "bl_ok"} /></center>
@@ -341,7 +376,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="bl_not" inputId="rb2" onChange={event => this.setState({ radioValue23: event.value })} checked={this.state.radioValue23 === "bl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Break Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Break Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rl_ok" inputId="rb1" onChange={event => this.setState({ radioValue24: event.value })} checked={this.state.radioValue24 === "rl_ok"} /></center>
@@ -349,7 +384,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rl_not" inputId="rb2" onChange={event => this.setState({ radioValue24: event.value })} checked={this.state.radioValue24 === "rl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Reverse Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Reverse Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="hl_ok" inputId="rb1" onChange={event => this.setState({ radioValue25: event.value })} checked={this.state.radioValue25 === "hl_ok"} /></center>
@@ -357,7 +392,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="hl_not" inputId="rb2" onChange={event => this.setState({ radioValue25: event.value })} checked={this.state.radioValue25 === "hl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Hazard Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Hazard Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rfl_ok" inputId="rb1" onChange={event => this.setState({ radioValue26: event.value })} checked={this.state.radioValue26 === "rfl_ok"} /></center>
@@ -365,7 +400,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rfl_not" inputId="rb2" onChange={event => this.setState({ radioValue26: event.value })} checked={this.state.radioValue26 === "rfl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Rear Fog Light</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Rear Fog Light</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="il_ok" inputId="rb1" onChange={event => this.setState({ radioValue27: event.value })} checked={this.state.radioValue27 === "il_ok"} /></center>
@@ -373,7 +408,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="il_not" inputId="rb2" onChange={event => this.setState({ radioValue27: event.value })} checked={this.state.radioValue27 === "il_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Interior Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Interior Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="sw_ok" inputId="rb1" onChange={event => this.setState({ radioValue28: event.value })} checked={this.state.radioValue28 === "sw_ok"} /></center>
@@ -381,7 +416,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="sw_not" inputId="rb2" onChange={event => this.setState({ radioValue28: event.value })} checked={this.state.radioValue28 === "sw_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Screen Washer</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Screen Washer</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="wb_ok" inputId="rb1" onChange={event => this.setState({ radioValue29: event.value })} checked={this.state.radioValue29 === "wb_ok"} /></center>
@@ -389,7 +424,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="wb_not" inputId="rb2" onChange={event => this.setState({ radioValue29: event.value })} checked={this.state.radioValue29 === "wb_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Wiper Blades</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Wiper Blades</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="h_ok" inputId="rb1" onChange={event => this.setState({ radioValue30: event.value })} checked={this.state.radioValue30 === "h_ok"} /></center>
@@ -397,7 +432,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="h_not" inputId="rb2" onChange={event => this.setState({ radioValue30: event.value })} checked={this.state.radioValue30 === "h_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Horn</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Horn</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rcd_ok" inputId="rb1" onChange={event => this.setState({ radioValue31: event.value })} checked={this.state.radioValue31 === "rcd_ok"} /></center>
@@ -405,7 +440,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rcd_not" inputId="rb2" onChange={event => this.setState({ radioValue31: event.value })} checked={this.state.radioValue31 === "rcd_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Radio/ CD</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Radio/ CD</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="ffl_ok" inputId="rb1" onChange={event => this.setState({ radioValue32: event.value })} checked={this.state.radioValue32 === "ffl_ok"} /></center>
@@ -413,7 +448,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="ffl_not" inputId="rb2" onChange={event => this.setState({ radioValue32: event.value })} checked={this.state.radioValue32 === "ffl_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Front Fog Lights</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Front Fog Lights</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="ac_ok" inputId="rb1" onChange={event => this.setState({ radioValue33: event.value })} checked={this.state.radioValue33 === "ac_ok"} /></center>
@@ -421,7 +456,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="ac_not" inputId="rb2" onChange={event => this.setState({ radioValue33: event.value })} checked={this.state.radioValue33 === "ac_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Air Conditioning</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Air Conditioning</label></div>
                         </div>
                     </div>
                 </div>
@@ -444,7 +479,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="t_not" inputId="rb2" onChange={event => this.setState({ radioValue34: event.value })} checked={this.state.radioValue34 === "t_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Tyres</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Tyres</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="fv_ok" inputId="rb1" onChange={event => this.setState({ radioValue35: event.value })} checked={this.state.radioValue35 === "fv_ok"} /></center>
@@ -452,7 +487,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="fv_not" inputId="rb2" onChange={event => this.setState({ radioValue35: event.value })} checked={this.state.radioValue35 === "fv_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Front (Visual)</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Front (Visual)</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rv_ok" inputId="rb1" onChange={event => this.setState({ radioValue36: event.value })} checked={this.state.radioValue36 === "rv_ok"} /></center>
@@ -460,7 +495,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rv_not" inputId="rb2" onChange={event => this.setState({ radioValue36: event.value })} checked={this.state.radioValue36 === "rv_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Rear (Visual)</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Rear (Visual)</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="sv_ok" inputId="rb1" onChange={event => this.setState({ radioValue37: event.value })} checked={this.state.radioValue37 === "sv_ok"} /></center>
@@ -468,7 +503,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="sv_not" inputId="rb2" onChange={event => this.setState({ radioValue37: event.value })} checked={this.state.radioValue37 === "sv_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Spare (Visual)</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Spare (Visual)</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="wbr_ok" inputId="rb1" onChange={event => this.setState({ radioValue38: event.value })} checked={this.state.radioValue38 === "wbr_ok"} /></center>
@@ -476,7 +511,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="wbr_not" inputId="rb2" onChange={event => this.setState({ radioValue38: event.value })} checked={this.state.radioValue38 === "wbr_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Wheel Brace</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Wheel Brace</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="j_ok" inputId="rb1" onChange={event => this.setState({ radioValue39: event.value })} checked={this.state.radioValue39 === "j_ok"} /></center>
@@ -484,7 +519,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="j_not" inputId="rb2" onChange={event => this.setState({ radioValue39: event.value })} checked={this.state.radioValue39 === "j_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Jack</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Jack</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="lf_ok" inputId="rb1" onChange={event => this.setState({ radioValue40: event.value })} checked={this.state.radioValue40 === "lf_ok"} /></center>
@@ -492,7 +527,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="lf_not" inputId="rb2" onChange={event => this.setState({ radioValue40: event.value })} checked={this.state.radioValue40 === "lf_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Left Front</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Left Front</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rf_ok" inputId="rb1" onChange={event => this.setState({ radioValue41: event.value })} checked={this.state.radioValue41 === "rf_ok"} /></center>
@@ -500,7 +535,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rf_not" inputId="rb2" onChange={event => this.setState({ radioValue41: event.value })} checked={this.state.radioValue41 === "rf_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Right Front</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Right Front</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="lr_ok" inputId="rb1" onChange={event => this.setState({ radioValue42: event.value })} checked={this.state.radioValue42 === "lr_ok"} /></center>
@@ -508,7 +543,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="lr_not" inputId="rb2" onChange={event => this.setState({ radioValue42: event.value })} checked={this.state.radioValue42 === "lr_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Left Rear</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Left Rear</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rr_ok" inputId="rb1" onChange={event => this.setState({ radioValue43: event.value })} checked={this.state.radioValue43 === "rr_ok"} /></center>
@@ -516,13 +551,13 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox value="rr_not" inputId="rb2" onChange={event => this.setState({ radioValue43: event.value })} checked={this.state.radioValue43 === "rr_not"} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><center><label>Right Rear</label></center></div>
+                            <div className="p-col-12 p-md-4"><label>Right Rear</label></div>
                         </div>
                     </div>
                 </div>
 
 
-                <div className="p-col-12 p-lg-12">
+                <div className="p-col-12 p-lg-6">
                     <div className="card card-w-title">
                         <h1>Gas and Oil</h1>
                         <div className="p-grid">
