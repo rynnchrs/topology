@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer , PermissionUserSerializer# add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer# add this
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo  # add this
 
 from rest_framework import generics, status     # add this
@@ -19,7 +19,7 @@ class RegisterView(generics.GenericAPIView):  # for register user
         if serializer.is_valid(raise_exception=True): # add this
             serializer.save() # add this
             return Response("Successfully Register") # add this
-        return Response(serializer.error_messages) # add this
+        return Response(serializer.errors) # add this
 
 class BlacklistTokenView(APIView):      # for Logout
     def post(self, request):    
@@ -53,7 +53,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
         user = User.objects.get(username=user)  # get current user
         if permission.can_add_users == True:      # permission
             serializer = UserSerializer(data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(serializer.data)          
         else:
@@ -65,7 +65,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
         user = User.objects.get(username=user)      # get current user
         if permission.can_view_users == True:       # permission
             queryset = User.objects.all()
-            users = get_object_or_404(queryset, username=pk)
+            users = get_object_or_404(queryset, username=pk)    # get user
             serializer = UserSerializer(users,  many=False)
             return Response(serializer.data)          
         else:
@@ -81,19 +81,13 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
         user = User.objects.get(username=user)  # get current user
         if permission.can_edit_users == True:   # permission
             queryset = User.objects.all()
-            users = get_object_or_404(queryset, username=pk)
-            serializer = UserSerializer(instance=users, data=request.data)
-            if serializer.is_valid():
+            users = get_object_or_404(queryset, username=pk)    # get user
+            serializer = UpdateUserSerializer(instance=users, data=request.data)
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response("success")       
+            return Response(serializer.data)       
         else:
-            if pk == permission.slug:   # if current user is equal to pk
-                serializer = UserSerializer(instance=user, data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                return Response("success")
-            else:    
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):       # delete user
         user = self.request.user    
@@ -101,7 +95,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
         user = User.objects.get(username=user)  # get current user
         if permission.can_delete_users == True: # permission
             queryset = User.objects.all()
-            users = get_object_or_404(queryset, username=pk)
+            users = get_object_or_404(queryset, username=pk)    # get user
             users.delete()
             return Response('Successfully deleted.')        
         else: 
@@ -116,7 +110,7 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
         permission = Permission.objects.get(slug=user.username) # get permission
         if permission.can_add_users == True:    # permission
             serializer = PermissionSerializer(data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(serializer.data)          
         else:
@@ -144,7 +138,7 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
         else:
             if pk == permission.slug:    # if current user is equal to pk
                 queryset = Permission.objects.all()
-                users = get_object_or_404(queryset, slug=pk)
+                users = get_object_or_404(queryset, slug=pk)    # get user
                 serializer = PermissionSerializer(users,  many=False)
                 return Response(serializer.data)
             else:    
@@ -165,11 +159,11 @@ class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_edit_users == True:       # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)
+            users = get_object_or_404(queryset, slug=pk)    # get user
             serializer = PermissionUserSerializer(instance=users, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response("success")       
+            return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -178,7 +172,7 @@ class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
         permission = Permission.objects.get(slug=user)      # get permission
         if permission.can_delete_users == True:         # permission
             queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk)
+            user = get_object_or_404(queryset, slug=pk) # get user
             user.delete()
             return Response('Successfully deleted.')        
         else:
@@ -198,12 +192,11 @@ class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_edit_users == True:   # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)
+            users = get_object_or_404(queryset, slug=pk)    # get user
             serializer = PermissionInventorySerializer(instance=users, data=request.data)
-
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response("success")       
+            return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -211,7 +204,7 @@ class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
         user = self.request.user
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_delete_users == True:     # permission
-            queryset = Permission.objects.all()
+            queryset = Permission.objects.all() # get user
             user = get_object_or_404(queryset, slug=pk)
             user.delete()
             return Response('Successfully deleted.')        
@@ -232,11 +225,11 @@ class PermissionReportView(viewsets.ViewSet): # Reports permission ViewSet
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_edit_users == True:   # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)
+            users = get_object_or_404(queryset, slug=pk) # get user
             serializer = PermissionInventorySerializer(instance=users, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response("success")       
+            return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -245,7 +238,7 @@ class PermissionReportView(viewsets.ViewSet): # Reports permission ViewSet
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_delete_users == True:     # permission
             queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk)
+            user = get_object_or_404(queryset, slug=pk) # get user
             user.delete()
             return Response('Successfully deleted.')        
         else:
@@ -265,11 +258,11 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_edit_users == True:       # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)
+            users = get_object_or_404(queryset, slug=pk)    # get user
             serializer = PermissionInventorySerializer(instance=users, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response("success")       
+            return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -278,7 +271,7 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         permission = Permission.objects.get(slug=user)  # get permission
         if permission.can_delete_users == True:     # permission
             queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk)
+            user = get_object_or_404(queryset, slug=pk) # get user
             user.delete()
             return Response('Successfully deleted.')        
         else:

@@ -5,9 +5,9 @@ from .models import Car, Contract, TPL, Insurance, UserInfo, Permission # add th
 
 from django.contrib.auth.models import User # add this
 import django.contrib.auth.password_validation as validators    # add this
+from django.core import exceptions
 
 class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
-    
     class Meta:
         model = UserInfo
         fields = ['id','company','position','gender','birthday','phone','address']
@@ -15,6 +15,32 @@ class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
         
 class UserSerializer(serializers.ModelSerializer):  # user serializer
     user_info = UserInfoSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id','username','email','first_name','last_name','password','user_info']
+        extra_kwargs = {
+            'user_info': {'validators': []},
+            'password': {'write_only': True}
+        }
+        lookup_field = 'username'
+        
+    def validate_password(self, data):  # validate password
+        validators.validate_password(password=data, user=User)
+        return data
+
+    def create(self, validated_data):       # Creating User
+        user_data = validated_data.pop('user_info')
+        password = validated_data['password']
+        user = User.objects.create(**validated_data)
+        UserInfo.objects.create(user=user, **user_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+class UpdateUserSerializer(serializers.ModelSerializer):  # user serializer
+    user_info = UserInfoSerializer()
+    password = serializers.CharField(required=False, write_only=True)
     class Meta:
         model = User
         fields = ['id','username','email','first_name','last_name','password','user_info']
@@ -28,25 +54,18 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
         validators.validate_password(password=data, user=User)
         return data
 
-    def create(self, validated_data):       # Creating User
-        user_data = validated_data.pop('user_info')
-        password = validated_data['password']
-        user = User.objects.create(**validated_data)
-        user.set_password(password)
-        UserInfo.objects.create(user=user, **user_data)
-        user.save()
-        return user
-    
     def update(self, instance, validated_data):     # Updating User Info
         user_data = validated_data.pop("user_info")
+        password = validated_data.pop('password',None)
         user_info = instance.user_info
         
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.password = validated_data.get('password', instance.password)
-        instance.set_password(instance.password)
+
+        if password is not None:
+            instance.set_password(password)
         instance.save()
 
         user_info.company = user_data.get('company', user_info.company)
