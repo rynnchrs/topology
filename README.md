@@ -23,18 +23,22 @@ user delete = api/users/(?P<format>[a-z0-9]+)
 permission list = api/permission/  
 permission create = api/permission/  
 permission retrive = api/permission/(?P<format>[a-z0-9]+)  
+permission delete = api/permission/(?P<format>[a-z0-9]+)  
 
-permission user delete = api/permission/user/(?P<format>[a-z0-9]+)  
 permission user update = api/permission/user/(?P<format>[a-z0-9]+)  
-  
-permission inventory delete = api/permission/inventory/(?P<format>[a-z0-9]+)  
 permission inventory update = api/permission/inventory/(?P<format>[a-z0-9]+)  
- 
-permission reports delete = api/permission/report/(?P<format>[a-z0-9]+)  
-permission reports update = api/permission/report/(?P<format>[a-z0-9]+)  
-  
-permission task delete = api/permission/report/(?P<format>[a-z0-9]+)  
 permission task update = api/permission/report/(?P<format>[a-z0-9]+)  
+permission maintenance reports update = api/permission/maintenance-report/(?P<format>[a-z0-9]+)  
+permission inspection reports update = api/permission/inspection-report/(?P<format>[a-z0-9]+)  
+permission repair reports update = api/permission/repair-report/(?P<format>[a-z0-9]+)  
+  
+permission can add maintenance reports list = api/permission/add-list/maintenance/  
+permission can add inspection reports list = api/permission/add-list/inspection/  
+permission can add repair reports list = api/permission/add-list/repair/  
+
+  
+
+
   
 super_user:  
 username = admin  

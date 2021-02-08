@@ -39,10 +39,20 @@ class Permission(models.Model):         # permission Model
     can_edit_inventory = BooleanField(default=False)    
     can_delete_inventory = BooleanField(default=False)  
 
-    can_view_reports = BooleanField(default=False) 
-    can_add_reports = BooleanField(default=False)   
-    can_edit_reports = BooleanField(default=False) 
-    can_delete_reports = BooleanField(default=False)    
+    can_view_inspection_reports = BooleanField(default=False) 
+    can_add_inspection_reports = BooleanField(default=False)   
+    can_edit_inspection_reports = BooleanField(default=False) 
+    can_delete_inspection_reports = BooleanField(default=False)
+
+    can_view_maintenance_reports = BooleanField(default=False) 
+    can_add_maintenance_reports = BooleanField(default=False)   
+    can_edit_maintenance_reports = BooleanField(default=False) 
+    can_delete_maintenance_reports = BooleanField(default=False)    
+
+    can_view_repair_reports = BooleanField(default=False) 
+    can_add_repair_reports = BooleanField(default=False)   
+    can_edit_repair_reports = BooleanField(default=False) 
+    can_delete_repair_reports = BooleanField(default=False)   
 
     can_view_task = BooleanField(default=False) 
     can_add_task = BooleanField(default=False)  

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer# add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer# add this
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo  # add this
 
 from rest_framework import generics, status     # add this
@@ -144,6 +144,17 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
             else:    
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, pk=None):    # delete task permission
+        user = self.request.user
+        permission = Permission.objects.get(slug=user)  # get permission
+        if permission.can_delete_users == True:     # permission
+            queryset = Permission.objects.all()
+            user = get_object_or_404(queryset, slug=pk) # get user
+            user.delete()
+            return Response('Successfully deleted.')        
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionUserSerializer  # add this
@@ -167,17 +178,6 @@ class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):    # delete user permission
-        user = self.request.user
-        permission = Permission.objects.get(slug=user)      # get permission
-        if permission.can_delete_users == True:         # permission
-            queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk) # get user
-            user.delete()
-            return Response('Successfully deleted.')        
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST) 
-
 class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionInventorySerializer
@@ -200,20 +200,10 @@ class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):        # delete inventory permission        
-        user = self.request.user
-        permission = Permission.objects.get(slug=user)  # get permission
-        if permission.can_delete_users == True:     # permission
-            queryset = Permission.objects.all() # get user
-            user = get_object_or_404(queryset, slug=pk)
-            user.delete()
-            return Response('Successfully deleted.')        
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-class PermissionReportView(viewsets.ViewSet): # Reports permission ViewSet
+class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permission ViewSet
     permission_classes = [IsAuthenticated]
-    serializer_class = PermissionReportSerializer
+    serializer_class = PermissionInspectionReportSerializer
     # def retrieve(self, request, pk=None):
     #     queryset = Permission.objects.all()
     #     permission = get_object_or_404(queryset, slug=pk)
@@ -226,21 +216,55 @@ class PermissionReportView(viewsets.ViewSet): # Reports permission ViewSet
         if permission.can_edit_users == True:   # permission
             queryset = Permission.objects.all()
             users = get_object_or_404(queryset, slug=pk) # get user
-            serializer = PermissionInventorySerializer(instance=users, data=request.data)
+            serializer = PermissionInspectionReportSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):    # delete current permission
+class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permission ViewSet
+    permission_classes = [IsAuthenticated]
+    serializer_class = PermissionMaintenanceReportSerializer
+    # def retrieve(self, request, pk=None):
+    #     queryset = Permission.objects.all()
+    #     permission = get_object_or_404(queryset, slug=pk)
+    #     serializer_class = PermissionReportSerializer(permission)
+    #     return Response(serializer_class.data)
+
+    def update(self, request, pk=None):     # update report permission
         user = self.request.user
         permission = Permission.objects.get(slug=user)  # get permission
-        if permission.can_delete_users == True:     # permission
+        if permission.can_edit_users == True:   # permission
             queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk) # get user
-            user.delete()
-            return Response('Successfully deleted.')        
+            users = get_object_or_404(queryset, slug=pk) # get user
+            serializer = PermissionMaintenanceReportSerializer(instance=users, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(serializer.data)       
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission ViewSet
+    permission_classes = [IsAuthenticated]
+    serializer_class = PermissionRepairReportSerializer
+    # def retrieve(self, request, pk=None):
+    #     queryset = Permission.objects.all()
+    #     permission = get_object_or_404(queryset, slug=pk)
+    #     serializer_class = PermissionReportSerializer(permission)
+    #     return Response(serializer_class.data)
+
+    def update(self, request, pk=None):     # update report permission
+        user = self.request.user
+        permission = Permission.objects.get(slug=user)  # get permission
+        if permission.can_edit_users == True:   # permission
+            queryset = Permission.objects.all()
+            users = get_object_or_404(queryset, slug=pk) # get user
+            serializer = PermissionRepairReportSerializer(instance=users, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -259,23 +283,51 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         if permission.can_edit_users == True:       # permission
             queryset = Permission.objects.all()
             users = get_object_or_404(queryset, slug=pk)    # get user
-            serializer = PermissionInventorySerializer(instance=users, data=request.data)
+            serializer = PermissionTaskSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(serializer.data)       
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):    # delete task permission
+class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance report s
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    def list(self, request):        # User List
         user = self.request.user
-        permission = Permission.objects.get(slug=user)  # get permission
-        if permission.can_delete_users == True:     # permission
-            queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk) # get user
-            user.delete()
-            return Response('Successfully deleted.')        
+        permission = Permission.objects.get(slug=user.username) # get users permission
+        if permission.can_view_users == True:    # permission
+            queryset = User.objects.all().filter(permission__can_add_maintenance_reports=True)
+            serializer = UserSerializer(queryset, many=True)
+            return Response(serializer.data)            
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection reports
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    def list(self, request):        # User List
+        user = self.request.user
+        permission = Permission.objects.get(slug=user.username) # get users permission
+        if permission.can_view_users == True:    # permission
+            queryset = User.objects.all().filter(permission__can_add_inspection_reports=True)
+            serializer = UserSerializer(queryset, many=True)
+            return Response(serializer.data)            
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports 
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    def list(self, request):        # User List
+        user = self.request.user
+        permission = Permission.objects.get(slug=user.username) # get users permission
+        if permission.can_view_users == True:    # permission
+            queryset = User.objects.all().filter(permission__can_add_repair_reports=True)
+            serializer = UserSerializer(queryset, many=True)
+            return Response(serializer.data)            
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)   
 
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
