@@ -220,3 +220,87 @@ class Insurance(models.Model):
 
     def __str__(self):
         return self.company
+
+class Report(models.Model):
+    report_id = models.AutoField(primary_key=True)
+    car =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
+    body_no = models.CharField(unique=True, max_length=30)
+    make = models.CharField(max_length=30)
+    mileage = models.IntegerField(default=0)
+    location = models.CharField(max_length=50)
+    # Exterior
+    cleanliness_exterior = models.BooleanField(default=False)
+    condition_rust = models.BooleanField(default=False)
+    decals = models.BooleanField(default=False)
+    windows = models.BooleanField(default=False)
+    rear_door = models.BooleanField(default=False)
+    mirror = models.BooleanField(default=False)
+    roof_rack = models.BooleanField(default=False)
+    rear_step = models.BooleanField(default=False)
+    # Interior
+    seats = models.BooleanField(default=False)
+    seat_belts = models.BooleanField(default=False)
+    general_condition = models.BooleanField(default=False)
+    vehicle_documents = models.BooleanField(default=False)
+    # Electrics
+    main_beam = models.BooleanField(default=False)
+    dipped_beam = models.BooleanField(default=False)
+    side_lights = models.BooleanField(default=False)
+    tail_lights = models.BooleanField(default=False)
+    indicators = models.BooleanField(default=False)
+    breake_lights = models.BooleanField(default=False)
+    reverse_lights = models.BooleanField(default=False)
+    hazard_light = models.BooleanField(default=False)
+    rear_fog_lights = models.BooleanField(default=False)
+    interior_lights = models.BooleanField(default=False)
+    screen_washer = models.BooleanField(default=False)
+    wiper_blades = models.BooleanField(default=False)
+    horn = models.BooleanField(default=False)
+    radio = models.BooleanField(default=False)
+    front_fog_lights = models.BooleanField(default=False)
+    air_conditioning = models.BooleanField(default=False)
+    # Engine Bay
+    cleanliness_engine_bay = models.BooleanField(default=False)
+    washer_fluid = models.BooleanField(default=False)
+    coolant_level = models.BooleanField(default=False)
+    brake_fluid_level = models.BooleanField(default=False)
+    power_steering_fluid = models.BooleanField(default=False)
+    Gas_List = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4)
+    ]
+    gas_level = models.IntegerField(choices=Gas_List)
+    Oil_List = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4)
+    ]
+    oil_level = models.IntegerField(choices=Oil_List)
+    # Wheels and Tyres
+    tyres = models.BooleanField(default=False)
+    front_visual = models.BooleanField(default=False)
+    rear_visual = models.BooleanField(default=False)
+    spare_visual = models.BooleanField(default=False)
+    wheel_brace = models.BooleanField(default=False)
+    jack = models.BooleanField(default=False)
+    front_right_wheel = models.BooleanField(default=False)
+    front_left_wheel = models.BooleanField(default=False)
+    rear_right_wheel = models.BooleanField(default=False)
+    rear_left_wheel = models.BooleanField(default=False)
+
+    notes = models.TextField(null=True, blank=True)
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.car.vin_no
+
+class ReportImage(models.Model):
+    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
+    images = models.ImageField(upload_to = 'images/')
+ 
+    def __str__(self):
+        return self.report.car.vin_no

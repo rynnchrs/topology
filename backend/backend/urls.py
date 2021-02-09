@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include, re_path                 # add this
 from rest_framework import routers                    # add this
 from careta import views                            # add this
+from django.conf.urls.static import static
+from django.conf import settings
 
 router = routers.DefaultRouter()                      # add this
 router.register(r'careta', views.CarView, 'careta')     # add this
@@ -36,8 +38,12 @@ router.register(r'permission/task', views.PermissionTaskView, 'permission-task')
 router.register(r'permission/add-list/maintenance', views.AddMaintenanceReportView, 'permission-maintenance-list') # list of can add maintenance report
 router.register(r'permission/add-list/inspection', views.AddInspectionReportView, 'permission-inspection-list')  # list of can add inspection report
 router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permission-repair-list')  # list of can add repair report
+
+router.register(r'report', views.ReportView, 'report') # report creation api
+
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
     path('api/',  include('careta.urls')), # add this
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

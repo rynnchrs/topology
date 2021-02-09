@@ -35,10 +35,6 @@ permission repair reports update = api/permission/repair-report/(?P<format>[a-z0
 permission can add maintenance reports list = api/permission/add-list/maintenance/  
 permission can add inspection reports list = api/permission/add-list/inspection/  
 permission can add repair reports list = api/permission/add-list/repair/  
-
-  
-
-
   
 super_user:  
 username = admin  
@@ -47,4 +43,7 @@ password = password
 sample_user:  
 username = pedro  
 password = userpassword  
-
+  
+installed package:  
+simplejwt  
+pillow  

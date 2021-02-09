@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer# add this
-from .models import Car, Contract, Permission, TPL, Insurance, UserInfo  # add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer# add this
+from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
 from rest_framework.response import Response    # add this
@@ -11,6 +11,8 @@ from django.contrib.auth.models import User     # add this
 from rest_framework_simplejwt.tokens import RefreshToken    # add this
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend # filter
+from rest_framework import filters # filter 
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
@@ -329,6 +331,21 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)   
 
+class ReportView(viewsets.ModelViewSet):  # report Form
+
+    queryset = Report.objects.all() 
+    serializer_class = ReportSerializer
+    filter_backends = [filters.SearchFilter,filters.OrderingFilter] # filtering and ordering
+    search_fields = '__all__'   # filtering
+    ordering_fields = ['car', 'date_created'] # ordering
+
+    def create(self, request): # create report 
+        serializer = ReportSerializer(data=request.data) 
+        if serializer.is_valid(raise_exception=True): 
+            serializer.save() # add this
+            return Response("Successfully Register") 
+        return Response(serializer.errors) 
+            
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
