@@ -3,13 +3,26 @@ import { TabView,TabPanel } from 'primereact/tabview';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column'
 import {InputText} from 'primereact/inputtext';
+
+
+import {Button} from 'primereact/button';
+import {InputNumber} from 'primereact/inputtext' 
+
 import './TabViewDemo.css';
 import axios from "axios";
+
+
+
 export class Vehicles extends Component {
 
     constructor() {
         super();
         this.state = {
+
+            //filter option for search
+
+            filterOption:'VIN', //possible values: byVIN, byBDN or byPLN
+
             todoList: {},
             dataTableValue:[
                 {vin: 'PAEL65NYHJB005043', body: '18-1654', plate: 'NCT4511' },
@@ -132,6 +145,8 @@ export class Vehicles extends Component {
                 {label: 'To', value: 'N/A' },
             ],
         };
+
+        this.radioChange = this.radioChange.bind(this);
     }
     componentDidMount() {
         this.refreshList();
@@ -145,23 +160,73 @@ export class Vehicles extends Component {
           .catch(err => console.log(err));
       };
 
+
+    // search option function
+    
+    radioChange(e) {
+        this.setState({
+            filterOption: e.currentTarget.value
+        });
+      }
+
     render() {
         return (
             <div className="p-grid">
+ 
+
                 <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-12 p-md-4">
-                                <InputText placeholder="Search by VIN no." onKeyUp={event => this.dv.filter(event.target.value)} />
+                            <div className="p-col-12 p-md-6" name="searchbox">
+                                <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={event => this.dv.filter(event.target.value)} />
                             </div>
+
+                            <div className="p-col-12 p-md-2">
+                                <input type="radio"
+                                       value="VIN"
+                                       checked={this.state.filterOption === "VIN"}
+                                       onChange={this.radioChange} />Search By VIN No.
+                            </div>
+
+                            <div className="p-col-12 p-md-2">
+                                <input type="radio"
+                                       value="Body"
+                                       checked={this.state.filterOption === "Body"}
+                                       onChange={this.radioChange} />Search By Body No.
+                            </div>
+
+                            <div className="p-col-12 p-md-2">
+                                <input type="radio"
+                                       value="Plate"
+                                       checked={this.state.filterOption === "Plate"}
+                                       onChange={this.radioChange} />Search By Plate No.
+                            </div>
+                            <div className="p-grid p-col-12 p-md-4">
+                                <div className="p-col">
+                                    <Button type="button" label="Add New" style={{width: '100%'}} class="btn-block"/>
+                                </div>
+
+                                <div className="p-col">
+                                    <Button type="button" label="Modify" style={{width: '100%'}} class="btn-block"/>
+                                </div>
+
+                                <div className="p-col">
+                                    <Button type="button" label="Remove" style={{width: '100%'}} class="btn-block"/>
+                                </div>
+                            </div>
+                            
+
+                            {/*
                             <div className="p-col-12 p-md-4">
                                 <InputText placeholder="Search by body no." onKeyUp={event => this.dv.filter(event.target.value)} />
                             </div>
                             <div className="p-col-12 p-md-4">
                                 <InputText placeholder="Search by plate no." onKeyUp={event => this.dv.filter(event.target.value)} />
                             </div>
+                            */}
                         </div>
                 </div>
-                <div className="p-col-12">
+                
+                <div className="p-col-8">
                     <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
                         <TabPanel header="Identification">
                             <p class="aligncenter">
@@ -240,7 +305,7 @@ export class Vehicles extends Component {
                         </TabPanel>
                     </TabView>
                 </div>
-                <p>{this.state.todoList.release_year}</p>
+                {/*<p>{this.state.todoList.release_year}</p>*/}
             </div>
             
         );
