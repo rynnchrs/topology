@@ -47,6 +47,7 @@ import './layout/layout.scss';
 import './App.scss';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
+import { DriverInspectionReport } from './components/DriverInspectionReport'; {/*I add Driver Inspection Report tab.*/ }
 import {Vehicles} from './components/Vehicles';
 
 class App extends Component {
@@ -132,6 +133,7 @@ class App extends Component {
             {
                 label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
+                    {label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
                     {label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     {label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     {label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -273,6 +275,18 @@ class App extends Component {
                     <Route path="/vehicles" exact component={Vehicles} />
                     <Route path="/inspectionreport" exact component={InspectionReport} />
                     <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+                    <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                    <Route path="/forms" component={FormsDemo} />
+                    <Route path="/sample" component={SampleDemo} />
+                    <Route path="/data" component={DataDemo} />
+                    <Route path="/panels" component={PanelsDemo} />
+                    <Route path="/overlays" component={OverlaysDemo} />
+                    <Route path="/menus" component={MenusDemo} />
+                    <Route path="/messages" component={MessagesDemo} />
+                    <Route path="/charts" component={ChartsDemo} />
+                    <Route path="/misc" component={MiscDemo} />
+                    <Route path="/empty" component={EmptyPage} />
+                    <Route path="/documentation" component={Documentation} />
                 </div>
 
                 <AppFooter />
