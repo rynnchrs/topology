@@ -1,10 +1,70 @@
 from django.db import models
 import datetime
+from django.db.models.deletion import CASCADE # add this
+from django.db.models.fields import AutoField, BooleanField, CharField, DateField, DateTimeField
 from phone_field import PhoneField
 # Create your models here.
 # add this
+from django.contrib.auth.models import User # authenticate User
 
-#
+
+class UserInfo(models.Model):  # User Info Model
+    user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
+    slug = models.CharField(max_length=30)
+    Gender_List=[
+        ('M', 'Male'),
+        ('F', 'Female'),
+    ]
+    company = models.CharField(max_length=50)
+    position = models.CharField(max_length=20)
+    gender = models.CharField(max_length=1, choices=Gender_List)
+    birthday = models.DateField(auto_now=False, auto_now_add=False)
+    phone = PhoneField(blank=True, help_text='Contact phone number')
+    address = models.CharField(max_length=100)
+    date_created = DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+
+class Permission(models.Model):         # permission Model
+    user = models.OneToOneField(User, on_delete=CASCADE)
+    slug = models.CharField(max_length=30)
+
+    can_view_users = BooleanField(default=False)
+    can_add_users = BooleanField(default=False)
+    can_edit_users = BooleanField(default=False)
+    can_delete_users = BooleanField(default=False)
+
+    can_view_inventory = BooleanField(default=False)
+    can_add_inventory = BooleanField(default=False)
+    can_edit_inventory = BooleanField(default=False)
+    can_delete_inventory = BooleanField(default=False)
+
+    can_view_inspection_reports = BooleanField(default=False)
+    can_add_inspection_reports = BooleanField(default=False)
+    can_edit_inspection_reports = BooleanField(default=False)
+    can_delete_inspection_reports = BooleanField(default=False)
+
+    can_view_maintenance_reports = BooleanField(default=False)
+    can_add_maintenance_reports = BooleanField(default=False)
+    can_edit_maintenance_reports = BooleanField(default=False)
+    can_delete_maintenance_reports = BooleanField(default=False)
+
+    can_view_repair_reports = BooleanField(default=False)
+    can_add_repair_reports = BooleanField(default=False)
+    can_edit_repair_reports = BooleanField(default=False)
+    can_delete_repair_reports = BooleanField(default=False)
+
+    can_view_task = BooleanField(default=False)
+    can_add_task = BooleanField(default=False)
+    can_edit_task = BooleanField(default=False)
+    can_delete_task = BooleanField(default=False)
+
+    date_created = DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
     slug = models.CharField(max_length=30)
@@ -161,3 +221,89 @@ class Insurance(models.Model):
 
     def __str__(self):
         return self.company
+
+
+class Report(models.Model):
+    report_id = models.AutoField(primary_key=True)
+    car =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
+    body_no = models.CharField(unique=True, max_length=30)
+    make = models.CharField(max_length=30)
+    mileage = models.IntegerField(default=0)
+    location = models.CharField(max_length=50)
+    # Exterior
+    cleanliness_exterior = models.BooleanField(default=False)
+    condition_rust = models.BooleanField(default=False)
+    decals = models.BooleanField(default=False)
+    windows = models.BooleanField(default=False)
+    rear_door = models.BooleanField(default=False)
+    mirror = models.BooleanField(default=False)
+    roof_rack = models.BooleanField(default=False)
+    rear_step = models.BooleanField(default=False)
+    # Interior
+    seats = models.BooleanField(default=False)
+    seat_belts = models.BooleanField(default=False)
+    general_condition = models.BooleanField(default=False)
+    vehicle_documents = models.BooleanField(default=False)
+    # Electrics
+    main_beam = models.BooleanField(default=False)
+    dipped_beam = models.BooleanField(default=False)
+    side_lights = models.BooleanField(default=False)
+    tail_lights = models.BooleanField(default=False)
+    indicators = models.BooleanField(default=False)
+    breake_lights = models.BooleanField(default=False)
+    reverse_lights = models.BooleanField(default=False)
+    hazard_light = models.BooleanField(default=False)
+    rear_fog_lights = models.BooleanField(default=False)
+    interior_lights = models.BooleanField(default=False)
+    screen_washer = models.BooleanField(default=False)
+    wiper_blades = models.BooleanField(default=False)
+    horn = models.BooleanField(default=False)
+    radio = models.BooleanField(default=False)
+    front_fog_lights = models.BooleanField(default=False)
+    air_conditioning = models.BooleanField(default=False)
+    # Engine Bay
+    cleanliness_engine_bay = models.BooleanField(default=False)
+    washer_fluid = models.BooleanField(default=False)
+    coolant_level = models.BooleanField(default=False)
+    brake_fluid_level = models.BooleanField(default=False)
+    power_steering_fluid = models.BooleanField(default=False)
+    Gas_List = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4)
+    ]
+    gas_level = models.IntegerField(choices=Gas_List)
+    Oil_List = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4)
+    ]
+    oil_level = models.IntegerField(choices=Oil_List)
+    # Wheels and Tyres
+    tyres = models.BooleanField(default=False)
+    front_visual = models.BooleanField(default=False)
+    rear_visual = models.BooleanField(default=False)
+    spare_visual = models.BooleanField(default=False)
+    wheel_brace = models.BooleanField(default=False)
+    jack = models.BooleanField(default=False)
+    front_right_wheel = models.BooleanField(default=False)
+    front_left_wheel = models.BooleanField(default=False)
+    rear_right_wheel = models.BooleanField(default=False)
+    rear_left_wheel = models.BooleanField(default=False)
+
+    notes = models.TextField(null=True, blank=True)
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.car.vin_no
+
+
+class ReportImage(models.Model):
+    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
+    images = models.ImageField(upload_to = 'images/')
+
+    def __str__(self):
+        return self.report.car.vin_no
