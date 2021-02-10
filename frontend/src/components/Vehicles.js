@@ -6,7 +6,8 @@ import {InputText} from 'primereact/inputtext';
 
 
 import {Button} from 'primereact/button';
-import {InputNumber} from 'primereact/inputtext' 
+import {InputNumber} from 'primereact/inputnumber' 
+import { Fieldset } from 'primereact/fieldset';
 
 import './TabViewDemo.css';
 import axios from "axios";
@@ -172,49 +173,58 @@ export class Vehicles extends Component {
     render() {
         return (
             <div className="p-grid">
- 
-
+                
                 <div className="p-col-12">
-                        <div className="p-grid">
-                            <div className="p-col-12 p-md-6" name="searchbox">
-                                <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={event => this.dv.filter(event.target.value)} />
-                            </div>
-
-                            <div className="p-col-12 p-md-2">
-                                <input type="radio"
-                                       value="VIN"
-                                       checked={this.state.filterOption === "VIN"}
-                                       onChange={this.radioChange} />Search By VIN No.
-                            </div>
-
-                            <div className="p-col-12 p-md-2">
-                                <input type="radio"
-                                       value="Body"
-                                       checked={this.state.filterOption === "Body"}
-                                       onChange={this.radioChange} />Search By Body No.
-                            </div>
-
-                            <div className="p-col-12 p-md-2">
-                                <input type="radio"
-                                       value="Plate"
-                                       checked={this.state.filterOption === "Plate"}
-                                       onChange={this.radioChange} />Search By Plate No.
-                            </div>
-                            <div className="p-grid p-col-12 p-md-4">
-                                <div className="p-col">
-                                    <Button type="button" label="Add New" style={{width: '100%'}} class="btn-block"/>
-                                </div>
-
-                                <div className="p-col">
-                                    <Button type="button" label="Modify" style={{width: '100%'}} class="btn-block"/>
-                                </div>
-
-                                <div className="p-col">
-                                    <Button type="button" label="Remove" style={{width: '100%'}} class="btn-block"/>
-                                </div>
-                            </div>
+                        
+                        <div className="p-grid p-dir-col">
                             
+                                
+                                <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
 
+                                    <div className="p-d-flex p-mb-2" name="searchbox">
+                                        <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={event => this.dv.filter(event.target.value)} />
+                                    </div>
+
+                                    <div className="p-grid p-mb-2">
+                                        <div className="p-col">
+                                            <input type="radio"
+                                                value="VIN"
+                                                checked={this.state.filterOption === "VIN"}
+                                                onChange={this.radioChange} />Search By VIN No.
+                                        </div>
+
+                                        <div className="p-col">
+                                            <input type="radio"
+                                                value="Body"
+                                                checked={this.state.filterOption === "Body"}
+                                                onChange={this.radioChange} />Search By Body No.
+                                        </div>
+
+                                        <div className="p-col">
+                                            <input type="radio"
+                                                value="Plate"
+                                                checked={this.state.filterOption === "Plate"}
+                                                onChange={this.radioChange} />Search By Plate No.
+                                        </div>
+                                    
+                                    </div>  
+                                    
+                                    <div className="p-grid">
+                                        <div className="p-col-2">
+                                            <Button type="button" label="Add New" style={{width: '100%'}} class="btn-block"/>
+                                        </div>
+
+                                        <div className="p-col-2">
+                                            <Button type="button" label="Modify" style={{width: '100%'}} class="btn-block"/>
+                                        </div>
+
+                                        <div className="p-col-2">
+                                            <Button type="button" label="Remove" style={{width: '100%'}} class="btn-block"/>
+                                        </div>
+                                    </div>                                         
+                                
+                                </Fieldset>    
+                            
                             {/*
                             <div className="p-col-12 p-md-4">
                                 <InputText placeholder="Search by body no." onKeyUp={event => this.dv.filter(event.target.value)} />
