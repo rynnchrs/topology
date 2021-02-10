@@ -1,0 +1,17 @@
+.tabview-demo .tabview-custom i, .tabview-demo .tabview-custom span {
+    vertical-align: middle;
+}
+
+.tabview-demo .tabview-custom span {
+    margin: 0 .5rem;
+}
+
+.tabview-demo .p-button {
+    margin-right: .25rem;
+}
+
+.tabview-demo .p-tabview p {
+    line-height: 1.5;
+    margin: 0;
+}
+                 
