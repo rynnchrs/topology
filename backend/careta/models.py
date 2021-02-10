@@ -26,6 +26,7 @@ class UserInfo(models.Model):  # User Info Model
     def __str__(self):
         return self.user.username
 
+
 class Permission(models.Model):         # permission Model
     user = models.OneToOneField(User, on_delete=CASCADE)
     slug = models.CharField(max_length=30)
