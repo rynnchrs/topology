@@ -22,22 +22,25 @@ user delete = api/users/(?P<format>[a-z0-9]+)
   
 permission list = api/permission/  
 permission create = api/permission/  
-permission retrive = api/permission/(?P<format>[a-z0-9]+)  
-permission delete = api/permission/(?P<format>[a-z0-9]+)  
+permission retrive = api/permission/(?P<format>[a-z0-9]+)/  
+permission delete = api/permission/(?P<format>[a-z0-9]+)/  
 
-permission user update = api/permission/user/(?P<format>[a-z0-9]+)  
-permission inventory update = api/permission/inventory/(?P<format>[a-z0-9]+)  
-permission task update = api/permission/report/(?P<format>[a-z0-9]+)  
-permission maintenance reports update = api/permission/maintenance-report/(?P<format>[a-z0-9]+)  
-permission inspection reports update = api/permission/inspection-report/(?P<format>[a-z0-9]+)  
-permission repair reports update = api/permission/repair-report/(?P<format>[a-z0-9]+)  
+permission user update = api/permission/user/(?P<format>[a-z0-9]+)/  
+permission inventory update = api/permission/inventory/(?P<format>[a-z0-9]+)/  
+permission task update = api/permission/report/(?P<format>[a-z0-9]+)/  
+permission maintenance reports update = api/permission/maintenance-report/(?P<format>[a-z0-9]+)/  
+permission inspection reports update = api/permission/inspection-report/(?P<format>[a-z0-9]+)/  
+permission repair reports update = api/permission/repair-report/(?P<format>[a-z0-9]+)/  
   
 permission can add maintenance reports list = api/permission/add-list/maintenance/  
 permission can add inspection reports list = api/permission/add-list/inspection/  
 permission can add repair reports list = api/permission/add-list/repair/  
 
 report list = api/report/  
-report create = api/report/    
+report create = api/report/  
+report retrive = api/report/(?P<format>[a-z0-9]+)/  
+report update = api/report/(?P<format>[a-z0-9]+)/  
+report delete = api/report/(?P<format>[a-z0-9]+)/    
 report search = api/report/?search=  
 report ordering car = api/report/?ordering=car  
 report ordering date = api/report/?ordering=date_created  

@@ -20,7 +20,7 @@ class RegisterView(generics.GenericAPIView):  # for register user
         serializer = UserSerializer(data=request.data) # add this
         if serializer.is_valid(raise_exception=True): # add this
             serializer.save() # add this
-            return Response("Successfully Register") # add this
+            return Response("Successfully Register", status=status.HTTP_201_CREATED) # add this
         return Response(serializer.errors) # add this
 
 class BlacklistTokenView(APIView):      # for Logout
