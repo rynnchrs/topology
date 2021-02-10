@@ -237,96 +237,100 @@ export class Vehicles extends Component {
 
                     <Fieldset legend="Vehicle Data" className="p-grid p-dir-col">
 
-                    <div className="p-grid">
+                        <div className="p-grid">
 
-                    <div className="p-col-5">
+                            <div className="p-col-5">
 
-<div class="p-d-flex p-jc-center">
-    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="250" alt="car"></img>
-</div>
+                                <div class="p-d-flex p-jc-center">
+                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="250" alt="car"></img>
+                                </div>
 
-</div>            
+                            </div>            
 
-<div className="p-col-7">
-<TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
-    <TabPanel header="Identification">
-        
-        <DataTable value={this.state.identitylist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Vehicle Info">
-        <DataTable value={this.state.vehicleinfolist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Suppliers">
-        <DataTable value={this.state.supplierslist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Engine and Body Info">
-        <DataTable value={this.state.enginelist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="LTO">
-        <DataTable value={this.state.ltolist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Location">
-        <DataTable value={this.state.locationlist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Delivery Info">
-        <DataTable value={this.state.deliverylist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Bidding/Contract">
-        <DataTable value={this.state.biddinglist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="Received Items">
-        <DataTable value={this.state.receivedlist} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="2019 TPL">
-        <DataTable value={this.state.tpl19list} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="2019 Insurance">
-        <DataTable value={this.state.insurance19list} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-    <TabPanel header="2020 Insurance">
-        <DataTable value={this.state.insurance20list} className="p-datatable-gridlines">
-            <Column field="label"></Column>
-            <Column field="value"></Column>
-        </DataTable>
-    </TabPanel>
-</TabView>
-</div>
+                            <div className="p-col-7">
+                                <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
+                                    <TabPanel header="Identification" className="btn-block">
+                                        <DataTable value={this.state.identitylist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
 
+                                    <TabPanel header="Vehicle Info">
+                                        <DataTable value={this.state.vehicleinfolist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
 
-                    </div>
+                                    <TabPanel header="Suppliers">
+                                        <DataTable value={this.state.supplierslist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Engine and Body Info">
+                                        <DataTable value={this.state.enginelist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="LTO">
+                                        <DataTable value={this.state.ltolist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Location">
+                                        <DataTable value={this.state.locationlist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Delivery Info">
+                                        <DataTable value={this.state.deliverylist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="Bidding/Contract">
+                                        <DataTable value={this.state.biddinglist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="Received Items">
+                                        <DataTable value={this.state.receivedlist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="2019 TPL">
+                                        <DataTable value={this.state.tpl19list} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="2019 Insurance">
+                                        <DataTable value={this.state.insurance19list} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="2020 Insurance">
+                                        <DataTable value={this.state.insurance20list} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                </TabView>
+                            </div>
+
+                        </div>
 
                     </Fieldset>
     
