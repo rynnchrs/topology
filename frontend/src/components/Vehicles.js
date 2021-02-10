@@ -226,12 +226,18 @@ export class Vehicles extends Component {
                         </div>
                 </div>
                 
-                <div className="p-col-8">
+                <div className="p-col-5">
+
+                    <p class="aligncenter">
+                        <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="250" alt="car"></img>
+                    </p>
+                    
+                </div>            
+
+                <div className="p-col-7">
                     <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
                         <TabPanel header="Identification">
-                            <p class="aligncenter">
-                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="250" alt="car"></img>
-                            </p>
+                            
                             <DataTable value={this.state.identitylist} className="p-datatable-gridlines">
                                 <Column field="label"></Column>
                                 <Column field="value"></Column>
