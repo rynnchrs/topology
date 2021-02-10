@@ -4,7 +4,7 @@ from phone_field import PhoneField
 # Create your models here.
 # add this
 
-
+#
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
     slug = models.CharField(max_length=30)
