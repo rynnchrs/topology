@@ -35,6 +35,12 @@ permission repair reports update = api/permission/repair-report/(?P<format>[a-z0
 permission can add maintenance reports list = api/permission/add-list/maintenance/  
 permission can add inspection reports list = api/permission/add-list/inspection/  
 permission can add repair reports list = api/permission/add-list/repair/  
+
+report list = api/report/  
+report create = api/report/    
+report search = api/report/?search=  
+report ordering car = api/report/?ordering=car  
+report ordering date = api/report/?ordering=date_created  
   
 super_user:  
 username = admin  
