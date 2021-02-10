@@ -55,6 +55,7 @@ export class DriverInspectionReport extends Component {
             radioValue41: null,
             selectedFile: undefined,
             text: "No File Chosen",
+            bodyValue: undefined,
             
         };
 
@@ -86,7 +87,22 @@ export class DriverInspectionReport extends Component {
     };
 
     onUpload = (event) => {
+        [value1, setValue1] = useState('');
         console.log(event.target.files);
+    }
+
+    handleSubmit = event => {
+        console.log("submit try");
+        event.preventDefault();
+
+    }
+
+    getBody = ({ target }) => {
+        bodyValue(target.value);
+    };
+
+    tryThis() {
+        console.log(bodyValue);
     }
 
     
@@ -98,7 +114,7 @@ export class DriverInspectionReport extends Component {
                         <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6">
-                                <InputText placeholder="Body No." /> 
+                                <InputText placeholder="Body No." value={bodyValue} onChange={getBody}/> 
                             </div>
                             <div className="p-col-12 p-md-6">
                                 <InputText placeholder="Make/Model" />
@@ -128,6 +144,8 @@ export class DriverInspectionReport extends Component {
                                 <Button onClick={() => this.fileInput.click()} label="Choose File"> </Button>
                                 {/*<FileUpload mode="basic" name="demo[]" url="./upload.php" onChange={this.fileSelect} multiple accept="image*//*" maxFileSize={1000000}
                                     emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />*/}
+
+                                <Button label="Submit" onClick={this.tryThis}> </Button>
                                 
                             </div>
                             <div className="p-col-12 p-md-4"></div>
