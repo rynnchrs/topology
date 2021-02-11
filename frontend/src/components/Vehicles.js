@@ -154,11 +154,6 @@ export class Vehicles extends Component {
         };
 
         this.radioChange = this.radioChange.bind(this);
-
-      
-        
-       
-        
      
     }
     componentDidMount() {
@@ -304,46 +299,284 @@ export class Vehicles extends Component {
                                        
                             </TabPanel>
 
-                                    <TabPanel header="Suppliers">
-                                        <DataTable value={this.state.supplierslist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
+                            <TabPanel header="Suppliers">
 
-                                    <TabPanel header="Engine and Body Info">
-                                        <DataTable value={this.state.enginelist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDealer" className="p-col-12 p-md-2">Dealer:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDealer" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPONumber" className="p-col-12 p-md-2">PO Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPONumber" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPODate" className="p-col-12 p-md-2">PO Date:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPODate" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vBodyBuilder" className="p-col-12 p-md-2">Body Builder:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vBodyBuilder" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vFabricator" className="p-col-12 p-md-2">Fabricator:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vFabricator" type="text"/>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                        
+                            </TabPanel>
 
-                                    <TabPanel header="LTO">
-                                        <DataTable value={this.state.ltolist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
+                            <TabPanel header="Engine and Body Info">
 
-                                    <TabPanel header="Location">
-                                        <DataTable value={this.state.locationlist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vChassisN" className="p-col-12 p-md-2">Chassis Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vChassisN" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vEngineN" className="p-col-12 p-md-2">Engine Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vEngineN" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vBatteryN" className="p-col-12 p-md-2">Battery Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vBatteryN" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vFuelType" className="p-col-12 p-md-2">Fuel Type:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vFuelType" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vTransmission" className="p-col-12 p-md-2">Transmission:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vTransmission" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDenomination" className="p-col-12 p-md-2">Denomination:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDenomination" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPistonD" className="p-col-12 p-md-2">Piston Displacement:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPistonD" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vNumCylinders" className="p-col-12 p-md-2">Number of Cylinders:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vNumCylinders" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vProcEntity" className="p-col-12 p-md-2">Procuring Entity:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vProcEntity" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vCapacity" className="p-col-12 p-md-2">Capacity:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vCapacity" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vGrossW" className="p-col-12 p-md-2">Gross Weight:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vGrossW" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vNetW" className="p-col-12 p-md-2">Net Weight:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vNetW" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vShippingW" className="p-col-12 p-md-2">Shipping Weight:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vShippingW" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vNetCapacity" className="p-col-12 p-md-2">Net Capacity:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vNetCapacity" type="text"/>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                        
+                            </TabPanel>
 
-                                    <TabPanel header="Delivery Info">
-                                        <DataTable value={this.state.deliverylist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
-                                    <TabPanel header="Bidding/Contract">
-                                        <DataTable value={this.state.biddinglist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
+                            <TabPanel header="LTO">
+
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vLTOCR" className="p-col-12 p-md-2">LTO CR:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vLTOCR" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vLTOCRDate" className="p-col-12 p-md-2">LTO Date:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vLTOCRDate" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vORNumber" className="p-col-12 p-md-2">OR Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vORNumber" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vORDate" className="p-col-12 p-md-2">OR Date:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vORDate" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vTopLoadReg" className="p-col-12 p-md-2">TopLoadReg:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vTopLoadReg" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vFieldOfc" className="p-col-12 p-md-2">Field office:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vFieldOfc" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vORCRCopy" className="p-col-12 p-md-2">ORCR Copy:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vORCRCopy" type="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </TabPanel>
+
+                            <TabPanel header="Location">
+
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPermanentLoc" className="p-col-12 p-md-2">Permanent:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPermanentLoc" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vCurrentLoc" className="p-col-12 p-md-2">Current:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vCurrentLoc" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vVTF" className="p-col-12 p-md-2">With VTF?:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vVTF" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPLStatus" className="p-col-12 p-md-2">Permanent?:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPLStatus" type="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                        
+                            </TabPanel>
+
+                            <TabPanel header="Delivery Info">
+
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDeliveryLoc" className="p-col-12 p-md-2">Delivery Location:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDeliveryLoc" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDeliveryDate" className="p-col-12 p-md-2">Delivery Date:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDeliveryDate" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vSINumber" className="p-col-12 p-md-2">SI Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vSINumber" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDRNumber" className="p-col-12 p-md-2">DR Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDRNumber" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDRCodes" className="p-col-12 p-md-2">DR Codes:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDRCodes" type="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                        
+                            </TabPanel>
+                                    
+                            <TabPanel header="Bidding/Contract">
+
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vBiddingDate" className="p-col-12 p-md-2">Bidding Date:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vBiddingDate" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vBiddingName" className="p-col-12 p-md-2">Bidding Name:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vBiddingName" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vBidNumber" className="p-col-12 p-md-2">Bid Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vBidNumber" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vContractNumber" className="p-col-12 p-md-2">Contract Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vContractNumber" type="text"/>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                    
+                            </TabPanel>
                                     <TabPanel header="Received Items">
                                         <DataTable value={this.state.receivedlist} className="p-datatable-gridlines">
                                             <Column field="label"></Column>
