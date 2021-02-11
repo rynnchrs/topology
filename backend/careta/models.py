@@ -7,62 +7,64 @@ from phone_field import PhoneField
 # add this
 from django.contrib.auth.models import User # authenticate User
 
+
 class UserInfo(models.Model):  # User Info Model
-    user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info') 
-    slug = models.CharField(max_length=30) 
+    user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
+    slug = models.CharField(max_length=30)
     Gender_List=[
         ('M', 'Male'),
         ('F', 'Female'),
     ]
-    company = models.CharField(max_length=50) 
+    company = models.CharField(max_length=50)
     position = models.CharField(max_length=20)
-    gender = models.CharField(max_length=1, choices=Gender_List)   
-    birthday = models.DateField(auto_now=False, auto_now_add=False) 
-    phone = PhoneField(blank=True, help_text='Contact phone number')   
-    address = models.CharField(max_length=100) 
+    gender = models.CharField(max_length=1, choices=Gender_List)
+    birthday = models.DateField(auto_now=False, auto_now_add=False)
+    phone = PhoneField(blank=True, help_text='Contact phone number')
+    address = models.CharField(max_length=100)
     date_created = DateField(auto_now_add=True)
-    
-    def __str__(self):  
-        return self.user.username   
+
+    def __str__(self):
+        return self.user.username
+
 
 class Permission(models.Model):         # permission Model
-    user = models.OneToOneField(User, on_delete=CASCADE)   
-    slug = models.CharField(max_length=30)  
-    
-    can_view_users = BooleanField(default=False)    
-    can_add_users = BooleanField(default=False) 
-    can_edit_users = BooleanField(default=False)   
-    can_delete_users = BooleanField(default=False)  
+    user = models.OneToOneField(User, on_delete=CASCADE)
+    slug = models.CharField(max_length=30)
 
-    can_view_inventory = BooleanField(default=False)    
-    can_add_inventory = BooleanField(default=False) 
-    can_edit_inventory = BooleanField(default=False)    
-    can_delete_inventory = BooleanField(default=False)  
+    can_view_users = BooleanField(default=False)
+    can_add_users = BooleanField(default=False)
+    can_edit_users = BooleanField(default=False)
+    can_delete_users = BooleanField(default=False)
 
-    can_view_inspection_reports = BooleanField(default=False) 
-    can_add_inspection_reports = BooleanField(default=False)   
-    can_edit_inspection_reports = BooleanField(default=False) 
+    can_view_inventory = BooleanField(default=False)
+    can_add_inventory = BooleanField(default=False)
+    can_edit_inventory = BooleanField(default=False)
+    can_delete_inventory = BooleanField(default=False)
+
+    can_view_inspection_reports = BooleanField(default=False)
+    can_add_inspection_reports = BooleanField(default=False)
+    can_edit_inspection_reports = BooleanField(default=False)
     can_delete_inspection_reports = BooleanField(default=False)
 
-    can_view_maintenance_reports = BooleanField(default=False) 
-    can_add_maintenance_reports = BooleanField(default=False)   
-    can_edit_maintenance_reports = BooleanField(default=False) 
-    can_delete_maintenance_reports = BooleanField(default=False)    
+    can_view_maintenance_reports = BooleanField(default=False)
+    can_add_maintenance_reports = BooleanField(default=False)
+    can_edit_maintenance_reports = BooleanField(default=False)
+    can_delete_maintenance_reports = BooleanField(default=False)
 
-    can_view_repair_reports = BooleanField(default=False) 
-    can_add_repair_reports = BooleanField(default=False)   
-    can_edit_repair_reports = BooleanField(default=False) 
-    can_delete_repair_reports = BooleanField(default=False)   
+    can_view_repair_reports = BooleanField(default=False)
+    can_add_repair_reports = BooleanField(default=False)
+    can_edit_repair_reports = BooleanField(default=False)
+    can_delete_repair_reports = BooleanField(default=False)
 
-    can_view_task = BooleanField(default=False) 
-    can_add_task = BooleanField(default=False)  
-    can_edit_task = BooleanField(default=False) 
-    can_delete_task = BooleanField(default=False)  
+    can_view_task = BooleanField(default=False)
+    can_add_task = BooleanField(default=False)
+    can_edit_task = BooleanField(default=False)
+    can_delete_task = BooleanField(default=False)
 
-    date_created = DateField(auto_now_add=True) 
+    date_created = DateField(auto_now_add=True)
 
-    def __str__(self):  
-        return self.user.username   
+    def __str__(self):
+        return self.user.username
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
@@ -221,6 +223,7 @@ class Insurance(models.Model):
     def __str__(self):
         return self.company
 
+
 class Report(models.Model):
     report_id = models.AutoField(primary_key=True)
     car =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
@@ -298,9 +301,10 @@ class Report(models.Model):
     def __str__(self):
         return self.car.vin_no
 
+
 class ReportImage(models.Model):
     report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
     images = models.ImageField(upload_to = 'images/')
- 
+
     def __str__(self):
         return self.report.car.vin_no

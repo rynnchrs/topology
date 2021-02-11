@@ -7,6 +7,7 @@ django-easy-maps==1.1.2
 django-filter==2.3.0
 django-phone-field==1.8.1
 djangorestframework==3.12.2
+djangorestframework-simplejwt==4.6.0
 geographiclib==1.50
 geopy==2.1.0
 importlib-metadata==3.1.1
