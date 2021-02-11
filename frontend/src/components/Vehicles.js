@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState} from 'react';
 import { TabView,TabPanel } from 'primereact/tabview';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column'
@@ -7,7 +7,9 @@ import {InputText} from 'primereact/inputtext';
 
 import {Button} from 'primereact/button';
 import {InputNumber} from 'primereact/inputnumber' 
-import { Fieldset } from 'primereact/fieldset';
+import {Fieldset} from 'primereact/fieldset';
+import {TabMenu} from 'primereact/tabmenu';
+import {Dialog} from 'primereact/dialog';
 
 import './TabViewDemo.css';
 import axios from "axios";
@@ -16,14 +18,18 @@ import axios from "axios";
 
 export class Vehicles extends Component {
 
+    
+
     constructor() {
         super();
         this.state = {
 
             //filter option for search
 
-            filterOption:'VIN', //possible values: byVIN, byBDN or byPLN
-
+            filterOption:'VIN', //possible values: VIN, BDN or PLN
+            vmModalMode: 'Add', //possible values: Add, Modify, Remove    
+            vmVisibility: true,
+            
             todoList: {},
             dataTableValue:[
                 {vin: 'PAEL65NYHJB005043', body: '18-1654', plate: 'NCT4511' },
@@ -148,6 +154,12 @@ export class Vehicles extends Component {
         };
 
         this.radioChange = this.radioChange.bind(this);
+
+      
+        
+       
+        
+     
     }
     componentDidMount() {
         this.refreshList();
@@ -170,11 +182,126 @@ export class Vehicles extends Component {
         });
       }
 
+    
     render() {
+
+        const onHide = () => {
+
+            this.setState({
+                vmVisibility: false
+            });
+            }
+
+        const onShow = (vm) => {
+
+            this.setState({
+                vmVisibility: true,
+                vmModalMode: vm
+            });
+            }
+    
+        
+
+        const renderFooter = (name) => {
+            return (
+                <div>
+                    <Button label="Cancel" icon="pi pi-times" onClick={() => onHide()} className="p-button-text" />
+                    <Button label="Save" icon="pi pi-check" onClick={() => onHide()} autoFocus />
+                </div>
+            );
+        }
+
         return (
+
+            
             <div className="p-grid">
                 
                 <div className="p-col-12">
+
+                <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} style={{ width: '50vw' }} closable={false} footer={renderFooter('displayBasic')} onHide={() => onHide()} >
+                <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
+                                    <TabPanel header="Identification" className="btn-block">
+                                        <DataTable value={this.state.identitylist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Vehicle Info">
+                                        <DataTable value={this.state.vehicleinfolist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Suppliers">
+                                        <DataTable value={this.state.supplierslist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Engine and Body Info">
+                                        <DataTable value={this.state.enginelist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="LTO">
+                                        <DataTable value={this.state.ltolist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Location">
+                                        <DataTable value={this.state.locationlist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+
+                                    <TabPanel header="Delivery Info">
+                                        <DataTable value={this.state.deliverylist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="Bidding/Contract">
+                                        <DataTable value={this.state.biddinglist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="Received Items">
+                                        <DataTable value={this.state.receivedlist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="2019 TPL">
+                                        <DataTable value={this.state.tpl19list} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="2019 Insurance">
+                                        <DataTable value={this.state.insurance19list} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="2020 Insurance">
+                                        <DataTable value={this.state.insurance20list} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                </TabView>
+                    
+                    
+                </Dialog>
                                 
                                 <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
 
@@ -206,19 +333,7 @@ export class Vehicles extends Component {
                                     
                                     </div>  
                                     
-                                    <div className="p-grid">
-                                        <div className="p-col-2">
-                                            <Button type="button" label="Add New" style={{width: '100%'}} class="btn-block"/>
-                                        </div>
-
-                                        <div className="p-col-2">
-                                            <Button type="button" label="Modify" style={{width: '100%'}} class="btn-block"/>
-                                        </div>
-
-                                        <div className="p-col-2">
-                                            <Button type="button" label="Remove" style={{width: '100%'}} class="btn-block"/>
-                                        </div>
-                                    </div>                                         
+                                                                  
                                 
                                 </Fieldset>    
                             
@@ -238,6 +353,15 @@ export class Vehicles extends Component {
                     <Fieldset legend="Vehicle Data" className="p-grid p-dir-col">
 
                         <div className="p-grid">
+
+                            <div className="p-col-12">
+                            <div className="p-grid p-justify-end">
+                                <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-mr-2" onClick={() => onShow("Add")} />
+                                <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-mr-2" onClick={() => onShow("Modify")} />
+                                <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-mr-2" onClick={() => onShow("Remove")} />
+                            </div>
+                            </div>
+                            
 
                             <div className="p-col-3">
 
