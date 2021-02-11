@@ -345,12 +345,12 @@ class ReportView(viewsets.ModelViewSet):  # report Form
                     'notes','date_updated','date_created']  # filtering
     ordering_fields = ['car', 'date_created'] # ordering
 
-    def create(self, request): # create report 
-        serializer = ReportSerializer(data=request.data) 
-        if serializer.is_valid(raise_exception=True): 
-            serializer.save() # add this
-            return Response(status.HTTP_201_CREATED) 
-        return Response(serializer.errors) 
+    # def create(self, request): # create report 
+    #     serializer = ReportSerializer(data=request.data) 
+    #     if serializer.is_valid(raise_exception=True): 
+    #         serializer.save() # add this
+    #         return Response(status.HTTP_201_CREATED) 
+    #     return Response(serializer.errors) 
             
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
