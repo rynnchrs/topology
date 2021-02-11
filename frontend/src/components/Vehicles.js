@@ -239,7 +239,7 @@ export class Vehicles extends Component {
 
                         <div className="p-grid">
 
-                            <div className="p-col-5">
+                            <div className="p-col-3">
 
                                 <div class="p-d-flex p-jc-center">
                                     <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="250" alt="car"></img>
@@ -247,7 +247,7 @@ export class Vehicles extends Component {
 
                             </div>            
 
-                            <div className="p-col-7">
+                            <div className="p-col-9">
                                 <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
                                     <TabPanel header="Identification" className="btn-block">
                                         <DataTable value={this.state.identitylist} className="p-datatable-gridlines">
