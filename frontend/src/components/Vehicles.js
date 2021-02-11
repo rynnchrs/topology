@@ -28,7 +28,7 @@ export class Vehicles extends Component {
 
             filterOption:'VIN', //possible values: VIN, BDN or PLN
             vmModalMode: 'Add', //possible values: Add, Modify, Remove    
-            vmVisibility: true,
+            vmVisibility: false,
             
             todoList: {},
             dataTableValue:[
@@ -198,8 +198,8 @@ export class Vehicles extends Component {
         const renderFooter = (name) => {
             return (
                 <div>
+                    <Button label="Save" icon="pi pi-check" onClick={() => onHide()} autofocus />
                     <Button label="Cancel" icon="pi pi-times" onClick={() => onHide()} className="p-button-text" />
-                    <Button label="Save" icon="pi pi-check" onClick={() => onHide()} autoFocus />
                 </div>
             );
         }
@@ -255,7 +255,6 @@ export class Vehicles extends Component {
                                 </div>
                               
                             </TabPanel>
-
                             <TabPanel header="Vehicle Info">
 
                                 <div className="p-fluid">
@@ -298,7 +297,6 @@ export class Vehicles extends Component {
                                 </div>
                                        
                             </TabPanel>
-
                             <TabPanel header="Suppliers">
 
                                 <div className="p-fluid">
@@ -336,7 +334,6 @@ export class Vehicles extends Component {
                                 </div>
                                         
                             </TabPanel>
-
                             <TabPanel header="Engine and Body Info">
 
                                 <div className="p-fluid">
@@ -428,7 +425,6 @@ export class Vehicles extends Component {
                                 </div>
                                         
                             </TabPanel>
-
                             <TabPanel header="LTO">
 
                                 <div className="p-fluid">
@@ -477,7 +473,6 @@ export class Vehicles extends Component {
                                 </div>
 
                             </TabPanel>
-
                             <TabPanel header="Location">
 
                                 <div className="p-fluid">
@@ -508,7 +503,6 @@ export class Vehicles extends Component {
                                 </div>
                                         
                             </TabPanel>
-
                             <TabPanel header="Delivery Info">
 
                                 <div className="p-fluid">
@@ -545,7 +539,6 @@ export class Vehicles extends Component {
                                 </div>
                                         
                             </TabPanel>
-                                    
                             <TabPanel header="Bidding/Contract">
 
                                 <div className="p-fluid">
@@ -577,34 +570,227 @@ export class Vehicles extends Component {
                                 </div>
                                     
                             </TabPanel>
-                                    <TabPanel header="Received Items">
-                                        <DataTable value={this.state.receivedlist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
-                                    <TabPanel header="2019 TPL">
-                                        <DataTable value={this.state.tpl19list} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
-                                    <TabPanel header="2019 Insurance">
-                                        <DataTable value={this.state.insurance19list} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
-                                    <TabPanel header="2020 Insurance">
-                                        <DataTable value={this.state.insurance20list} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
-                                    </TabPanel>
-                                </TabView>
-                    
-                    
-                </Dialog>
+                            <TabPanel header="Received Items">
+
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPlateNumDel" className="p-col-12 p-md-2">Plate Number Delivery:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPlateNumDel" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vDecals" className="p-col-12 p-md-2">Decals:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vDecals" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vModified" className="p-col-12 p-md-2">Modified:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vModified" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vEWD" className="p-col-12 p-md-2">EWD:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vEWD" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vTools" className="p-col-12 p-md-2">Tools:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vTools" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vUsersManual" className="p-col-12 p-md-2">User's Manual:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vUsersManual" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vWarrantyBook" className="p-col-12 p-md-2">Warranty Book:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vWarrantyBook" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vUnitKey" className="p-col-12 p-md-2">Unit Key:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vUnitKey" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vBodyKey" className="p-col-12 p-md-2">Body Key:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vBodyKey" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vCigPlug" className="p-col-12 p-md-2">Cigarette Plug:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vCigPlug" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vKeyChain" className="p-col-12 p-md-2">Key Chain:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vKeyChain" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vJack" className="p-col-12 p-md-2">Jack:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vJack" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vTireWrench" className="p-col-12 p-md-2">Tire Wrench:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vTireWrench" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vFireExt" className="p-col-12 p-md-2">Fire Extinguisher:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vFireExt" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vEWDevice" className="p-col-12 p-md-2">Early Warning Device:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vEWDevice" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vFan" className="p-col-12 p-md-2">Fan:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vFan" type="text"/>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                       
+                            </TabPanel>
+                            <TabPanel header="2019 TPL">
+
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vInsuranceCompany1" className="p-col-12 p-md-2">Insurance Company:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vInsuranceCompany1" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyNumber1" className="p-col-12 p-md-2">Policy Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyNumber1" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyDateIssued1" className="p-col-12 p-md-2">Date Issued:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyDateIssued1" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyFrom1" className="p-col-12 p-md-2">From:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyFrom1" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyTo1" className="p-col-12 p-md-2">To:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyTo1" type="text"/>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                        
+                            </TabPanel>
+                            <TabPanel header="2019 Insurance">
+
+                            <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vInsuranceCompany2" className="p-col-12 p-md-2">Insurance Company:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vInsuranceCompany2" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyNumber2" className="p-col-12 p-md-2">Policy Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyNumber2" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyDateIssued2" className="p-col-12 p-md-2">Date Issued:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyDateIssued2" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyFrom2" className="p-col-12 p-md-2">From:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyFrom2" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyTo2" className="p-col-12 p-md-2">To:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyTo2" type="text"/>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                        
+                            </TabPanel>
+                            <TabPanel header="2020 Insurance">
+                                <div className="p-fluid">
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vInsuranceCompany3" className="p-col-12 p-md-2">Insurance Company:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vInsuranceCompany3" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyNumber3" className="p-col-12 p-md-2">Policy Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyNumber3" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vReferrenceNumber3" className="p-col-12 p-md-2">Referrence Number:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vReferrenceNumber3" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyDateIssued3" className="p-col-12 p-md-2">Date Issued:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyDateIssued3" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyFrom3" className="p-col-12 p-md-2">From:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyFrom3" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPolicyTo3" className="p-col-12 p-md-2">To:</label>
+                                        <div className="p-col-12 p-md-10">
+                                            <InputText id="vPolicyTo3" type="text"/>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                       
+                            </TabPanel>
+                        </TabView>
+                    </Dialog>
                                 
                                 <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
 
