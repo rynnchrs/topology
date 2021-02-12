@@ -347,7 +347,9 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vPODate" className="p-col-12 p-md-2">PO Date:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vPODate" type="text"/>
+                                            {/*<InputText id="vPODate" type="text"/> */}
+                                            <Calendar id="vPODate" style={{overflow:'visible'}}></Calendar>
+                                            
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
