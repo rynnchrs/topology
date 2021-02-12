@@ -8,8 +8,10 @@ import {InputText} from 'primereact/inputtext';
 import {Button} from 'primereact/button';
 import {InputNumber} from 'primereact/inputnumber' 
 import {Fieldset} from 'primereact/fieldset';
-import {TabMenu} from 'primereact/tabmenu';
 import {Dialog} from 'primereact/dialog';
+import {Dropdown} from 'primereact/dropdown';
+import {InputMask} from 'primereact/inputmask';
+import {Calendar} from 'primereact/calendar';
 
 import './TabViewDemo.css';
 import axios from "axios";
@@ -28,7 +30,9 @@ export class Vehicles extends Component {
 
             filterOption:'VIN', //possible values: VIN, BDN or PLN
             vmModalMode: 'Add', //possible values: Add, Modify, Remove    
-            vmVisibility: false,
+            vmVisibility: false, //modal form visibility
+
+            vBrandSelected: 'Mitsubishi', //test data only
             
             todoList: {},
             dataTableValue:[
@@ -180,6 +184,16 @@ export class Vehicles extends Component {
     
     render() {
 
+        const brandListItems = [
+            {label: 'Mitsubishi', value: 'Mitsubishi'},
+            {label: 'Kia', value: 'Kia'}
+        ];
+
+        const dealerListItems = [
+            {label: 'Diamond Motor Corporation', value: 'Diamond Motor Corporation'},
+            {label: 'Toyota Motors', value: 'Toyota Motors'}
+        ];
+
         const onHide = () => {
 
             this.setState({
@@ -203,6 +217,24 @@ export class Vehicles extends Component {
                 </div>
             );
         }
+
+        const onBrandChange = (e) => {
+
+            /*    
+
+            test hookup to defined lists in state
+
+            this.setState(prevState => ({
+                vehicleinfolist: prevState.vehicleinfolist.map(
+                obj => (obj.label === 'Brand:' ? Object.assign(obj, { value: e.value }) : obj)
+              )
+            }));
+            
+            */
+            
+        }
+
+        
 
         return (
 
@@ -261,13 +293,13 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vBrand" className="p-col-12 p-md-2">Brand:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vBrand" type="text"/>
+                                            <Dropdown id="vBrand" value={this.state.vBrandSelected} options={brandListItems} optionLabel="label" placeholder="Select a Brand" />
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vYear" className="p-col-12 p-md-2">Year:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vYear" type="text"/>
+                                            <InputMask id="vYear" mask="9999" value={'2020'} ></InputMask>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -303,7 +335,7 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vDealer" className="p-col-12 p-md-2">Dealer:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vDealer" type="text"/>
+                                            <Dropdown id="vDealer" value={''} options={dealerListItems} optionLabel="label" placeholder="Select a Dealer" />
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
