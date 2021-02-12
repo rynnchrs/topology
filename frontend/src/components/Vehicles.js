@@ -242,8 +242,9 @@ export class Vehicles extends Component {
             <div className="p-grid">
                 
                 <div className="p-col-12">
-
-                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} style={{ width: '50vw' }} closable={false} footer={renderFooter('displayBasic')} onHide={() => onHide()} >
+                    
+                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} footer={renderFooter('displayBasic')} onHide={() => onHide()} className="p-md-10" closable={false} blockScroll={true}>
+                        <div className="card">
                         <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
                             <TabPanel header="Identification" className="btn-block">
 
@@ -348,8 +349,7 @@ export class Vehicles extends Component {
                                         <label htmlFor="vPODate" className="p-col-12 p-md-2">PO Date:</label>
                                         <div className="p-col-12 p-md-10">
                                             {/*<InputText id="vPODate" type="text"/> */}
-                                            <Calendar id="vPODate" style={{overflow:'visible'}}></Calendar>
-                                            
+                                            <InputMask id="vPODate" mask="99-99-9999"  slotChar="mm-dd-yyyy" ></InputMask>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -824,50 +824,43 @@ export class Vehicles extends Component {
                                        
                             </TabPanel>
                         </TabView>
+                        </div>
                     </Dialog>
                                 
-                                <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
+                    <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
 
-                                    <div className="p-d-flex p-mb-2" name="searchbox">
-                                        <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={event => this.dv.filter(event.target.value)} />
-                                    </div>
+                        <div className="p-d-flex p-mb-2" name="searchbox">
+                            <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={event => this.dv.filter(event.target.value)} />
+                        </div>
 
-                                    <div className="p-grid p-mb-2">
-                                        <div className="p-col">
-                                            <input type="radio"
-                                                value="VIN"
-                                                checked={this.state.filterOption === "VIN"}
-                                                onChange={this.radioChange} />Search By VIN No.
-                                        </div>
+                        <div className="p-grid p-mb-2">
+                            <div className="p-col">
+                                <input type="radio"
+                                    value="VIN"
+                                    checked={this.state.filterOption === "VIN"}
+                                    onChange={this.radioChange} />Search By VIN No.
+                            </div>
 
-                                        <div className="p-col">
-                                            <input type="radio"
-                                                value="Body"
-                                                checked={this.state.filterOption === "Body"}
-                                                onChange={this.radioChange} />Search By Body No.
-                                        </div>
+                            <div className="p-col">
+                                <input type="radio"
+                                    value="Body"
+                                    checked={this.state.filterOption === "Body"}
+                                    onChange={this.radioChange} />Search By Body No.
+                            </div>
 
-                                        <div className="p-col">
-                                            <input type="radio"
-                                                value="Plate"
-                                                checked={this.state.filterOption === "Plate"}
-                                                onChange={this.radioChange} />Search By Plate No.
-                                        </div>
-                                    
-                                    </div>  
+                            <div className="p-col">
+                                <input type="radio"
+                                    value="Plate"
+                                    checked={this.state.filterOption === "Plate"}
+                                    onChange={this.radioChange} />Search By Plate No.
+                            </div>
+                        
+                        </div>  
                                     
                                                                   
                                 
-                                </Fieldset>    
-                            
-                            {/*
-                            <div className="p-col-12 p-md-4">
-                                <InputText placeholder="Search by body no." onKeyUp={event => this.dv.filter(event.target.value)} />
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <InputText placeholder="Search by plate no." onKeyUp={event => this.dv.filter(event.target.value)} />
-                            </div>
-                            */}
+                    </Fieldset>    
+                           
 
                 </div>
                 
@@ -879,9 +872,9 @@ export class Vehicles extends Component {
 
                             <div className="p-col-12">
                             <div className="p-grid p-justify-end">
-                                <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-mr-2" onClick={() => onShow("Add")} />
-                                <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-mr-2" onClick={() => onShow("Modify")} />
-                                <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-mr-2" onClick={() => onShow("Remove")} />
+                                <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} />
+                                <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} />
+                                <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Remove")} />
                             </div>
                             </div>
                             
