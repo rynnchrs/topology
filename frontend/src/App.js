@@ -29,6 +29,7 @@ import './layout/layout.scss';
 import './App.scss';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
+<<<<<<< Updated upstream
 import { DriverInspectionReport } from './components/DriverInspectionReport'; {/*I add Driver Inspection Report tab.*/ }
 
 class App extends Component {
@@ -48,6 +49,34 @@ class App extends Component {
         this.onSidebarClick = this.onSidebarClick.bind(this);
         this.onMenuItemClick = this.onMenuItemClick.bind(this);
         this.createMenu();
+=======
+import { DriverInspectionReport } from './components/DriverInspectionReport';
+
+
+const App = () => {
+
+    const [layoutMode, setLayoutMode] = useState('static');
+    const [layoutColorMode, setLayoutColorMode] = useState('dark')
+    const [staticMenuInactive, setStaticMenuInactive] = useState(false);
+    const [overlayMenuActive, setOverlayMenuActive] = useState(false);
+    const [mobileMenuActive, setMobileMenuActive] = useState(false);
+    const [inputStyle, setInputStyle] = useState('outlined');
+    const [ripple, setRipple] = useState(false);
+    const sidebar = useRef();
+    let menuClick = false;
+
+    useEffect(() => {
+        if (mobileMenuActive) {
+            addClass(document.body, 'body-overflow-hidden');
+        }
+        else {
+            removeClass(document.body, 'body-overflow-hidden');
+        }
+    }, [mobileMenuActive]);
+
+    const onInputStyleChange = (inputStyle) => {
+        setInputStyle(inputStyle);
+>>>>>>> Stashed changes
     }
 
     onWrapperClick(event) {
@@ -114,7 +143,11 @@ class App extends Component {
             {
                 label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
+<<<<<<< Updated upstream
                     {label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
+=======
+                    { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
+>>>>>>> Stashed changes
                     {label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     {label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     {label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -251,6 +284,7 @@ class App extends Component {
                     <AppMenu model={this.menu} onMenuItemClick={this.onMenuItemClick} />
                 </div>
 
+<<<<<<< Updated upstream
                 <div className="layout-main">
                     <Route path="/" exact component={Dashboard} />
                     <Route path="/vehicles" exact component={Vehicles} />
@@ -269,6 +303,20 @@ class App extends Component {
                     <Route path="/empty" component={EmptyPage} />
                     <Route path="/documentation" component={Documentation} />
                 </div>
+=======
+            <AppConfig rippleEffect={ripple} onRippleEffect={onRipple} inputStyle={inputStyle} onInputStyleChange={onInputStyleChange}
+                layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
+
+            <div className="layout-main">
+                <Route path="/" exact component={Dashboard} />
+                <Route path="/vehicles" exact component={Vehicles} />
+                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                <Route path="/inspectionreport" exact component={InspectionReport} />
+                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+            </div>
+
+            <AppFooter />
+>>>>>>> Stashed changes
 
                 <AppFooter />
 
