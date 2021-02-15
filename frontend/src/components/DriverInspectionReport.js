@@ -1,4 +1,5 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import React, { Component, useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
@@ -736,6 +737,8 @@ export class DriverInspectionReport extends Component {
         );
     }
 =======
+=======
+>>>>>>> Stashed changes
 import React, { Component, useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
@@ -1472,5 +1475,8 @@ export class DriverInspectionReport extends Component {
             </div>
         );
     }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }
