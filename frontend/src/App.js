@@ -32,6 +32,7 @@ import { InspectionReportDriver } from './components/InspectionReportDriver';
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { DriverInspectionReport } from './components/DriverInspectionReport'; {/*I add Driver Inspection Report tab.*/ }
 
 class App extends Component {
@@ -52,6 +53,8 @@ class App extends Component {
         this.onMenuItemClick = this.onMenuItemClick.bind(this);
         this.createMenu();
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -152,7 +155,11 @@ const App = () => {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     {label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
+=======
+                    { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
+>>>>>>> Stashed changes
 =======
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
 >>>>>>> Stashed changes
