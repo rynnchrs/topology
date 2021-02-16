@@ -55,6 +55,7 @@ import './App.scss';
 import {Vehicles} from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
+import { DriverInspectionReport } from './components/DriverInspectionReport'; {/*I add Driver Inspection Report tab.*/ }
 
 
 const App = () => {
@@ -148,6 +149,7 @@ const App = () => {
         {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
+                    {label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
                     {label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     {label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     {label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -234,6 +236,7 @@ const App = () => {
                 <Route path="/vehicles" exact component={Vehicles} />
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
             </div>
 
             <AppFooter />
