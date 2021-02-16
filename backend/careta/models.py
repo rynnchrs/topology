@@ -139,18 +139,18 @@ class Car(models.Model):
     si_no = models.IntegerField(default=0)
     dr_no = models.CharField(max_length=50)
     dr_codes = models.CharField(max_length=50)
-    plate_date = models.DateField(auto_now=False, auto_now_add=False)
-    decals_date = models.DateField(auto_now=False, auto_now_add=False)
+    plate_date = models.CharField(max_length=10)
+    decals_date = models.CharField(max_length=10)
     modified = models.BooleanField(default=False)
-    ewd_date = models.DateField(auto_now=False, auto_now_add=False)
-    tools_date = models.DateField(auto_now=False, auto_now_add=False)
-    userManual_date = models.DateField(auto_now=False, auto_now_add=False)
-    warrantyBook_date = models.DateField(auto_now=False, auto_now_add=False)
-    unitKey_date = models.DateField(auto_now=False, auto_now_add=False)
-    bodyKey_date = models.DateField(auto_now=False, auto_now_add=False)
-    cigarettePlug_date = models.DateField(auto_now=False, auto_now_add=False)
-    keychain_date = models.DateField(auto_now=False, auto_now_add=False)
-    fan_date = models.DateField(auto_now=False, auto_now_add=False)
+    ewd_date = models.CharField(max_length=10)
+    tools_date = models.CharField(max_length=10)
+    userManual_date = models.CharField(max_length=10)
+    warrantyBook_date = models.CharField(max_length=10)
+    unitKey_date = models.CharField(max_length=10)
+    bodyKey_date = models.CharField(max_length=10)
+    cigarettePlug_date = models.CharField(max_length=10)
+    keychain_date = models.CharField(max_length=10)
+    fan_date = models.CharField(max_length=10)
     remarks = models.TextField(max_length=200)
     operational = models.BooleanField(default=False)
     Status_List = [
@@ -165,6 +165,105 @@ class Car(models.Model):
     def _str_(self):
         return self.vin_no
 
+    @property
+    def get_total(self):
+        return Car.objects.all().count()
+    @property
+    def plate_with_date(self):
+        return Car.objects.all().filter(plate_date__gt = 1).count()
+    @property
+    def fan_date_with_date(self):
+        return Car.objects.all().filter(fan_date__gt = 1).count()
+    @property
+    def ewd_date_with_date(self):
+        return Car.objects.all().filter(ewd_date__gt = 1).count()
+    @property
+    def tools_with_date(self):
+        return Car.objects.all().filter(tools_date__gt = 1).count()
+    @property
+    def cigarettePlug_date_with_date(self):
+        return Car.objects.all().filter(cigarettePlug_date__gt = 1).count()
+    @property
+    def tools_with_date(self):
+        return Car.objects.all().filter(tools_date__gt = 1).count()
+
+    @property
+    def plate_with_nrc(self):
+        return Car.objects.all().filter(plate_date='NRC').count()
+    @property
+    def fan_date_with_nrc(self):
+        return Car.objects.all().filter(fan_date='NRC').count()
+    @property
+    def ewd_date_with_nrc(self):
+        return Car.objects.all().filter(ewd_date='NRC').count()
+    @property
+    def tools_with_nrc(self):
+        return Car.objects.all().filter(tools_date='NRC').count()
+    @property
+    def cigarettePlug_date_with_nrc(self):
+        return Car.objects.all().filter(cigarettePlug_date='NRC').count()
+    @property
+    def tools_with_nrc(self):
+        return Car.objects.all().filter(tools_date='NRC').count()
+
+    @property
+    def plate_with_nyr(self):
+        return Car.objects.all().filter(plate_date='NYR').count()
+    @property
+    def fan_date_with_nyr(self):
+        return Car.objects.all().filter(fan_date='NYR').count()
+    @property
+    def ewd_date_with_nyr(self):
+        return Car.objects.all().filter(ewd_date='NYR').count()
+    @property
+    def tools_with_nyr(self):
+        return Car.objects.all().filter(tools_date='NYR').count()
+    @property
+    def cigarettePlug_date_with_nyr(self):
+        return Car.objects.all().filter(cigarettePlug_date='NYR').count()
+    @property
+    def tools_with_nyr(self):
+        return Car.objects.all().filter(tools_date='NYR').count()
+
+    @property
+    def plate_with_na(self):
+        return Car.objects.all().filter(plate_date='NA').count()
+    @property
+    def fan_date_with_na(self):
+        return Car.objects.all().filter(fan_date='NA').count()
+    @property
+    def ewd_date_with_na(self):
+        return Car.objects.all().filter(ewd_date='NA').count()
+    @property
+    def tools_with_na(self):
+        return Car.objects.all().filter(tools_date='NA').count()
+    @property
+    def cigarettePlug_date_with_na(self):
+        return Car.objects.all().filter(cigarettePlug_date='NA').count()
+    @property
+    def tools_with_na(self):
+        return Car.objects.all().filter(tools_date='NA').count()
+
+    @property
+    def plate_with_dnr(self):
+        return Car.objects.all().filter(plate_date='DNR').count()
+    @property
+    def fan_date_with_dnr(self):
+        return Car.objects.all().filter(fan_date='DNR').count()
+    @property
+    def ewd_date_with_dnr(self):
+        return Car.objects.all().filter(ewd_date='DNR').count()
+    @property
+    def tools_with_dnr(self):
+        return Car.objects.all().filter(tools_date='DNR').count()
+    @property
+    def cigarettePlug_date_with_dnr(self):
+        return Car.objects.all().filter(cigarettePlug_date='DNR').count()
+    @property
+    def tools_with_dnr(self):
+        return Car.objects.all().filter(tools_date='DNR').count()
+
+        
 
 class Contract(models.Model):
     contract_id = models.AutoField(primary_key=True)

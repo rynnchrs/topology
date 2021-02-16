@@ -40,6 +40,7 @@ router.register(r'permission/add-list/inspection', views.AddInspectionReportView
 router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permission-repair-list')  # list of can add repair report
 
 router.register(r'report', views.ReportView, 'report') # report creation api
+router.register(r'tools', views.Tools, 'tools') # report creation api
 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this

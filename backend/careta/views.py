@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer# add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer# add this
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
@@ -381,3 +381,7 @@ class InsuranceList(generics.ListAPIView):
     def get_queryset(self):
         username = self.kwargs['username']
         return Insurance.objects.filter(car=username)
+
+class Tools(viewsets.ModelViewSet):
+    serializer_class = TotalCarSerializer
+    queryset = Car.objects.all().order_by('date_created')[:1]

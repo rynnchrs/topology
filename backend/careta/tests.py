@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import serializers, status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-import pytest
 
 from .models import (TPL, Car, Contract, Insurance, Permission,  # add this
                      Report, UserInfo)
