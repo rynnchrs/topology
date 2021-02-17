@@ -6,7 +6,7 @@ from phone_field import PhoneField
 # Create your models here.
 # add this
 from django.contrib.auth.models import User # authenticate User
-
+from datetime import date
 
 class UserInfo(models.Model):  # User Info Model
     user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
@@ -168,100 +168,169 @@ class Car(models.Model):
     @property
     def get_total(self):
         return Car.objects.all().count()
+
+    #with date
     @property
     def plate_with_date(self):
-        return Car.objects.all().filter(plate_date__gt = 1).count()
+        return Car.objects.all().filter(plate_date__lte = date.today().strftime("%Y-%m-%d")).count()
     @property
-    def fan_date_with_date(self):
-        return Car.objects.all().filter(fan_date__gt = 1).count()
+    def decals_with_date(self):
+        return Car.objects.all().filter(decals_date__lte = date.today().strftime("%Y-%m-%d")).count()
     @property
     def ewd_date_with_date(self):
-        return Car.objects.all().filter(ewd_date__gt = 1).count()
+        return Car.objects.all().filter(ewd_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def fan_date_with_date(self):
+        return Car.objects.all().filter(fan_date__lte = date.today().strftime("%Y-%m-%d")).count()
     @property
     def tools_with_date(self):
-        return Car.objects.all().filter(tools_date__gt = 1).count()
+        return Car.objects.all().filter(tools_date__lte = date.today().strftime("%Y-%m-%d")).count()
     @property
-    def cigarettePlug_date_with_date(self):
-        return Car.objects.all().filter(cigarettePlug_date__gt = 1).count()
+    def userManual_with_date(self):
+        return Car.objects.all().filter(userManual_date__lte = date.today().strftime("%Y-%m-%d")).count()
     @property
-    def tools_with_date(self):
-        return Car.objects.all().filter(tools_date__gt = 1).count()
+    def warrantyBook_with_date(self):
+        return Car.objects.all().filter(warrantyBook_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def unitKey_with_date(self):
+        return Car.objects.all().filter(unitKey_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def bodyKey_with_date(self):
+        return Car.objects.all().filter(bodyKey_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def cigarettePlug_with_date(self):
+        return Car.objects.all().filter(cigarettePlug_date__lte = date.today().strftime("%Y-%m-%d")).count()
 
+    # with NRC
     @property
     def plate_with_nrc(self):
         return Car.objects.all().filter(plate_date='NRC').count()
     @property
-    def fan_date_with_nrc(self):
-        return Car.objects.all().filter(fan_date='NRC').count()
+    def decals_with_nrc(self):
+        return Car.objects.all().filter(decals_date='NRC').count()
     @property
     def ewd_date_with_nrc(self):
         return Car.objects.all().filter(ewd_date='NRC').count()
     @property
+    def fan_date_with_nrc(self):
+        return Car.objects.all().filter(fan_date='NRC').count()
+    @property
     def tools_with_nrc(self):
         return Car.objects.all().filter(tools_date='NRC').count()
     @property
-    def cigarettePlug_date_with_nrc(self):
+    def userManual_with_nrc(self):
+        return Car.objects.all().filter(userManual_date='NRC').count()
+    @property
+    def warrantyBook_with_nrc(self):
+        return Car.objects.all().filter(warrantyBook_date='NRC').count()
+    @property
+    def unitKey_with_nrc(self):
+        return Car.objects.all().filter(unitKey_date='NRC').count()
+    @property
+    def bodyKey_with_nrc(self):
+        return Car.objects.all().filter(bodyKey_date='NRC').count()
+    @property
+    def tools_with_nrc(self):
+        return Car.objects.all().filter(tools_date='NRC').count()
+    @property
+    def cigarettePlug_with_nrc(self):
         return Car.objects.all().filter(cigarettePlug_date='NRC').count()
-    @property
-    def tools_with_nrc(self):
-        return Car.objects.all().filter(tools_date='NRC').count()
 
+    # with NYR
     @property
     def plate_with_nyr(self):
         return Car.objects.all().filter(plate_date='NYR').count()
     @property
-    def fan_date_with_nyr(self):
-        return Car.objects.all().filter(fan_date='NYR').count()
+    def decals_with_nyr(self):
+        return Car.objects.all().filter(decals_date='NYR').count()
     @property
     def ewd_date_with_nyr(self):
         return Car.objects.all().filter(ewd_date='NYR').count()
     @property
+    def fan_date_with_nyr(self):
+        return Car.objects.all().filter(fan_date='NYR').count()
+    @property
     def tools_with_nyr(self):
         return Car.objects.all().filter(tools_date='NYR').count()
     @property
-    def cigarettePlug_date_with_nyr(self):
+    def userManual_with_nyr(self):
+        return Car.objects.all().filter(userManual_date='NYR').count()
+    @property
+    def warrantyBook_with_nyr(self):
+        return Car.objects.all().filter(warrantyBook_date='NYR').count()
+    @property
+    def unitKey_with_nyr(self):
+        return Car.objects.all().filter(unitKey_date='NYR').count()
+    @property
+    def bodyKey_with_nyr(self):
+        return Car.objects.all().filter(bodyKey_date='NYR').count()
+    @property
+    def cigarettePlug_with_nyr(self):
         return Car.objects.all().filter(cigarettePlug_date='NYR').count()
-    @property
-    def tools_with_nyr(self):
-        return Car.objects.all().filter(tools_date='NYR').count()
 
+    # with NA
     @property
     def plate_with_na(self):
         return Car.objects.all().filter(plate_date='NA').count()
     @property
-    def fan_date_with_na(self):
-        return Car.objects.all().filter(fan_date='NA').count()
+    def decals_with_na(self):
+        return Car.objects.all().filter(decals_date='NA').count()
     @property
     def ewd_date_with_na(self):
         return Car.objects.all().filter(ewd_date='NA').count()
     @property
+    def fan_date_with_na(self):
+        return Car.objects.all().filter(fan_date='NA').count()
+    @property
     def tools_with_na(self):
         return Car.objects.all().filter(tools_date='NA').count()
     @property
-    def cigarettePlug_date_with_na(self):
+    def userManual_with_na(self):
+        return Car.objects.all().filter(userManual_date='NA').count()
+    @property
+    def warrantyBook_with_na(self):
+        return Car.objects.all().filter(warrantyBook_date='NA').count()
+    @property
+    def unitKey_with_na(self):
+        return Car.objects.all().filter(unitKey_date='NA').count()
+    @property
+    def bodyKey_with_na(self):
+        return Car.objects.all().filter(bodyKey_date='NA').count()
+    @property
+    def cigarettePlug_with_na(self):
         return Car.objects.all().filter(cigarettePlug_date='NA').count()
-    @property
-    def tools_with_na(self):
-        return Car.objects.all().filter(tools_date='NA').count()
 
+    # with DNR
     @property
     def plate_with_dnr(self):
         return Car.objects.all().filter(plate_date='DNR').count()
     @property
+    def decals_with_dnr(self):
+        return Car.objects.all().filter(decals_date='DNR').count()
+    @property
     def fan_date_with_dnr(self):
         return Car.objects.all().filter(fan_date='DNR').count()
+    @property
+    def tools_with_dnr(self):
+        return Car.objects.all().filter(tools_date='DNR').count()
     @property
     def ewd_date_with_dnr(self):
         return Car.objects.all().filter(ewd_date='DNR').count()
     @property
-    def tools_with_dnr(self):
-        return Car.objects.all().filter(tools_date='DNR').count()
+    def userManual_with_dnr(self):
+        return Car.objects.all().filter(userManual_date='DNR').count()
     @property
-    def cigarettePlug_date_with_dnr(self):
+    def warrantyBook_with_dnr(self):
+        return Car.objects.all().filter(warrantyBook_date='DNR').count()
+    @property
+    def unitKey_with_dnr(self):
+        return Car.objects.all().filter(unitKey_date='DNR').count()
+    @property
+    def bodyKey_with_dnr(self):
+        return Car.objects.all().filter(bodyKey_date='DNR').count()
+    @property
+    def cigarettePlug_with_dnr(self):
         return Car.objects.all().filter(cigarettePlug_date='DNR').count()
-    @property
-    def tools_with_dnr(self):
-        return Car.objects.all().filter(tools_date='DNR').count()
 
         
 

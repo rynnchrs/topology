@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer# add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer # add this
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend # filter
 from rest_framework import filters # filter 
+from .utils import check_or_date, check_cr_date, check_TPL_date, check_Com_date
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
@@ -382,6 +383,17 @@ class InsuranceList(generics.ListAPIView):
         username = self.kwargs['username']
         return Insurance.objects.filter(car=username)
 
-class Tools(viewsets.ModelViewSet):
+class TotalView(viewsets.ModelViewSet):
     serializer_class = TotalCarSerializer
     queryset = Car.objects.all().order_by('date_created')[:1]
+
+class ExpiryView(APIView): # expiry 
+    def get(self, request):
+        year = request.data.get('year')
+        return Response({
+            'OR':check_or_date(year), # OR
+            'CR':check_cr_date(year), # CR
+            'TPL':check_TPL_date(year), # TPL Insurance
+            'Com':check_Com_date(year), # Comprehensive Insurance
+            })
+
