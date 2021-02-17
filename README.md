@@ -45,6 +45,9 @@ report search = api/report/?search=
 report ordering car = api/report/?ordering=car  
 report ordering date = api/report/?ordering=date_created  
   
+total table = api/total/  
+expiry table = api/expiry/  
+  
 super_user:  
 username = admin  
 password = password  
