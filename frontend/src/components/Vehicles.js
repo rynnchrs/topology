@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, {Component, useState } from 'react';
 import { TabView,TabPanel } from 'primereact/tabview';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column'
@@ -13,10 +13,8 @@ import {Dropdown} from 'primereact/dropdown';
 import {InputMask} from 'primereact/inputmask';
 import {Calendar} from 'primereact/calendar';
 
-import './TabViewDemo.css';
+//import './TabViewDemo.css';
 import axios from "axios";
-
-
 
 export class Vehicles extends Component {
 
@@ -33,6 +31,8 @@ export class Vehicles extends Component {
             vmVisibility: false, //modal form visibility
 
             vBrandSelected: 'Mitsubishi', //test data only
+
+            selectedRowVal:[],
             
             todoList: {},
             dataTableValue:[
@@ -234,12 +234,19 @@ export class Vehicles extends Component {
             
         }
 
+        const setSelectedProduct = (e) => {
+
+            console.log(e)
+
+        }
+
         
 
         return (
 
             
             <div className="p-grid">
+
                 
                 <div className="p-col-12">
                     
@@ -866,7 +873,12 @@ export class Vehicles extends Component {
                 
                 <div className="p-col-12">
 
+                    
+            
+
                     <Fieldset legend="Vehicle Data" className="p-grid p-dir-col">
+
+               
 
                         <div className="p-grid">
 
@@ -890,14 +902,14 @@ export class Vehicles extends Component {
                             <div className="p-col-9">
                                 <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
                                     <TabPanel header="Identification" className="btn-block">
-                                        <DataTable value={this.state.identitylist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
+                                        <DataTable value={this.state.identitylist} selectionMode="single" selection={this.state.selectedRowVal}  onSelectionChange={e => setSelectedProduct(e.value)} rowHover className="p-datatable-gridlines p-highlight">
+                                            <Column field="label" className="p-column"></Column>
                                             <Column field="value"></Column>
                                         </DataTable>
                                     </TabPanel>
 
                                     <TabPanel header="Vehicle Info">
-                                        <DataTable value={this.state.vehicleinfolist} className="p-datatable-gridlines">
+                                        <DataTable value={this.state.vehicleinfolist} selectionMode="single" className="p-datatable-gridlines">
                                             <Column field="label"></Column>
                                             <Column field="value"></Column>
                                         </DataTable>
