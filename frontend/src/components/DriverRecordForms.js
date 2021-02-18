@@ -50,26 +50,20 @@ export default function DriverRecordForms() {
             <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '75vw' }} onHide={() => onHide('displayBasic')}>
                 <div className="card card-w-title">
                     <div className="p-grid">
-                        <div className="p-col-12 p-md-2">
-                    
-                        <div className="p-col-12 p-md-4">
-                            <InputText placeholder="Body No." value={selectedCar.body_no}/>
+
+                        <div className="p-col-12 p-md-6">
+                            <InputText id ="bodyno" value={selectedCar.body_no}/>
+                            <label htmlFor="bodyno">Right Icon</label>
                         </div>
-                        <div className="p-col-12 p-md-2">
-                            <label>Make:</label></div>
-                        <div className="p-col-12 p-md-4">
+                        <div className="p-col-12 p-md-6">
                             <InputText placeholder="Make/Model" value={selectedCar.make}/>
                         </div>
                     </div>
                     <div className="p-grid">
-                        <div className="p-col-12 p-md-2">
-                            <label>Mileage:</label></div>
-                        <div className="p-col-12 p-md-4">
+                        <div className="p-col-12 p-md-6">
                             <InputText placeholder="Mileage" value={selectedCar.mileage}/>
                         </div>
-                        <div className="p-col-12 p-md-2">
-                            <label>Location:</label></div>
-                        <div className="p-col-12 p-md-2">
+                        <div className="p-col-12 p-md-6">
                             <InputText placeholder="Location" value={selectedCar.location}/>
                         </div>
                     </div>
