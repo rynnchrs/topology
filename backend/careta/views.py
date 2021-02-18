@@ -358,7 +358,7 @@ class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
     lookup_field = 'slug'
-
+    search_fields = ['body_no', 'plate_no']
 
 class ContractView(viewsets.ModelViewSet):  # add this
     queryset = Contract.objects.all()  # add this
