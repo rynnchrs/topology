@@ -113,19 +113,13 @@ export class Vehicles extends Component {
             selectedRowVal:[],
             
             todoList: {},
-            dataTableValue:[
-                {vin: 'PAEL65NYHJB005043', body: '18-1654', plate: 'NCT4511' },
-                {vin: 'PAEL65NYHJB005036', body: '18-1655', plate: 'NCT4508' },
-                {vin: 'PAEL65NYHJB005044', body: '18-1656', plate: 'NCT4507' },
-                {vin: 'PAEL65NYHJB005012', body: '18-1657', plate: 'NCT4506' },
-                {vin: 'PAEL65NYHJB005051', body: '18-1658', plate: 'NCT4505' },
-                {vin: 'PAEL65NYHJB004620', body: '18-1659', plate: 'NCT4233' },
-                {vin: 'PAEL65NYHJB004958', body: '18-1660', plate: 'NCT4240' },
-                {vin: 'PAEL65NYHJB004985', body: '18-1661', plate: 'NCT4236' },
-                {vin: 'PAEL65NYHJB005016', body: '18-1662', plate: 'NCT4238' },
-                {vin: 'PAEL65NYHJB005032', body: '18-1663', plate: 'NCT4234' },
-            ],
+       
             layout: 'list',
+
+            activeIndexMain: 0,
+            activeIndexModal: 0,
+
+            
 
             
         };
@@ -368,6 +362,26 @@ export class Vehicles extends Component {
 
                         //others
 
+                    case 'Permanent Type': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                permanent_status: e.value
+                            }
+                        });
+                        break;                            
+
+                    case 'VTF Type': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                vtf: e.value
+                            }
+                        });
+                        break;    
+
                     case 'Fuel Type': 
 
                         this.setState({
@@ -541,7 +555,7 @@ export class Vehicles extends Component {
                         });
                         break;
 
-                    case 'Fire Extingusisher Delivery Date': 
+                    case 'Fire Extinguisher Delivery Date': 
 
                         this.setState({
                             vehicleData: {
@@ -591,6 +605,47 @@ export class Vehicles extends Component {
 
             switch(this.state.vdModalMode)
                 {
+
+
+                    case 'Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                deliver_date: formattedValue
+                            }
+                        });
+                    break;
+
+                    case 'OR CR Copy Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                or_cr: formattedValue
+                            }
+                        });
+                    break;
+
+                    case 'LTO Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                cr_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'OR Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                or_date: formattedValue
+                            }
+                        });
+                        break;
 
                     case 'PO Date': 
 
@@ -732,7 +787,7 @@ export class Vehicles extends Component {
                         });
                         break;
 
-                    case 'Fire Extingusisher Delivery Date': 
+                    case 'Fire Extinguisher Delivery Date': 
 
                         this.setState({
                             vehicleData: {
@@ -770,6 +825,22 @@ export class Vehicles extends Component {
 
         }
 
+       
+        const onSearchBarOnKeyUp = (e) => {
+
+            
+            if(e.keyCode===13)
+                {
+                    axios
+                    .get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
+                    .then(res => console.log(res))
+                    .catch(err => console.log(err));
+                }
+
+            
+
+        }
+
         return (
             
             <div className="p-grid">
@@ -782,9 +853,9 @@ export class Vehicles extends Component {
                         </div>
                     </Dialog>
                                         
-                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} footer={renderFooter('displayBasic')} onHide={() => onHide()} className="p-md-10" closable={false} blockScroll={true}>
+                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} footer={renderFooter('displayBasic')} onHide={() => onHide()} className="p-md-8" closable={false} blockScroll={true}>
                         <div className="card">
-                        <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
+                        <TabView activeIndex={this.state.activeIndexModal} onTabChange={(e) => this.setState({activeIndexModal: e.index})}>
                             <TabPanel header="Identification" className="btn-block">
 
                                 <div className="p-fluid">
@@ -802,7 +873,6 @@ export class Vehicles extends Component {
                                             <InputText id="vOperational" type="text" value = {this.state.vehicleData.operational}/>
                                             <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Operational',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
-                                        
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vBodyNum" className="p-col-12 p-md-2">Body Number:</label>
@@ -1013,9 +1083,9 @@ export class Vehicles extends Component {
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
-                                        <label htmlFor="vLTOCRDate" className="p-col-12 p-md-2">LTO Date:</label>
+                                        <label htmlFor="vLTOCRDate" className="p-col-12 p-md-2">LTO CR Date:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vLTOCRDate" type="text"/>
+                                            <InputText id="vLTOCRDate" type="text" value={this.state.vehicleData.cr_date} onClick={()=>onInputTextClickHandler("LTO Date")} readOnly/> 
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -1027,7 +1097,7 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vORDate" className="p-col-12 p-md-2">OR Date:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vORDate" type="text"/>
+                                            <InputText id="vORDate" type="text" value={this.state.vehicleData.or_date} onClick={()=>onInputTextClickHandler("OR Date")} readOnly/> 
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -1045,7 +1115,7 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vORCRCopy" className="p-col-12 p-md-2">ORCR Copy:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vORCRCopy" type="text"/>
+                                            <InputText id="vORCRCopy" type="text" value={this.state.vehicleData.or_cr} onClick={()=>onInputTextClickHandler("OR CR Copy Date")} readOnly/> 
                                         </div>
                                     </div>
                                 </div>
@@ -1068,14 +1138,16 @@ export class Vehicles extends Component {
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vVTF" className="p-col-12 p-md-2">With VTF?:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vVTF" type="text"/>
+                                        <div className="p-inputgroup p-col-12 p-md-10">
+                                            <InputText id="vVTF" type="text" value={this.state.vehicleData.vtf} readOnly/>
+                                            <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('VTF Type',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vPLStatus" className="p-col-12 p-md-2">Permanent?:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vPLStatus" type="text"/>
+                                        <div className="p-inputgroup p-col-12 p-md-10">
+                                            <InputText id="vPLStatus" type="text" value={this.state.vehicleData.permanent_status} readOnly/>
+                                            <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Permanent Type',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
                                     </div>
                                 </div>
@@ -1093,7 +1165,7 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vDeliveryDate" className="p-col-12 p-md-2">Delivery Date:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vDeliveryDate" type="text"/>
+                                            <InputText id="vDeliveryDate" type="text" value={this.state.vehicleData.deliver_date} onClick={()=>onInputTextClickHandler("Delivery Date")} readOnly/> 
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -1117,37 +1189,7 @@ export class Vehicles extends Component {
                                 </div>
                                         
                             </TabPanel>
-                            <TabPanel header="Bidding/Contract">
-
-                                <div className="p-fluid">
-                                    <div className="p-field p-grid">
-                                        <label htmlFor="vBiddingDate" className="p-col-12 p-md-2">Bidding Date:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vBiddingDate" type="text"/>
-                                        </div>
-                                    </div>
-                                    <div className="p-field p-grid">
-                                        <label htmlFor="vBiddingName" className="p-col-12 p-md-2">Bidding Name:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vBiddingName" type="text"/>
-                                        </div>
-                                    </div>
-                                    <div className="p-field p-grid">
-                                        <label htmlFor="vBidNumber" className="p-col-12 p-md-2">Bid Number:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vBidNumber" type="text"/>
-                                        </div>
-                                    </div>
-                                    <div className="p-field p-grid">
-                                        <label htmlFor="vContractNumber" className="p-col-12 p-md-2">Contract Number:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vContractNumber" type="text"/>
-                                        </div>
-                                    </div>
-                                   
-                                </div>
-                                    
-                            </TabPanel>
+                            
                             <TabPanel header="Received Items">
 
                                 <div className="p-fluid">
@@ -1268,7 +1310,7 @@ export class Vehicles extends Component {
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
 
                         <div className="p-d-flex p-mb-2" name="searchbox">
-                            <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={event => this.dv.filter(event.target.value)} />
+                            <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} />
                         </div>
 
                         <div className="p-grid p-mb-2">
@@ -1322,7 +1364,7 @@ export class Vehicles extends Component {
                             </div>            
 
                             <div className="p-col-9">
-                                <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
+                                <TabView activeIndex={this.state.activeIndexMain} onTabChange={(e) => this.setState({activeIndexMain: e.index})}>
                                     <TabPanel header="Identification" className="btn-block">
                                         <DataTable value={this.identitylist} className="p-datatable-gridlines">
                                             <Column field="label" className="p-column"></Column>
@@ -1371,16 +1413,17 @@ export class Vehicles extends Component {
                                             <Column field="value"></Column>
                                         </DataTable>
                                     </TabPanel>
-                                    <TabPanel header="Bidding/Contract">
-                                        <DataTable value={this.biddinglist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column> 
-                                        </DataTable>
-                                    </TabPanel>
+                                    
                                     <TabPanel header="Received Items">
                                         <DataTable value={this.receivedlist} className="p-datatable-gridlines">
                                             <Column field="label"></Column>
                                             <Column field="value"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="Bidding/Contract">
+                                        <DataTable value={this.biddinglist} className="p-datatable-gridlines">
+                                            <Column field="label"></Column>
+                                            <Column field="value"></Column> 
                                         </DataTable>
                                     </TabPanel>
                                     <TabPanel header="TPL">
