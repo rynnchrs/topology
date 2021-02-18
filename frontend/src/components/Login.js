@@ -5,7 +5,12 @@ import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
 import axios from "axios";
 
-{/*I added Image upload table below*/ }
+import { Link, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { login } from '../actions/auth';
+
+
 
 export class Login extends Component {
 
@@ -23,8 +28,14 @@ export class Login extends Component {
 
     }
 
+    static propTypes = {
+        login: PropTypes.func.isRequired,
+        isAuthenticated: PropTypes.bool,
+    };
+
     submitData = event => {
-        alert("U: " + this.state.username + "\nP: " + this.state.password)
+        //alert("U: " + this.state.username + "\nP: " + this.state.password)
+        this.props.login(this.state.username, this.state.password);
     }
 
     toggleShow() {
@@ -32,6 +43,9 @@ export class Login extends Component {
     }
 
     render() {
+        if (this.props.isAuthenticated) {
+            return <Redirect to="/" />;
+        }
         return (
             <div className="p-grid p-fluid" style={{ marginTop: '5%' }}>
                 <div className="p-col"> </div>
@@ -86,3 +100,9 @@ export class Login extends Component {
         );
     }
 }
+
+const mapStateToProps = (state) => ({
+    isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { login })(Login);

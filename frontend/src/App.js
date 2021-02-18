@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { Route } from 'react-router-dom';
+import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';
@@ -56,7 +57,7 @@ import {Vehicles} from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
-import { Login } from './Login';
+import { Login } from './components/Login';
 
 
 const App = () => {
@@ -217,6 +218,7 @@ const App = () => {
     });
 
     return (
+        
         <div className={wrapperClass} onClick={onWrapperClick}>
             <AppTopbar onToggleMenu={onToggleMenu} />
 
@@ -245,6 +247,7 @@ const App = () => {
             <AppFooter />
 
         </div>
+               
     );
 
 }
