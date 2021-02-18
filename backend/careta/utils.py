@@ -1,7 +1,22 @@
 import datetime
 from datetime import datetime
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report 
+from django.contrib.auth.models import User
 import json
+
+def user_permission(user):
+    permission = Permission.objects.get(slug=user.username) # get users permission
+    user = User.objects.get(username=user) 
+    if permission.can_view_users == True:  
+        return True
+    elif permission.can_edit_users == True:  
+        return True
+    elif permission.can_delete_users == True:  
+        return True
+    elif permission.can_add_users == True:  
+        return True
+    else:
+        return False
 def check_or_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
@@ -155,34 +170,35 @@ def check_or_date(year):
         or_date = json.loads(or_date)
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         return (or_date)
+
 def check_cr_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         dates = Car.objects.filter(cr_date__isnull=False)
         for date in dates:
-            if date.cr_date.strftime("%Y/%m") == '2022/01':
+            if date.cr_date.strftime("%Y/%m") == '2019/01':
                 jan += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/02':
+            elif date.cr_date.strftime("%Y/%m") == '2019/02':
                 feb += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/03':
+            elif date.cr_date.strftime("%Y/%m") == '2019/03':
                 mar += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/04':
+            elif date.cr_date.strftime("%Y/%m") == '2019/04':
                 apr += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/05':
+            elif date.cr_date.strftime("%Y/%m") == '2019/05':
                 may += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/06':
+            elif date.cr_date.strftime("%Y/%m") == '2019/06':
                 jun += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/07':
+            elif date.cr_date.strftime("%Y/%m") == '2019/07':
                 jul += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/08':
+            elif date.cr_date.strftime("%Y/%m") == '2019/08':
                 aug += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/09':
+            elif date.cr_date.strftime("%Y/%m") == '2019/09':
                 sep += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/10':
+            elif date.cr_date.strftime("%Y/%m") == '2019/10':
                 octo += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/11':
+            elif date.cr_date.strftime("%Y/%m") == '2019/11':
                 nov += 1
-            elif date.cr_date.strftime("%Y/%m") == '2022/12':
+            elif date.cr_date.strftime("%Y/%m") == '2019/12':
                 dec += 1
         total = jan+feb+mar+apr+may+jun+jul+aug+sep+octo+nov+dec
         cr_date = {
@@ -310,29 +326,29 @@ def check_TPL_date(year):
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         dates = TPL.objects.filter(end_date__isnull=False)
         for date in dates:
-            if date.end_date.strftime("%Y/%m") == '2022/01':
+            if date.end_date.strftime("%Y/%m") == '2019/01':
                 jan += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/02':
+            elif date.end_date.strftime("%Y/%m") == '2019/02':
                 feb += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/03':
+            elif date.end_date.strftime("%Y/%m") == '2019/03':
                 mar += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/04':
+            elif date.end_date.strftime("%Y/%m") == '2019/04':
                 apr += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/05':
+            elif date.end_date.strftime("%Y/%m") == '2019/05':
                 may += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/06':
+            elif date.end_date.strftime("%Y/%m") == '2019/06':
                 jun += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/07':
+            elif date.end_date.strftime("%Y/%m") == '2019/07':
                 jul += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/08':
+            elif date.end_date.strftime("%Y/%m") == '2019/08':
                 aug += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/09':
+            elif date.end_date.strftime("%Y/%m") == '2019/09':
                 sep += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/10':
+            elif date.end_date.strftime("%Y/%m") == '2019/10':
                 octo += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/11':
+            elif date.end_date.strftime("%Y/%m") == '2019/11':
                 nov += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/12':
+            elif date.end_date.strftime("%Y/%m") == '2019/12':
                 dec += 1
         total = jan+feb+mar+apr+may+jun+jul+aug+sep+octo+nov+dec
         end_date = {
@@ -460,29 +476,29 @@ def check_Com_date(year):
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         dates = Insurance.objects.filter(end_date__isnull=False)
         for date in dates:
-            if date.end_date.strftime("%Y/%m") == '2022/01':
+            if date.end_date.strftime("%Y/%m") == '2019/01':
                 jan += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/02':
+            elif date.end_date.strftime("%Y/%m") == '2019/02':
                 feb += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/03':
+            elif date.end_date.strftime("%Y/%m") == '2019/03':
                 mar += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/04':
+            elif date.end_date.strftime("%Y/%m") == '2019/04':
                 apr += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/05':
+            elif date.end_date.strftime("%Y/%m") == '2019/05':
                 may += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/06':
+            elif date.end_date.strftime("%Y/%m") == '2019/06':
                 jun += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/07':
+            elif date.end_date.strftime("%Y/%m") == '2019/07':
                 jul += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/08':
+            elif date.end_date.strftime("%Y/%m") == '2019/08':
                 aug += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/09':
+            elif date.end_date.strftime("%Y/%m") == '2019/09':
                 sep += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/10':
+            elif date.end_date.strftime("%Y/%m") == '2019/10':
                 octo += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/11':
+            elif date.end_date.strftime("%Y/%m") == '2019/11':
                 nov += 1
-            elif date.end_date.strftime("%Y/%m") == '2022/12':
+            elif date.end_date.strftime("%Y/%m") == '2019/12':
                 dec += 1
         total = jan+feb+mar+apr+may+jun+jul+aug+sep+octo+nov+dec
         end_date = {
@@ -490,9 +506,9 @@ def check_Com_date(year):
             'July': jul,'August': aug,'September': sep,'October': octo,'November': nov,'December': dec,
             'Total': total
             }
-        cr_date = json.dumps(cr_date)
-        cr_date = json.loads(cr_date)
-        return (cr_date)
+        end_date = json.dumps(end_date)
+        end_date = json.loads(end_date)
+        return (end_date)
     if year == 2020:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         dates = Insurance.objects.filter(end_date__isnull=False)
