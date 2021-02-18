@@ -90,6 +90,9 @@ export class Vehicles extends Component {
                 cigarettePlug_date : '',
                 keychain_date : '',
                 fan_date : '',
+                jack_date: '',
+                wrench_date: '',
+                fire_ext_date:'',
                 remarks : '',
                 operational : '',
                 status : 'A',
@@ -283,13 +286,7 @@ export class Vehicles extends Component {
             {label: 'Did Not Recieve', value: 'DR'},
             {label: 'Date', value: 'DT'}
         ];
-        const recievedItemStatus1 = [
-            {label: 'No Recieving Copy', value: 'NRC'},
-            {label: 'Not Yet Released', value: 'NYR'},
-            {label: 'Not Applicable', value: 'N/A'},
-            {label: 'Did Not Recieve', value: 'DR'},
-            {label: 'Date', value: 'DT'}
-        ];
+
 
         const onHide = () => {
 
@@ -342,29 +339,170 @@ export class Vehicles extends Component {
 
         const setOptionValue = (name,e) => {
 
+            if(e.value!=='DT'){
 
-            switch(name)
-                {
-                    case 'setPlateNumDel': 
+                switch(name)
+                    {
+                        case 'Plate Number Delivery Date': 
 
-                        if(e.value!=='DT'){
-                            this.setState({
-                                vehicleData: {
-                                    ...this.state.vehicleData,
-                                    plate_date: e.value
-                                  }
-                            });
-
-                        }
-                        else{
-                            onCalendarModalShow('Plate Number Delivery Date');
-
-                        }
-                        
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                plate_date: e.value
+                            }
+                        });
                         break;
 
-                    default:
-                }    
+                    case 'Decal Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                decals_date: e.value
+                            }
+                        });
+                        break;
+                        
+                    case 'Modified Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                modified: e.value
+                            }
+                        });
+                        break;
+
+                    case 'EWD Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                ewd_date: e.value
+                            }
+                        });
+                        break;
+                    
+                    case 'Tools Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                tools_date: e.value
+                            }
+                        });
+                        break;
+
+                    case "User's Manual Delivery Date": 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                userManual_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Warranty Book Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                warrantyBook_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Unit Key Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                unitKey_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Body Key Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                bodyKey_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Cigarette Plug Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                cigarettePlug_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Key Chain Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                keychain_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Jack Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                jack_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Tire Wrench Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                wrench_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Fire Extingusisher Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                fire_ext_date: e.value
+                            }
+                        });
+                        break;
+
+                    case 'Fan Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                fan_date: e.value
+                            }
+                        });
+                        break;    
+                        default:
+                    }
+                
+            }
+
+            else
+            {
+                onCalendarModalShow(name);
+            }
+
+
 
         }
 
@@ -381,6 +519,8 @@ export class Vehicles extends Component {
 
         const onCalendarModalDateChange = (e) => {
 
+            let formattedValue = e.getFullYear() + "-" + ('0' + (e.getMonth() + 1)).slice(-2) + "-" + ('0' + e.getDate()).slice(-2);
+
             switch(this.state.vdModalMode)
                 {
                     case 'Plate Number Delivery Date': 
@@ -388,10 +528,150 @@ export class Vehicles extends Component {
                         this.setState({
                             vehicleData: {
                                 ...this.state.vehicleData,
-                                plate_date: e.getFullYear() + "-" + ('0' + (e.getMonth() + 1)).slice(-2) + "-" + ('0' + e.getDate()).slice(-2)
+                                plate_date: formattedValue
                             }
                         });
                         break;
+
+                    case 'Decal Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                decals_date: formattedValue
+                            }
+                        });
+                        break;
+                        
+                    case 'Modified Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                modified: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'EWD Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                ewd_date: formattedValue
+                            }
+                        });
+                        break;
+                    
+                    case 'Tools Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                tools_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case "User's Manual Delivery Date": 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                userManual_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Warranty Book Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                warrantyBook_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Unit Key Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                unitKey_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Body Key Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                bodyKey_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Cigarette Plug Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                cigarettePlug_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Key Chain Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                keychain_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Jack Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                jack_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Tire Wrench Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                wrench_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Fire Extingusisher Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                fire_ext_date: formattedValue
+                            }
+                        });
+                        break;
+
+                    case 'Fan Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                fan_date: formattedValue
+                            }
+                        });
+                        break;    
 
                     default:
                 }    
@@ -784,112 +1064,105 @@ export class Vehicles extends Component {
                                         <label htmlFor="vPlateNumDel" className="p-col-2 p-md-2">Plate Number Delivery:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
                                             <InputText id="vPlateNumDel"  type="text" value={this.state.vehicleData.plate_date} disabled/>
-                                            <SelectButton value={"NA"} options={recievedItemStatus} onChange={(e) => setOptionValue('setPlateNumDel',e)}></SelectButton>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Plate Number Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vDecals" className="p-col-12 p-md-2">Decals:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus1}></SelectButton>
-                                            <InputText id="vDecals" type="text"/>
+                                            <InputText id="vDecals" type="text" value={this.state.vehicleData.decals_date} disabled/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Decal Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vModified" className="p-col-12 p-md-2">Modified:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vModified" type="text"/>
+                                            <InputText id="vModified" type="text" value={this.state.vehicleData.modified}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Modified Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
-                                        <label htmlFor="vEWD" className="p-col-12 p-md-2">EWD:</label>
+                                        <label htmlFor="vEWD" className="p-col-12 p-md-2">Early Warning Device:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vEWD" type="text"/>
+                                            <InputText id="vEWD" type="text" value={this.state.vehicleData.ewd_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('EWD Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vTools" className="p-col-12 p-md-2">Tools:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vTools" type="text"/>
+                                            <InputText id="vTools" type="text" value={this.state.vehicleData.tools_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Tools Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vUsersManual" className="p-col-12 p-md-2">User's Manual:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vUsersManual" type="text"/>
+                                            <InputText id="vUsersManual" type="text" value={this.state.vehicleData.userManual_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue("User's Manual Delivery Date",e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vWarrantyBook" className="p-col-12 p-md-2">Warranty Book:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vWarrantyBook" type="text"/>
+                                            <InputText id="vWarrantyBook" type="text" value={this.state.vehicleData.warrantyBook_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Warranty Book Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vUnitKey" className="p-col-12 p-md-2">Unit Key:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vUnitKey" type="text"/>
+                                            <InputText id="vUnitKey" type="text" value={this.state.vehicleData.unitKey_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Unit Key Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vBodyKey" className="p-col-12 p-md-2">Body Key:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vBodyKey" type="text"/>
+                                            <InputText id="vBodyKey" type="text" value={this.state.vehicleData.bodyKey_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Body Key Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vCigPlug" className="p-col-12 p-md-2">Cigarette Plug:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vCigPlug" type="text"/>
+                                            <InputText id="vCigPlug" type="text" value={this.state.vehicleData.cigarettePlug_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Cigarette Plug Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vKeyChain" className="p-col-12 p-md-2">Key Chain:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vKeyChain" type="text"/>
+                                            <InputText id="vKeyChain" type="text" value={this.state.vehicleData.keychain_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Key Chain Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vJack" className="p-col-12 p-md-2">Jack:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vJack" type="text"/>
+                                            <InputText id="vJack" type="text" value={this.state.vehicleData.jack_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Jack Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vTireWrench" className="p-col-12 p-md-2">Tire Wrench:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vTireWrench" type="text"/>
+                                            <InputText id="vTireWrench" type="text" value={this.state.vehicleData.wrench_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Tire Wrench Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vFireExt" className="p-col-12 p-md-2">Fire Extinguisher:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vFireExt" type="text"/>
-                                        </div>
-                                    </div>
-                                    <div className="p-field p-grid">
-                                        <label htmlFor="vEWDevice" className="p-col-12 p-md-2">Early Warning Device:</label>
-                                        <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vEWDevice" type="text"/>
+                                            <InputText id="vFireExt" type="text" value={this.state.vehicleData.fire_ext_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Fire Extinguisher Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vFan" className="p-col-12 p-md-2">Fan:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus}></SelectButton>
-                                            <InputText id="vFan" type="text"/>
+                                            <InputText id="vFan" type="text" value={this.state.vehicleData.fan_date}/>
+                                            <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Fan Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                    
