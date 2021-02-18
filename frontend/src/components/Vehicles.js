@@ -280,12 +280,34 @@ export class Vehicles extends Component {
         ];
 
         const recievedItemStatus = [
-            {label: 'No Recieving Copy', value: 'NRC'},
-            {label: 'Not Yet Released', value: 'NYR'},
-            {label: 'Not Applicable', value: 'N/A'},
-            {label: 'Did Not Recieve', value: 'DR'},
+            {label: 'No Recieving Copy', value: 'No Recieving Copy'},
+            {label: 'Not Yet Released', value: 'Not Yet Released'},
+            {label: 'Not Applicable', value: 'Not Applicable'},
+            {label: 'Did Not Recieve', value: 'Did Not Recieve'},
             {label: 'Date', value: 'DT'}
         ];
+
+        const statusOptions = [
+            {label: 'Active', value: 'Active'},
+            {label: 'Maintenance', value: 'Maintenance'},
+            {label: 'Repair', value: 'Repair'}
+        ];
+
+        const operationalStatus = [
+            {label: 'Yes', value: 'Yes'},
+            {label: 'No', value: 'No'}
+        ];
+
+        const fuelType = [
+            {label: 'Diesel', value: 'Diesel'},
+            {label: 'Gas', value: 'Gas'}
+        ];
+
+        const transmissionType = [
+            {label: 'Automatic', value: 'Automatic'},
+            {label: 'Manual', value: 'Manual'}
+        ];
+
 
 
         const onHide = () => {
@@ -343,7 +365,53 @@ export class Vehicles extends Component {
 
                 switch(name)
                     {
-                        case 'Plate Number Delivery Date': 
+
+                        //others
+
+                    case 'Fuel Type': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                fuel_type: e.value
+                            }
+                        });
+                        break;
+                        
+                    case 'Transmission Type': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                transmission: e.value
+                            }
+                        });
+                        break;
+                    
+                    case 'Status': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                status: e.value
+                            }
+                        });
+                        break;
+                    
+                    case 'Operational': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                operational: e.value
+                            }
+                        });
+                        break;    
+
+
+                        //recieved items
+
+                    case 'Plate Number Delivery Date': 
 
                         this.setState({
                             vehicleData: {
@@ -523,6 +591,17 @@ export class Vehicles extends Component {
 
             switch(this.state.vdModalMode)
                 {
+
+                    case 'PO Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                po_date: formattedValue
+                            }
+                        });
+                        break;    
+
                     case 'Plate Number Delivery Date': 
 
                         this.setState({
@@ -684,6 +763,13 @@ export class Vehicles extends Component {
             });
             }    
 
+
+        const onInputTextClickHandler = (clickSender) => {
+
+            onCalendarModalShow(clickSender);
+
+        }
+
         return (
             
             <div className="p-grid">
@@ -704,15 +790,19 @@ export class Vehicles extends Component {
                                 <div className="p-fluid">
                                     <div className="p-field p-grid">
                                         <label htmlFor="vStatus" className="p-col-12 p-md-2">Status:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vStatus" type="text"/>
+                                        <div className="p-inputgroup p-col-12 p-md-10">
+                                            <InputText id="vStatus" type="text" value = {this.state.vehicleData.status}/>
+                                            <SelectButton value={""} options={statusOptions} onChange={(e) => setOptionValue('Status',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
+
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vOperational" className="p-col-12 p-md-2">Operational:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vOperational" type="text"/>
+                                        <div className="p-inputgroup p-col-12 p-md-10">
+                                            <InputText id="vOperational" type="text" value = {this.state.vehicleData.operational}/>
+                                            <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Operational',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
+                                        
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vBodyNum" className="p-col-12 p-md-2">Body Number:</label>
@@ -801,8 +891,7 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vPODate" className="p-col-12 p-md-2">PO Date:</label>
                                         <div className="p-col-12 p-md-10">
-                                            {/*<InputText id="vPODate" type="text"/> */}
-                                            <InputMask id="vPODate" mask="99-99-9999"  slotChar="mm-dd-yyyy" ></InputMask>
+                                            <InputText id="vPODate" type="text" value={this.state.vehicleData.po_date} onClick={()=>onInputTextClickHandler("PO Date")} readOnly/> 
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -827,7 +916,7 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vChassisN" className="p-col-12 p-md-2">Chassis Number:</label>
                                         <div className="p-col-12 p-md-10">
-                                            <InputText id="vChassisN" type="text"/>
+                                            <InputText id="vChassisN" type="text" />
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -844,14 +933,16 @@ export class Vehicles extends Component {
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vFuelType" className="p-col-12 p-md-2">Fuel Type:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vFuelType" type="text"/>
+                                        <div className="p-inputgroup p-col-12 p-md-10">
+                                            <InputText id="vFuelType" type="text" value = {this.state.vehicleData.fuel_type}/>
+                                            <SelectButton value={""} options={fuelType} onChange={(e) => setOptionValue('Fuel Type',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vTransmission" className="p-col-12 p-md-2">Transmission:</label>
-                                        <div className="p-col-12 p-md-10">
-                                            <InputText id="vTransmission" type="text"/>
+                                        <div className="p-inputgroup p-col-12 p-md-10">
+                                            <InputText id="vTransmission" type="text" value = {this.state.vehicleData.transmission}/>
+                                            <SelectButton value={""} options={transmissionType} onChange={(e) => setOptionValue('Transmission Type',e)} className="p-col-4 p-md-6"></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
@@ -1060,8 +1151,8 @@ export class Vehicles extends Component {
                             <TabPanel header="Received Items">
 
                                 <div className="p-fluid">
-                                    <div className="p-grid">
-                                        <label htmlFor="vPlateNumDel" className="p-col-2 p-md-2">Plate Number Delivery:</label>
+                                    <div className="p-field p-grid">
+                                        <label htmlFor="vPlateNumDel" className="p-col-12 p-md-2">Plate Number Delivery:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
                                             <InputText id="vPlateNumDel"  type="text" value={this.state.vehicleData.plate_date} disabled/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Plate Number Delivery Date',e)}></SelectButton>
