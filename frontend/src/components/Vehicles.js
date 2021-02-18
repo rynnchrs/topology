@@ -939,7 +939,7 @@ export class Vehicles extends Component {
                                     <TabPanel header="Bidding/Contract">
                                         <DataTable value={this.biddinglist} className="p-datatable-gridlines">
                                             <Column field="label"></Column>
-                                            <Column field="value"></Column>
+                                            <Column field="value"></Column> 
                                         </DataTable>
                                     </TabPanel>
                                     <TabPanel header="Received Items">
