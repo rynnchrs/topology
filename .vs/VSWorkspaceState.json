@@ -1,11 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\backend",
     "\\frontend",
     "\\frontend\\src",
+    "\\frontend\\src\\actions",
     "\\frontend\\src\\components",
-    "\\frontend\\src\\layout",
-    "\\frontend\\src\\service"
+    "\\frontend\\src\\components\\common",
+    "\\frontend\\src\\reducers"
   ],
   "SelectedNode": "\\frontend\\src\\components\\DriverInspectionReport.js",
   "PreviewInSolutionExplorer": false
