@@ -102,6 +102,8 @@ export class Vehicles extends Component {
             filterOption:'VIN', //possible values: VIN, BDN or PLN
             vmModalMode: 'Add', //possible values: Add, Modify, Remove    
             vmVisibility: false, //modal form visibility
+            vdModalMode: '',
+            vdVisibility: false,
 
             vBrandSelected: 'Mitsubishi', //test data only
 
@@ -307,7 +309,7 @@ export class Vehicles extends Component {
         const renderFooter = (name) => {
             return (
                 <div>
-                    <Button label="Save" icon="pi pi-check" onClick={() => onHide()} autofocus />
+                    <Button label="Save" icon="pi pi-check" onClick={() => onHide()} autoFocus />
                     <Button label="Cancel" icon="pi pi-times" onClick={() => onHide()} className="p-button-text" />
                 </div>
             );
@@ -335,16 +337,85 @@ export class Vehicles extends Component {
 
         }
 
-        
+
+        //selectbutton behavior on vehicle data: recieved items modal dialog
+
+        const setOptionValue = (name,e) => {
+
+
+            switch(name)
+                {
+                    case 'setPlateNumDel': 
+
+                        if(e.value!=='DT'){
+                            this.setState({
+                                vehicleData: {
+                                    ...this.state.vehicleData,
+                                    plate_date: e.value
+                                  }
+                            });
+
+                        }
+                        else{
+                            onCalendarModalShow('Plate Number Delivery Date');
+
+                        }
+                        
+                        break;
+
+                    default:
+                }    
+
+        }
+
+        //custom modal calendar behavior
+
+        const onCalendarModalShow = (calendarTarget) => {
+
+            this.setState({
+                vdVisibility: true,
+                vdModalMode: calendarTarget
+                
+            });
+            }
+
+        const onCalendarModalDateChange = (e) => {
+
+            switch(this.state.vdModalMode)
+                {
+                    case 'Plate Number Delivery Date': 
+
+                        this.setState({
+                            vehicleData: {
+                                ...this.state.vehicleData,
+                                plate_date: e.getFullYear() + "-" + ('0' + (e.getMonth() + 1)).slice(-2) + "-" + ('0' + e.getDate()).slice(-2)
+                            }
+                        });
+                        break;
+
+                    default:
+                }    
+            }    
+
+        const onCalendarModalHide = () => {
+
+            this.setState({
+                vdVisibility: false
+            });
+            }    
 
         return (
-
             
             <div className="p-grid">
 
-                
                 <div className="p-col-12">
-                    
+
+                    <Dialog header={"Select " + this.state.vdModalMode} visible={this.state.vdVisibility}  onHide={() => onCalendarModalHide()}  >
+                        <div className="card">
+                        <Calendar inline monthNavigator yearNavigator yearRange="2010:2030" onChange={(e) => onCalendarModalDateChange(e.value)}></Calendar>
+                        </div>
+                    </Dialog>
+                                        
                     <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} footer={renderFooter('displayBasic')} onHide={() => onHide()} className="p-md-10" closable={false} blockScroll={true}>
                         <div className="card">
                         <TabView activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({activeIndex: e.index})}>
@@ -712,8 +783,8 @@ export class Vehicles extends Component {
                                     <div className="p-grid">
                                         <label htmlFor="vPlateNumDel" className="p-col-2 p-md-2">Plate Number Delivery:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <SelectButton value={"NA"} options={recievedItemStatus} ></SelectButton>
-                                            <InputText id="vPlateNumDel"  type="text" disabled/>
+                                            <InputText id="vPlateNumDel"  type="text" value={this.state.vehicleData.plate_date} disabled/>
+                                            <SelectButton value={"NA"} options={recievedItemStatus} onChange={(e) => setOptionValue('setPlateNumDel',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
