@@ -358,7 +358,7 @@ class ReportView(viewsets.ModelViewSet):  # report Form
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
-    search_fields = ['body_no', 'plate_no']
+    search_fields = ['body_no', 'plate_no', 'vin_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
 
