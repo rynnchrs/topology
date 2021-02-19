@@ -26,13 +26,13 @@ export class Vehicles extends Component {
 
             //vehicle data object    
             vehicleData : {
-                car_id : '0',
+                car_id : '',
                 slug : '',
                 vin_no : '',
                 body_no : '',
                 cs_no : '',
                 plate_no : '',
-                brand : 'M',
+                brand : '',
                 release_year : '',
                 make : '',
                 series : '',
@@ -49,8 +49,8 @@ export class Vehicles extends Component {
                 vat_price : '',
                 engine_no : '',
                 battery_no : '',
-                fuel_type : 'D',
-                transmission : 'M',
+                fuel_type : '',
+                transmission : '',
                 denomination : '',
                 piston : '',
                 cylinder : '',
@@ -93,7 +93,7 @@ export class Vehicles extends Component {
                 fire_ext_date:'',
                 remarks : '',
                 operational : '',
-                status : 'A',
+                status : '',
                 date_updated : '',
                 date_created : ''
 
@@ -323,7 +323,7 @@ export class Vehicles extends Component {
             else
 
             {
-                
+
             }
 
 
@@ -845,20 +845,54 @@ export class Vehicles extends Component {
                     axios
                     .get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
                     .then(res =>  {
-                        console.log(res.data[0]);
+                        //console.log(res.data[0]);
                         this.setState({ vehicleData: res.data[0] });
-                        console.log(this.state.vehicleData);
+                        reProcessResult();
                     })
                     .catch(err => console.log(err));
 
                     
                 }
 
-        
- 
-
 
         }
+
+        const reProcessResult = () => {
+
+            let newValue = '';
+
+            switch(this.state.vehicleData.status)
+                {
+                    case 'A': newValue = 'Active'; break;
+                    case 'M': newValue = 'Maintenance'; break;
+                    case 'R': newValue = 'Repair'; break;
+                    default:  
+
+                }
+
+            this.setState({
+                    vehicleData: {
+                        ...this.state.vehicleData,
+                        status : newValue
+                    }
+                });    
+
+            switch(this.state.vehicleData.operational)
+                {
+                    case true: newValue = 'Yes'; break;
+                    default:  
+                        newValue='No'
+
+                }
+
+            this.setState({
+                    vehicleData: {
+                        ...this.state.vehicleData,
+                        operational : newValue
+                    }
+                });        
+
+            }
 
         const onChangeHandler = (e) => {
 
