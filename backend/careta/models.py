@@ -151,6 +151,9 @@ class Car(models.Model):
     cigarettePlug_date = models.CharField(max_length=20, null = True)
     keychain_date = models.CharField(max_length=20, null = True)
     fan_date = models.CharField(max_length=20, null = True)
+    jack = models.CharField(max_length=20, null = True)
+    wrench = models.CharField(max_length=20, null = True)
+    fire_extinguisher = models.CharField(max_length=20, null = True)
     remarks = models.TextField(max_length=200, null=True, blank=True)
     operational = models.BooleanField(default=False, null=True, blank=True)
     Status_List = [

@@ -353,12 +353,15 @@ class ReportView(viewsets.ModelViewSet):  # report Form
             serializer.save() # add this
             return Response("Successfully Register") 
         return Response(serializer.errors) 
-            
+
+
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
-    lookup_field = 'slug'
     search_fields = ['body_no', 'plate_no']
+    filter_backends = [filters.SearchFilter]
+    lookup_field = 'slug'
+
 
 class ContractView(viewsets.ModelViewSet):  # add this
     queryset = Contract.objects.all()  # add this
