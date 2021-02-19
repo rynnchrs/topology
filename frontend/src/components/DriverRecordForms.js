@@ -5,12 +5,15 @@ import axios from "axios";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Checkbox } from 'primereact/checkbox';
+import { Calendar } from 'primereact/calendar';
+import { format } from 'date-fns';
 
 export default function DriverRecordForms() {
         const [selectedCar, setSelectedCar] = useState(['']);
         const [carValues, setcarValues] = useState(['']);
         const [displayBasic, setDisplayBasic] = useState(false);
         const [position, setPosition] = useState('center');
+        const [date2, setDate2] = useState(null);
 
         const dialogFuncMap = {
             'displayBasic': setDisplayBasic,
@@ -28,11 +31,16 @@ export default function DriverRecordForms() {
             dialogFuncMap[`${name}`](false);
         }
 
-        
-        const submitData = () => {
-            console.log(selectedCar)
-        }
+         const submitSearch = () => {
+            console.log(format(date2, 'yyyy-MM-dd'))
+            fetch('http://127.0.0.1:8000/api/report/?search=' + format(date2, 'yyyy-MM-dd'))
+                .then(response => response.json())
+                .then(data => {
+                    setcarValues(data);
+                });
+         }
 
+        
         React.useEffect(function effectFunction() {
             fetch('http://127.0.0.1:8000/api/report/')
                 .then(response => response.json())
@@ -42,29 +50,39 @@ export default function DriverRecordForms() {
         }, []);
         return(
             <div>
-            <ListBox value={selectedCar} options={carValues} onChange={(e) => setSelectedCar(e.value)} filter optionLabel="body_no"
-                   style={{width: '15rem'}} listStyle={{maxHeight: '250px'}} />
-            <Button label="Submit" onClick={submitData}> </Button>
-
+                <div className="p-grid">
+            <div className="p-col-12 p-md-6">
             <Button label="Show" icon="pi pi-external-link" onClick={() => onClick('displayBasic')} />
-            <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '75vw' }} onHide={() => onHide('displayBasic')}>
-                <div className="card card-w-title">
-                    <div className="p-grid">
+            </div>
+            <div className="p-col-12 p-md-6">
+            <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
+            <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon />
+            </div>
+            </div>
+            <ListBox value={selectedCar} options={carValues} onChange={(e) => setSelectedCar(e.value)} filter optionLabel="body_no"/>
 
+            
+            <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '75vw' }} onHide={() => onHide('displayBasic')}>
+                <div className="card card">
+                    <div className="p-grid">
                         <div className="p-col-12 p-md-6">
-                            <InputText id ="bodyno" value={selectedCar.body_no}/>
-                            <label htmlFor="bodyno">Right Icon</label>
+                            <label htmlFor="bodyno">Body No.:</label>
+                            <InputText id="bodyno" value={selectedCar.body_no} />
+                                
                         </div>
                         <div className="p-col-12 p-md-6">
-                            <InputText placeholder="Make/Model" value={selectedCar.make}/>
+                            <label htmlFor="make">Make:</label>
+                            <InputText id="make" value={selectedCar.make} />
                         </div>
                     </div>
                     <div className="p-grid">
                         <div className="p-col-12 p-md-6">
-                            <InputText placeholder="Mileage" value={selectedCar.mileage}/>
+                            <label htmlFor="mileage">Mileage:</label>
+                            <InputText id="mileage" value={selectedCar.mileage} />    
                         </div>
                         <div className="p-col-12 p-md-6">
-                            <InputText placeholder="Location" value={selectedCar.location}/>
+                            <label htmlFor="location">Location:</label>
+                            <InputText id="location" value={selectedCar.location} />
                         </div>
                     </div>
                 </div>
