@@ -361,7 +361,7 @@ class CarView(viewsets.ModelViewSet):  # add this
     search_fields = ['body_no', 'plate_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
-
+    search_fields = ['body_no', 'plate_no']
 
 
 class ContractView(viewsets.ModelViewSet):  # add this
