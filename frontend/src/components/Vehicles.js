@@ -311,10 +311,23 @@ export class Vehicles extends Component {
 
         const onShow = (vm) => {
 
-            this.setState({
-                vmVisibility: true,
-                vmModalMode: vm
-            });
+            if(vm !== 'Remove')
+            {
+
+                this.setState({
+                    vmVisibility: true,
+                    vmModalMode: vm
+                });
+            }  
+            
+            else
+
+            {
+                
+            }
+
+
+           
             }
         
         const renderFooter = (name) => {
@@ -1213,105 +1226,105 @@ export class Vehicles extends Component {
                                     <div className="p-field p-grid">
                                         <label htmlFor="vPlateNumDel" className="p-col-12 p-md-2">Plate Number Delivery:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vPlateNumDel"  type="text" value={this.state.vehicleData.plate_date} disabled/>
+                                            <InputText id="vPlateNumDel"  type="text" value={this.state.vehicleData.plate_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Plate Number Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vDecals" className="p-col-12 p-md-2">Decals:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vDecals" type="text" value={this.state.vehicleData.decals_date} disabled/>
+                                            <InputText id="vDecals" type="text" value={this.state.vehicleData.decals_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Decal Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vModified" className="p-col-12 p-md-2">Modified:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vModified" type="text" value={this.state.vehicleData.modified}/>
+                                            <InputText id="vModified" type="text" value={this.state.vehicleData.modified} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Modified Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vEWD" className="p-col-12 p-md-2">Early Warning Device:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vEWD" type="text" value={this.state.vehicleData.ewd_date}/>
+                                            <InputText id="vEWD" type="text" value={this.state.vehicleData.ewd_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('EWD Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vTools" className="p-col-12 p-md-2">Tools:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vTools" type="text" value={this.state.vehicleData.tools_date}/>
+                                            <InputText id="vTools" type="text" value={this.state.vehicleData.tools_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Tools Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vUsersManual" className="p-col-12 p-md-2">User's Manual:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vUsersManual" type="text" value={this.state.vehicleData.userManual_date}/>
+                                            <InputText id="vUsersManual" type="text" value={this.state.vehicleData.userManual_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue("User's Manual Delivery Date",e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vWarrantyBook" className="p-col-12 p-md-2">Warranty Book:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vWarrantyBook" type="text" value={this.state.vehicleData.warrantyBook_date}/>
+                                            <InputText id="vWarrantyBook" type="text" value={this.state.vehicleData.warrantyBook_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Warranty Book Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vUnitKey" className="p-col-12 p-md-2">Unit Key:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vUnitKey" type="text" value={this.state.vehicleData.unitKey_date}/>
+                                            <InputText id="vUnitKey" type="text" value={this.state.vehicleData.unitKey_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Unit Key Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vBodyKey" className="p-col-12 p-md-2">Body Key:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vBodyKey" type="text" value={this.state.vehicleData.bodyKey_date}/>
+                                            <InputText id="vBodyKey" type="text" value={this.state.vehicleData.bodyKey_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Body Key Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vCigPlug" className="p-col-12 p-md-2">Cigarette Plug:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vCigPlug" type="text" value={this.state.vehicleData.cigarettePlug_date}/>
+                                            <InputText id="vCigPlug" type="text" value={this.state.vehicleData.cigarettePlug_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Cigarette Plug Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vKeyChain" className="p-col-12 p-md-2">Key Chain:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vKeyChain" type="text" value={this.state.vehicleData.keychain_date}/>
+                                            <InputText id="vKeyChain" type="text" value={this.state.vehicleData.keychain_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Key Chain Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vJack" className="p-col-12 p-md-2">Jack:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vJack" type="text" value={this.state.vehicleData.jack_date}/>
+                                            <InputText id="vJack" type="text" value={this.state.vehicleData.jack_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Jack Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vTireWrench" className="p-col-12 p-md-2">Tire Wrench:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vTireWrench" type="text" value={this.state.vehicleData.wrench_date}/>
+                                            <InputText id="vTireWrench" type="text" value={this.state.vehicleData.wrench_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Tire Wrench Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vFireExt" className="p-col-12 p-md-2">Fire Extinguisher:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vFireExt" type="text" value={this.state.vehicleData.fire_ext_date}/>
+                                            <InputText id="vFireExt" type="text" value={this.state.vehicleData.fire_ext_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Fire Extinguisher Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
                                     <div className="p-field p-grid">
                                         <label htmlFor="vFan" className="p-col-12 p-md-2">Fan:</label>
                                         <div className="p-inputgroup p-col-12 p-md-10">
-                                            <InputText id="vFan" type="text" value={this.state.vehicleData.fan_date}/>
+                                            <InputText id="vFan" type="text" value={this.state.vehicleData.fan_date} readOnly/>
                                             <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Fan Delivery Date',e)}></SelectButton>
                                         </div>
                                     </div>
@@ -1695,7 +1708,6 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                     </TabPanel>
-                                    
                                     <TabPanel header="Received Items">
                                         <div className="p-fluid">
                                             <div className="p-field p-grid">
