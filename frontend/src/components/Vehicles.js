@@ -1498,7 +1498,6 @@ export class Vehicles extends Component {
                                         </div>
                                         
                                     </TabPanel>
-
                                     <TabPanel header="Engine and Body Info">
                                         <div className="p-fluid">
                                             <div className="p-field p-grid">
@@ -1588,33 +1587,209 @@ export class Vehicles extends Component {
                                             
                                         </div>
                                     </TabPanel>
-
                                     <TabPanel header="LTO">
-                                        <DataTable value={this.ltolist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dLTOCR" className="p-col-12 p-md-2">LTO CR:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dLTOCR" type="text" value = {this.state.vehicleData.lto_cr} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dLTOCRDate" className="p-col-12 p-md-2">LTO CR Date:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dLTOCRDate" type="text" value={this.state.vehicleData.cr_date} readOnly/> 
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dORNumber" className="p-col-12 p-md-2">OR Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dORNumber" type="text" value = {this.state.vehicleData.or_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dORDate" className="p-col-12 p-md-2">OR Date:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dORDate" type="text" value={this.state.vehicleData.or_date} readOnly/> 
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dTopLoadReg" className="p-col-12 p-md-2">TopLoadReg:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dTopLoadReg" type="text" value = {this.state.vehicleData.top_load} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dFieldOfc" className="p-col-12 p-md-2">Field office:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dFieldOfc" type="text" value = {this.state.vehicleData.field_office} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dORCRCopy" className="p-col-12 p-md-2">ORCR Copy:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dORCRCopy" type="text" value={this.state.vehicleData.or_cr} readOnly/> 
+                                                </div>
+                                            </div>
+                                        </div>
                                     </TabPanel>
-
                                     <TabPanel header="Location">
-                                        <DataTable value={this.locationlist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dPermanentLoc" className="p-col-12 p-md-2">Permanent:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dPermanentLoc" type="text" value = {this.state.vehicleData.permanent_loc} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dCurrentLoc" className="p-col-12 p-md-2">Current:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dCurrentLoc" type="text" value = {this.state.vehicleData.current_loc} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dVTF" className="p-col-12 p-md-2">With VTF?:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dVTF" type="text" value={this.state.vehicleData.vtf} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dPLStatus" className="p-col-12 p-md-2">Permanent?:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dPLStatus" type="text" value={this.state.vehicleData.permanent_status} readOnly/>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </TabPanel>
-
                                     <TabPanel header="Delivery Info">
-                                        <DataTable value={this.deliverylist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDeliveryLoc" className="p-col-12 p-md-2">Delivery Location:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDeliveryLoc" type="text" value = {this.state.vehicleData.delivery_location} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDeliveryDate" className="p-col-12 p-md-2">Delivery Date:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDeliveryDate" type="text" value={this.state.vehicleData.deliver_date} readOnly/> 
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dSINumber" className="p-col-12 p-md-2">SI Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dSINumber" value = {this.state.vehicleData.si_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDRNumber" className="p-col-12 p-md-2">DR Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDRNumber" type="text" value = {this.state.vehicleData.dr_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDRCodes" className="p-col-12 p-md-2">DR Codes:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDRCodes" type="text" value = {this.state.vehicleData.dr_codes} readOnly/>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </TabPanel>
                                     
                                     <TabPanel header="Received Items">
-                                        <DataTable value={this.receivedlist} className="p-datatable-gridlines">
-                                            <Column field="label"></Column>
-                                            <Column field="value"></Column>
-                                        </DataTable>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dPlateNumDel" className="p-col-12 p-md-2">Plate Number Delivery:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dPlateNumDel"  type="text" value={this.state.vehicleData.plate_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDecals" className="p-col-12 p-md-2">Decals:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDecals" type="text" value={this.state.vehicleData.decals_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dModified" className="p-col-12 p-md-2">Modified:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dModified" type="text" value={this.state.vehicleData.modified} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dEWD" className="p-col-12 p-md-2">Early Warning Device:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dEWD" type="text" value={this.state.vehicleData.ewd_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dTools" className="p-col-12 p-md-2">Tools:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dTools" type="text" value={this.state.vehicleData.tools_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dUsersManual" className="p-col-12 p-md-2">User's Manual:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dUsersManual" type="text" value={this.state.vehicleData.userManual_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dWarrantyBook" className="p-col-12 p-md-2">Warranty Book:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dWarrantyBook" type="text" value={this.state.vehicleData.warrantyBook_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dUnitKey" className="p-col-12 p-md-2">Unit Key:</label>
+                                                <div className="p-inputgroup p-col-12 p-md-10">
+                                                    <InputText id="dUnitKey" type="text" value={this.state.vehicleData.unitKey_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="BodyKey" className="p-col-12 p-md-2">Body Key:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="BodyKey" type="text" value={this.state.vehicleData.bodyKey_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dCigPlug" className="p-col-12 p-md-2">Cigarette Plug:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dCigPlug" type="text" value={this.state.vehicleData.cigarettePlug_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dKeyChain" className="p-col-12 p-md-2">Key Chain:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dKeyChain" type="text" value={this.state.vehicleData.keychain_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dJack" className="p-col-12 p-md-2">Jack:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dJack" type="text" value={this.state.vehicleData.jack_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dTireWrench" className="p-col-12 p-md-2">Tire Wrench:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dTireWrench" type="text" value={this.state.vehicleData.wrench_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dFireExt" className="p-col-12 p-md-2">Fire Extinguisher:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dFireExt" type="text" value={this.state.vehicleData.fire_ext_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dFan" className="p-col-12 p-md-2">Fan:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dFan" type="text" value={this.state.vehicleData.fan_date} readOnly/>
+                                                </div>
+                                            </div>
+                                        
+                                        </div>
                                     </TabPanel>
                                     <TabPanel header="Bidding/Contract">
                                         <DataTable value={this.biddinglist} className="p-datatable-gridlines">
