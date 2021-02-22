@@ -15,12 +15,12 @@ class UserInfo(models.Model):  # User Info Model
         ('M', 'Male'),
         ('F', 'Female'),
     ]
-    company = models.CharField(max_length=50)
-    position = models.CharField(max_length=20)
+    company = models.CharField(max_length=50, null = True)
+    position = models.CharField(max_length=20, null = True)
     gender = models.CharField(max_length=1, choices=Gender_List)
     birthday = models.DateField(auto_now=False, auto_now_add=False)
     phone = PhoneField(blank=True, help_text='Contact phone number')
-    address = models.CharField(max_length=100)
+    address = models.CharField(max_length=100, null = True)
     date_created = DateField(auto_now_add=True)
 
     def __str__(self):
@@ -66,13 +66,14 @@ class Permission(models.Model):         # permission Model
     def __str__(self):
         return self.user.username
 
+
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
     slug = models.CharField(max_length=30)
     vin_no = models.CharField(unique=True, max_length=30)
-    body_no = models.CharField(unique=True, max_length=30)
-    cs_no = models.CharField(unique=True, max_length=30)
-    plate_no = models.CharField(unique=True, max_length=30)
+    body_no = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    cs_no = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    plate_no = models.CharField(unique=True, max_length=30, null=True, blank=True)
 
     Brand_List=[
         ('M', 'Mitsubishi'),
@@ -80,28 +81,27 @@ class Car(models.Model):
     ]
 
     brand = models.CharField(max_length=2, choices=Brand_List, default="M")
-    release_year = models.IntegerField(default=datetime.date.today().year)
-    make = models.CharField(max_length=30)
-    series = models.CharField(max_length=30)
-    body_type = models.CharField(max_length=30)
-    color = models.CharField(max_length=30)
+    release_year = models.IntegerField(default=datetime.date.today().year, null=True, blank=True)
+    make = models.CharField(max_length=30, null=True, blank=True)
+    series = models.CharField(max_length=30, null=True, blank=True)
+    body_type = models.CharField(max_length=30, null=True, blank=True)
+    color = models.CharField(max_length=30, null=True, blank=True)
 
     Dealer_List = [
         ('DM', 'Diamond Motor Corporation'),
         ('SA', 'Sample Corporation')
     ]
     dealer = models.CharField(max_length=2, choices=Dealer_List, default="DM")
-    dealer_phone = PhoneField(blank=True, help_text='Contact phone number')
-    dealer_email = models.EmailField(max_length=60)
-    po_no = models.CharField(max_length=100)
-    po_date = models.DateField(auto_now=False, auto_now_add=False)
-    body_builder = models.CharField(max_length=50)
-    fabricator = models.CharField(max_length=50)
-    sale_price = models.IntegerField(default=0)
-    vat_price = models.IntegerField(default=0)
-    chassis_no = models.CharField(max_length=100)
-    engine_no = models.CharField(max_length=50)
-    battery_no = models.CharField(max_length=50)
+    dealer_phone = PhoneField(help_text='Contact phone number', null=True, blank=True)
+    dealer_email = models.EmailField(max_length=60, null=True, blank=True)
+    po_no = models.CharField(max_length=100, null=True, blank=True)
+    po_date = models.CharField(max_length=20, null = True)
+    body_builder = models.CharField(max_length=50, null=True, blank=True)
+    fabricator = models.CharField(max_length=50, null=True, blank=True)
+    sale_price = models.IntegerField(default=0, null=True, blank=True)
+    vat_price = models.IntegerField(default=0, null=True, blank=True)
+    engine_no = models.CharField(max_length=50, null=True, blank=True)
+    battery_no = models.CharField(max_length=50, null=True, blank=True)
 
     Fuel_List = [
         ('D', 'Diesel'),
@@ -114,6 +114,7 @@ class Car(models.Model):
         ('M', 'Manual')
     ]
     transmission = models.CharField(max_length=1, choices=Transmission_List, default="M")
+<<<<<<< HEAD
     denomination = models.CharField(max_length=30)
     piston = models.IntegerField(default=0)
     cylinder = models.IntegerField(default=0)
@@ -153,6 +154,50 @@ class Car(models.Model):
     fan_date = models.CharField(max_length=10)
     remarks = models.TextField(max_length=200)
     operational = models.BooleanField(default=False)
+=======
+    denomination = models.CharField(max_length=30, null=True, blank=True)
+    piston = models.IntegerField(default=0, null=True, blank=True)
+    cylinder = models.IntegerField(default=0, null=True, blank=True)
+    procuring_entity = models.CharField(max_length=50, null=True, blank=True)
+    capacity = models.IntegerField(default=0, null=True, blank=True)
+    gross_weight = models.IntegerField(default=0, null=True, blank=True)
+    net_weight = models.IntegerField(default=0, null=True, blank=True)
+    shipping_weight = models.IntegerField(default=0, null=True, blank=True)
+    net_capacity = models.IntegerField(default=0, null=True, blank=True)
+    lto_cr = models.IntegerField(default=0, null=True, blank=True)
+    cr_date = models.CharField(max_length=20, null = True)
+    or_no = models.IntegerField(default=0, null=True, blank=True)
+    or_date = models.CharField(max_length=20, null = True)
+    top_load = models.BooleanField(default=False, null=True, blank=True)
+    field_office = models.CharField(max_length=50, null=True, blank=True)
+    or_cr = models.CharField(max_length=20, null = True)
+    permanent_loc = models.CharField(max_length=30, null=True, blank=True)
+    current_loc = models.CharField(max_length=30, null=True, blank=True)
+    vtf = models.BooleanField(default=False, null=True, blank=True)
+    permanent_status = models.BooleanField(default=False, null=True, blank=True)
+    delivery_location = models.CharField(max_length=50, null=True, blank=True)
+    deliver_date = models.CharField(max_length=20, null = True)
+    si_no = models.IntegerField(default=0, null=True, blank=True)
+    dr_no = models.CharField(max_length=50, null=True, blank=True)
+    dr_codes = models.CharField(max_length=50, null=True, blank=True)
+    plate_date = models.CharField(max_length=20, null = True)
+    decals_date = models.CharField(max_length=20, null = True)
+    modified = models.BooleanField(default=False, null=True, blank=True)
+    ewd_date = models.CharField(max_length=20, null = True)
+    tools_date = models.CharField(max_length=20, null = True)
+    userManual_date = models.CharField(max_length=20, null = True)
+    warrantyBook_date = models.CharField(max_length=20, null = True)
+    unitKey_date = models.CharField(max_length=20, null = True)
+    bodyKey_date = models.CharField(max_length=20, null = True)
+    cigarettePlug_date = models.CharField(max_length=20, null = True)
+    keychain_date = models.CharField(max_length=20, null = True)
+    fan_date = models.CharField(max_length=20, null = True)
+    jack = models.CharField(max_length=20, null = True)
+    wrench = models.CharField(max_length=20, null = True)
+    fire_extinguisher = models.CharField(max_length=20, null = True)
+    remarks = models.TextField(max_length=200, null=True, blank=True)
+    operational = models.BooleanField(default=False, null=True, blank=True)
+>>>>>>> f41c9e1ee064fd5428b8cb55d3328219ac8a282b
     Status_List = [
         ('A', 'Active'),
         ('M', 'Maintenance'),
@@ -338,16 +383,16 @@ class Contract(models.Model):
     contract_id = models.AutoField(primary_key=True)
     car = models.ForeignKey(Car, related_name='contract', on_delete=models.CASCADE)
     slug = models.CharField(max_length=30)
-    client_name = models.CharField(max_length=100)
-    contract_no = models.CharField(max_length=50)
-    start_date = models.DateField(auto_now=False, auto_now_add=False)
-    end_date = models.DateField(auto_now=False, auto_now_add=False)
-    bid_no = models.CharField(max_length=50)
-    bid_name = models.CharField(max_length=50)
-    bid_date = models.DateField(auto_now=False, auto_now_add=False)
-    cost = models.IntegerField(default=0)
-    date_updated = models.DateField(auto_now=True)
-    date_created = models.DateField(auto_now_add=True)
+    client_name = models.CharField(max_length=100, null=True, blank=True)
+    contract_no = models.CharField(max_length=50, null=True, blank=True)
+    start_date = models.CharField(max_length=20, null = True)
+    end_date = models.CharField(max_length=20, null = True)
+    bid_no = models.CharField(max_length=50, null=True, blank=True)
+    bid_name = models.CharField(max_length=50, null=True, blank=True)
+    bid_date = models.CharField(max_length=20, null = True)
+    cost = models.IntegerField(default=0, null=True, blank=True)
+    date_updated = models.DateField(auto_now=True, null=True, blank=True)
+    date_created = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.client_name
@@ -357,14 +402,14 @@ class TPL(models.Model):
     tpl_id = models.AutoField(primary_key=True)
     car = models.ForeignKey(Car, related_name='tpl', on_delete=models.CASCADE)
     slug = models.CharField(max_length=30)
-    insurance_name = models.CharField(max_length=50)
-    telephone = PhoneField(blank=True, help_text='Contact phone number')
-    email = models.EmailField(max_length=60)
-    po_no = models.CharField(max_length=50)
-    date_issued = models.DateField(auto_now=False, auto_now_add=False)
-    start_date = models.DateField(auto_now=False, auto_now_add=False)
-    end_date = models.DateField(auto_now=False, auto_now_add=False)
-    cost = models.IntegerField(default=0)
+    insurance_name = models.CharField(max_length=50, null=True, blank=True)
+    telephone = PhoneField(help_text='Contact phone number', null=True, blank=True)
+    email = models.EmailField(max_length=60, null=True, blank=True)
+    po_no = models.CharField(max_length=50, null=True, blank=True)
+    date_issued = models.CharField(max_length=20, null = True)
+    start_date = models.CharField(max_length=20, null = True)
+    end_date = models.CharField(max_length=20, null = True)
+    cost = models.IntegerField(default=0, null=True, blank=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
@@ -376,17 +421,17 @@ class Insurance(models.Model):
     insurance_id = models.AutoField(primary_key=True)
     car = models.ForeignKey(Car, related_name='insurance', on_delete=models.CASCADE)
     slug = models.CharField(max_length=30)
-    company = models.CharField(max_length=100)
-    telephone = PhoneField(blank=True, help_text='Contact phone number')
-    email = models.EmailField(max_length=50)
-    po_no = models.CharField(max_length=30)
-    date_issued = models.DateField(auto_now=False, auto_now_add=False)
-    start_date = models.DateField(auto_now=False, auto_now_add=False)
-    end_date = models.DateField(auto_now=False, auto_now_add=False)
-    cost = models.IntegerField(default=0)
-    insurance_no = models.IntegerField(default=1)
-    date_updated = models.DateField(auto_now=True)
-    date_created = models.DateField(auto_now_add=True)
+    company = models.CharField(max_length=100, null=True, blank=True)
+    telephone = PhoneField(help_text='Contact phone number', null=True, blank=True)
+    email = models.EmailField(max_length=50, null=True, blank=True)
+    po_no = models.CharField(max_length=30, null=True, blank=True)
+    date_issued = models.CharField(max_length=20, null = True)
+    start_date = models.CharField(max_length=20, null = True)
+    end_date = models.CharField(max_length=20, null = True)
+    cost = models.IntegerField(default=0, null=True, blank=True)
+    insurance_no = models.IntegerField(default=1, null=True, blank=True)
+    date_updated = models.DateField(auto_now=True, null=True, blank=True)
+    date_created = models.DateField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.company
@@ -419,7 +464,7 @@ class Report(models.Model):
     side_lights = models.BooleanField(default=False)
     tail_lights = models.BooleanField(default=False)
     indicators = models.BooleanField(default=False)
-    breake_lights = models.BooleanField(default=False)
+    break_lights = models.BooleanField(default=False)
     reverse_lights = models.BooleanField(default=False)
     hazard_light = models.BooleanField(default=False)
     rear_fog_lights = models.BooleanField(default=False)
@@ -470,9 +515,9 @@ class Report(models.Model):
         return self.car.vin_no
 
 
-class ReportImage(models.Model):
-    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
-    images = models.ImageField(upload_to = 'images/')
+#class ReportImage(models.Model):
+#    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
+#    images = models.ImageField(upload_to = 'images/')
 
-    def __str__(self):
-        return self.report.car.vin_no
+#    def __str__(self):
+#        return self.report.car.vin_no

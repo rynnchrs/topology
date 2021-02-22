@@ -10,35 +10,6 @@ import { AppProfile } from './AppProfile';
 import { AppConfig } from './AppConfig';
 
 import { Dashboard } from './components/Dashboard';
-import { ButtonDemo } from './components/ButtonDemo';
-import { ChartDemo } from './components/ChartDemo';
-import { Documentation } from './components/Documentation';
-import { FileDemo } from './components/FileDemo';
-import { FloatLabelDemo } from './components/FloatLabelDemo';
-import { FormLayoutDemo } from './components/FormLayoutDemo';
-import { InputDemo } from './components/InputDemo';
-import { ListDemo } from './components/ListDemo';
-import { MenuDemo } from './components/MenuDemo';
-import { MessagesDemo } from './components/MessagesDemo';
-import { MiscDemo } from './components/MiscDemo';
-import { OverlayDemo } from './components/OverlayDemo';
-import { PanelDemo } from './components/PanelDemo';
-import { TableDemo } from './components/TableDemo';
-import { TreeDemo } from './components/TreeDemo';
-
-import { Calendar } from './pages/Calendar';
-import { Crud } from './pages/Crud';
-import { EmptyPage } from './pages/EmptyPage';
-
-import { DisplayDemo } from './utilities/DisplayDemo';
-import { ElevationDemo } from './utilities/ElevationDemo';
-import { FlexBoxDemo } from './utilities/FlexBoxDemo';
-import { GridDemo } from './utilities/GridDemo';
-import { IconsDemo } from './utilities/IconsDemo';
-import { SpacingDemo } from './utilities/SpacingDemo';
-import { TextDemo } from './utilities/TextDemo';
-import { TypographyDemo } from './utilities/TypographyDemo';
-
 import PrimeReact from 'primereact/utils';
 
 import 'primereact/resources/themes/saga-blue/theme.css';
@@ -55,6 +26,8 @@ import './App.scss';
 import {Vehicles} from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
+import { DriverInspectionReport } from './components/DriverInspectionReport';
+import  DriverRecordForms from './components/DriverRecordForms';
 
 
 const App = () => {
@@ -148,6 +121,7 @@ const App = () => {
         {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
+                    {label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
                     {label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     {label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     {label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -156,7 +130,7 @@ const App = () => {
         {
             label: 'Records', icon: 'pi pi-fw pi-table',
                 items: [
-                    {label: 'Inspection Records', icon: 'pi pi-fw pi-table', to: '/empty'},
+                    {label: 'Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms'},
                     {label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
                 ]
         },
@@ -234,6 +208,8 @@ const App = () => {
                 <Route path="/vehicles" exact component={Vehicles} />
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                <Route path="/driverrecordforms" exact component={DriverRecordForms} />
             </div>
 
             <AppFooter />
