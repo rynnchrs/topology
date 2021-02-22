@@ -10,16 +10,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { login } from '../actions/auth';
 
-
-
 export class Login extends Component {
 
     constructor() {
         super();
         this.state = {
             checkboxValue: [],
-            username: '',
-            password: '',
+            username: 'careta',
+            password: 'mypasscar',
             hidden: true,
            
         };

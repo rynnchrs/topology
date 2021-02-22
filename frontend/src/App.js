@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { Route } from 'react-router-dom';
+import { Route, Link, useRouteMatch } from 'react-router-dom';
 import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
@@ -53,14 +53,19 @@ import '@fullcalendar/timegrid/main.css';
 import './layout/flags/flags.css';
 import './layout/layout.scss';
 import './App.scss';
-import {Vehicles} from './components/Vehicles';
+import { Vehicles } from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
-import { Login } from './components/Login';
+import { Register } from './components/Register';
+
+import PrivateRoute from './components/common/PrivateRoute';
+
 
 
 const App = () => {
+
+    let match = useRouteMatch();
 
     const [layoutMode, setLayoutMode] = useState('static');
     const [layoutColorMode, setLayoutColorMode] = useState('dark')
@@ -152,10 +157,10 @@ const App = () => {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
-                    { label: 'Login', icon: 'pi pi-fw pi-file', to: '/login' },
-                    {label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
-                    {label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
-                    {label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
+                    { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
+                    { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
+                    { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
+                    { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
                 ]
         },
         {
@@ -239,7 +244,7 @@ const App = () => {
                 <Route path="/" exact component={Dashboard} />
                 <Route path="/vehicles" exact component={Vehicles} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
-                <Route path="/login" exact component={Login} />
+                <Route path="/register" component={Register} />
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
             </div>

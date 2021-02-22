@@ -5,8 +5,6 @@ import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
 import axios from "axios";
 
-{/*I added Image upload table below*/ }
-
 export class DriverInspectionReport extends Component {
 
     constructor() {
@@ -152,6 +150,7 @@ export class DriverInspectionReport extends Component {
     }
 
     render() {
+       
         return (
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12">
@@ -740,3 +739,5 @@ export class DriverInspectionReport extends Component {
         );
     }
 }
+
+export default DriverInspectionReport;

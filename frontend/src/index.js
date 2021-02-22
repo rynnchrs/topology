@@ -10,19 +10,17 @@ import { Provider } from 'react-redux';
 import store from './store';
 
 import ScrollToTop from './ScrollToTop';
-import Login from './components/Login';
 import App from './App';
+import Login from './components/Login';
 import PrivateRoute from './components/common/PrivateRoute';
 
 ReactDOM.render(
     <Provider store={store}>
         <Router>
             <ScrollToTop>
-                {/*<App></App>*/}
                 <Switch>
-                    <PrivateRoute path="/" exact component={App} />
-                    <Route path="/login" exact component={Login} />
-                    
+                    <PrivateRoute exact path="/" component={App} />
+                    <Route exact path="/login" component={Login} />
                 </Switch>
             </ScrollToTop>
         </Router>
