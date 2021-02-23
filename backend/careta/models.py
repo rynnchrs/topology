@@ -1,5 +1,6 @@
 from django.db import models
 import datetime
+from django.db.models import fields
 from django.db.models.deletion import CASCADE # add this
 from django.db.models.fields import AutoField, BooleanField, CharField, DateField, DateTimeField
 from phone_field import PhoneField
@@ -114,47 +115,6 @@ class Car(models.Model):
         ('M', 'Manual')
     ]
     transmission = models.CharField(max_length=1, choices=Transmission_List, default="M")
-<<<<<<< HEAD
-    denomination = models.CharField(max_length=30)
-    piston = models.IntegerField(default=0)
-    cylinder = models.IntegerField(default=0)
-    procuring_entity = models.CharField(max_length=50)
-    capacity = models.IntegerField(default=0)
-    gross_weight = models.IntegerField(default=0)
-    net_weight = models.IntegerField(default=0)
-    shipping_weight = models.IntegerField(default=0)
-    net_capacity = models.IntegerField(default=0)
-    lto_cr = models.IntegerField(default=0)
-    cr_date = models.DateField(auto_now=False, auto_now_add=False)
-    or_no = models.IntegerField(default=0)
-    or_date = models.DateField(auto_now=False, auto_now_add=False)
-    top_load = models.BooleanField(default=False)
-    field_office = models.CharField(max_length=50)
-    or_cr = models.DateField(auto_now=False, auto_now_add=False)
-    permanent_loc = models.CharField(max_length=30)
-    current_loc = models.CharField(max_length=30)
-    vtf = models.BooleanField(default=False)
-    permanent_status = models.BooleanField(default=False)
-    delivery_location = models.CharField(max_length=50)
-    deliver_date = models.DateField(auto_now=False, auto_now_add=False)
-    si_no = models.IntegerField(default=0)
-    dr_no = models.CharField(max_length=50)
-    dr_codes = models.CharField(max_length=50)
-    plate_date = models.CharField(max_length=10)
-    decals_date = models.CharField(max_length=10)
-    modified = models.BooleanField(default=False)
-    ewd_date = models.CharField(max_length=10)
-    tools_date = models.CharField(max_length=10)
-    userManual_date = models.CharField(max_length=10)
-    warrantyBook_date = models.CharField(max_length=10)
-    unitKey_date = models.CharField(max_length=10)
-    bodyKey_date = models.CharField(max_length=10)
-    cigarettePlug_date = models.CharField(max_length=10)
-    keychain_date = models.CharField(max_length=10)
-    fan_date = models.CharField(max_length=10)
-    remarks = models.TextField(max_length=200)
-    operational = models.BooleanField(default=False)
-=======
     denomination = models.CharField(max_length=30, null=True, blank=True)
     piston = models.IntegerField(default=0, null=True, blank=True)
     cylinder = models.IntegerField(default=0, null=True, blank=True)
@@ -197,7 +157,6 @@ class Car(models.Model):
     fire_extinguisher = models.CharField(max_length=20, null = True)
     remarks = models.TextField(max_length=200, null=True, blank=True)
     operational = models.BooleanField(default=False, null=True, blank=True)
->>>>>>> f41c9e1ee064fd5428b8cb55d3328219ac8a282b
     Status_List = [
         ('A', 'Active'),
         ('M', 'Maintenance'),
@@ -514,10 +473,50 @@ class Report(models.Model):
     def __str__(self):
         return self.car.vin_no
 
+class ReportImage(models.Model):
+   report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
+   images = models.ImageField(upload_to = 'images/')
 
-#class ReportImage(models.Model):
-#    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
-#    images = models.ImageField(upload_to = 'images/')
+   def __str__(self):
+       return self.report.car.vin_no
 
-#    def __str__(self):
-#        return self.report.car.vin_no
+class Repair(models.Model):
+    repair_id = models.AutoField(primary_key=True)
+    vin_no = models.ForeignKey(Car, related_name='repair', on_delete=models.CASCADE)
+    ro_no = models.CharField(unique=True, max_length=10)
+    incident_details = models.TextField(max_length=200, null=True, blank=True)
+    vms = models.CharField(max_length=50)
+    dealer = models.CharField(max_length=30)
+    schedule_date = models.DateField(auto_now=False, auto_now_add=False)
+    perform_by = models.ForeignKey(User, related_name='actual', on_delete=models.CASCADE)
+    perform_date = models.DateField(auto_now=False, auto_now_add=False)
+    actual_findings = models.TextField(max_length=200, null=True, blank=True)
+    actual_remarks = models.TextField(max_length=200, null=True, blank=True)
+    repair_by = models.ForeignKey(User, related_name='repair', on_delete=models.CASCADE)
+    repair_date = models.DateField(auto_now=False, auto_now_add=False)
+    action_taken = models.TextField(max_length=200, null=True, blank=True)
+    date_done = models.DateField(auto_now=False, auto_now_add=False)
+    status_repair = models.CharField(max_length=20)
+    remarks = models.TextField(max_length=200, null=True, blank=True)
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.ro_no
+
+class Cost(models.Model):
+    cost_id = models.AutoField(primary_key=True)
+    ro_no = models.ForeignKey(Repair, related_name='cost', on_delete=models.CASCADE)
+    Cost_List = [
+        ('P', 'Parts'),
+        ('L', 'Labor'),
+    ]
+    cost_type = models.CharField(max_length=1, choices=Cost_List, default="L")
+    particulars = models.CharField(max_length=50)
+    cost = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=0)
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.ro_no

@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer # add this
-from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report  # add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer # add this
+from .models import Car, Contract, Permission, Repair, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
 from rest_framework.response import Response    # add this
@@ -280,18 +280,6 @@ class ReportView(viewsets.ModelViewSet):  # report Form
                     'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
                     'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','gas_level','oil_level','tyres','front_visual',
                     'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel', 
-<<<<<<< HEAD
-                    'notes','date_updated','date_created']  # filtering
-    ordering_fields = ['car', 'date_created'] # ordering
-
-    # def create(self, request): # create report 
-    #     serializer = ReportSerializer(data=request.data) 
-    #     if serializer.is_valid(raise_exception=True): 
-    #         serializer.save() # add this
-    #         return Response(status.HTTP_201_CREATED) 
-    #     return Response(serializer.errors) 
-            
-=======
                     'notes','date_updated','date_created']   # filtering
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # filtering and ordering
@@ -305,7 +293,6 @@ class ReportView(viewsets.ModelViewSet):  # report Form
         return Response(serializer.errors) 
 
 
->>>>>>> f41c9e1ee064fd5428b8cb55d3328219ac8a282b
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
@@ -352,3 +339,8 @@ class ExpiryView(APIView): # expiry
             'Com':check_Com_date(year), # Comprehensive Insurance
             })
 
+class RepairView(viewsets.ModelViewSet):  # add this
+    queryset = Repair.objects.all()  # add this
+    serializer_class = RepairSerializer  # add this
+    search_fields = ['vin_no__vin_no']
+    filter_backends = [filters.SearchFilter]
