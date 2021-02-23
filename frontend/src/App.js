@@ -58,14 +58,12 @@ import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
 import { Register } from './components/Register';
+import Try from './components/Try';
 
-import PrivateRoute from './components/common/PrivateRoute';
-
-
+import { Provider } from 'react-redux';
+import store from './store';
 
 const App = () => {
-
-    let match = useRouteMatch();
 
     const [layoutMode, setLayoutMode] = useState('static');
     const [layoutColorMode, setLayoutColorMode] = useState('dark')
@@ -158,6 +156,7 @@ const App = () => {
                 items: [
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
                     { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
+                    { label: 'Try', icon: 'pi pi-fw pi-file', to: '/try' },
                     { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -241,12 +240,20 @@ const App = () => {
                 layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 
             <div className="layout-main">
-                <Route path="/" exact component={Dashboard} />
-                <Route path="/vehicles" exact component={Vehicles} />
-                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                <Provider store={store}>
+                <Router>
+                    <Switch>
+                <Route path="/" exact component={Register} />
+                <Route path="/vehicles" component={Vehicles} />
+                <Route path="/driverinspectionreport" component={DriverInspectionReport} />
                 <Route path="/register" component={Register} />
-                <Route path="/inspectionreport" exact component={InspectionReport} />
-                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+                <Route path="/try" component={Try} />
+                <Route path="/inspectionreport" component={InspectionReport} />
+                        {/*<Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />*/}
+                        
+                    </Switch>
+                    </Router>
+                    </Provider>
             </div>
 
             <AppFooter />

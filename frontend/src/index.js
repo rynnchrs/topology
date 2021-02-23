@@ -12,6 +12,7 @@ import store from './store';
 import ScrollToTop from './ScrollToTop';
 import App from './App';
 import Login from './components/Login';
+import Register from './components/Register';
 import PrivateRoute from './components/common/PrivateRoute';
 
 ReactDOM.render(
@@ -21,6 +22,7 @@ ReactDOM.render(
                 <Switch>
                     <PrivateRoute exact path="/" component={App} />
                     <Route exact path="/login" component={Login} />
+                    
                 </Switch>
             </ScrollToTop>
         </Router>

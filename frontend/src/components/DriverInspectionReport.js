@@ -114,7 +114,6 @@ export class DriverInspectionReport extends Component {
                     filteredSuggestions: this.state.filteredSuggestions
                 });
                 console.log(this.state.filteredSuggestions);
-                console.log("aw");
             }
         }, 1000);
     };

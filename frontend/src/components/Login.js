@@ -16,8 +16,8 @@ export class Login extends Component {
         super();
         this.state = {
             checkboxValue: [],
-            username: 'careta',
-            password: 'mypasscar',
+            username: 'admin',
+            password: 'password',
             hidden: true,
            
         };
