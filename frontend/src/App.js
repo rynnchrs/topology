@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { Route, Link, useRouteMatch } from 'react-router-dom';
+//import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
@@ -60,10 +61,9 @@ import { DriverInspectionReport } from './components/DriverInspectionReport';
 import { Register } from './components/Register';
 import Try from './components/Try';
 
-import { Provider } from 'react-redux';
-import store from './store';
+import PrivateRoute from './components/common/PrivateRoute';
 
-const App = () => {
+const App = (props) => {
 
     const [layoutMode, setLayoutMode] = useState('static');
     const [layoutColorMode, setLayoutColorMode] = useState('dark')
@@ -155,8 +155,9 @@ const App = () => {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
+                    //{ label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
                     { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
-                    { label: 'Try', icon: 'pi pi-fw pi-file', to: '/try' },
+                    { label: 'Try', icon: 'pi pi-fw pi-file', to: '/try'},
                     { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -221,8 +222,15 @@ const App = () => {
         'layout-sidebar-light': layoutColorMode === 'light'
     });
 
+    /*const currentURLhref = window.location.href
+    const currentURLpath = window.location.pathname
+    console.log("app.js:");
+    console.log(props.location);
+    console.log(props.match);
+    console.log(props.history);
+    console.log(currentURLpath);*/
+
     return (
-        
         <div className={wrapperClass} onClick={onWrapperClick}>
             <AppTopbar onToggleMenu={onToggleMenu} />
 
@@ -240,20 +248,23 @@ const App = () => {
                 layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 
             <div className="layout-main">
-                <Provider store={store}>
-                <Router>
-                    <Switch>
-                <Route path="/" exact component={Register} />
+                <Route path="/" component={Dashboard} />
+                <Route path="/register" component={Register} />
+                <Route path="/try" render={() => (<div>List of Items</div>)} />
+                    
+                {/*<Router>
+                <Switch>
+                    <Route exact path="/" component={Dashboard} />
                 <Route path="/vehicles" component={Vehicles} />
                 <Route path="/driverinspectionreport" component={DriverInspectionReport} />
                 <Route path="/register" component={Register} />
                 <Route path="/try" component={Try} />
                 <Route path="/inspectionreport" component={InspectionReport} />
-                        {/*<Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />*/}
-                        
                     </Switch>
-                    </Router>
-                    </Provider>
+                    </Router>*/}
+                    
+                {/*<Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />*/}
+                    
             </div>
 
             <AppFooter />

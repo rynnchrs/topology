@@ -18,6 +18,10 @@ const PrivateRoute = ({ component: Component, auth, ...rest }) => (
                 //return <Redirect to="/dashboard" />;
                 return <Component {...props} />;
             }
+
+            /*localStorage.getItem('token')
+                ? <Component {...props} />
+                : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />*/
         }}
     />
 );

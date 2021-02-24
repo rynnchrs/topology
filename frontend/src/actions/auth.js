@@ -28,6 +28,7 @@ export const login = (username, password) => (dispatch) => {
         .post('http://127.0.0.1:8000/api/login/', body, config)
         .then((res) => {
             console.log('login token: ' + res.data.access)
+           
             dispatch({
                 type: LOGIN_SUCCESS,
                 payload: res.data,

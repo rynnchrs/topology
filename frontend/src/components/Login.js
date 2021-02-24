@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
 import axios from "axios";
 
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, useLocation } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { login } from '../actions/auth';
@@ -19,12 +19,16 @@ export class Login extends Component {
             username: 'admin',
             password: 'password',
             hidden: true,
+
            
         };
 
         this.toggleShow = this.toggleShow.bind(this);
+        
 
     }
+
+    
 
     static propTypes = {
         login: PropTypes.func.isRequired,
@@ -43,7 +47,9 @@ export class Login extends Component {
     render() {
         if (this.props.isAuthenticated) {
             return <Redirect to="/" />;
+            
         }
+        
         return (
             <div className="p-grid p-fluid" style={{ marginTop: '5%' }}>
                 <div className="p-col"> </div>

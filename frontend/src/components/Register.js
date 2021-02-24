@@ -3,9 +3,8 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
+import { Message } from 'primereact/message';
 import axios from "axios";
-
-
 
 export class Register extends Component {
 
@@ -32,17 +31,12 @@ export class Register extends Component {
     }
 
     submitData = event => {
-        
         /*console.log(this.state.gender.name);
         alert("U: " + this.state.firstname + "\nP: " + this.state.lastname + "\nP: " + this.state.email
             + "\nP: " + this.state.username + "\nP: " + this.state.password + "\nP: " + (this.state.gender.name)
             + "\nP: " + this.state.company + "\nP: " + this.state.position + "\nP: " + this.state.address
             + "\nP: " + this.state.phone + "\nP: " + this.state.birthday)*/
         
-        /*register(this.state.firstname, this.state.lastname, this.state.email, this.state.username,
-            this.state.password, this.state.gender.name, this.state.company, this.state.position,
-            this.state.address, this.state.phone, this.state.birthday);*/
-
         let token = localStorage.getItem("token");
         console.log('the token: ' + token);
         
@@ -51,7 +45,6 @@ export class Register extends Component {
         const gender = this.state.gender.name;
         const user_info = { company, position, gender, birthday, phone, address};
         
-
         const config = {
             headers: {
                 'Authorization': 'Bearer '+token,
@@ -66,12 +59,15 @@ export class Register extends Component {
         axios
             .post('http://127.0.0.1:8000/api/register/', body, config)
             .then((res) => {
+                console.log('succ: ');
                 console.log(res.data)
-                
             })
             .catch((err) => {
-                console.log('err: ' + err);
-                
+                //console.log('err: ' + err);
+                //console.log('err: ' + err.response);
+                console.log('err: ');
+                console.log(err.response.data)
+
             });
         
     }
@@ -81,6 +77,7 @@ export class Register extends Component {
     }
 
     render() {
+
         return (
             <div className="p-grid p-fluid" >
                 <div className="p-col-12">
@@ -157,7 +154,7 @@ export class Register extends Component {
                             </div>
                             <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%',paddingRight: '5%', marginTop: '2%' }}>
                                 <h6><b>Birthday:</b></h6>
-                                <InputMask mask="9999/99/99" placeholder="YYYY/MM/DD" value={this.state.birthday} onChange={event => this.setState({ birthday: event.target.value })} />
+                                <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={this.state.birthday} onChange={event => this.setState({ birthday: event.target.value })} />
                             </div>
                         </div>
 
@@ -176,4 +173,6 @@ export class Register extends Component {
     }
 }
 
-//export default Register;
+
+
+export default Register;
