@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef }  from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -10,18 +10,13 @@ const PrivateRoute = ({ component: Component, auth, ...rest }) => (
            /* if (auth.isLoading) {
                 return <h2>Loading...</h2>;
             } else*/
-
             if (!auth.isAuthenticated) {
+            //if (localStorage.getItem('token') == null) {
                 return <Redirect to="/login" />;
                 //<Redirect to={{ pathname: '/login', state: { from: props.location } }} />
             } else {
-                //return <Redirect to="/dashboard" />;
                 return <Component {...props} />;
             }
-
-            /*localStorage.getItem('token')
-                ? <Component {...props} />
-                : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />*/
         }}
     />
 );

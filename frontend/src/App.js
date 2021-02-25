@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { Route, Link, useRouteMatch } from 'react-router-dom';
-//import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
-import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';
@@ -11,7 +9,6 @@ import { AppMenu } from './AppMenu';
 import { AppProfile } from './AppProfile';
 import { AppConfig } from './AppConfig';
 
-import { Dashboard } from './components/Dashboard';
 import { ButtonDemo } from './components/ButtonDemo';
 import { ChartDemo } from './components/ChartDemo';
 import { Documentation } from './components/Documentation';
@@ -42,7 +39,6 @@ import { TextDemo } from './utilities/TextDemo';
 import { TypographyDemo } from './utilities/TypographyDemo';
 
 import PrimeReact from 'primereact/utils';
-
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -54,16 +50,16 @@ import '@fullcalendar/timegrid/main.css';
 import './layout/flags/flags.css';
 import './layout/layout.scss';
 import './App.scss';
+import { Dashboard } from './components/Dashboard';
 import { Vehicles } from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
 import { Register } from './components/Register';
-import Try from './components/Try';
+import LogoutTry from './components/LogoutTry';
 
-import PrivateRoute from './components/common/PrivateRoute';
 
-const App = (props) => {
+const App = () => {
 
     const [layoutMode, setLayoutMode] = useState('static');
     const [layoutColorMode, setLayoutColorMode] = useState('dark')
@@ -155,9 +151,8 @@ const App = (props) => {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
-                    //{ label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
                     { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
-                    { label: 'Try', icon: 'pi pi-fw pi-file', to: '/try'},
+                    { label: 'Try', icon: 'pi pi-fw pi-file', to: '/logouttry'},
                     { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -222,14 +217,9 @@ const App = (props) => {
         'layout-sidebar-light': layoutColorMode === 'light'
     });
 
-    /*const currentURLhref = window.location.href
-    const currentURLpath = window.location.pathname
-    console.log("app.js:");
-    console.log(props.location);
-    console.log(props.match);
-    console.log(props.history);
-    console.log(currentURLpath);*/
+    
 
+    
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
             <AppTopbar onToggleMenu={onToggleMenu} />
@@ -248,23 +238,13 @@ const App = (props) => {
                 layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 
             <div className="layout-main">
-                <Route path="/" component={Dashboard} />
-                <Route path="/register" component={Register} />
-                <Route path="/try" render={() => (<div>List of Items</div>)} />
-                    
-                {/*<Router>
-                <Switch>
-                    <Route exact path="/" component={Dashboard} />
-                <Route path="/vehicles" component={Vehicles} />
-                <Route path="/driverinspectionreport" component={DriverInspectionReport} />
-                <Route path="/register" component={Register} />
-                <Route path="/try" component={Try} />
-                <Route path="/inspectionreport" component={InspectionReport} />
-                    </Switch>
-                    </Router>*/}
-                    
-                {/*<Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />*/}
-                    
+                <Route path="/" exact component={Dashboard} />
+                <Route path="/vehicles" exact component={Vehicles} />
+                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                <Route path="/register" exact component={Register} />
+                <Route path="/logouttry" exact component={LogoutTry} />
+                <Route path="/inspectionreport" exact component={InspectionReport} />
+                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
             </div>
 
             <AppFooter />
@@ -274,5 +254,6 @@ const App = (props) => {
     );
 
 }
+
 
 export default App;

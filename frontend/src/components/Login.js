@@ -1,11 +1,9 @@
 ﻿import React, { Component } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
-import { AutoComplete } from 'primereact/autocomplete';
 import axios from "axios";
 
-import { Link, Redirect, useLocation } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { login } from '../actions/auth';
@@ -19,16 +17,10 @@ export class Login extends Component {
             username: 'admin',
             password: 'password',
             hidden: true,
-
-           
         };
 
         this.toggleShow = this.toggleShow.bind(this);
-        
-
     }
-
-    
 
     static propTypes = {
         login: PropTypes.func.isRequired,
@@ -47,9 +39,7 @@ export class Login extends Component {
     render() {
         if (this.props.isAuthenticated) {
             return <Redirect to="/" />;
-            
-        }
-        
+        } 
         return (
             <div className="p-grid p-fluid" style={{ marginTop: '5%' }}>
                 <div className="p-col"> </div>
@@ -98,9 +88,7 @@ export class Login extends Component {
                     </div>
                 </div>
                 <div className="p-col"> </div>
-                
             </div>
-            
         );
     }
 }
@@ -110,3 +98,5 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, { login })(Login);
+
+//export default Login;

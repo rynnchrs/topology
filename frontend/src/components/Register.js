@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
-import { Message } from 'primereact/message';
+import { Toast } from 'primereact/toast';
 import axios from "axios";
 
 export class Register extends Component {
@@ -24,6 +24,7 @@ export class Register extends Component {
             phone: '09123456789',
             birthday: '7777-77-77',
             hidden: true,
+            toast: React.createRef(null),
         };
 
         this.toggleShow = this.toggleShow.bind(this);
@@ -53,7 +54,6 @@ export class Register extends Component {
         };
 
         // Request Body
-        //const body = JSON.stringify({ username, email, first_name, last_name, password, g, company, position, address, phone, birthday });
         const body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
         console.log('body: ' + body);
         axios
@@ -61,15 +61,13 @@ export class Register extends Component {
             .then((res) => {
                 console.log('succ: ');
                 console.log(res.data)
+                this.state.toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 3000 });
             })
             .catch((err) => {
-                //console.log('err: ' + err);
-                //console.log('err: ' + err.response);
                 console.log('err: ');
-                console.log(err.response.data)
-
+                console.log(err.response)
+                this.state.toast.current.show({ severity: 'error', summary: 'Error Input', detail: 'Please check your input details.', life: 3000 });
             });
-        
     }
 
     toggleShow() {
@@ -80,6 +78,7 @@ export class Register extends Component {
 
         return (
             <div className="p-grid p-fluid" >
+                <Toast ref={this.state.toast} />
                 <div className="p-col-12">
                     <div className="card card-w-title p-shadow-10">
                         <center><h3><b>Registration Form</b></h3></center>
