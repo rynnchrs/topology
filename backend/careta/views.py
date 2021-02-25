@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer# add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer, SearchInventorySerializer# add this
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
@@ -14,14 +14,17 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend # filter
 from rest_framework import filters # filter 
 
+
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
+
     def post(self, request): # add this
         serializer = UserSerializer(data=request.data) # add this
         if serializer.is_valid(raise_exception=True): # add this
             serializer.save() # add this
             return Response("Successfully Register", status=status.HTTP_201_CREATED) # add this
         return Response(serializer.errors) # add this
+
 
 class BlacklistTokenView(APIView):      # for Logout
     def post(self, request):    
@@ -225,6 +228,7 @@ class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permiss
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionMaintenanceReportSerializer
@@ -270,6 +274,7 @@ class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission View
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionTaskSerializer
@@ -292,6 +297,7 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance report s
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
@@ -305,6 +311,7 @@ class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance 
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection reports
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
@@ -317,6 +324,7 @@ class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection re
             return Response(serializer.data)            
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports 
     permission_classes = [IsAuthenticated]
@@ -361,6 +369,15 @@ class CarView(viewsets.ModelViewSet):  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
+
+
+class SearchInventoryView(viewsets.ViewSet):
+
+    def list(self, request):
+        value = request.query_params.get('search_field', None)
+        queryset = Car.objects.only(value)
+        serializer = SearchInventorySerializer(queryset, many=True, fields=[str(value)])
+        return Response(serializer.data)
 
 
 class ContractView(viewsets.ModelViewSet):  # add this

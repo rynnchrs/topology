@@ -27,7 +27,7 @@ import {Vehicles} from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
-//import  DriverRecordForms from './components/DriverRecordForms';
+import  DriverRecordForms from './components/DriverRecordForms';
 
 
 const App = () => {
@@ -130,8 +130,8 @@ const App = () => {
         {
             label: 'Records', icon: 'pi pi-fw pi-table',
                 items: [
-                    //{label: 'Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms'},
-                    {label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
+                    {label: 'Driver Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms'},
+                    //{label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
                 ]
         },
         { label: 'Job Schedule', icon: 'pi pi-fw pi-calendar' },
@@ -209,7 +209,7 @@ const App = () => {
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
-                {/*<Route path="/driverrecordforms" exact component={DriverRecordForms} />*/}
+                <Route path="/driverrecordforms" exact component={DriverRecordForms} />
             </div>
 
             <AppFooter />
