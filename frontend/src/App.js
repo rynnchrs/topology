@@ -217,9 +217,6 @@ const App = () => {
         'layout-sidebar-light': layoutColorMode === 'light'
     });
 
-    
-
-    
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
             <AppTopbar onToggleMenu={onToggleMenu} />
@@ -254,6 +251,5 @@ const App = () => {
     );
 
 }
-
 
 export default App;

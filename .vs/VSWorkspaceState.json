@@ -2,7 +2,6 @@
   "ExpandedNodes": [
     "",
     "\\backend",
-    "\\backend\\careta",
     "\\frontend",
     "\\frontend\\src",
     "\\frontend\\src\\actions",
@@ -10,6 +9,6 @@
     "\\frontend\\src\\components\\common",
     "\\frontend\\src\\reducers"
   ],
-  "SelectedNode": "\\frontend\\src\\reducers\\auth.js",
+  "SelectedNode": "\\frontend\\src\\reducers\\messages.js",
   "PreviewInSolutionExplorer": false
 }

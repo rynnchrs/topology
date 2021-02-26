@@ -1,4 +1,4 @@
-import React, { Component, useRef } from 'react';
+import React, { Component } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -13,9 +13,9 @@ export class Register extends Component {
         this.state = {
             first_name: 'myfirst',
             last_name: 'mylast',
-            email: 'myemail',
-            username: 'users',
-            password: 'p&743A',
+            email: 'myemail@gmail.com',
+            username: 'usersa',
+            password: 'qwerty12345()',
             genderOptions: [{ name: 'F' }, {name: 'M' }],
             gender: null,
             company: 'com',
@@ -32,42 +32,69 @@ export class Register extends Component {
     }
 
     submitData = event => {
-        /*console.log(this.state.gender.name);
-        alert("U: " + this.state.firstname + "\nP: " + this.state.lastname + "\nP: " + this.state.email
-            + "\nP: " + this.state.username + "\nP: " + this.state.password + "\nP: " + (this.state.gender.name)
-            + "\nP: " + this.state.company + "\nP: " + this.state.position + "\nP: " + this.state.address
-            + "\nP: " + this.state.phone + "\nP: " + this.state.birthday)*/
-        
-        let token = localStorage.getItem("token");
-        console.log('the token: ' + token);
-        
-        const { username, email, first_name, last_name, password, company, position, address, phone, birthday} = this.state;
+        if (this.state.firstname == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Firstname is required.', life: 5000 });
+        } else if (this.state.lastname == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Lastname is required.', life: 5000 });
+        } else if (this.state.email == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Email is required.', life: 5000 });
+        } else if (this.state.username == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Username is required.', life: 5000 });
+        } else if (this.state.password == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Password is required.', life: 5000 });
+        } else if (this.state.gender == null) {
+            this.state.toast.current.show({ severity: 'warn', summary: 'No Selected', detail: 'Please select a gender.', life: 5000 });
+        } else if (this.state.company == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Company is required.', life: 5000 });
+        } else if (this.state.position == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Position is required.', life: 5000 });
+        } else if (this.state.address == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Address is required.', life: 5000 });
+        } else if (this.state.phone == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 5000 });
+        } else if (this.state.birthday == "") {
+            this.state.toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
+        } else {
+            let token = localStorage.getItem("token");
+            console.log('the token: ' + token);
 
-        const gender = this.state.gender.name;
-        const user_info = { company, position, gender, birthday, phone, address};
-        
-        const config = {
-            headers: {
-                'Authorization': 'Bearer '+token,
-                'Content-Type': 'application/json',
-            },
-        };
+            const { username, email, first_name, last_name, password, company, position, address, phone, birthday } = this.state;
 
-        // Request Body
-        const body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
-        console.log('body: ' + body);
-        axios
-            .post('http://127.0.0.1:8000/api/register/', body, config)
-            .then((res) => {
-                console.log('succ: ');
-                console.log(res.data)
-                this.state.toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 3000 });
-            })
-            .catch((err) => {
-                console.log('err: ');
-                console.log(err.response)
-                this.state.toast.current.show({ severity: 'error', summary: 'Error Input', detail: 'Please check your input details.', life: 3000 });
-            });
+            const gender = this.state.gender.name;
+            const user_info = { company, position, gender, birthday, phone, address };
+
+            const config = {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            // Request Body
+            const body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
+            console.log('body: ' + body);
+            axios
+                .post('http://127.0.0.1:8000/api/register/', body, config)
+                .then((res) => {
+                    console.log('succ: ');
+                    console.log(res.data)
+                    this.state.toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
+                })
+                .catch((err) => {
+                    console.log('err: ');
+                    console.log(err.response)
+                    if (err.response.data.username) {
+                        this.state.toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.username.join()}`, life: 5000 });
+                    } else if (err.response.data.email) {
+                        this.state.toast.current.show({ severity: 'error', summary: 'Email', detail: `${err.response.data.email.join()}`, life: 5000 });
+                    } else if (err.response.data.password) {
+                        this.state.toast.current.show({ severity: 'error', summary: 'Password', detail: `${err.response.data.password.join()}`, life: 5000 });
+                    } else if (err.response.data.user_info.birthday) {
+                        //this.state.toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
+                        this.state.toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 5000 });
+                    }
+                });
+        }
     }
 
     toggleShow() {
@@ -75,7 +102,6 @@ export class Register extends Component {
     }
 
     render() {
-
         return (
             <div className="p-grid p-fluid" >
                 <Toast ref={this.state.toast} />
@@ -165,13 +191,10 @@ export class Register extends Component {
 
                     </div>
                 </div>
-                
             </div>
 
         );
     }
 }
-
-
 
 export default Register;

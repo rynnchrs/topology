@@ -1,21 +1,20 @@
 ﻿import React, { Component } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import axios from "axios";
 
 import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { login } from '../actions/auth';
+import Toasts from './Toasts';
 
 export class Login extends Component {
 
     constructor() {
         super();
         this.state = {
-            checkboxValue: [],
             username: 'admin',
-            password: 'password',
+            password: 'passwor',
             hidden: true,
         };
 
@@ -32,6 +31,10 @@ export class Login extends Component {
         this.props.login(this.state.username, this.state.password);
     }
 
+    showError() {
+        console.log("not auth")
+    }
+
     toggleShow() {
         this.setState({ hidden: !this.state.hidden });
     }
@@ -39,9 +42,10 @@ export class Login extends Component {
     render() {
         if (this.props.isAuthenticated) {
             return <Redirect to="/" />;
-        } 
+        }
         return (
             <div className="p-grid p-fluid" style={{ marginTop: '5%' }}>
+                <Toasts/>
                 <div className="p-col"> </div>
                 <div className="p-col-12 p-lg-6 p-md-6">
                     <div className="card card-w-title p-shadow-10">
