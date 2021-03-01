@@ -152,20 +152,18 @@ Permission Task Update:
         "can_edit_task": ,  
         "can_delete_task":   
 }  
-   
-
+    
+  
 
 
 
 Report Form  
 API:  
-repair order form = api/report/  
+report order form = api/report/  
   
 Structure:  
 {  
-    "car": null,  
-    "body_no": "",  
-    "make": "",  
+    "vin_no": "vin_no",  
     "mileage": null,  
     "location": "",  
     "cleanliness_exterior": false,  
@@ -216,23 +214,27 @@ Structure:
     "notes": ""  
 }  
   
+
+
 Repair Form  
 API:  
 repair order form = api/repair/  
   
 Structure:  
 {  
-    "vin_no": null,  
+    "vin_no": "vin_no",  
     "ro_no": "",  
+    "location":"1",  
+    "current_status":"1",  
     "incident_details": "",  
-    "vms": "",  
+    "vms": "username",  
     "dealer": "",  
     "schedule_date": null,  
-    "perform_by": null,  
+    "perform_by": "username",  
     "perform_date": null,  
     "actual_findings": "",  
     "actual_remarks": "",  
-    "repair_by": null,  
+    "repair_by": "username",  
     "repair_date": null,  
     "action_taken": "",  
     "date_done": null,  

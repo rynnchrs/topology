@@ -398,9 +398,7 @@ class Insurance(models.Model):
 
 class Report(models.Model):
     report_id = models.AutoField(primary_key=True)
-    car =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
-    body_no = models.CharField(unique=True, max_length=30)
-    make = models.CharField(max_length=30)
+    vin_no =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
     mileage = models.IntegerField(default=0)
     location = models.CharField(max_length=50)
     # Exterior
@@ -484,8 +482,10 @@ class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
     vin_no = models.ForeignKey(Car, related_name='repair', on_delete=models.CASCADE)
     ro_no = models.CharField(unique=True, max_length=10)
+    location = models.CharField(max_length=30)
+    current_status = models.CharField(max_length=30)
     incident_details = models.TextField(max_length=200, null=True, blank=True)
-    vms = models.CharField(max_length=50)
+    vms = models.ForeignKey(User, related_name='vms', on_delete=models.CASCADE)
     dealer = models.CharField(max_length=30)
     schedule_date = models.DateField(auto_now=False, auto_now_add=False)
     perform_by = models.ForeignKey(User, related_name='actual', on_delete=models.CASCADE)
@@ -503,6 +503,27 @@ class Repair(models.Model):
 
     def __str__(self):
         return self.ro_no
+        
+    @property
+    def total_parts_cost(self):  # total cost of particular
+        ro_no = Repair.objects.get(ro_no=self.ro_no)
+        repair_list = Cost.objects.filter(ro_no=ro_no,cost_type="P")
+        total = 0
+        for cost in repair_list:
+            total += cost.total_cost
+        return total
+    
+    @property
+    def total_labor_cost(self): # total cost of labor
+        ro_no = Repair.objects.get(ro_no=self.ro_no)
+        repair_list = Cost.objects.filter(ro_no=ro_no, cost_type="L")
+        total = 0
+        for cost in repair_list:
+            total += cost.cost
+        return total
+    
+    def total_estimate_cost(self): # total estimate
+        return self.total_labor_cost + self.total_parts_cost
 
 class Cost(models.Model):
     cost_id = models.AutoField(primary_key=True)
@@ -519,4 +540,8 @@ class Cost(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.ro_no
+        return self.ro_no.ro_no
+
+    @property
+    def total_cost(self): # total cost of an item per quantity
+        return self.cost * self.quantity

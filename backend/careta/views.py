@@ -1,7 +1,8 @@
 from abc import abstractmethod
+from django.db.models import query
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer # add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer # add this
 from .models import Car, Contract, Permission, Repair, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
@@ -29,7 +30,8 @@ class BlacklistTokenView(APIView):      # for Logout
         try:       
             refresh_token = request.data.get("refresh_token")   
             token = RefreshToken(refresh_token)
-            token.blacklist()  
+            token.blacklist()
+            return Response(status=status.HTTP_200_OK) 
         except Exception as e:  
             return Response(status=status.HTTP_400_BAD_REQUEST) 
 
@@ -342,5 +344,10 @@ class ExpiryView(APIView): # expiry
 class RepairView(viewsets.ModelViewSet):  # add this
     queryset = Repair.objects.all()  # add this
     serializer_class = RepairSerializer  # add this
-    search_fields = ['vin_no__vin_no']
+    search_fields = ['vin_no__vin_no','date_created']
     filter_backends = [filters.SearchFilter]
+
+    def list(self, request): # list of all repair
+        queryset =  Repair.objects.all()
+        serializer = RepairListSerializer(queryset, many=True)
+        return Response(serializer.data)

@@ -156,14 +156,18 @@ class InsuranceSerializer(serializers.ModelSerializer):
 #    class Meta:
 #        model = ReportImage
 #        fields = ['id','images']
+class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance
+    class Meta:
+        model = Car
+        fields = ['vin_no','body_no','plate_no','brand']
 
 
-class ReportSerializer(serializers.ModelSerializer):
+class ReportSerializer(serializers.ModelSerializer): # report serializer 
     #images = ReportImageSerializer(many=True)
-
+    vin_no = serializers.CharField()
     class Meta:
         model = Report
-        fields = ['report_id','car','body_no','make','mileage','location','cleanliness_exterior','condition_rust','decals','windows',
+        fields = ['report_id','vin_no','mileage','location','cleanliness_exterior','condition_rust','decals','windows',
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition','vehicle_documents','main_beam',
                     'dipped_beam','side_lights','tail_lights','indicators','break_lights','reverse_lights','hazard_light','rear_fog_lights',
                     'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
@@ -171,13 +175,23 @@ class ReportSerializer(serializers.ModelSerializer):
                     'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel', 
                     'notes','date_updated','date_created']#,'images']
 
+    def validate(self, obj): # validate if vin_no input is vin_no
+        try:
+            obj['vin_no'] = Car.objects.get(vin_no=obj['vin_no'])
+        except:
+           raise serializers.ValidationError({"vin_no": 'Invalid vin_no'})
+        return obj
 
-    def create(self, validated_data):       # Creating User
+    def create(self, validated_data):       # Creating report
         # images_data = validated_data.pop('images')
         report = Report.objects.create(**validated_data)
         # for image_data in images_data:
         #     ReportImage.objects.create(report=report, **image_data)
         return report
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
+        return super(ReportSerializer, self).to_representation(instance)
 
 class TotalCarSerializer(serializers.ModelSerializer):
     class Meta:
@@ -198,25 +212,58 @@ class TotalCarSerializer(serializers.ModelSerializer):
                     'decals_with_dnr','userManual_with_dnr','warrantyBook_with_dnr','unitKey_with_dnr','bodyKey_with_dnr',
                  ]
 
-class CostSerializer(serializers.ModelSerializer):
+class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     class Meta:
         model = Cost
-        fields = ['cost_type','particulars','cost','quantity']
+        fields = ['cost_type','particulars','cost','quantity','total_cost']
 
-class RepairSerializer(serializers.ModelSerializer):
+class RepairSerializer(serializers.ModelSerializer): # repair serializer
     cost = CostSerializer(many=True)
+    vin_no = serializers.CharField()
+    vms = serializers.CharField()
+    perform_by = serializers.CharField()
+    repair_by = serializers.CharField()
     class Meta:
         model = Repair
-        fields = [  'repair_id','vin_no','ro_no','incident_details','vms','dealer','schedule_date','perform_by','perform_date',
+        fields = [  'repair_id','ro_no','vin_no','location','current_status','incident_details','vms','dealer','schedule_date','perform_by','perform_date',
                     'actual_findings','actual_remarks','repair_by','repair_date','action_taken','date_done','status_repair',
-                    'remarks','date_updated','date_created','cost'
+                    'remarks','date_updated','date_created','cost','total_parts_cost','total_labor_cost','total_estimate_cost',
                     ]
-                    
-    def create(self, validated_data):       # Creating Cost
+    def validate(self, obj): # validate input in foreign keys
+        errors = []
+        try:
+            obj['vin_no'] = Car.objects.get(vin_no=obj['vin_no'])
+        except:
+            errors.append({"vin_no": 'Invalid vin_no'})
+        try:
+            obj['vms'] = User.objects.get(username=obj['vms'])
+        except:
+            errors.append({"vms": 'Invalid vms'})
+        try:
+            obj['perform_by'] = User.objects.get(username=obj['perform_by'])
+        except:
+            errors.append({"perform_by": 'Invalid perform_by'})
+        try:
+            obj['repair_by'] = User.objects.get(username=obj['repair_by'])
+        except:
+            errors.append({"repair_by": 'Invalid repair_by'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+
+    def create(self, validated_data):       # Creating Repair with many Cost
         costs_data = validated_data.pop('cost')
         ro_no = Repair.objects.create(**validated_data)
         for cost_data in costs_data:
             Cost.objects.create(ro_no=ro_no, **cost_data)
         return ro_no
 
-    
+    def to_representation(self, instance): # vin_no instances
+        self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
+        return super(RepairSerializer, self).to_representation(instance)
+
+class RepairListSerializer(serializers.ModelSerializer): # list of all repair
+    vin_no = serializers.CharField(source='vin_no.vin_no')
+    class Meta:
+        model = Repair
+        fields = [  'repair_id','ro_no','vin_no']
