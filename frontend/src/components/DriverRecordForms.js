@@ -32,7 +32,7 @@ export default function DriverRecordForms() {
         }
 
          const submitSearch = () => {
-            console.log(format(date2, 'yyyy-MM-dd'))
+            console.log(carValues);
             fetch('http://127.0.0.1:8000/api/report/?search=' + format(date2, 'yyyy-MM-dd'))
                 .then(response => response.json())
                 .then(data => {

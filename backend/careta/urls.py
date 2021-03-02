@@ -1,6 +1,10 @@
 from django.urls import path, include # add this
 from rest_framework_simplejwt import views as jwt_views # add this
+<<<<<<< HEAD
 from .views import RegisterView, BlacklistTokenView , PermissionUserView, ExpiryView # add this
+=======
+from .views import RegisterView, BlacklistTokenView , PermissionUserView, SearchInventoryView # add this
+>>>>>>> 4caf1cb559e5500b3d4c723f04e7259518ca75ff
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('login/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'), # login api

@@ -130,8 +130,8 @@ const App = () => {
         {
             label: 'Records', icon: 'pi pi-fw pi-table',
                 items: [
-                    {label: 'Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms'},
-                    {label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
+                    {label: 'Driver Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms'},
+                    //{label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
                 ]
         },
         { label: 'Job Schedule', icon: 'pi pi-fw pi-calendar' },
