@@ -2,6 +2,7 @@
   "ExpandedNodes": [
     "",
     "\\backend",
+    "\\backend\\careta",
     "\\frontend",
     "\\frontend\\src",
     "\\frontend\\src\\actions",
@@ -9,6 +10,6 @@
     "\\frontend\\src\\components\\common",
     "\\frontend\\src\\reducers"
   ],
-  "SelectedNode": "\\frontend\\src\\reducers\\messages.js",
+  "SelectedNode": "\\frontend\\src\\components\\Register.js",
   "PreviewInSolutionExplorer": false
 }
