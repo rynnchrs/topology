@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { returnErrors } from '../reducers/messages';
+import { createMessage, returnErrors } from './messages';
 
 import {
     GET_ERRORS,
@@ -30,10 +30,18 @@ export const login = (username, password) => (dispatch) => {
         .then((res) => {
             //console.log('login token: ' + res.data.access)
             localStorage.setItem('username', username);
-            dispatch({
+            dispatch(createMessage({ okayLogin: "okay" }));
+            // i added delay 1.5second to make dispatch above perform the toast before the dispatch below
+            setTimeout(() => {
+                dispatch({
+                    type: LOGIN_SUCCESS,
+                    payload: res.data,
+                });
+            }, 1500)
+            /*dispatch({
                 type: LOGIN_SUCCESS,
                 payload: res.data,
-            });
+            });*/
         })
         .catch((err) => {
             console.log(err.response);
@@ -41,10 +49,14 @@ export const login = (username, password) => (dispatch) => {
                 msg: err.response.data,
                 status: err.response.status
             }
-            dispatch(returnErrors(err.response.data, err.response.status));
+            //dispatch(returnErrors(err.response.data, err.response.status));
+            dispatch({
+                //type: LOGIN_FAIL,
+                type: GET_ERRORS,
+                payload: errors
+            });
             dispatch({
                 type: LOGIN_FAIL,
-                //type: GET_ERRORS,
                 payload: errors
             });
         });

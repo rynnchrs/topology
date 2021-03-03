@@ -14,6 +14,7 @@ export const AppProfile = () => {
 
     useEffect(() => {
         let token = localStorage.getItem("token");
+        let username = localStorage.getItem("username");
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -22,15 +23,14 @@ export const AppProfile = () => {
         };
 
         axios
-            .get('http://127.0.0.1:8000/api/users/', config)
+            .get('http://127.0.0.1:8000/api/users/' + username + '/', config)
+            //.get('http://127.0.0.1:8000/api/users/', config)
             .then((res) => {
                 //console.log("get users:")
                 //console.log(res.data)
-                var usen = localStorage.getItem("username");
-                let myfind = res.data.find(x => x.username === usen);
-                localStorage.setItem('myfirst', myfind.username);
+                localStorage.setItem('myfirst', res.data.username);
                 setUserData(localStorage.getItem("myfirst"))
-                toast.current.show({ severity: 'success', summary: 'Login Successful', detail: 'You are now log in.', life: 5000 });
+                //toast.current.show({ severity: 'success', summary: 'Login Successful', detail: 'You are now log in.', life: 5000 });
             })
             .catch((err) => {
                 console.log("get users err:")
@@ -74,7 +74,10 @@ export const AppProfile = () => {
         localStorage.removeItem("username");
         localStorage.removeItem("myfirst");
         toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
-        window.location.href = '/';
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1500)
+        
     }
  
     return (

@@ -56,8 +56,6 @@ import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
 import { Register } from './components/Register';
-import LogoutTry from './components/LogoutTry';
-
 
 const App = () => {
 
@@ -152,7 +150,6 @@ const App = () => {
                 items: [
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
                     { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
-                    { label: 'Try', icon: 'pi pi-fw pi-file', to: '/logouttry'},
                     { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -196,7 +193,6 @@ const App = () => {
             else
                 return true;
         }
-
         return true;
     }
 
@@ -239,7 +235,6 @@ const App = () => {
                 <Route path="/vehicles" exact component={Vehicles} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/register" exact component={Register} />
-                <Route path="/logouttry" exact component={LogoutTry} />
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
             </div>
