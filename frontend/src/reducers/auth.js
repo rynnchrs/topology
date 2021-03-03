@@ -1,4 +1,3 @@
-import axios from 'axios';
 
 import {
     USER_LOADED,
@@ -46,6 +45,7 @@ export default function (state = initialState, action) {
         case AUTH_ERROR:
         case LOGIN_FAIL:
             localStorage.removeItem('token');
+            //console.log("LOGIN FAIL TRY")
             return {
                 ...state,
                 token: null,

@@ -10,7 +10,7 @@ export default function (state = initialState, action) {
         case GET_ERRORS:
             return {
                 msg: action.payload.msg,
-                status: action.payload.status,
+                status: action.payload.status
             };
         default:
             return state;

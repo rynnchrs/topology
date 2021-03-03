@@ -1,17 +1,14 @@
-import { CREATE_MESSAGE, GET_ERRORS } from '../actions/types';
+import { GET_MESSAGES, CREATE_MESSAGE } from '../actions/types';
 
-// CREATE MESSAGE
-export const createMessage = (msg) => {
-    return {
-        type: CREATE_MESSAGE,
-        payload: msg,
-    };
-};
+const initialState = {};
 
-// RETURN ERRORS
-export const returnErrors = (msg, status) => {
-    return {
-        type: GET_ERRORS,
-        payload: { msg, status },
-    };
-};
+export default function (state = initialState, action) {
+    switch (action.type) {
+        case GET_MESSAGES:
+            return action.payload;
+        case CREATE_MESSAGE:
+           return (state = action.payload);
+        default:
+            return state;
+    }
+}
