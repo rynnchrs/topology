@@ -1,6 +1,6 @@
 import datetime
 from datetime import datetime
-from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report 
+from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Inspection 
 from django.contrib.auth.models import User
 import json
 
@@ -17,6 +17,7 @@ def user_permission(user):
         return True
     else:
         return False
+
 def check_or_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0

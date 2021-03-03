@@ -1,7 +1,7 @@
 # todo/admin.py
 
 from django.contrib import admin
-from .models import Car, Cost, Permission, Repair, UserInfo , Report #ReportImage # add this
+from .models import Car, Cost, Permission, Repair, UserInfo , Inspection #ReportImage # add this
 
 
 class CarAdmin(admin.ModelAdmin):  # add this
@@ -13,7 +13,7 @@ class UserInfoAdmin(admin.ModelAdmin):  # add this
 admin.site.register(Car, CarAdmin)  # add this
 admin.site.register(UserInfo, UserInfoAdmin)  # add this
 admin.site.register(Permission)  # add this
-
+admin.site.register(Inspection) 
 #class ImageReport(admin.TabularInline):
 #    model = ReportImage
 #    extra = 1

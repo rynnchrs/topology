@@ -2,8 +2,8 @@ from abc import abstractmethod
 from django.db.models import query
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer , TotalCarSerializer # add this
-from .models import Car, Contract, Permission, Repair, TPL, Insurance, UserInfo, Report  # add this
+from .serializers import CarSerializer, ContractSerializer, InspectionSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, SearchInventorySerializer, TPLSerializer, InsuranceSerializer, UserListSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, InspectionSerializer , TotalCarSerializer # add this
+from .models import Car, Contract, Inspection, Permission, Repair, TPL, Insurance, UserInfo  # add this
 
 from rest_framework import generics, status     # add this
 from rest_framework.response import Response    # add this
@@ -91,7 +91,16 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
             users.delete()
             return Response('Successfully deleted.')        
         else: 
-            return Response(status=status.HTTP_400_BAD_REQUEST)       
+            return Response(status=status.HTTP_400_BAD_REQUEST)     
+
+
+class UserListView(generics.ListAPIView):
+    queryset = Permission.objects.all()
+    serializer_class = UserListSerializer            
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['can_view_inspection_reports']
+    
+
 class PermissionView(viewsets.ViewSet):  # permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionSerializer 
@@ -280,10 +289,10 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
             return Response(status=status.HTTP_400_BAD_REQUEST)   
 
 
-class ReportView(viewsets.ModelViewSet):  # report Form
+class InspectionView(viewsets.ModelViewSet):  # report Form
 
-    queryset = Report.objects.all() 
-    serializer_class = ReportSerializer
+    queryset = Inspection.objects.all() 
+    serializer_class = InspectionSerializer
     search_fields = ['report_id','car__vin_no','body_no','make','mileage','location','cleanliness_exterior','condition_rust','decals','windows',
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition','vehicle_documents','main_beam',
                     'dipped_beam','side_lights','tail_lights','indicators','break_lights','reverse_lights','hazard_light','rear_fog_lights',
@@ -296,7 +305,7 @@ class ReportView(viewsets.ModelViewSet):  # report Form
     ordering_fields = ['car', 'date_created'] # ordering
 
     def create(self, request): # create report 
-        serializer = ReportSerializer(data=request.data) 
+        serializer = InspectionSerializer(data=request.data) 
         if serializer.is_valid(raise_exception=True): 
             serializer.save() # add this
             return Response("Successfully Register") 

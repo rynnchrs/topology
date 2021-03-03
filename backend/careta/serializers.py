@@ -1,16 +1,24 @@
 # todo/serializers.py
 from django.db.models import fields
 from rest_framework import serializers
-from .models import Car, Contract, Cost, Repair, ReportImage, TPL, Insurance, UserInfo, Permission, Report#, ReportImage # add this
+from .models import Car, Contract, Cost, Repair, TPL, Insurance, UserInfo, Permission, Inspection#, ReportImage # add this
 
 from django.contrib.auth.models import User # add this
 import django.contrib.auth.password_validation as validators    # add this
 from django.core import exceptions
 
+class UserListSerializer(serializers.ModelSerializer):  # user info serializer
+    user_id = serializers.CharField(read_only=True, source='user.id')
+    first_name = serializers.CharField(read_only=True, source='user.first_name')
+    class Meta:
+        model = Permission
+        fields = ['user_id','first_name']
+
+
 class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
     class Meta:
         model = UserInfo
-        fields = ['id','company','position','gender','birthday','phone','address']
+        fields = ['id','company','position','gender','birthday','phone','address','full_name']
         
         
 class UserSerializer(serializers.ModelSerializer):  # user serializer
@@ -37,6 +45,7 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
         user.set_password(password)
         user.save()
         return user
+
 
 class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializer
     user_info = UserInfoSerializer()
@@ -77,6 +86,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializ
         user_info.save()
         return instance
 
+
 class PermissionSerializer(serializers.ModelSerializer):    # permission serializer
     class Meta:
         model = Permission
@@ -87,11 +97,13 @@ class PermissionSerializer(serializers.ModelSerializer):    # permission seriali
                   'can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports',
                   'can_view_task','can_add_task','can_edit_task','can_delete_task']
 
+
 class PermissionUserSerializer(serializers.ModelSerializer):    # user permission serializer
     class Meta:
         model = Permission
         fields = ['id','slug','can_view_users','can_add_users','can_edit_users','can_delete_users']
         extra_kwargs = {'slug': {'read_only': True},}
+
 
 class PermissionInventorySerializer(serializers.ModelSerializer):    # inventory permission serializer
     class Meta:
@@ -99,11 +111,13 @@ class PermissionInventorySerializer(serializers.ModelSerializer):    # inventory
         fields = ['id','slug','can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory']
         extra_kwargs = {'slug': {'read_only': True},}
 
+
 class PermissionInspectionReportSerializer(serializers.ModelSerializer):    # inspection report permission serializer
     class Meta:
         model = Permission
         fields = ['id','slug','can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports']
         extra_kwargs = {'slug': {'read_only': True},}
+
 
 class PermissionMaintenanceReportSerializer(serializers.ModelSerializer):    # maintenance report permission serializer
     class Meta:
@@ -111,11 +125,13 @@ class PermissionMaintenanceReportSerializer(serializers.ModelSerializer):    # m
         fields = ['id','slug','can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports']
         extra_kwargs = {'slug': {'read_only': True},}
 
+
 class PermissionRepairReportSerializer(serializers.ModelSerializer):    # repair permission serializer
     class Meta:
         model = Permission
         fields = ['id','slug','can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports']
         extra_kwargs = {'slug': {'read_only': True},}
+
 
 class PermissionTaskSerializer(serializers.ModelSerializer):    # task permission serializer
     class Meta:
@@ -179,70 +195,62 @@ class InsuranceSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-#class ReportImageSerializer(serializers.ModelSerializer):
+#class InspectionImageSerializer(serializers.ModelSerializer):
 #    class Meta:
-#        model = ReportImage
+#        model = InspectionImage
 #        fields = ['id','images']
+
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance
     class Meta:
         model = Car
         fields = ['vin_no','body_no','plate_no','brand']
 
 
-class ReportSerializer(serializers.ModelSerializer): # report serializer 
-    #images = ReportImageSerializer(many=True)
+class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
+    #images = InspectionImageSerializer(many=True)
     vin_no = serializers.CharField()
+    driver = serializers.CharField()
     class Meta:
-        model = Report
+        model = Inspection
         fields = ['report_id','vin_no','mileage','location','cleanliness_exterior','condition_rust','decals','windows',
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition','vehicle_documents','main_beam',
                     'dipped_beam','side_lights','tail_lights','indicators','break_lights','reverse_lights','hazard_light','rear_fog_lights',
                     'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
                     'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','gas_level','oil_level','tyres','front_visual',
-                    'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel', 
+                    'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel','driver',
                     'notes','date_updated','date_created']#,'images']
 
     def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
         try:
             obj['vin_no'] = Car.objects.get(vin_no=obj['vin_no'])
         except:
-           raise serializers.ValidationError({"vin_no": 'Invalid vin_no'})
+           errors.append({"vin_no": 'Invalid vin_no'})
+        try:
+            obj['driver'] = User.objects.get(first_name=obj['driver'])
+        except:
+            errors.append({"driver": 'Invalid driver'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
         return obj
 
     def create(self, validated_data):       # Creating report
         # images_data = validated_data.pop('images')
-        report = Report.objects.create(**validated_data)
+        report = Inspection.objects.create(**validated_data)
         # for image_data in images_data:
         #     ReportImage.objects.create(report=report, **image_data)
         return report
 
     def to_representation(self, instance): # instance of vin_no
         self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
-        return super(ReportSerializer, self).to_representation(instance)
+        return super(InspectionSerializer, self).to_representation(instance)
 
-class TotalCarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Car
-        fields = ['get_total','plate_with_date','decals_with_date','userManual_with_date','warrantyBook_with_date','unitKey_with_date',
-                    'bodyKey_with_date','fan_date_with_date','ewd_date_with_date','tools_with_date','cigarettePlug_with_date','tools_with_date',
-                    
-                    'plate_with_nrc','fan_date_with_nrc','ewd_date_with_nrc','tools_with_nrc','cigarettePlug_with_nrc','tools_with_nrc',
-                    'decals_with_nrc','userManual_with_nrc','warrantyBook_with_nrc','unitKey_with_nrc','bodyKey_with_nrc',
-
-                    'plate_with_nyr','fan_date_with_nyr','ewd_date_with_nyr','tools_with_nyr','cigarettePlug_with_nyr','tools_with_nyr',
-                    'decals_with_nyr','userManual_with_nyr','warrantyBook_with_nyr','unitKey_with_nyr','bodyKey_with_nyr',
-
-                    'plate_with_na','fan_date_with_na','ewd_date_with_na','tools_with_na','cigarettePlug_with_na','tools_with_na',
-                    'decals_with_na','userManual_with_na','warrantyBook_with_na','unitKey_with_na','bodyKey_with_na',
-
-                    'plate_with_dnr','fan_date_with_dnr','ewd_date_with_dnr','tools_with_dnr','cigarettePlug_with_dnr','tools_with_dnr',
-                    'decals_with_dnr','userManual_with_dnr','warrantyBook_with_dnr','unitKey_with_dnr','bodyKey_with_dnr',
-                 ]
 
 class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     class Meta:
         model = Cost
         fields = ['cost_type','particulars','cost','quantity','total_cost']
+
 
 class RepairSerializer(serializers.ModelSerializer): # repair serializer
     cost = CostSerializer(many=True)
@@ -289,8 +297,30 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
         self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
         return super(RepairSerializer, self).to_representation(instance)
 
+
 class RepairListSerializer(serializers.ModelSerializer): # list of all repair
     vin_no = serializers.CharField(source='vin_no.vin_no')
     class Meta:
         model = Repair
         fields = [  'repair_id','ro_no','vin_no']
+
+
+class TotalCarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = ['get_total','plate_with_date','decals_with_date','userManual_with_date','warrantyBook_with_date','unitKey_with_date',
+                    'bodyKey_with_date','fan_date_with_date','ewd_date_with_date','tools_with_date','cigarettePlug_with_date','tools_with_date',
+                    
+                    'plate_with_nrc','fan_date_with_nrc','ewd_date_with_nrc','tools_with_nrc','cigarettePlug_with_nrc','tools_with_nrc',
+                    'decals_with_nrc','userManual_with_nrc','warrantyBook_with_nrc','unitKey_with_nrc','bodyKey_with_nrc',
+
+                    'plate_with_nyr','fan_date_with_nyr','ewd_date_with_nyr','tools_with_nyr','cigarettePlug_with_nyr','tools_with_nyr',
+                    'decals_with_nyr','userManual_with_nyr','warrantyBook_with_nyr','unitKey_with_nyr','bodyKey_with_nyr',
+
+                    'plate_with_na','fan_date_with_na','ewd_date_with_na','tools_with_na','cigarettePlug_with_na','tools_with_na',
+                    'decals_with_na','userManual_with_na','warrantyBook_with_na','unitKey_with_na','bodyKey_with_na',
+
+                    'plate_with_dnr','fan_date_with_dnr','ewd_date_with_dnr','tools_with_dnr','cigarettePlug_with_dnr','tools_with_dnr',
+                    'decals_with_dnr','userManual_with_dnr','warrantyBook_with_dnr','unitKey_with_dnr','bodyKey_with_dnr',
+                 ]
+

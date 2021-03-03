@@ -40,7 +40,6 @@ class RegistrationTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
 class UserTestCase(APITestCase):
-    
     TEST_USER = {
                 "username": "sample",
                 "email": "sample@email.com",
@@ -51,7 +50,6 @@ class UserTestCase(APITestCase):
     url = reverse('users-list')
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER)
-
         self.TEST_PERMISSION = {
                 "user": self.user,
                 "slug": "sample",
@@ -61,7 +59,6 @@ class UserTestCase(APITestCase):
                 "can_delete_users": True,
             }
         self.permission = Permission.objects.create(**self.TEST_PERMISSION)
-        
         self.refresh = RefreshToken.for_user(self.user)
         self.api_auth()
 
