@@ -211,7 +211,7 @@ export class DriverInspectionReport extends Component {
                                 <center><Checkbox value="clean_not" inputId="rb1" onChange={event => this.setState({ radioValue1: event.value })} checked={this.state.radioValue1 === "clean_not"} /></center>
                             </div>
                             <div className="p-field p-col">
-                                <center><Checkbox value="clean_ok" inputId="rb2" onChange={event => this.setState({ radioValue1: event.value })} checked={this.state.radioValue1 === "ok"} /></center>
+                                <center><Checkbox value="clean_ok" inputId="rb2" onChange={event => this.setState({ radioValue1: event.value })} checked={this.state.radioValue1 === "clean_ok"} /></center>
                             </div>
                             <div className="p-field p-col"><label>Cleanliness</label></div>
                         </div>
