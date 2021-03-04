@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 import json
 
 def user_permission(user):
-    permission = Permission.objects.get(slug=user.username) # get users permission
+    permission = Permission.objects.get(user__username=user.username) # get users permission
     user = User.objects.get(username=user) 
     if permission.can_view_users == True:  
         return True

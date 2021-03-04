@@ -254,6 +254,11 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
         self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
         return super(InspectionSerializer, self).to_representation(instance)
 
+class InspectionListSerializer(serializers.ModelSerializer): # list of all Inspection
+    vin_no = serializers.CharField(source='vin_no.vin_no')
+    class Meta:
+        model = Inspection
+        fields = [  'report_id','vin_no']
 
 class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     class Meta:

@@ -2,7 +2,7 @@ from abc import abstractmethod
 from django.db.models import query
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, InspectionSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, SearchInventorySerializer, TPLSerializer, InsuranceSerializer, UserListSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, InspectionSerializer , TotalCarSerializer # add this
+from .serializers import CarSerializer, ContractSerializer, InspectionListSerializer, InspectionSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, SearchInventorySerializer, TPLSerializer, InsuranceSerializer, UserListSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, InspectionSerializer , TotalCarSerializer # add this
 from .models import Car, Contract, Inspection, Permission, Repair, TPL, Insurance, UserInfo  # add this
 
 from rest_framework import generics, status     # add this
@@ -67,7 +67,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
             serializer = UserSerializer(users,  many=False)
             return Response(serializer.data)          
         else:
-            if pk == permission.slug:       # if current user is equal to pk
+            if pk == user.username:       # if current user is equal to pk
                 serializer = UserSerializer(user,  many=False)
                 return Response(serializer.data)
             else:    
@@ -125,16 +125,15 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
 
     def retrieve(self, request, pk=None):       # retrieve permission
         user = self.request.user
-        permission = Permission.objects.get(slug=user.username)
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)
+            users = get_object_or_404(queryset, user__username=pk)
             serializer = PermissionSerializer(users,  many=False)
             return Response(serializer.data)          
         else:
-            if pk == permission.slug:    # if current user is equal to pk
+            if pk == user.username:    # if current user is equal to pk
                 queryset = Permission.objects.all()
-                users = get_object_or_404(queryset, slug=pk)    # get user
+                users = get_object_or_404(queryset, user__username=pk)    # get user
                 serializer = PermissionSerializer(users,  many=False)
                 return Response(serializer.data)
             else:    
@@ -144,7 +143,7 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
         user = self.request.user
         if user_permission(user): # permission 
             queryset = Permission.objects.all()
-            user = get_object_or_404(queryset, slug=pk) # get user
+            user = get_object_or_404(queryset, user__username=pk) # get user
             user.delete()
             return Response('Successfully deleted.')        
         else:
@@ -157,7 +156,7 @@ class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
         user = self.request.user
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)    # get user
+            users = get_object_or_404(queryset, user__username=pk)    # get user
             serializer = PermissionUserSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -172,7 +171,7 @@ class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
         user = self.request.user
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)    # get user
+            users = get_object_or_404(queryset, user__username=pk)    # get user
             serializer = PermissionInventorySerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -188,7 +187,7 @@ class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permiss
         user = self.request.user
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk) # get user
+            users = get_object_or_404(queryset, user__username=pk) # get user
             serializer = PermissionInspectionReportSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -204,7 +203,7 @@ class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permi
         user = self.request.user
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk) # get user
+            users = get_object_or_404(queryset, user__username=pk) # get user
             serializer = PermissionMaintenanceReportSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -220,7 +219,7 @@ class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission View
         user = self.request.user
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk) # get user
+            users = get_object_or_404(queryset, user__username=pk) # get user
             serializer = PermissionRepairReportSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -242,7 +241,7 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         user = self.request.user
         if user_permission(user): # permission
             queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, slug=pk)    # get user
+            users = get_object_or_404(queryset, user__username=pk)    # get user
             serializer = PermissionTaskSerializer(instance=users, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -290,21 +289,20 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
             return Response(status=status.HTTP_400_BAD_REQUEST)   
 
 
-class InspectionView(viewsets.ModelViewSet):  # report Form
-
-    queryset = Inspection.objects.all() 
+class InspectionView(viewsets.ViewSet):  # report Form
     serializer_class = InspectionSerializer
-    search_fields = ['report_id','car__vin_no','body_no','make','mileage','location','cleanliness_exterior','condition_rust','decals','windows',
-                    'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition','vehicle_documents','main_beam',
-                    'dipped_beam','side_lights','tail_lights','indicators','break_lights','reverse_lights','hazard_light','rear_fog_lights',
-                    'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
-                    'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','gas_level','oil_level','tyres','front_visual',
-                    'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel', 
-                    'notes','date_updated','date_created']   # filtering
+    # queryset = Inspection.objects.all() 
+    # search_fields = ['report_id','car__vin_no']   # filtering
+    # filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # filtering and ordering
+    # ordering_fields = ['car', 'date_created'] # ordering
 
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # filtering and ordering
-    ordering_fields = ['car', 'date_created'] # ordering
-
+    def filter_queryset(self):
+        queryset = Inspection.objects.all
+        vin_no = self.request.query_params.get('vin_no', None)
+        if vin_no is not None:
+            queryset = queryset.filter(vin_no=vin_no)
+        return queryset
+        
     def create(self, request): # create report 
         serializer = InspectionSerializer(data=request.data) 
         if serializer.is_valid(raise_exception=True): 
@@ -312,6 +310,16 @@ class InspectionView(viewsets.ModelViewSet):  # report Form
             return Response("Successfully Register") 
         return Response(serializer.errors) 
 
+    def list(self, request): # list of all repair
+        queryset =  Inspection.objects.all()
+        serializer = InspectionListSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def retrieve(self, request, pk=None): # list of all repair
+        queryset =  Inspection.objects.all()
+        inspection = get_object_or_404(queryset, pk=pk)
+        serializer = InspectionSerializer(inspection, many=False)
+        return Response(serializer.data)
 
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
@@ -330,6 +338,12 @@ class SearchInventoryView(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+# class CarListView(generics.ListAPIView):
+#     queryset = Permission.objects.all()
+#     serializer_class = UserListSerializer            
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['can_view_inspection_reports']
+
 class ContractView(viewsets.ModelViewSet):  # add this
     queryset = Contract.objects.all()  # add this
     serializer_class = ContractSerializer  # add this
@@ -347,6 +361,7 @@ class InsuranceView(viewsets.ModelViewSet):  # add this
     serializer_class = InsuranceSerializer  # add this
     lookup_field = 'slug'
     
+
 class InsuranceList(generics.ListAPIView):
     serializer_class = InsuranceSerializer
 
@@ -354,19 +369,6 @@ class InsuranceList(generics.ListAPIView):
         username = self.kwargs['username']
         return Insurance.objects.filter(car=username)
 
-class TotalView(viewsets.ModelViewSet):
-    serializer_class = TotalCarSerializer
-    queryset = Car.objects.all().order_by('date_created')[:1]
-
-class ExpiryView(APIView): # expiry 
-    def get(self, request):
-        year = request.data.get('year')
-        return Response({
-            'OR':check_or_date(year), # OR
-            'CR':check_cr_date(year), # CR
-            'TPL':check_TPL_date(year), # TPL Insurance
-            'Com':check_Com_date(year), # Comprehensive Insurance
-            })
 
 class RepairView(viewsets.ModelViewSet):  # add this
     queryset = Repair.objects.all()  # add this
@@ -378,3 +380,19 @@ class RepairView(viewsets.ModelViewSet):  # add this
         queryset =  Repair.objects.all()
         serializer = RepairListSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class TotalView(viewsets.ModelViewSet):
+    serializer_class = TotalCarSerializer
+    queryset = Car.objects.all().order_by('date_created')[:1]
+
+
+class ExpiryView(APIView): # expiry 
+    def get(self, request):
+        year = request.data.get('year')
+        return Response({
+            'OR':check_or_date(year), # OR
+            'CR':check_cr_date(year), # CR
+            'TPL':check_TPL_date(year), # TPL Insurance
+            'Com':check_Com_date(year), # Comprehensive Insurance
+            })
