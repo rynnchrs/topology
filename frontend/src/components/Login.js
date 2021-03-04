@@ -35,15 +35,19 @@ export const Login = (props) => {
         <div className="p-grid p-fluid" style={{ marginTop: '5%' }}>
             <Toasts />
             <div className="p-col"> </div>
-            <div className="p-col-12 p-lg-6 p-md-6">
+            <div className="p-col-12 p-lg-8 p-md-8 p-sm-8" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
                 <div className="card card-w-title p-shadow-10">
-                    <div className="p-fluid p-formgrid p-grid">
+                    <div className="p-fluid p-grid">
                         <div className="p-col"></div>
-                        <div className="p-col"> <img src='/assets/layout/images/careta-logo.png' /></div>
+                        <div className="p-col">
+                            <center>
+                                <div><img src='/assets/layout/images/careta-logo.png' /></div>
+                                <div><label style={{ fontSize: '25px', fontWeight: 'bold' }}>Sign in</label></div>
+                            </center>
+                        </div>
                         <div className="p-col"></div>
                     </div>
-                    <center><h3><b>Sign in</b></h3></center>
-
+                    
                     <div className="p-grid p-fluid">
                         <div className="p-col" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
                             <div className="p-inputgroup">
@@ -66,7 +70,7 @@ export const Login = (props) => {
                                     <i className="pi pi-lock"></i>
                                 </span>
                                 <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
-                                <Button icon="pi pi-eye" onClick={toggleShow}> </Button>
+                                <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
                             </div>
                         </div>
                     </div>
@@ -79,7 +83,7 @@ export const Login = (props) => {
 
                 </div>
             </div>
-            <div className="p-col"> </div>
+            <div className="p-col"></div>
         </div>
     );
     

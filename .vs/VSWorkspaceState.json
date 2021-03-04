@@ -10,6 +10,6 @@
     "\\frontend\\src\\components\\common",
     "\\frontend\\src\\reducers"
   ],
-  "SelectedNode": "\\frontend\\src\\reducers\\auth.js",
+  "SelectedNode": "\\frontend\\src\\components\\Register.js",
   "PreviewInSolutionExplorer": false
 }

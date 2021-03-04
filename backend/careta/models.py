@@ -1,12 +1,13 @@
 from django.db import models
 import datetime
+from django.db.models import fields
 from django.db.models.deletion import CASCADE # add this
 from django.db.models.fields import AutoField, BooleanField, CharField, DateField, DateTimeField
 from phone_field import PhoneField
 # Create your models here.
 # add this
 from django.contrib.auth.models import User # authenticate User
-
+from datetime import date
 
 class UserInfo(models.Model):  # User Info Model
     user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
@@ -15,16 +16,20 @@ class UserInfo(models.Model):  # User Info Model
         ('M', 'Male'),
         ('F', 'Female'),
     ]
-    company = models.CharField(max_length=50)
-    position = models.CharField(max_length=20)
+    company = models.CharField(max_length=50, null = True)
+    position = models.CharField(max_length=20, null = True)
     gender = models.CharField(max_length=1, choices=Gender_List)
     birthday = models.DateField(auto_now=False, auto_now_add=False)
     phone = PhoneField(blank=True, help_text='Contact phone number')
-    address = models.CharField(max_length=100)
+    address = models.CharField(max_length=100, null = True)
     date_created = DateField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
+    
+    @property
+    def full_name(self):
+        return "%s %s" % (self.user.first_name, self.user.last_name)
 
 
 class Permission(models.Model):         # permission Model
@@ -95,7 +100,7 @@ class Car(models.Model):
     dealer_phone = PhoneField(help_text='Contact phone number', null=True, blank=True)
     dealer_email = models.EmailField(max_length=60, null=True, blank=True)
     po_no = models.CharField(max_length=100, null=True, blank=True)
-    po_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    po_date = models.CharField(max_length=20, null = True)
     body_builder = models.CharField(max_length=50, null=True, blank=True)
     fabricator = models.CharField(max_length=50, null=True, blank=True)
     sale_price = models.IntegerField(default=0, null=True, blank=True)
@@ -124,33 +129,36 @@ class Car(models.Model):
     shipping_weight = models.IntegerField(default=0, null=True, blank=True)
     net_capacity = models.IntegerField(default=0, null=True, blank=True)
     lto_cr = models.IntegerField(default=0, null=True, blank=True)
-    cr_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    cr_date = models.CharField(max_length=20, null = True)
     or_no = models.IntegerField(default=0, null=True, blank=True)
-    or_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    or_date = models.CharField(max_length=20, null = True)
     top_load = models.BooleanField(default=False, null=True, blank=True)
     field_office = models.CharField(max_length=50, null=True, blank=True)
-    or_cr = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    or_cr = models.CharField(max_length=20, null = True)
     permanent_loc = models.CharField(max_length=30, null=True, blank=True)
     current_loc = models.CharField(max_length=30, null=True, blank=True)
     vtf = models.BooleanField(default=False, null=True, blank=True)
     permanent_status = models.BooleanField(default=False, null=True, blank=True)
     delivery_location = models.CharField(max_length=50, null=True, blank=True)
-    deliver_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    deliver_date = models.CharField(max_length=20, null = True)
     si_no = models.IntegerField(default=0, null=True, blank=True)
     dr_no = models.CharField(max_length=50, null=True, blank=True)
     dr_codes = models.CharField(max_length=50, null=True, blank=True)
-    plate_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    decals_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    plate_date = models.CharField(max_length=20, null = True)
+    decals_date = models.CharField(max_length=20, null = True)
     modified = models.BooleanField(default=False, null=True, blank=True)
-    ewd_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    tools_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    userManual_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    warrantyBook_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    unitKey_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    bodyKey_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    cigarettePlug_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    keychain_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    fan_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    ewd_date = models.CharField(max_length=20, null = True)
+    tools_date = models.CharField(max_length=20, null = True)
+    userManual_date = models.CharField(max_length=20, null = True)
+    warrantyBook_date = models.CharField(max_length=20, null = True)
+    unitKey_date = models.CharField(max_length=20, null = True)
+    bodyKey_date = models.CharField(max_length=20, null = True)
+    cigarettePlug_date = models.CharField(max_length=20, null = True)
+    keychain_date = models.CharField(max_length=20, null = True)
+    fan_date = models.CharField(max_length=20, null = True)
+    jack = models.CharField(max_length=20, null = True)
+    wrench = models.CharField(max_length=20, null = True)
+    fire_extinguisher = models.CharField(max_length=20, null = True)
     remarks = models.TextField(max_length=200, null=True, blank=True)
     operational = models.BooleanField(default=False, null=True, blank=True)
     Status_List = [
@@ -165,6 +173,174 @@ class Car(models.Model):
     def _str_(self):
         return self.vin_no
 
+    @property
+    def get_total(self):
+        return Car.objects.all().count()
+
+    #with date
+    @property
+    def plate_with_date(self):
+        return Car.objects.all().filter(plate_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def decals_with_date(self):
+        return Car.objects.all().filter(decals_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def ewd_date_with_date(self):
+        return Car.objects.all().filter(ewd_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def fan_date_with_date(self):
+        return Car.objects.all().filter(fan_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def tools_with_date(self):
+        return Car.objects.all().filter(tools_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def userManual_with_date(self):
+        return Car.objects.all().filter(userManual_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def warrantyBook_with_date(self):
+        return Car.objects.all().filter(warrantyBook_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def unitKey_with_date(self):
+        return Car.objects.all().filter(unitKey_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def bodyKey_with_date(self):
+        return Car.objects.all().filter(bodyKey_date__lte = date.today().strftime("%Y-%m-%d")).count()
+    @property
+    def cigarettePlug_with_date(self):
+        return Car.objects.all().filter(cigarettePlug_date__lte = date.today().strftime("%Y-%m-%d")).count()
+
+    # with NRC
+    @property
+    def plate_with_nrc(self):
+        return Car.objects.all().filter(plate_date='NRC').count()
+    @property
+    def decals_with_nrc(self):
+        return Car.objects.all().filter(decals_date='NRC').count()
+    @property
+    def ewd_date_with_nrc(self):
+        return Car.objects.all().filter(ewd_date='NRC').count()
+    @property
+    def fan_date_with_nrc(self):
+        return Car.objects.all().filter(fan_date='NRC').count()
+    @property
+    def tools_with_nrc(self):
+        return Car.objects.all().filter(tools_date='NRC').count()
+    @property
+    def userManual_with_nrc(self):
+        return Car.objects.all().filter(userManual_date='NRC').count()
+    @property
+    def warrantyBook_with_nrc(self):
+        return Car.objects.all().filter(warrantyBook_date='NRC').count()
+    @property
+    def unitKey_with_nrc(self):
+        return Car.objects.all().filter(unitKey_date='NRC').count()
+    @property
+    def bodyKey_with_nrc(self):
+        return Car.objects.all().filter(bodyKey_date='NRC').count()
+    @property
+    def tools_with_nrc(self):
+        return Car.objects.all().filter(tools_date='NRC').count()
+    @property
+    def cigarettePlug_with_nrc(self):
+        return Car.objects.all().filter(cigarettePlug_date='NRC').count()
+
+    # with NYR
+    @property
+    def plate_with_nyr(self):
+        return Car.objects.all().filter(plate_date='NYR').count()
+    @property
+    def decals_with_nyr(self):
+        return Car.objects.all().filter(decals_date='NYR').count()
+    @property
+    def ewd_date_with_nyr(self):
+        return Car.objects.all().filter(ewd_date='NYR').count()
+    @property
+    def fan_date_with_nyr(self):
+        return Car.objects.all().filter(fan_date='NYR').count()
+    @property
+    def tools_with_nyr(self):
+        return Car.objects.all().filter(tools_date='NYR').count()
+    @property
+    def userManual_with_nyr(self):
+        return Car.objects.all().filter(userManual_date='NYR').count()
+    @property
+    def warrantyBook_with_nyr(self):
+        return Car.objects.all().filter(warrantyBook_date='NYR').count()
+    @property
+    def unitKey_with_nyr(self):
+        return Car.objects.all().filter(unitKey_date='NYR').count()
+    @property
+    def bodyKey_with_nyr(self):
+        return Car.objects.all().filter(bodyKey_date='NYR').count()
+    @property
+    def cigarettePlug_with_nyr(self):
+        return Car.objects.all().filter(cigarettePlug_date='NYR').count()
+
+    # with NA
+    @property
+    def plate_with_na(self):
+        return Car.objects.all().filter(plate_date='NA').count()
+    @property
+    def decals_with_na(self):
+        return Car.objects.all().filter(decals_date='NA').count()
+    @property
+    def ewd_date_with_na(self):
+        return Car.objects.all().filter(ewd_date='NA').count()
+    @property
+    def fan_date_with_na(self):
+        return Car.objects.all().filter(fan_date='NA').count()
+    @property
+    def tools_with_na(self):
+        return Car.objects.all().filter(tools_date='NA').count()
+    @property
+    def userManual_with_na(self):
+        return Car.objects.all().filter(userManual_date='NA').count()
+    @property
+    def warrantyBook_with_na(self):
+        return Car.objects.all().filter(warrantyBook_date='NA').count()
+    @property
+    def unitKey_with_na(self):
+        return Car.objects.all().filter(unitKey_date='NA').count()
+    @property
+    def bodyKey_with_na(self):
+        return Car.objects.all().filter(bodyKey_date='NA').count()
+    @property
+    def cigarettePlug_with_na(self):
+        return Car.objects.all().filter(cigarettePlug_date='NA').count()
+
+    # with DNR
+    @property
+    def plate_with_dnr(self):
+        return Car.objects.all().filter(plate_date='DNR').count()
+    @property
+    def decals_with_dnr(self):
+        return Car.objects.all().filter(decals_date='DNR').count()
+    @property
+    def fan_date_with_dnr(self):
+        return Car.objects.all().filter(fan_date='DNR').count()
+    @property
+    def tools_with_dnr(self):
+        return Car.objects.all().filter(tools_date='DNR').count()
+    @property
+    def ewd_date_with_dnr(self):
+        return Car.objects.all().filter(ewd_date='DNR').count()
+    @property
+    def userManual_with_dnr(self):
+        return Car.objects.all().filter(userManual_date='DNR').count()
+    @property
+    def warrantyBook_with_dnr(self):
+        return Car.objects.all().filter(warrantyBook_date='DNR').count()
+    @property
+    def unitKey_with_dnr(self):
+        return Car.objects.all().filter(unitKey_date='DNR').count()
+    @property
+    def bodyKey_with_dnr(self):
+        return Car.objects.all().filter(bodyKey_date='DNR').count()
+    @property
+    def cigarettePlug_with_dnr(self):
+        return Car.objects.all().filter(cigarettePlug_date='DNR').count()
+
+        
 
 class Contract(models.Model):
     contract_id = models.AutoField(primary_key=True)
@@ -172,11 +348,11 @@ class Contract(models.Model):
     slug = models.CharField(max_length=30)
     client_name = models.CharField(max_length=100, null=True, blank=True)
     contract_no = models.CharField(max_length=50, null=True, blank=True)
-    start_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    end_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    start_date = models.CharField(max_length=20, null = True)
+    end_date = models.CharField(max_length=20, null = True)
     bid_no = models.CharField(max_length=50, null=True, blank=True)
     bid_name = models.CharField(max_length=50, null=True, blank=True)
-    bid_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    bid_date = models.CharField(max_length=20, null = True)
     cost = models.IntegerField(default=0, null=True, blank=True)
     date_updated = models.DateField(auto_now=True, null=True, blank=True)
     date_created = models.DateField(auto_now_add=True, null=True, blank=True)
@@ -193,9 +369,9 @@ class TPL(models.Model):
     telephone = PhoneField(help_text='Contact phone number', null=True, blank=True)
     email = models.EmailField(max_length=60, null=True, blank=True)
     po_no = models.CharField(max_length=50, null=True, blank=True)
-    date_issued = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    start_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    end_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    date_issued = models.CharField(max_length=20, null = True)
+    start_date = models.CharField(max_length=20, null = True)
+    end_date = models.CharField(max_length=20, null = True)
     cost = models.IntegerField(default=0, null=True, blank=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
@@ -212,9 +388,9 @@ class Insurance(models.Model):
     telephone = PhoneField(help_text='Contact phone number', null=True, blank=True)
     email = models.EmailField(max_length=50, null=True, blank=True)
     po_no = models.CharField(max_length=30, null=True, blank=True)
-    date_issued = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    start_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
-    end_date = models.DateField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    date_issued = models.CharField(max_length=20, null = True)
+    start_date = models.CharField(max_length=20, null = True)
+    end_date = models.CharField(max_length=20, null = True)
     cost = models.IntegerField(default=0, null=True, blank=True)
     insurance_no = models.IntegerField(default=1, null=True, blank=True)
     date_updated = models.DateField(auto_now=True, null=True, blank=True)
@@ -224,11 +400,9 @@ class Insurance(models.Model):
         return self.company
 
 
-class Report(models.Model):
+class Inspection(models.Model):
     report_id = models.AutoField(primary_key=True)
-    car =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
-    body_no = models.CharField(unique=True, max_length=30)
-    make = models.CharField(max_length=30)
+    vin_no =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
     mileage = models.IntegerField(default=0)
     location = models.CharField(max_length=50)
     # Exterior
@@ -251,7 +425,7 @@ class Report(models.Model):
     side_lights = models.BooleanField(default=False)
     tail_lights = models.BooleanField(default=False)
     indicators = models.BooleanField(default=False)
-    breake_lights = models.BooleanField(default=False)
+    break_lights = models.BooleanField(default=False)
     reverse_lights = models.BooleanField(default=False)
     hazard_light = models.BooleanField(default=False)
     rear_fog_lights = models.BooleanField(default=False)
@@ -293,18 +467,87 @@ class Report(models.Model):
     front_left_wheel = models.BooleanField(default=False)
     rear_right_wheel = models.BooleanField(default=False)
     rear_left_wheel = models.BooleanField(default=False)
-
     notes = models.TextField(null=True, blank=True)
+    driver = models.ForeignKey(User, related_name='driver', on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.car.vin_no
+        return self.vin_no.vin_no
 
 
-class ReportImage(models.Model):
-    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
-    images = models.ImageField(upload_to = 'images/')
+class InspectiontImage(models.Model):
+   report = models.ForeignKey(Inspection, default=None, on_delete=models.CASCADE, related_name='images')
+   images = models.ImageField(upload_to = 'images/')
+
+
+
+class Repair(models.Model):
+    repair_id = models.AutoField(primary_key=True)
+    vin_no = models.ForeignKey(Car, related_name='repair', on_delete=models.CASCADE)
+    ro_no = models.CharField(unique=True, max_length=10)
+    location = models.CharField(max_length=30)
+    current_status = models.CharField(max_length=30)
+    incident_details = models.TextField(max_length=200, null=True, blank=True)
+    vms = models.ForeignKey(User, related_name='vms', on_delete=models.CASCADE)
+    dealer = models.CharField(max_length=30)
+    schedule_date = models.DateField(auto_now=False, auto_now_add=False)
+    perform_by = models.ForeignKey(User, related_name='actual', on_delete=models.CASCADE)
+    perform_date = models.DateField(auto_now=False, auto_now_add=False)
+    actual_findings = models.TextField(max_length=200, null=True, blank=True)
+    actual_remarks = models.TextField(max_length=200, null=True, blank=True)
+    repair_by = models.ForeignKey(User, related_name='repair', on_delete=models.CASCADE)
+    repair_date = models.DateField(auto_now=False, auto_now_add=False)
+    action_taken = models.TextField(max_length=200, null=True, blank=True)
+    date_done = models.DateField(auto_now=False, auto_now_add=False)
+    status_repair = models.CharField(max_length=20)
+    remarks = models.TextField(max_length=200, null=True, blank=True)
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.report.car.vin_no
+        return self.ro_no
+        
+    @property
+    def total_parts_cost(self):  # total cost of particular
+        ro_no = Repair.objects.get(ro_no=self.ro_no)
+        repair_list = Cost.objects.filter(ro_no=ro_no,cost_type="P")
+        total = 0
+        for cost in repair_list:
+            total += cost.total_cost
+        return total
+    
+    @property
+    def total_labor_cost(self): # total cost of labor
+        ro_no = Repair.objects.get(ro_no=self.ro_no)
+        repair_list = Cost.objects.filter(ro_no=ro_no, cost_type="L")
+        total = 0
+        for cost in repair_list:
+            total += cost.cost
+        return total
+    
+    def total_estimate_cost(self): # total estimate
+        return self.total_labor_cost + self.total_parts_cost
+
+
+class Cost(models.Model):
+    cost_id = models.AutoField(primary_key=True)
+    ro_no = models.ForeignKey(Repair, related_name='cost', on_delete=models.CASCADE)
+    Cost_List = [
+        ('P', 'Parts'),
+        ('L', 'Labor'),
+    ]
+    cost_type = models.CharField(max_length=1, choices=Cost_List, default="L")
+    particulars = models.CharField(max_length=50)
+    cost = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=0)
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.ro_no.ro_no
+
+    @property
+    def total_cost(self): # total cost of an item per quantity
+        return self.cost * self.quantity

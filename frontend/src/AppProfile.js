@@ -26,9 +26,10 @@ export const AppProfile = () => {
             .get('http://127.0.0.1:8000/api/users/' + username + '/', config)
             //.get('http://127.0.0.1:8000/api/users/', config)
             .then((res) => {
-                //console.log("get users:")
-                //console.log(res.data)
-                localStorage.setItem('myfirst', res.data.username);
+                console.log("get users:")
+                console.log(res.data)
+                //localStorage.setItem('myfirst', res.data.username);
+                localStorage.setItem('myfirst', res.data.user_info.full_name);
                 setUserData(localStorage.getItem("myfirst"))
                 //toast.current.show({ severity: 'success', summary: 'Login Successful', detail: 'You are now log in.', life: 5000 });
             })

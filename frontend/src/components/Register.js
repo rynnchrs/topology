@@ -96,7 +96,8 @@ export const Register = () => {
                 .then((res) => {
                     console.log('succ: ');
                     console.log(res.data)
-                    toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
+                    submitPermission();
+                    //toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
                 })
                 .catch((err) => {
                     console.log('err: ');
@@ -113,6 +114,61 @@ export const Register = () => {
                     }
                 });
         }
+    }
+
+    const submitPermission = event => {
+        let token = localStorage.getItem("token");
+        console.log('the token: ' + token);
+
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        // Request Body
+        const body = JSON.stringify({
+            "user": username,
+            "can_view_users": check1,
+            "can_add_users": check2,
+            "can_edit_users": check3,
+            "can_delete_users": check4,
+            "can_view_inventory": check5,
+            "can_add_inventory": check6,
+            "can_edit_inventory": check7,
+            "can_delete_inventory": check8,
+            "can_view_inspection_reports": check9,
+            "can_add_inspection_reports": check10,
+            "can_edit_inspection_reports": check11,
+            "can_delete_inspection_reports": check12,
+            "can_view_maintenance_reports": check13,
+            "can_add_maintenance_reports": check14,
+            "can_edit_maintenance_reports": check15,
+            "can_delete_maintenance_reports": check16,
+            "can_view_repair_reports": check17,
+            "can_add_repair_reports": check18,
+            "can_edit_repair_reports": check19,
+            "can_delete_repair_reports": check20,
+            "can_view_task": check21,
+            "can_add_task": check22,
+            "can_edit_task": check23,
+            "can_delete_task": check24
+        });
+        console.log('body: ' + body);
+        axios
+            .post('http://127.0.0.1:8000/api/permission/', body, config)
+            .then((res) => {
+                console.log('succ permission: ');
+                console.log(res.data)
+                toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
+            })
+            .catch((err) => {
+                console.log('err permission: ');
+                console.log(err.response)
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal', detail: 'Something went wrong.', life: 5000 });
+                    
+            });
     }
 
     const toggleShow = () => {
@@ -155,7 +211,7 @@ export const Register = () => {
         <div className="p-grid p-fluid" >
             <Toast ref={toast} />
             <div className="p-col-12">
-                <div className="card card-w-title p-shadow-10">
+                <div className="card card-w-title p-shadow-5">
                     <center><h2 style={{ marginTop: '2%' }}><b>Registration Form</b></h2></center>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
@@ -187,7 +243,8 @@ export const Register = () => {
                             <h6><b>PASSWORD:</b></h6>
                             <div className="p-inputgroup">
                                 <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
-                                <Button icon="pi pi-eye" onClick={toggleShow}> </Button>
+                                {/*<Button icon="pi pi-eye" onClick={toggleShow}> </Button>*/}
+                                <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
                             </div>
                         </div>
                     </div>
@@ -369,7 +426,9 @@ export const Register = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-field p-col"> </div>
                         <div className="p-field p-col"> </div>
-                        <div className="p-field p-col" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}> <Button label="REGISTER" className="p-button-md p-shadow-5" onClick={submitData}> </Button> </div>
+                        <div className="p-field p-col" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <Button label="REGISTER" className="p-button-md p-shadow-6 p-button-rounded" onClick={submitData} />
+                        </div>
                     </div>
 
 

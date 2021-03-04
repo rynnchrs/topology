@@ -38,8 +38,12 @@ router.register(r'permission/task', views.PermissionTaskView, 'permission-task')
 router.register(r'permission/add-list/maintenance', views.AddMaintenanceReportView, 'permission-maintenance-list') # list of can add maintenance report
 router.register(r'permission/add-list/inspection', views.AddInspectionReportView, 'permission-inspection-list')  # list of can add inspection report
 router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permission-repair-list')  # list of can add repair report
+router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permission-repair-list')  # list of can add repair report
+router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
 
-router.register(r'report', views.ReportView, 'report') # report creation api
+router.register(r'inspection', views.InspectionView, 'inspection') # report creation api
+router.register(r'total', views.TotalView, 'total') # total list api
+router.register(r'repair', views.RepairView, 'repair') # repair list api
 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
