@@ -2,7 +2,7 @@ from abc import abstractmethod
 from django.db.models import query
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, InspectionListSerializer, InspectionSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, SearchInventorySerializer, TPLSerializer, InsuranceSerializer, UserListSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, InspectionSerializer , TotalCarSerializer # add this
+from .serializers import CarInfoSerializer, CarSerializer, ContractSerializer, InspectionListSerializer, InspectionSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, SearchInventorySerializer, TPLSerializer, InsuranceSerializer, UserListSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, InspectionSerializer , TotalCarSerializer # add this
 from .models import Car, Contract, Inspection, Permission, Repair, TPL, Insurance, UserInfo  # add this
 
 from rest_framework import generics, status     # add this
@@ -99,6 +99,7 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserListSerializer            
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['can_view_inspection_reports']
+
     
 
 class PermissionView(viewsets.ViewSet):  # permission ViewSet
@@ -289,37 +290,37 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
             return Response(status=status.HTTP_400_BAD_REQUEST)   
 
 
-class InspectionView(viewsets.ViewSet):  # report Form
+class InspectionView(viewsets.ViewSet):  # inspection report Form
     serializer_class = InspectionSerializer
-    # queryset = Inspection.objects.all() 
-    # search_fields = ['report_id','car__vin_no']   # filtering
-    # filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # filtering and ordering
-    # ordering_fields = ['car', 'date_created'] # ordering
+  
 
-    def filter_queryset(self):
-        queryset = Inspection.objects.all
-        vin_no = self.request.query_params.get('vin_no', None)
-        if vin_no is not None:
-            queryset = queryset.filter(vin_no=vin_no)
-        return queryset
-        
     def create(self, request): # create report 
         serializer = InspectionSerializer(data=request.data) 
         if serializer.is_valid(raise_exception=True): 
             serializer.save() # add this
             return Response("Successfully Register") 
         return Response(serializer.errors) 
-
-    def list(self, request): # list of all repair
-        queryset =  Inspection.objects.all()
-        serializer = InspectionListSerializer(queryset, many=True)
-        return Response(serializer.data)
     
     def retrieve(self, request, pk=None): # list of all repair
         queryset =  Inspection.objects.all()
         inspection = get_object_or_404(queryset, pk=pk)
         serializer = InspectionSerializer(inspection, many=False)
         return Response(serializer.data)
+    
+    def update(self, request, pk=None): # list of all repair
+        queryset =  Inspection.objects.all()
+        inspection = get_object_or_404(queryset, pk=pk)
+        inspection.status = False
+        inspection.save()
+        return Response("Status False")
+
+
+class InspectionListView(generics.ListAPIView): #list of inspection with filtering
+    queryset = Inspection.objects.all()
+    serializer_class = InspectionListSerializer       
+    filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
+    filterset_fields = ['inspection_id','vin_no__vin_no']
+    ordering_fields = ['vin_no__vin_no', 'date_created']
 
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
@@ -327,6 +328,12 @@ class CarView(viewsets.ModelViewSet):  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
+
+class CarListView(generics.ListAPIView):  #list of all car with filtering
+    queryset = Car.objects.all()  # add this
+    serializer_class = CarInfoSerializer  # add this
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['body_no', 'plate_no', 'vin_no','make','current_loc']
 
 
 class SearchInventoryView(viewsets.ViewSet):
