@@ -56,7 +56,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response(serializer.data)          
+            return Response("Successfully Register")          
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)     
     def retrieve(self, request, pk=None):   # retrieve user
@@ -125,6 +125,7 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
 
     def retrieve(self, request, pk=None):       # retrieve permission
         user = self.request.user
+        permission = Permission.objects.get(slug=user.username)
         if user_permission(user): # permission
             queryset = Permission.objects.all()
             users = get_object_or_404(queryset, slug=pk)

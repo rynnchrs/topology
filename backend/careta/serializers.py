@@ -88,6 +88,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializ
 
 
 class PermissionSerializer(serializers.ModelSerializer):    # permission serializer
+    user = serializers.CharField()
+    slug = serializers.CharField(read_only=True, source='user.username')
     class Meta:
         model = Permission
         fields = ['id','user','slug','can_view_users','can_add_users','can_edit_users','can_delete_users',
@@ -96,6 +98,13 @@ class PermissionSerializer(serializers.ModelSerializer):    # permission seriali
                   'can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports',
                   'can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports',
                   'can_view_task','can_add_task','can_edit_task','can_delete_task']
+
+    def validate(self, obj): # validate if user field input is username
+        try:
+            obj['user'] = User.objects.get(username=obj['user'])
+        except:
+            raise serializers.ValidationError({'user':'Invalid username in permission'})
+        return obj
 
 
 class PermissionUserSerializer(serializers.ModelSerializer):    # user permission serializer
