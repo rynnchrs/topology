@@ -8,11 +8,11 @@ import django.contrib.auth.password_validation as validators    # add this
 from django.core import exceptions
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
-    user_id = serializers.CharField(read_only=True, source='user.id')
-    first_name = serializers.CharField(read_only=True, source='user.first_name')
+    id = serializers.CharField(read_only=True, source='user.id')
+    username = serializers.CharField(read_only=True, source='user.username')
     class Meta:
-        model = Permission
-        fields = ['user_id','first_name']
+        model = UserInfo
+        fields = ['id','username','full_name']
 
 
 class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer

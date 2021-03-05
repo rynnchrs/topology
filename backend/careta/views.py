@@ -109,10 +109,10 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
 
 
 class UserListView(generics.ListAPIView):
-    queryset = Permission.objects.all()
+    queryset = UserInfo.objects.all()
     serializer_class = UserListSerializer            
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['can_view_inspection_reports']
+    filter_backends = [filters.SearchFilter]
+    search_fields  = ['position']
 
     
 
