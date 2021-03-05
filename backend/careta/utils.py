@@ -18,6 +18,22 @@ def user_permission(user):
     else:
         return False
 
+
+def inspection_permission(user):
+    permission = Permission.objects.get(user__username=user.username) # get users permission
+    user = User.objects.get(username=user) 
+    if permission.can_view_inspection_reports == True:  
+        return True
+    elif permission.can_add_inspection_reports == True:  
+        return True
+    elif permission.can_edit_inspection_reports == True:  
+        return True
+    elif permission.can_delete_inspection_reports == True:  
+        return True
+    else:
+        return False
+
+
 def check_or_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
@@ -172,6 +188,7 @@ def check_or_date(year):
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         return (or_date)
 
+
 def check_cr_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
@@ -322,6 +339,7 @@ def check_cr_date(year):
         cr_date = json.loads(cr_date)
         return (cr_date)
 
+
 def check_TPL_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
@@ -471,6 +489,7 @@ def check_TPL_date(year):
         end_date = json.dumps(end_date)
         end_date = json.loads(end_date)
         return (end_date)
+
 
 def check_Com_date(year):
     if year == 2019:
