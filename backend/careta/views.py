@@ -109,7 +109,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
 
 
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
+    queryset = UserInfo.objects.all()
     serializer_class = UserListSerializer            
     filter_backends = [filters.SearchFilter]
     search_fields  = ['position']
