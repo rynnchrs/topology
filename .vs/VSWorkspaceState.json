@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\backend",
+    "\\backend\\backend",
+    "\\backend\\careta",
+    "\\frontend",
+    "\\frontend\\src",
+    "\\frontend\\src\\actions",
+    "\\frontend\\src\\components",
+    "\\frontend\\src\\components\\common",
+    "\\frontend\\src\\reducers"
+  ],
+  "SelectedNode": "\\frontend\\src\\components\\EditDeleteUser.js",
+  "PreviewInSolutionExplorer": false
+}
