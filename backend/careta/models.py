@@ -401,10 +401,9 @@ class Insurance(models.Model):
 
 
 class Inspection(models.Model):
-    report_id = models.AutoField(primary_key=True)
+    inspection_id = models.AutoField(primary_key=True)
     vin_no =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
     mileage = models.IntegerField(default=0)
-    location = models.CharField(max_length=50)
     # Exterior
     cleanliness_exterior = models.BooleanField(default=False)
     condition_rust = models.BooleanField(default=False)
@@ -487,7 +486,6 @@ class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
     vin_no = models.ForeignKey(Car, related_name='repair', on_delete=models.CASCADE)
     ro_no = models.CharField(unique=True, max_length=10)
-    location = models.CharField(max_length=30)
     current_status = models.CharField(max_length=30)
     incident_details = models.TextField(max_length=200, null=True, blank=True)
     vms = models.ForeignKey(User, related_name='vms', on_delete=models.CASCADE)

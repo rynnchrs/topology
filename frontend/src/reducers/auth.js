@@ -5,9 +5,7 @@ import {
     AUTH_ERROR,
     LOGIN_SUCCESS,
     LOGIN_FAIL,
-    LOGOUT_SUCCESS,
     REGISTER_SUCCESS,
-    REGISTER_FAIL,
 } from '../actions/types';
 
 const initialState = {
@@ -17,7 +15,7 @@ const initialState = {
     isLoading: false,
     //user: null,
 };
-
+// eslint-disable-next-line 
 export default function (state = initialState, action) {
     switch (action.type) {
         case USER_LOADING:
@@ -54,7 +52,7 @@ export default function (state = initialState, action) {
                 isLoading: false,
             };
         case REGISTER_SUCCESS:
-        
+        break;
         default:
             return state;
     }

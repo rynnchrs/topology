@@ -4,9 +4,7 @@ import ReactDOM from 'react-dom';
 //import * as serviceWorker from './serviceWorker';
 //import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { HashRouter as Router } from 'react-router-dom';
-
 import ScrollToTop from './ScrollToTop';
-import App from './App';
 
 import LoginDashboardRoute from './LoginDashboardRoute';
 

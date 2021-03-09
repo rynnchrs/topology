@@ -4,7 +4,7 @@ const initialState = {
     msg: {},
     status: null,
 };
-
+// eslint-disable-next-line 
 export default function (state = initialState, action) {
     switch (action.type) {
         case GET_ERRORS:

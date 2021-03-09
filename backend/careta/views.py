@@ -1,20 +1,34 @@
 from abc import abstractmethod
-from django.db.models import query
-from django.shortcuts import render
-from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, InspectionListSerializer, InspectionSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, RepairListSerializer, RepairSerializer, SearchInventorySerializer, TPLSerializer, InsuranceSerializer, UserListSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, InspectionSerializer , TotalCarSerializer # add this
-from .models import Car, Contract, Inspection, Permission, Repair, TPL, Insurance, UserInfo  # add this
 
-from rest_framework import generics, status     # add this
-from rest_framework.response import Response    # add this
-from rest_framework.views import APIView    # add this
-from django.contrib.auth.models import User     # add this
-from rest_framework_simplejwt.tokens import RefreshToken    # add this
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User  # add this
+from django.db.models import query
+from django.shortcuts import get_object_or_404, render
+from django_filters.rest_framework import DjangoFilterBackend  # filter
+from rest_framework import filters  # add this; filter
+from rest_framework import viewsets  # add this
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend # filter
-from rest_framework import filters # filter 
-from .utils import check_or_date, check_cr_date, check_TPL_date, check_Com_date, user_permission
+from rest_framework.response import Response  # add this
+from rest_framework.views import APIView  # add this
+from rest_framework_simplejwt.tokens import RefreshToken  # add this
+
+from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
+                     Permission, Repair, UserInfo)
+from .serializers import (CarInfoSerializer, CarSerializer,  # add this
+                          ContractSerializer, InspectionListSerializer,
+                          InspectionSerializer, InsuranceSerializer,
+                          PermissionInspectionReportSerializer,
+                          PermissionInventorySerializer,
+                          PermissionMaintenanceReportSerializer,
+                          PermissionRepairReportSerializer,
+                          PermissionSerializer, PermissionTaskSerializer,
+                          PermissionUserSerializer, RepairListSerializer,
+                          RepairSerializer, SearchInventorySerializer,
+                          TotalCarSerializer, TPLSerializer,
+                          UpdateUserSerializer, UserListSerializer,
+                          UserSerializer)
+from .utils import (check_Com_date, check_cr_date, check_or_date,
+                    check_TPL_date, inspection_permission, user_permission)
 
 
 class RegisterView(generics.GenericAPIView):  # for register user
@@ -95,10 +109,11 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
 
 
 class UserListView(generics.ListAPIView):
-    queryset = Permission.objects.all()
+    queryset = UserInfo.objects.all()
     serializer_class = UserListSerializer            
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['can_view_inspection_reports']
+    filter_backends = [filters.SearchFilter]
+    search_fields  = ['position']
+
     
 
 class PermissionView(viewsets.ViewSet):  # permission ViewSet
@@ -289,37 +304,50 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
             return Response(status=status.HTTP_400_BAD_REQUEST)   
 
 
-class InspectionView(viewsets.ViewSet):  # report Form
+class InspectionView(viewsets.ViewSet):  # inspection report Form
+    permission_classes = [IsAuthenticated]
     serializer_class = InspectionSerializer
-    # queryset = Inspection.objects.all() 
-    # search_fields = ['report_id','car__vin_no']   # filtering
-    # filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # filtering and ordering
-    # ordering_fields = ['car', 'date_created'] # ordering
 
-    def filter_queryset(self):
-        queryset = Inspection.objects.all
-        vin_no = self.request.query_params.get('vin_no', None)
-        if vin_no is not None:
-            queryset = queryset.filter(vin_no=vin_no)
-        return queryset
-        
     def create(self, request): # create report 
-        serializer = InspectionSerializer(data=request.data) 
-        if serializer.is_valid(raise_exception=True): 
-            serializer.save() # add this
-            return Response("Successfully Register") 
-        return Response(serializer.errors) 
-
-    def list(self, request): # list of all repair
-        queryset =  Inspection.objects.all()
-        serializer = InspectionListSerializer(queryset, many=True)
-        return Response(serializer.data)
+        user = self.request.user
+        if inspection_permission(user):
+            serializer = InspectionSerializer(data=request.data) 
+            if serializer.is_valid(raise_exception=True): 
+                serializer.save() # add this
+                return Response("Successfully Create") 
+            return Response(serializer.errors) 
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     
-    def retrieve(self, request, pk=None): # list of all repair
-        queryset =  Inspection.objects.all()
-        inspection = get_object_or_404(queryset, pk=pk)
-        serializer = InspectionSerializer(inspection, many=False)
-        return Response(serializer.data)
+    def retrieve(self, request, pk=None): #retrieve inspection
+        user = self.request.user
+        if inspection_permission(user):
+            queryset =  Inspection.objects.all()
+            inspection = get_object_or_404(queryset, pk=pk)
+            serializer = InspectionSerializer(inspection, many=False)
+            return Response(serializer.data)
+        else:   
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, pk=None): # update inspection
+        user = self.request.user
+        if inspection_permission(user):
+            queryset =  Inspection.objects.all()
+            inspection = get_object_or_404(queryset, pk=pk)
+            inspection.status = False
+            inspection.save()
+            return Response("Status False")
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class InspectionListView(generics.ListAPIView): #list of inspection with filtering
+    queryset = Inspection.objects.all()
+    serializer_class = InspectionListSerializer       
+    filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
+    filterset_fields = ['inspection_id','vin_no__vin_no']
+    ordering_fields = ['vin_no__vin_no', 'date_created']
+
 
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
@@ -327,6 +355,13 @@ class CarView(viewsets.ModelViewSet):  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
+
+
+class CarListView(generics.ListAPIView):  #list of all car with filtering
+    queryset = Car.objects.all()  # add this
+    serializer_class = CarInfoSerializer  # add this
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['body_no', 'plate_no', 'vin_no','make','current_loc']
 
 
 class SearchInventoryView(viewsets.ViewSet):
