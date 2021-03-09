@@ -8,10 +8,9 @@ import django.contrib.auth.password_validation as validators    # add this
 from django.core import exceptions
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
-    id = serializers.CharField(read_only=True, source='user.id')
-    username = serializers.CharField(read_only=True, source='user.username')
+    full_name = serializers.CharField(read_only=True, source='user_info.full_name')
     class Meta:
-        model = UserInfo
+        model = User
         fields = ['id','username','full_name']
 
 
@@ -19,7 +18,6 @@ class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
     class Meta:
         model = UserInfo
         fields = ['id','company','position','gender','birthday','phone','address','full_name']
-        
         
 class UserSerializer(serializers.ModelSerializer):  # user serializer
     user_info = UserInfoSerializer()
@@ -41,9 +39,9 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
         user_data = validated_data.pop('user_info')
         password = validated_data['password']
         user = User.objects.create(**validated_data)
-        UserInfo.objects.create(user=user, **user_data)
         user.set_password(password)
         user.save()
+        UserInfo.objects.create(user=user, **user_data)
         return user
 
 

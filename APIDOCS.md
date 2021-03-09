@@ -16,15 +16,15 @@ user delete = api/users/(?P<username>[a-z0-9]+)
   
 permission list = api/permission/  
 permission create = api/permission/  
-permission retrive = api/permission/(?P<slug>[a-z0-9]+)/  
-permission delete = api/permission/(?P<slug>[a-z0-9]+)/  
+permission retrive = api/permission/(?P<username>[a-z0-9]+)/  
+permission delete = api/permission/(?P<username>[a-z0-9]+)/  
 
-permission user update = api/permission/user/(?P<slug>[a-z0-9]+)/  
-permission inventory update = api/permission/inventory/(?P<slug>[a-z0-9]+)/  
-permission task update = api/permission/report/(?P<slug>[a-z0-9]+)/  
-permission maintenance reports update = api/permission/maintenance-report/(?P<slug>[a-z0-9]+)/  
-permission inspection reports update = api/permission/inspection-report/(?P<slug>[a-z0-9]+)/  
-permission repair reports update = api/permission/repair-report/(?P<slug>[a-z0-9]+)/  
+permission user update = api/permission/user/(?P<username>[a-z0-9]+)/  
+permission inventory update = api/permission/inventory/(?P<username>[a-z0-9]+)/  
+permission task update = api/permission/report/(?P<username>[a-z0-9]+)/  
+permission maintenance reports update = api/permission/maintenance-report/(?P<username>[a-z0-9]+)/  
+permission inspection reports update = api/permission/inspection-report/(?P<username>[a-z0-9]+)/  
+permission repair reports update = api/permission/repair-report/(?P<username>[a-z0-9]+)/  
   
 permission can add maintenance reports list = api/permission/add-list/maintenance/  
 permission can add inspection reports list = api/permission/add-list/inspection/  
