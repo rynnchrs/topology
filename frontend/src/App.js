@@ -55,10 +55,13 @@ import { Vehicles } from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
+
 import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
 import DriverRecordForms from './components/DriverRecordForms';
 
+import  TSManager  from './components/TSManager';
+import  DriverRecordForms from './components/DriverRecordForms';
 
 const App = () => {
 
@@ -243,6 +246,11 @@ const App = () => {
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
+                <Route path="/inspectionreport" exact component={InspectionReport} />
+                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                <Route path="/driverrecordforms" exact component={DriverRecordForms} />
+                <Route path="/taskscheduler" exact component={TSManager} />
             </div>
 
             <AppFooter />

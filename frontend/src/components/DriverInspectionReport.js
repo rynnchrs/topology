@@ -194,7 +194,6 @@ export class DriverInspectionReport extends Component {
     }
 
     render() {
-       
         return (
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12">
@@ -242,11 +241,11 @@ export class DriverInspectionReport extends Component {
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
                         <h1>Exterior</h1>
-                        <div className="p-fluid p-formgrid p-grid">
-                            <div className="p-field p-col">
+                        <div className="p-grid">
+                            <div className="p-col-12 p-md-4">
                                 <center><label>Not Okay</label></center>
                             </div>
-                            <div className="p-field p-col">
+                            <div className="p-col-12 p-md-4">
                                 <center><label>Okay</label></center>
                             </div>
                             <div className="p-col-12 p-md-4"></div>
@@ -257,12 +256,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue1: true})} checked={this.state.radioValue1 === true} /></center>
                             </div>
-                            <div className="p-field p-col">
-                                <center><Checkbox value="clean_ok" inputId="rb2" onChange={event => this.setState({ radioValue1: event.value })} checked={this.state.radioValue1 === "clean_ok"} /></center>
-                            </div>
-                            <div className="p-field p-col"><label>Cleanliness</label></div>
-                        </div>
-                        <div className="p-grid">
+                            <div className="p-col-12 p-md-4"><label>Cleanliness</label></div>
 
                             <div className="p-col-12 p-md-4">
                                 <center><Checkbox  inputId="rb1" onChange={event => this.setState({ radioValue2: false })} checked={this.state.radioValue2 === false} /></center>
@@ -705,53 +699,6 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-                <div className="p-col-12 p-lg-6">
-                    <div className="card card-w-title">
-                        <h1>Wheels</h1>
-                        <div className="p-grid">
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Not Okay</label></center>
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Okay</label></center>
-                            </div>
-                            <div className="p-col-12 p-md-4"></div>
-
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="ulw_not" inputId="rb1" onChange={event => this.setState({ radioValue46: event.value })} checked={this.state.radioValue46 === "ulw_not"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="ulw_ok" inputId="rb2" onChange={event => this.setState({ radioValue46: event.value })} checked={this.state.radioValue46 === "ulw_ok"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4"><label>Upper Left Wheel</label></div>
-
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="urw_not" inputId="rb1" onChange={event => this.setState({ radioValue47: event.value })} checked={this.state.radioValue47 === "urw_not"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="urw_ok" inputId="rb2" onChange={event => this.setState({ radioValue47: event.value })} checked={this.state.radioValue47 === "urw_ok"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4"><label>Upper Right Wheel</label></div>
-
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="llw_not" inputId="rb1" onChange={event => this.setState({ radioValue48: event.value })} checked={this.state.radioValue48 === "llw_not"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="llw_ok" inputId="rb2" onChange={event => this.setState({ radioValue48: event.value })} checked={this.state.radioValue48 === "llw_ok"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4"><label>Lower Left Wheel</label></div>
-
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="lrw_not" inputId="rb1" onChange={event => this.setState({ radioValue49: event.value })} checked={this.state.radioValue49 === "lrw_not"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox value="lrw_ok" inputId="rb2" onChange={event => this.setState({ radioValue49: event.value })} checked={this.state.radioValue49     === "lrw_ok"} /></center>
-                            </div>
-                            <div className="p-col-12 p-md-4"><label>Lower Right Wheel</label></div>
-                        </div>
-                    </div>
-                </div>
-
 
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
@@ -778,5 +725,3 @@ export class DriverInspectionReport extends Component {
         );
     }
 }
-
-export default DriverInspectionReport;

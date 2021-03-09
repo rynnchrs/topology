@@ -7,17 +7,10 @@ from django.contrib.auth.models import User # add this
 import django.contrib.auth.password_validation as validators    # add this
 from django.core import exceptions
 
-class UserListSerializer(serializers.ModelSerializer):  # user info serializer
-    user_id = serializers.CharField(read_only=True, source='user.id')
-    first_name = serializers.CharField(read_only=True, source='user.first_name')
-    class Meta:
-        model = Permission
-        fields = ['user_id','first_name']
-
 class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
     class Meta:
         model = UserInfo
-        fields = ['id','company','position','gender','birthday','phone','address','full_name']
+        fields = ['id','company','position','gender','birthday','phone','address']
         
         
 class UserSerializer(serializers.ModelSerializer):  # user serializer
@@ -85,8 +78,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializ
         return instance
 
 class PermissionSerializer(serializers.ModelSerializer):    # permission serializer
-    user = serializers.CharField()
-    slug = serializers.CharField(read_only=True, source='user.username')
     class Meta:
         model = Permission
         fields = ['id','user','slug','can_view_users','can_add_users','can_edit_users','can_delete_users',
@@ -95,13 +86,6 @@ class PermissionSerializer(serializers.ModelSerializer):    # permission seriali
                   'can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports',
                   'can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports',
                   'can_view_task','can_add_task','can_edit_task','can_delete_task']
-
-    def validate(self, obj): # validate if user field input is username
-        try:
-            obj['user'] = User.objects.get(username=obj['user'])
-        except:
-            raise serializers.ValidationError({'user':'Invalid username in permission'})
-        return obj
 
 class PermissionUserSerializer(serializers.ModelSerializer):    # user permission serializer
     class Meta:
@@ -115,13 +99,11 @@ class PermissionInventorySerializer(serializers.ModelSerializer):    # inventory
         fields = ['id','slug','can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory']
         extra_kwargs = {'slug': {'read_only': True},}
 
-
 class PermissionInspectionReportSerializer(serializers.ModelSerializer):    # inspection report permission serializer
     class Meta:
         model = Permission
         fields = ['id','slug','can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports']
         extra_kwargs = {'slug': {'read_only': True},}
-
 
 class PermissionMaintenanceReportSerializer(serializers.ModelSerializer):    # maintenance report permission serializer
     class Meta:
@@ -129,13 +111,11 @@ class PermissionMaintenanceReportSerializer(serializers.ModelSerializer):    # m
         fields = ['id','slug','can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports']
         extra_kwargs = {'slug': {'read_only': True},}
 
-
 class PermissionRepairReportSerializer(serializers.ModelSerializer):    # repair permission serializer
     class Meta:
         model = Permission
         fields = ['id','slug','can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports']
         extra_kwargs = {'slug': {'read_only': True},}
-
 
 class PermissionTaskSerializer(serializers.ModelSerializer):    # task permission serializer
     class Meta:

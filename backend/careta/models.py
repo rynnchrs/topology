@@ -6,7 +6,6 @@ from phone_field import PhoneField
 # Create your models here.
 # add this
 from django.contrib.auth.models import User # authenticate User
-from datetime import date
 
 class UserInfo(models.Model):  # User Info Model
     user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
@@ -25,10 +24,6 @@ class UserInfo(models.Model):  # User Info Model
 
     def __str__(self):
         return self.user.username
-
-    @property
-    def full_name(self):
-        return "%s %s" % (self.user.first_name, self.user.last_name)
 
 
 class Permission(models.Model):         # permission Model

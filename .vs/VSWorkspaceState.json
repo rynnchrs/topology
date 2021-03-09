@@ -3,6 +3,7 @@
     "",
     "\\backend",
     "\\backend\\backend",
+<<<<<<< HEAD
     "\\backend\\careta",
     "\\frontend",
     "\\frontend\\src",
@@ -12,5 +13,10 @@
     "\\frontend\\src\\reducers"
   ],
   "SelectedNode": "\\frontend\\src\\components\\EditDeleteUser.js",
+=======
+    "\\backend\\careta"
+  ],
+  "SelectedNode": "\\README.md",
+>>>>>>> 77d8375ea2c155a676c94f789df043feec17e84f
   "PreviewInSolutionExplorer": false
 }

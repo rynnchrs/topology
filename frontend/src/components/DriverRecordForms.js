@@ -51,15 +51,15 @@ export default function DriverRecordForms() {
         return(
             <div>
                 <div className="p-grid">
-                    <div className="p-col-12 p-md-6">
-                        <Button label="Show" icon="pi pi-external-link" onClick={() => onClick('displayBasic')} />
-                    </div>
-                    <div className="p-col-12 p-md-6">
-                        <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
-                        <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon />
-                    </div>
-                </div>
-                <ListBox value={selectedCar} options={carValues} onChange={(e) => setSelectedCar(e.value)} filter optionLabel="body_no" />
+            <div className="p-col-12 p-md-6">
+            <Button label="Show" icon="pi pi-external-link" onClick={() => onClick('displayBasic')} />
+            </div>
+            <div className="p-col-12 p-md-6">
+            <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
+            <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon />
+            </div>
+            </div>
+            <ListBox value={selectedCar} options={carValues} onChange={(e) => setSelectedCar(e.value)} filter optionLabel="body_no"/>
 
             
             <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '75vw' }} onHide={() => onHide('displayBasic')}>
