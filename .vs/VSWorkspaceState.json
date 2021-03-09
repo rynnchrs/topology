@@ -1,15 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\backend",
-    "\\backend\\careta",
     "\\frontend",
     "\\frontend\\src",
-    "\\frontend\\src\\actions",
     "\\frontend\\src\\components",
-    "\\frontend\\src\\components\\common",
-    "\\frontend\\src\\reducers"
+    "\\frontend\\src\\layout",
+    "\\frontend\\src\\service"
   ],
-  "SelectedNode": "\\frontend\\src\\reducers\\auth.js",
+<<<<<<< HEAD
+  "SelectedNode": "\\frontend\\src\\components\\DriverInspectionReport.js",
+=======
+  "SelectedNode": "\\frontend\\src\\components\\Register.js",
+>>>>>>> 213c638c291372a0ab7870a6c7c9d4167f782da7
   "PreviewInSolutionExplorer": false
 }

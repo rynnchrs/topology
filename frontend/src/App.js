@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { Route } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';
@@ -9,9 +9,36 @@ import { AppMenu } from './AppMenu';
 import { AppProfile } from './AppProfile';
 import { AppConfig } from './AppConfig';
 
-import { Dashboard } from './components/Dashboard';
-import PrimeReact from 'primereact/utils';
+import { ButtonDemo } from './components/ButtonDemo';
+import { ChartDemo } from './components/ChartDemo';
+import { Documentation } from './components/Documentation';
+import { FileDemo } from './components/FileDemo';
+import { FloatLabelDemo } from './components/FloatLabelDemo';
+import { FormLayoutDemo } from './components/FormLayoutDemo';
+import { InputDemo } from './components/InputDemo';
+import { ListDemo } from './components/ListDemo';
+import { MenuDemo } from './components/MenuDemo';
+import { MessagesDemo } from './components/MessagesDemo';
+import { MiscDemo } from './components/MiscDemo';
+import { OverlayDemo } from './components/OverlayDemo';
+import { PanelDemo } from './components/PanelDemo';
+import { TableDemo } from './components/TableDemo';
+import { TreeDemo } from './components/TreeDemo';
 
+import { Calendar } from './pages/Calendar';
+import { Crud } from './pages/Crud';
+import { EmptyPage } from './pages/EmptyPage';
+
+import { DisplayDemo } from './utilities/DisplayDemo';
+import { ElevationDemo } from './utilities/ElevationDemo';
+import { FlexBoxDemo } from './utilities/FlexBoxDemo';
+import { GridDemo } from './utilities/GridDemo';
+import { IconsDemo } from './utilities/IconsDemo';
+import { SpacingDemo } from './utilities/SpacingDemo';
+import { TextDemo } from './utilities/TextDemo';
+import { TypographyDemo } from './utilities/TypographyDemo';
+
+import PrimeReact from 'primereact/utils';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -23,12 +50,18 @@ import '@fullcalendar/timegrid/main.css';
 import './layout/flags/flags.css';
 import './layout/layout.scss';
 import './App.scss';
-import {Vehicles} from './components/Vehicles';
+import { Dashboard } from './components/Dashboard';
+import { Vehicles } from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
+<<<<<<< HEAD
+import  TSManager  from './components/TSManager';
 import  DriverRecordForms from './components/DriverRecordForms';
 
+=======
+import { Register } from './components/Register';
+>>>>>>> 213c638c291372a0ab7870a6c7c9d4167f782da7
 
 const App = () => {
 
@@ -121,20 +154,23 @@ const App = () => {
         {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
-                    {label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
-                    {label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
-                    {label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
-                    {label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
+                    { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
+                    { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
+                    { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
+                    { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
+                    { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
                 ]
         },
         {
             label: 'Records', icon: 'pi pi-fw pi-table',
                 items: [
-                    {label: 'Driver Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms'},
-                    //{label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
+                    {label: 'Inspection Records', icon: 'pi pi-fw pi-table', to: '/empty'},
+                    {label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
                 ]
         },
-        { label: 'Job Schedule', icon: 'pi pi-fw pi-calendar' },
+        { 
+            label: 'Job Schedule', icon: 'pi pi-fw pi-calendar', to: '/taskscheduler' 
+        },
         { label: 'Drivers List', icon: 'pi pi-fw pi-users'}
     ];
 
@@ -165,7 +201,6 @@ const App = () => {
             else
                 return true;
         }
-
         return true;
     }
 
@@ -206,15 +241,22 @@ const App = () => {
             <div className="layout-main">
                 <Route path="/" exact component={Dashboard} />
                 <Route path="/vehicles" exact component={Vehicles} />
+                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
+                <Route path="/register" exact component={Register} />
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+<<<<<<< HEAD
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
+                <Route path="/taskscheduler" exact component={TSManager} />
+=======
+>>>>>>> 213c638c291372a0ab7870a6c7c9d4167f782da7
             </div>
 
             <AppFooter />
 
         </div>
+               
     );
 
 }
