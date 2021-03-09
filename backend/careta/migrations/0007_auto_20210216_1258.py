@@ -6,10 +6,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('careta', '0006_report_reportimage'),
-    ]
-
     operations = [
         migrations.AlterField(
             model_name='reportimage',
