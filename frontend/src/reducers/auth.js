@@ -1,3 +1,4 @@
+
 import {
     USER_LOADED,
     USER_LOADING,
@@ -12,7 +13,7 @@ const initialState = {
     //isAuthenticated: null,
     isAuthenticated: localStorage.getItem('token') ? true : false,
     isLoading: false,
-    user: null,
+    //user: null,
 };
 // eslint-disable-next-line 
 export default function (state = initialState, action) {
@@ -27,7 +28,7 @@ export default function (state = initialState, action) {
                 ...state,
                 isAuthenticated: true,
                 isLoading: false,
-                user: action.payload,
+                //user: action.payload,
             };
         case LOGIN_SUCCESS:
             //localStorage.setItem('token', action.payload.token);
@@ -42,6 +43,7 @@ export default function (state = initialState, action) {
         case AUTH_ERROR:
         case LOGIN_FAIL:
             localStorage.removeItem('token');
+            //console.log("LOGIN FAIL TRY")
             return {
                 ...state,
                 token: null,

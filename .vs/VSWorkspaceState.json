@@ -2,14 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\backend",
-    "\\backend\\careta",
-    "\\frontend",
-    "\\frontend\\src",
-    "\\frontend\\src\\actions",
-    "\\frontend\\src\\components",
-    "\\frontend\\src\\components\\common",
-    "\\frontend\\src\\reducers"
+    "\\backend\\backend",
+    "\\backend\\careta"
   ],
-  "SelectedNode": "\\frontend\\src\\reducers\\auth.js",
+  "SelectedNode": "\\README.md",
   "PreviewInSolutionExplorer": false
 }
