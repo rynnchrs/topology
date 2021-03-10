@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken  # add this
 
 from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
                      Permission, Repair, UserInfo)
+from .populate import car_data, user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           ContractSerializer, InspectionListSerializer,
                           InspectionSerializer, InsuranceSerializer,
@@ -30,6 +31,29 @@ from .serializers import (CarInfoSerializer, CarSerializer,  # add this
 from .utils import (check_Com_date, check_cr_date, check_or_date,
                     check_TPL_date, inspection_permission, user_permission)
 
+class Populate(generics.GenericAPIView):  # for register user
+    # serializer_class = UserSerializer 
+    serializer_class = PermissionSerializer 
+    # serializer_class = CarSerializer
+
+    def post(self, request):
+        datas = user_data()
+        # for data in user_data():
+            # serializer = UserSerializer(data={
+            #         "username": "18-1654","email": "","first_name": "careta",
+            #         "last_name": "18-1655","password": "fiberhome","user_info": {}
+            #     })
+            # serializer = PermissionSerializer(data={
+            #         "user": data, "can_add_inspection_reports": "True"
+            #     })
+        for data in car_data():
+            serializer = CarSerializer(data={
+                    "slug": data[2],"body_no": data[0],"plate_no": data[1],
+                    "vin_no": data[2],"make": data[3],"current_loc": data[4]
+                })
+            if serializer.is_valid(raise_exception=True):
+                serializer.save() 
+        return Response("Successfully Created", status=status.HTTP_201_CREATED)
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
@@ -109,10 +133,15 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
 
 
 class UserListView(generics.ListAPIView):
-    queryset = UserInfo.objects.all()
+    queryset = Permission.objects.all()
     serializer_class = UserListSerializer            
-    filter_backends = [filters.SearchFilter]
-    search_fields  = ['position']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields  = ['can_view_users','can_add_users','can_edit_users','can_delete_users',
+                  'can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory',
+                  'can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports',
+                  'can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports',
+                  'can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports',
+                  'can_view_task','can_add_task','can_edit_task','can_delete_task']
 
     
 
@@ -372,12 +401,6 @@ class SearchInventoryView(viewsets.ViewSet):
         serializer = SearchInventorySerializer(queryset, many=True, fields=[str(value)])
         return Response(serializer.data)
 
-
-# class CarListView(generics.ListAPIView):
-#     queryset = Permission.objects.all()
-#     serializer_class = UserListSerializer            
-#     filter_backends = [DjangoFilterBackend]
-#     filterset_fields = ['can_view_inspection_reports']
 
 class ContractView(viewsets.ModelViewSet):  # add this
     queryset = Contract.objects.all()  # add this

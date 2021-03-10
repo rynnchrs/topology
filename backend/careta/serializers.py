@@ -10,8 +10,9 @@ from django.core import exceptions
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
     id = serializers.CharField(read_only=True, source='user.id')
     username = serializers.CharField(read_only=True, source='user.username')
+    full_name = serializers.CharField(read_only=True, source='user.user_info.full_name')
     class Meta:
-        model = UserInfo
+        model = Permission
         fields = ['id','username','full_name']
 
 
