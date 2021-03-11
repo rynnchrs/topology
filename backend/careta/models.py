@@ -20,7 +20,7 @@ class UserInfo(models.Model):  # User Info Model
     gender = models.CharField(max_length=1, choices=Gender_List)
     birthday = models.DateField(auto_now=False, auto_now_add=False)
     phone = PhoneField(blank=True, help_text='Contact phone number')
-    address = models.CharField(max_length=100)
+    address = models.CharField(max_length=100, null = True)
     date_created = DateField(auto_now_add=True)
 
     def __str__(self):
