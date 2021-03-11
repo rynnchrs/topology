@@ -1,6 +1,6 @@
 import datetime
 from datetime import datetime
-from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Inspection 
+from .models import Car, Contract, Permission, TPL, Insurance, UserInfo 
 from django.contrib.auth.models import User
 import json
 

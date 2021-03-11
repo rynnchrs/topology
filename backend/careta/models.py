@@ -25,6 +25,10 @@ class UserInfo(models.Model):  # User Info Model
     def __str__(self):
         return self.user.username
 
+    @property
+    def full_name(self):
+        return "%s %s" % (self.user.first_name, self.user.last_name)
+
 
 class Permission(models.Model):         # permission Model
     user = models.OneToOneField(User, on_delete=CASCADE)
@@ -308,9 +312,9 @@ class Report(models.Model):
         return self.car.vin_no
 
 
-#class ReportImage(models.Model):
-#    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
-#    images = models.ImageField(upload_to = 'images/')
+class ReportImage(models.Model):
+    report = models.ForeignKey(Report, default=None, on_delete=models.CASCADE, related_name='images')
+    images = models.ImageField(upload_to = 'images/')
 
-#    def __str__(self):
-#        return self.report.car.vin_no
+    def __str__(self):
+        return self.report.car.vin_no

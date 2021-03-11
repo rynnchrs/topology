@@ -58,7 +58,6 @@ import { DriverInspectionReport } from './components/DriverInspectionReport';
 
 import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
-import DriverRecordForms from './components/DriverRecordForms';
 
 import  TSManager  from './components/TSManager';
 import  DriverRecordForms from './components/DriverRecordForms';
