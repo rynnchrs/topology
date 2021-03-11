@@ -207,6 +207,47 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='UserInfo',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('slug', models.CharField(max_length=30)),
+                ('company', models.CharField(max_length=50, null=True)),
+                ('position', models.CharField(max_length=20, null=True)),
+                ('gender', models.CharField(choices=[('M', 'Male'), ('F', 'Female')], max_length=1)),
+                ('birthday', models.DateField()),
+                ('phone', phone_field.models.PhoneField(blank=True, help_text='Contact phone number', max_length=31)),
+                ('address', models.CharField(max_length=100, null=True)),
+                ('date_created', models.DateField(auto_now_add=True)),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='user_info', to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='TPL',
+            fields=[
+                ('tpl_id', models.AutoField(primary_key=True, serialize=False)),
+                ('slug', models.CharField(max_length=30)),
+                ('insurance_name', models.CharField(blank=True, max_length=50, null=True)),
+                ('telephone', phone_field.models.PhoneField(blank=True, help_text='Contact phone number', max_length=31, null=True)),
+                ('email', models.EmailField(blank=True, max_length=60, null=True)),
+                ('po_no', models.CharField(blank=True, max_length=50, null=True)),
+                ('date_issued', models.CharField(blank=True, max_length=20, null=True)),
+                ('start_date', models.CharField(blank=True, max_length=20, null=True)),
+                ('end_date', models.CharField(blank=True, max_length=20, null=True)),
+                ('cost', models.IntegerField(blank=True, default=0, null=True)),
+                ('date_updated', models.DateField(auto_now=True)),
+                ('date_created', models.DateField(auto_now_add=True)),
+                ('car', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tpl', to='careta.car')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ReportImage',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('images', models.ImageField(upload_to='images/')),
+                ('report', models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, related_name='images', to='careta.report')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Permission',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

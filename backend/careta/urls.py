@@ -1,5 +1,6 @@
-from django.urls import include, path  # add this
-from rest_framework_simplejwt import views as jwt_views  # add this
+from django.urls import path, include # add this
+from rest_framework_simplejwt import views as jwt_views # add this
+#from .views import RegisterView, BlacklistTokenView , PermissionUserView, SearchInventoryView # add this
 
 from .views import (BlacklistTokenView, CarListView, ExpiryView, InspectionListView,  # add this
                     PermissionUserView, Populate, RegisterView, SearchInventoryView,
