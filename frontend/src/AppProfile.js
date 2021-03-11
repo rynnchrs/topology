@@ -1,24 +1,53 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
 import { Link, Redirect, useLocation } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
-export const AppProfile = (props) => {
+export const AppProfile = () => {
 
     const [expanded, setExpanded] = useState(false);
     const toast = useRef(null);
+    
+    const [userData, setUserData] = useState();
 
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+        let username = localStorage.getItem("username");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios
+            .get('http://127.0.0.1:8000/api/users/' + username + '/', config)
+            //.get('http://127.0.0.1:8000/api/users/', config)
+            .then((res) => {
+                //console.log("get users:")
+                //console.log(res.data)
+                //localStorage.setItem('myfirst', res.data.username);
+                localStorage.setItem('myfirst', res.data.user_info.full_name);
+                setUserData(localStorage.getItem("myfirst"))
+                //toast.current.show({ severity: 'success', summary: 'Login Successful', detail: 'You are now log in.', life: 5000 });
+            })
+            .catch((err) => {
+                console.log("get users err:")
+                console.log(err.response);
+            });
+    },[]);
+    
     const onClick = (event) => {
         setExpanded(prevState => !prevState);
         event.preventDefault();
     }
-
+    
     const logout = () => {
         //alert("logoout");
         let token = localStorage.getItem("token");
-        const refresh_token = token; 
+        const refresh_token = token;
 
         const config = {
             headers: {
@@ -43,10 +72,15 @@ export const AppProfile = (props) => {
             });
 
         localStorage.removeItem("token");
-        toast.current.show({ severity: 'success', summary: 'Logout Successfully', detail: 'Account is ready to use.', life: 3000 });
-        window.location.href = '/';
+        localStorage.removeItem("username");
+        localStorage.removeItem("myfirst");
+        toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 1500)
+        
     }
-
+ 
     return (
         <div className="layout-profile">
             <Toast ref={toast} />
@@ -54,7 +88,8 @@ export const AppProfile = (props) => {
                 <img src="assets/layout/images/profile.png" alt="Profile" />
             </div>
             <button className="p-link layout-profile-link" onClick={onClick}>
-                <span className="username">Ryann Ang</span>
+                {/*<span className="username">Ryann Ang</span>*/}
+                <span className="username">{userData}</span>
                 <i className="pi pi-fw pi-cog" />
             </button>
             <CSSTransition classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
@@ -66,7 +101,7 @@ export const AppProfile = (props) => {
             </CSSTransition>
         </div>
     );
-
+    
 }
 
 export default AppProfile;

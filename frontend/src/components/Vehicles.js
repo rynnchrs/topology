@@ -1,6 +1,10 @@
 import React, {Component, createRef} from 'react';
 import { TabView,TabPanel } from 'primereact/tabview';
+import {DataTable} from 'primereact/datatable';
+import {Column} from 'primereact/column'
 import {InputText} from 'primereact/inputtext';
+import { AutoComplete } from 'primereact/autocomplete';
+
 import {Button} from 'primereact/button';
 import {Fieldset} from 'primereact/fieldset';
 import {Dialog} from 'primereact/dialog';
@@ -9,8 +13,11 @@ import {InputMask} from 'primereact/inputmask';
 import {Calendar} from 'primereact/calendar';
 import {SelectButton} from 'primereact/selectbutton';
 import {Toast} from 'primereact/toast'
+import { ListBox } from 'primereact/listbox';
+
 //import './TabViewDemo.css';
 import axios from "axios";
+import { isThisISOWeek } from 'date-fns';
 
 
 export class Vehicles extends Component {
@@ -1186,6 +1193,16 @@ export class Vehicles extends Component {
                             }
                         });
                         break;
+                    
+                    case 'Fan Delivery Date':
+
+                            this.setState({
+                                newvehicleData: {
+                                    ...this.state.newvehicleData,
+                                    fan_date: formattedValue
+                                }
+                            });
+                            break;
                     
                     case 'TDate Issued':
 
