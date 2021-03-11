@@ -2,8 +2,9 @@ from django.urls import path, include # add this
 from rest_framework_simplejwt import views as jwt_views # add this
 #from .views import RegisterView, BlacklistTokenView , PermissionUserView, SearchInventoryView # add this
 
-from .views import (BlacklistTokenView, ExpiryView, SearchInventoryView,  
-                    PermissionUserView, RegisterView, UserListView) # add this
+from .views import (BlacklistTokenView, CarListView, ExpiryView, InspectionListView,  # add this
+                    PermissionUserView, Populate, RegisterView, SearchInventoryView,
+                    UserListView)
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -11,6 +12,9 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'), # refresh token
     path('logout/blacklist/', BlacklistTokenView.as_view(), name='blacklist'), # logout api
     path('register/', RegisterView.as_view(), name='register'), # register api
-    path('userlist/', UserListView.as_view(), name='userlist'), # 
-    path('expiry/', ExpiryView.as_view(), name='expiry') # 
+    path('user-list/', UserListView.as_view(), name='user-list'), # 
+    path('inspection-list/', InspectionListView.as_view(), name='inspection-list'), # 
+    path('car-list/', CarListView.as_view(), name='inspection-list'), # 
+    path('expiry/', ExpiryView.as_view(), name='expiry'),
+    path('populate/', Populate.as_view(), name='populate') 
 ]

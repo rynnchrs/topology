@@ -4,6 +4,7 @@
     "\\backend",
     "\\backend\\backend",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "\\backend\\careta",
     "\\frontend",
     "\\frontend\\src",
@@ -18,5 +19,10 @@
   ],
   "SelectedNode": "\\README.md",
 >>>>>>> 77d8375ea2c155a676c94f789df043feec17e84f
+=======
+    "\\backend\\careta"
+  ],
+  "SelectedNode": "\\README.md",
+>>>>>>> b4a659ddfa53d0617276564910b4361cc2b71e3b
   "PreviewInSolutionExplorer": false
 }
