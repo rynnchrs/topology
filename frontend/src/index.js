@@ -1,7 +1,6 @@
 import 'react-app-polyfill/ie11';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
 //import * as serviceWorker from './serviceWorker';
 //import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { HashRouter as Router } from 'react-router-dom';
@@ -9,12 +8,14 @@ import { HashRouter as Router } from 'react-router-dom';
 import ScrollToTop from './ScrollToTop';
 import App from './App';
 
+import LoginDashboardRoute from './LoginDashboardRoute';
+
 ReactDOM.render(
-    <HashRouter>
+    <Router>
         <ScrollToTop>
-            <App></App>
+            <LoginDashboardRoute />
         </ScrollToTop>
-    </HashRouter>,
+    </Router>,
     document.getElementById('root')
 );
 
