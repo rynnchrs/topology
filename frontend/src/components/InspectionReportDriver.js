@@ -1,7 +1,24 @@
 import React, { Component } from 'react';
 import {CountryService} from '../service/CountryService';
 import {InputText} from 'primereact/inputtext';
+import {InputTextarea} from 'primereact/inputtextarea';
+import {AutoComplete} from 'primereact/autocomplete';
+import {MultiSelect} from 'primereact/multiselect';
+import {Calendar} from 'primereact/calendar';
+import {Chips} from 'primereact/chips';
 import {Checkbox} from 'primereact/checkbox';
+//import {RadioButton} from 'primereact/radiobutton';
+import {InputSwitch} from 'primereact/inputswitch';
+import {Dropdown} from 'primereact/dropdown';
+import {Password} from 'primereact/password';
+import {Slider} from 'primereact/components/slider/Slider';
+import {ListBox} from 'primereact/listbox';
+import {Rating} from 'primereact/rating';
+import {ColorPicker} from 'primereact/colorpicker';
+import {ToggleButton} from 'primereact/togglebutton';
+import {SelectButton} from 'primereact/selectbutton';
+import {Button} from 'primereact/button';
+import {SplitButton} from 'primereact/splitbutton';
 
 export class InspectionReportDriver extends Component {
 

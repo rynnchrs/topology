@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from django.shortcuts import render
 from rest_framework import viewsets  # add this
-from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer, SearchInventorySerializer# add this
+from .serializers import CarSerializer, ContractSerializer, PermissionInventorySerializer, PermissionInspectionReportSerializer, PermissionMaintenanceReportSerializer, PermissionRepairReportSerializer, PermissionSerializer, PermissionTaskSerializer, TPLSerializer, InsuranceSerializer, UserSerializer, UpdateUserSerializer , PermissionUserSerializer, ReportSerializer# add this
 from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Report  # add this
 
 from rest_framework import generics, status     # add this
@@ -14,17 +14,14 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend # filter
 from rest_framework import filters # filter 
 
-
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
-
     def post(self, request): # add this
         serializer = UserSerializer(data=request.data) # add this
         if serializer.is_valid(raise_exception=True): # add this
             serializer.save() # add this
             return Response("Successfully Register", status=status.HTTP_201_CREATED) # add this
         return Response(serializer.errors) # add this
-
 
 class BlacklistTokenView(APIView):      # for Logout
     def post(self, request):    
@@ -228,7 +225,6 @@ class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permiss
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionMaintenanceReportSerializer
@@ -274,7 +270,6 @@ class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission View
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
     permission_classes = [IsAuthenticated]
     serializer_class = PermissionTaskSerializer
@@ -297,7 +292,6 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance report s
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
@@ -310,7 +304,6 @@ class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance 
             return Response(serializer.data)            
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection reports
     permission_classes = [IsAuthenticated]
@@ -325,7 +318,6 @@ class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection re
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports 
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
@@ -339,20 +331,18 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)   
 
-
 class ReportView(viewsets.ModelViewSet):  # report Form
 
     queryset = Report.objects.all() 
     serializer_class = ReportSerializer
+    filter_backends = [filters.SearchFilter,filters.OrderingFilter] # filtering and ordering
     search_fields = ['report_id','car__vin_no','body_no','make','mileage','location','cleanliness_exterior','condition_rust','decals','windows',
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition','vehicle_documents','main_beam',
-                    'dipped_beam','side_lights','tail_lights','indicators','break_lights','reverse_lights','hazard_light','rear_fog_lights',
+                    'dipped_beam','side_lights','tail_lights','indicators','breake_lights','reverse_lights','hazard_light','rear_fog_lights',
                     'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
                     'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','gas_level','oil_level','tyres','front_visual',
                     'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel', 
                     'notes','date_updated','date_created']   # filtering
-
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]  # filtering and ordering
     ordering_fields = ['car', 'date_created'] # ordering
 
     def create(self, request): # create report 
@@ -361,23 +351,11 @@ class ReportView(viewsets.ModelViewSet):  # report Form
             serializer.save() # add this
             return Response("Successfully Register") 
         return Response(serializer.errors) 
-
-
+            
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
-    search_fields = ['body_no', 'plate_no', 'vin_no']
-    filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
-
-
-class SearchInventoryView(viewsets.ViewSet):
-
-    def list(self, request):
-        value = request.query_params.get('search_field', None)
-        queryset = Car.objects.only(value)
-        serializer = SearchInventorySerializer(queryset, many=True, fields=[str(value)])
-        return Response(serializer.data)
 
 
 class ContractView(viewsets.ModelViewSet):  # add this

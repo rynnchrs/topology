@@ -1,7 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import { ListBox } from 'primereact/listbox';
 import { InputText } from 'primereact/inputtext';
-import axios from "axios";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Checkbox } from 'primereact/checkbox';
@@ -12,19 +11,19 @@ export default function DriverRecordForms() {
         const [selectedCar, setSelectedCar] = useState(['']);
         const [carValues, setcarValues] = useState(['']);
         const [displayBasic, setDisplayBasic] = useState(false);
-        const [position, setPosition] = useState('center');
+        //const [position, setPosition] = useState('center');
         const [date2, setDate2] = useState(null);
 
         const dialogFuncMap = {
             'displayBasic': setDisplayBasic,
         }
 
-        const onClick = (name, position) => {
+        const onClick = (name) => {
             dialogFuncMap[`${name}`](true);
     
-            if (position) {
-                setPosition(position);
-            }
+            //if (position) {
+            //    setPosition(position);
+            //}
         }
     
         const onHide = (name) => {
@@ -41,7 +40,7 @@ export default function DriverRecordForms() {
          }
 
         
-        React.useEffect(function effectFunction() {
+        useEffect(function effectFunction() {
             fetch('http://127.0.0.1:8000/api/report/')
                 .then(response => response.json())
                 .then(data => {
