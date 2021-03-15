@@ -12,26 +12,29 @@ from django.contrib.auth.models import User     # add this
 from rest_framework_simplejwt.tokens import RefreshToken    # add this
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+
+from django_filters.rest_framework import DjangoFilterBackend # filter
+from rest_framework import filters # filter 
+
 from rest_framework.response import Response  # add this
 from rest_framework.views import APIView  # add this
-from rest_framework_simplejwt.tokens import RefreshToken  # add this
 
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Permission, Repair, UserInfo)
-from .populate import car_data, user_data
-from .serializers import (CarInfoSerializer, CarSerializer,  # add this
-                          ContractSerializer, InspectionListSerializer,
-                          InspectionSerializer, InsuranceSerializer,
-                          PermissionInspectionReportSerializer,
-                          PermissionInventorySerializer,
-                          PermissionMaintenanceReportSerializer,
-                          PermissionRepairReportSerializer,
-                          PermissionSerializer, PermissionTaskSerializer,
-                          PermissionUserSerializer, RepairListSerializer,
-                          RepairSerializer, SearchInventorySerializer,
-                          TotalCarSerializer, TPLSerializer,
-                          UpdateUserSerializer, UserListSerializer,
-                          UserSerializer)
+# from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
+#                      Permission, Repair, UserInfo)
+# from .populate import car_data, user_data
+# from .serializers import (CarInfoSerializer, CarSerializer,  # add this
+#                           ContractSerializer, InspectionListSerializer,
+#                           InspectionSerializer, InsuranceSerializer,
+#                           PermissionInspectionReportSerializer,
+#                           PermissionInventorySerializer,
+#                           PermissionMaintenanceReportSerializer,
+#                           PermissionRepairReportSerializer,
+#                           PermissionSerializer, PermissionTaskSerializer,
+#                           PermissionUserSerializer, RepairListSerializer,
+#                           RepairSerializer, SearchInventorySerializer,
+#                           TotalCarSerializer, TPLSerializer,
+#                           UpdateUserSerializer, UserListSerializer,
+#                           UserSerializer)
 from .utils import (check_Com_date, check_cr_date, check_or_date,
                     check_TPL_date, inspection_permission, user_permission)
 

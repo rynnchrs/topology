@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { Route, Link } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 import { AppTopbar } from './AppTopbar';
@@ -8,35 +8,6 @@ import { AppFooter } from './AppFooter';
 import { AppMenu } from './AppMenu';
 import { AppProfile } from './AppProfile';
 import { AppConfig } from './AppConfig';
-
-import { ButtonDemo } from './components/ButtonDemo';
-import { ChartDemo } from './components/ChartDemo';
-import { Documentation } from './components/Documentation';
-import { FileDemo } from './components/FileDemo';
-import { FloatLabelDemo } from './components/FloatLabelDemo';
-import { FormLayoutDemo } from './components/FormLayoutDemo';
-import { InputDemo } from './components/InputDemo';
-import { ListDemo } from './components/ListDemo';
-import { MenuDemo } from './components/MenuDemo';
-import { MessagesDemo } from './components/MessagesDemo';
-import { MiscDemo } from './components/MiscDemo';
-import { OverlayDemo } from './components/OverlayDemo';
-import { PanelDemo } from './components/PanelDemo';
-import { TableDemo } from './components/TableDemo';
-import { TreeDemo } from './components/TreeDemo';
-
-import { Calendar } from './pages/Calendar';
-import { Crud } from './pages/Crud';
-import { EmptyPage } from './pages/EmptyPage';
-
-import { DisplayDemo } from './utilities/DisplayDemo';
-import { ElevationDemo } from './utilities/ElevationDemo';
-import { FlexBoxDemo } from './utilities/FlexBoxDemo';
-import { GridDemo } from './utilities/GridDemo';
-import { IconsDemo } from './utilities/IconsDemo';
-import { SpacingDemo } from './utilities/SpacingDemo';
-import { TextDemo } from './utilities/TextDemo';
-import { TypographyDemo } from './utilities/TypographyDemo';
 
 import PrimeReact from 'primereact/utils';
 import 'primereact/resources/themes/saga-blue/theme.css';
@@ -83,6 +54,63 @@ const App = () => {
         }
     }, [mobileMenuActive]);
 
+    const sidebarMenu = [];
+    const sidebarSubMenu1 = [];
+    const sidebarSubMenu2 = [];
+    
+    sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
+    //users permission
+    if (localStorage.getItem("addUsers") === "true") {
+        sidebarSubMenu1.push({ label: 'Register User', icon: 'pi pi-user-plus', to: '/register'});
+    }
+    if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
+        sidebarSubMenu1.push({ label: 'Edit-Delete user', icon: 'pi pi-user-edit', to: '/editdeleteuser'});
+    }
+    //console.log("submenu1");
+    //console.log(sidebarSubMenu1);
+    
+    if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
+        sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user',items: sidebarSubMenu1});
+        //console.log("sidebarMenu");
+        //console.log(sidebarMenu);
+    } else {
+        console.log("permission data none");
+    }
+
+    //inventory permission
+    // if (localStorage.getItem("addInspectionReport") === "true") {
+    //     sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
+    // }
+    // if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    //     sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
+    // }
+    if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
+        sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
+    } else {
+        console.log("permission data none");
+    }
+
+    //inspection permission
+    if (localStorage.getItem("addInspectionReport") === "true") {
+        sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
+    }
+    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+        sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
+    }
+    
+    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+        sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file',items: sidebarSubMenu2});
+    } else {
+        console.log("permission data none");
+    }
+
+    if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
+        sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
+    } else {
+        console.log("permission data none");
+    }
+
+    //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);
     }
@@ -154,8 +182,6 @@ const App = () => {
              label: 'Reports', icon: 'pi pi-fw pi-file',
                 items: [
                     { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
-                    { label: 'Register', icon: 'pi pi-fw pi-file', to: '/register' },
-                    { label: 'Edit User', icon: 'pi pi-fw pi-file', to: '/editdeleteuser' },
                     { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
                     { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
                     { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
@@ -220,6 +246,7 @@ const App = () => {
     });
 
     return (
+        
         <div className={wrapperClass} onClick={onWrapperClick}>
             <AppTopbar onToggleMenu={onToggleMenu} />
 
@@ -229,7 +256,8 @@ const App = () => {
                         <img alt="Logo" src={logo} />
                     </div>
                     <AppProfile />
-                    <AppMenu model={menu} onMenuItemClick={onMenuItemClick} />
+                    {/*<AppMenu model={menu} onMenuItemClick={onMenuItemClick} />*/}
+                    <AppMenu model={sidebarMenu} onMenuItemClick={onMenuItemClick} />
                 </div>
             </CSSTransition>
 
@@ -238,17 +266,13 @@ const App = () => {
 
             <div className="layout-main">
                 <Route path="/" exact component={Dashboard} />
-                <Route path="/vehicles" exact component={Vehicles} />
-                <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/register" exact component={Register} />
                 <Route path="/editdeleteuser" exact component={EditDeleteUser} />
-                <Route path="/inspectionreport" exact component={InspectionReport} />
-                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
-                <Route path="/driverrecordforms" exact component={DriverRecordForms} />
-                <Route path="/inspectionreport" exact component={InspectionReport} />
-                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
+                <Route path="/vehicles" exact component={Vehicles} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
+                <Route path="/inspectionreport" exact component={InspectionReport} />
+                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
                 <Route path="/taskscheduler" exact component={TSManager} />
             </div>
 
