@@ -1,6 +1,6 @@
 import datetime
 from datetime import datetime
-from .models import Car, Contract, Permission, TPL, Insurance, UserInfo 
+from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Inspection 
 from django.contrib.auth.models import User
 import json
 
@@ -188,6 +188,7 @@ def check_or_date(year):
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
         return (or_date)
 
+
 def check_cr_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
@@ -338,6 +339,7 @@ def check_cr_date(year):
         cr_date = json.loads(cr_date)
         return (cr_date)
 
+
 def check_TPL_date(year):
     if year == 2019:
         jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
@@ -487,6 +489,7 @@ def check_TPL_date(year):
         end_date = json.dumps(end_date)
         end_date = json.loads(end_date)
         return (end_date)
+
 
 def check_Com_date(year):
     if year == 2019:
