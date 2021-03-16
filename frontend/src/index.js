@@ -8,8 +8,6 @@ import { HashRouter as Router } from 'react-router-dom';
 import ScrollToTop from './ScrollToTop';
 import LoginDashboardRoute from './LoginDashboardRoute';
 
-import LoginDashboardRoute from './LoginDashboardRoute';
-
 ReactDOM.render(
     <Router>
         <ScrollToTop>
