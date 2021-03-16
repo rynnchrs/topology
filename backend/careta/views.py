@@ -8,10 +8,6 @@ from rest_framework import filters  # add this; filter
 from rest_framework import viewsets  # add this
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
-
-from django_filters.rest_framework import DjangoFilterBackend # filter
-from rest_framework import filters # filter 
-
 from rest_framework.response import Response  # add this
 from rest_framework.views import APIView  # add this
 from rest_framework_simplejwt.tokens import RefreshToken  # add this
