@@ -1,4 +1,4 @@
-import React, { Component, useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
@@ -12,7 +12,6 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
-
 export const EditDeleteUser = () => {
     
     const [users, setUsers] = useState([]);
@@ -21,6 +20,7 @@ export const EditDeleteUser = () => {
 
     const [displayBasic, setDisplayBasic] = useState(false);
     const [displayBasic2, setDisplayBasic2] = useState(false);
+    const [isChanged, setIsChanged] = useState(false);
 
     const [first_name, setFirst_Name] = useState('');
     const [last_name, setLast_Name] = useState('');
@@ -97,26 +97,26 @@ export const EditDeleteUser = () => {
     }
 
     const saveChanges = () => {
-        if (first_name == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Firstname is required.', life: 5000 });
-        } else if (last_name == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Lastname is required.', life: 5000 });
-        } else if (email == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Email is required.', life: 5000 });
-        } else if (username == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Username is required.', life: 5000 });
-        } else if (mygender.val == null) {
-            toast.current.show({ severity: 'warn', summary: 'No Selected', detail: 'Please select a gender.', life: 5000 });
-        } else if (company == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Company is required.', life: 5000 });
-        } else if (position == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Position is required.', life: 5000 });
-        } else if (address == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Address is required.', life: 5000 });
-        } else if (phone == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 5000 });
-        } else if (birthday == "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
+        if (first_name === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Firstname is required.', life: 3000 });
+        } else if (last_name === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Lastname is required.', life: 3000 });
+        } else if (email === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Email is required.', life: 3000 });
+        } else if (username === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Username is required.', life: 3000 });
+        } else if (mygender.val === null) {
+            toast.current.show({ severity: 'warn', summary: 'No Selected', detail: 'Please select a gender.', life: 3000 });
+        } else if (company === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Company is required.', life: 3000 });
+        } else if (position === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Position is required.', life: 3000 });
+        } else if (address === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Address is required.', life: 3000 });
+        } else if (phone === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 3000 });
+        } else if (birthday === "") {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 3000 });
         } else {
             let token = localStorage.getItem("token");
             let usernames = selectedUser.username;
@@ -132,12 +132,12 @@ export const EditDeleteUser = () => {
             };
 
             let body = "";
-            if (password == "") {
+            if (password === "") {
                 body = JSON.stringify({ username, email, first_name, last_name, user_info });
-                console.log('body no pass: ' + body);
+                //console.log('body no pass: ' + body);
             } else {
                 body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
-                console.log('body w/ pass: ' + body);
+                //console.log('body w/ pass: ' + body);
             }
                 
             axios
@@ -151,14 +151,14 @@ export const EditDeleteUser = () => {
                     console.log("save changes err:");
                     console.log(err.response);
                     if (err.response.data.username) {
-                        toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.username.join()}`, life: 5000 });
+                        toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.username.join()}`, life: 3000 });
                     } else if (err.response.data.email) {
-                        toast.current.show({ severity: 'error', summary: 'Email', detail: `${err.response.data.email.join()}`, life: 5000 });
+                        toast.current.show({ severity: 'error', summary: 'Email', detail: `${err.response.data.email.join()}`, life: 3000 });
                     } else if (err.response.data.password) {
-                        toast.current.show({ severity: 'error', summary: 'Password', detail: `${err.response.data.password.join()}`, life: 5000 });
+                        toast.current.show({ severity: 'error', summary: 'Password', detail: `${err.response.data.password.join()}`, life: 3000 });
                     } else if (err.response.data.user_info.birthday) {
                         //toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
-                        toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 5000 });
+                        toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 3000 });
                     }
                 });
         }
@@ -201,6 +201,36 @@ export const EditDeleteUser = () => {
                 isCheck22(res.data.can_add_task);
                 isCheck23(res.data.can_edit_task);
                 isCheck24(res.data.can_delete_task);
+
+                // res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
+                // res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
+                // res.data.can_edit_users ? localStorage.setItem('editUsers', "true") : localStorage.setItem('editUsers', "false")
+                // res.data.can_delete_users ? localStorage.setItem('deleteUsers', "true") : localStorage.setItem('deleteUsers', "false")
+                
+                // res.data.can_view_inventory ? localStorage.setItem('viewInventory', "true") : localStorage.setItem('viewInventory', "false")
+                // res.data.can_add_inventory ? localStorage.setItem('addInventory', "true") : localStorage.setItem('addInventory', "false")
+                // res.data.can_edit_inventory ? localStorage.setItem('editInventory', "true") : localStorage.setItem('editInventory', "false")
+                // res.data.can_delete_inventory ? localStorage.setItem('deleteInventory', "true") : localStorage.setItem('deleteInventory', "false")
+
+                // res.data.can_view_inspection_reports ? localStorage.setItem('viewInspectionReport', "true") : localStorage.setItem('viewInspectionReport', "false")
+                // res.data.can_add_inspection_reports ? localStorage.setItem('addInspectionReport', "true") : localStorage.setItem('addInspectionReport', "false")
+                // res.data.can_edit_inspection_reports ? localStorage.setItem('editInspectionReport', "true") : localStorage.setItem('editInspectionReport', "false")
+                // res.data.can_delete_inspection_reports ? localStorage.setItem('deleteInspectionReport', "true") : localStorage.setItem('deleteInspectionReport', "false")
+                
+                // res.data.can_view_maintenance_reports ? localStorage.setItem('viewMaintenanceReport', "true") : localStorage.setItem('viewMaintenanceReport', "false")
+                // res.data.can_add_maintenance_reports ? localStorage.setItem('addMaintenanceReport', "true") : localStorage.setItem('addMaintenanceReport', "false")
+                // res.data.can_edit_maintenance_reports ? localStorage.setItem('editMaintenanceReport', "true") : localStorage.setItem('editMaintenanceReport', "false")
+                // res.data.can_delete_maintenance_reports ? localStorage.setItem('deleteMaintenanceReport', "true") : localStorage.setItem('deleteMaintenanceReport', "false")
+
+                // res.data.can_view_repair_reports ? localStorage.setItem('viewRepairReport', "true") : localStorage.setItem('viewRepairReport', "false")
+                // res.data.can_add_repair_reports ? localStorage.setItem('addRepairReport', "true") : localStorage.setItem('addRepairReport', "false")
+                // res.data.can_edit_repair_reports ? localStorage.setItem('editRepairReport', "true") : localStorage.setItem('editRepairReport', "false")
+                // res.data.can_delete_repair_reports ? localStorage.setItem('deleteRepairReport', "true") : localStorage.setItem('deleteRepairReport', "false")
+
+                // res.data.can_view_task ? localStorage.setItem('viewTask', "true") : localStorage.setItem('viewTask', "false")
+                // res.data.can_add_task ? localStorage.setItem('addTask', "true") : localStorage.setItem('addTask', "false")
+                // res.data.can_edit_task ? localStorage.setItem('editTask', "true") : localStorage.setItem('editTask', "false")
+                // res.data.can_delete_task ? localStorage.setItem('deleteTask', "true") : localStorage.setItem('deleteTask', "false")
             })
             .catch((err) => {
                 console.log("permission err:");
@@ -208,10 +238,64 @@ export const EditDeleteUser = () => {
             });
     }
 
+    const updateLocalPermission = () => {
+        let token = localStorage.getItem("token");
+        let user = localStorage.getItem("username");
+        let username = selectedUser.username;
+        if(user !== username){
+            console.log("not username")
+        } else {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+    
+            axios
+                .get('http://127.0.0.1:8000/api/permission/' + username + '/', config)
+                .then((res) => {
+                    res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
+                    res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
+                    res.data.can_edit_users ? localStorage.setItem('editUsers', "true") : localStorage.setItem('editUsers', "false")
+                    res.data.can_delete_users ? localStorage.setItem('deleteUsers', "true") : localStorage.setItem('deleteUsers', "false")
+                    
+                    res.data.can_view_inventory ? localStorage.setItem('viewInventory', "true") : localStorage.setItem('viewInventory', "false")
+                    res.data.can_add_inventory ? localStorage.setItem('addInventory', "true") : localStorage.setItem('addInventory', "false")
+                    res.data.can_edit_inventory ? localStorage.setItem('editInventory', "true") : localStorage.setItem('editInventory', "false")
+                    res.data.can_delete_inventory ? localStorage.setItem('deleteInventory', "true") : localStorage.setItem('deleteInventory', "false")
+    
+                    res.data.can_view_inspection_reports ? localStorage.setItem('viewInspectionReport', "true") : localStorage.setItem('viewInspectionReport', "false")
+                    res.data.can_add_inspection_reports ? localStorage.setItem('addInspectionReport', "true") : localStorage.setItem('addInspectionReport', "false")
+                    res.data.can_edit_inspection_reports ? localStorage.setItem('editInspectionReport', "true") : localStorage.setItem('editInspectionReport', "false")
+                    res.data.can_delete_inspection_reports ? localStorage.setItem('deleteInspectionReport', "true") : localStorage.setItem('deleteInspectionReport', "false")
+                    
+                    res.data.can_view_maintenance_reports ? localStorage.setItem('viewMaintenanceReport', "true") : localStorage.setItem('viewMaintenanceReport', "false")
+                    res.data.can_add_maintenance_reports ? localStorage.setItem('addMaintenanceReport', "true") : localStorage.setItem('addMaintenanceReport', "false")
+                    res.data.can_edit_maintenance_reports ? localStorage.setItem('editMaintenanceReport', "true") : localStorage.setItem('editMaintenanceReport', "false")
+                    res.data.can_delete_maintenance_reports ? localStorage.setItem('deleteMaintenanceReport', "true") : localStorage.setItem('deleteMaintenanceReport', "false")
+    
+                    res.data.can_view_repair_reports ? localStorage.setItem('viewRepairReport', "true") : localStorage.setItem('viewRepairReport', "false")
+                    res.data.can_add_repair_reports ? localStorage.setItem('addRepairReport', "true") : localStorage.setItem('addRepairReport', "false")
+                    res.data.can_edit_repair_reports ? localStorage.setItem('editRepairReport', "true") : localStorage.setItem('editRepairReport', "false")
+                    res.data.can_delete_repair_reports ? localStorage.setItem('deleteRepairReport', "true") : localStorage.setItem('deleteRepairReport', "false")
+    
+                    res.data.can_view_task ? localStorage.setItem('viewTask', "true") : localStorage.setItem('viewTask', "false")
+                    res.data.can_add_task ? localStorage.setItem('addTask', "true") : localStorage.setItem('addTask', "false")
+                    res.data.can_edit_task ? localStorage.setItem('editTask', "true") : localStorage.setItem('editTask', "false")
+                    res.data.can_delete_task ? localStorage.setItem('deleteTask', "true") : localStorage.setItem('deleteTask', "false")
+                    setIsChanged(true);
+                })
+                .catch((err) => {
+                    console.log("local permission err:");
+                    console.log(err.response);
+                });
+        }
+    }
+
     const updatePermissionUser = event => {
         let token = localStorage.getItem("token");
         //let username = selectedUser.username;
-
         const config = {
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -227,7 +311,7 @@ export const EditDeleteUser = () => {
             "can_edit_users": check3,
             "can_delete_users": check4
         });
-        console.log('body: ' + body);
+        //console.log('body: ' + body);
         axios
             .put('http://127.0.0.1:8000/api/permission/user/' + username + '/', body, config)
             .then((res) => {
@@ -238,7 +322,7 @@ export const EditDeleteUser = () => {
             .catch((err) => {
                 console.log('err permission user: ');
                 console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal User', detail: 'Something went wrong.', life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal User', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -261,7 +345,7 @@ export const EditDeleteUser = () => {
             "can_edit_inventory": check7,
             "can_delete_inventory": check8
         });
-        console.log('body: ' + body);
+        //console.log('body: ' + body);
         axios
             .put('http://127.0.0.1:8000/api/permission/inventory/' + username + '/', body, config)
             .then((res) => {
@@ -272,7 +356,7 @@ export const EditDeleteUser = () => {
             .catch((err) => {
                 console.log('err permission inventory: ');
                 console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal Inventory', detail: 'Something went wrong.', life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Inventory', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -295,7 +379,7 @@ export const EditDeleteUser = () => {
             "can_edit_inspection_reports": check11,
             "can_delete_inspection_reports": check12
         });
-        console.log('body: ' + body);
+        //console.log('body: ' + body);
         axios
             .put('http://127.0.0.1:8000/api/permission/inspection-report/' + username + '/', body, config)
             .then((res) => {
@@ -306,7 +390,7 @@ export const EditDeleteUser = () => {
             .catch((err) => {
                 console.log('err permission inspect: ');
                 console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal Inspection Report', detail: 'Something went wrong.', life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Inspection Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -329,7 +413,7 @@ export const EditDeleteUser = () => {
             "can_edit_maintenance_reports": check15,
             "can_delete_maintenance_reports": check16
         });
-        console.log('body: ' + body);
+        //console.log('body: ' + body);
         axios
             .put('http://127.0.0.1:8000/api/permission/maintenance-report/' + username + '/', body, config)
             .then((res) => {
@@ -340,7 +424,7 @@ export const EditDeleteUser = () => {
             .catch((err) => {
                 console.log('err permission maintenance: ');
                 console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal Maintenance Report', detail: 'Something went wrong.', life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Maintenance Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -363,7 +447,7 @@ export const EditDeleteUser = () => {
             "can_edit_repair_reports": check19,
             "can_delete_repair_reports": check20
         });
-        console.log('body: ' + body);
+        //console.log('body: ' + body);
         axios
             .put('http://127.0.0.1:8000/api/permission/repair-report/' + username + '/', body, config)
             .then((res) => {
@@ -374,7 +458,7 @@ export const EditDeleteUser = () => {
             .catch((err) => {
                 console.log('err permission repair: ');
                 console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -397,20 +481,28 @@ export const EditDeleteUser = () => {
             "can_edit_task": check23,
             "can_delete_task": check24
         });
-        console.log('body: ' + body);
+        //console.log('body: ' + body);
         axios
             .put('http://127.0.0.1:8000/api/permission/task/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission task: ');
                 //console.log(res.data)
-                toast.current.show({ severity: 'success', summary: 'Save Successfully', detail: 'User details updated.', life: 5000 });
+                toast.current.show({ severity: 'success', summary: 'Save Successfully', detail: 'User details updated.', life: 3000 });
                 getUsers();
+                updateLocalPermission();
+                //setIsChanged(true);
+                //refreshPage()
+
             })
             .catch((err) => {
                 console.log('err permission task: ');
                 console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
             });
+    }
+
+    function refreshPage() {
+        window.location.reload();
     }
 
     const dialogFuncMap = {
@@ -475,31 +567,31 @@ export const EditDeleteUser = () => {
             });
     }
 
-    const deletePermission = event => {
-        let token = localStorage.getItem("token");
-        let username = selectedUser.username;
+    // const deletePermission = event => {
+    //     let token = localStorage.getItem("token");
+    //     let username = selectedUser.username;
 
-        const config = {
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json',
-            },
-        };
+    //     const config = {
+    //         headers: {
+    //             'Authorization': 'Bearer ' + token,
+    //             'Content-Type': 'application/json',
+    //         },
+    //     };
 
-        axios
-            .delete('http://127.0.0.1:8000/api/permission/' + username + '/', config)
-            .then((res) => {
-                console.log('succ delete permission: ');
-                console.log(res.data)
-                toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
-                getUsers();
-            })
-            .catch((err) => {
-                console.log('err delete permission: ');
-                console.log(err.response)
-                toast.current.show({ severity: 'error', summary: 'Delete Permission Error', detail: 'Something went wrong.', life: 5000 });
-            });
-    }
+    //     axios
+    //         .delete('http://127.0.0.1:8000/api/permission/' + username + '/', config)
+    //         .then((res) => {
+    //             console.log('succ delete permission: ');
+    //             console.log(res.data)
+    //             toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
+    //             getUsers();
+    //         })
+    //         .catch((err) => {
+    //             console.log('err delete permission: ');
+    //             console.log(err.response)
+    //             toast.current.show({ severity: 'error', summary: 'Delete Permission Error', detail: 'Something went wrong.', life: 5000 });
+    //         });
+    // }
 
 
     const renderFooter = (name) => {
@@ -513,12 +605,21 @@ export const EditDeleteUser = () => {
 
     const actionBody = () => {
         return (
+            localStorage.getItem("deleteUsers") === "true" ?
             <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')}/>
+            :
+            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')} disabled/>
         );
     }
 
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
+        if (isChanged) {
+            refreshPage();
+            setIsChanged(false);
+            } else {
+               console.log("nothing change")
+            }
     }
 
     const onHideDelete = (name) => {
@@ -531,12 +632,15 @@ export const EditDeleteUser = () => {
             <Toast ref={toast} />
             <div className="p-col-12">
                 <div className="p-fluid p-grid">
-                    <div className="p-col-12 p-lg-2 p-md-2 p-sm-3">
+                <div className="p-col-12 p-lg-2 p-md-2 p-sm-3">
+                    { localStorage.getItem("editUsers") === "true" ?
                         <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')} />
-                    </div>
-                    <div className="p-col-12 p-md-6">
+                        :
+                        <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')} disabled/> }
+                        </div>
+                        <div className="p-col-12 p-md-6">
 
-                    </div>
+                        </div>
                     <div className="p-col-12 p-lg-4 p-md-4 p-sm-4">
                         <span className="p-input-icon-left">
                             <i className="pi pi-search" />
@@ -561,7 +665,7 @@ export const EditDeleteUser = () => {
 
 
 
-            <Dialog header="Edit Form" visible={displayBasic} style={{ width: '75vw' }} onHide={() => onHide('displayBasic')}>
+            <Dialog header="Edit Form" visible={displayBasic} style={{  width: '85vw' }} onHide={() => onHide('displayBasic')}>
                 <div className="p-col-12">
                     
                         <div className="p-grid p-fluid">
@@ -639,133 +743,134 @@ export const EditDeleteUser = () => {
                             </div>
                         </div>
 
-                        <div className="p-grid p-fluid" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                        <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
                             <Panel header="PERMISSION" className="p-col-12 p-md-12">
                                 <div className="p-grid p-fluid">
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                         <Fieldset legend="User Data">
-                                            <div className="p-col">
+                                            {/*<div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check1} onChange={event => isCheck1(check1 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                            </div>*/}
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check2} onChange={event => isCheck2(check2 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check3} onChange={event => isCheck3(check3 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check4} onChange={event => isCheck4(check4 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                             </div>
+                                            <div className="p-col" style={{ height:'45px'}}></div>
                                         </Fieldset>
                                     </div>
 
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                         <Fieldset legend="Inventory">
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check5} onChange={event => isCheck5(check5 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check6} onChange={event => isCheck6(check6 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check7} onChange={event => isCheck7(check7 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check8} onChange={event => isCheck8(check8 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                             </div>
                                         </Fieldset>
                                     </div>
 
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                         <Fieldset legend="Inspection Report">
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check9} onChange={event => isCheck9(check9 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check10} onChange={event => isCheck10(check10 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check11} onChange={event => isCheck11(check11 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check12} onChange={event => isCheck12(check12 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                             </div>
                                         </Fieldset>
                                     </div>
                                 </div>
 
                                 <div className="p-grid p-fluid">
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                         <Fieldset legend="Maintenance Report">
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check13} onChange={event => isCheck13(check13 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check14} onChange={event => isCheck14(check14 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check15} onChange={event => isCheck15(check15 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check16} onChange={event => isCheck16(check16 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                             </div>
                                         </Fieldset>
                                     </div>
 
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                         <Fieldset legend="Repair Reports">
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check17} onChange={event => isCheck17(check17 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check18} onChange={event => isCheck18(check18 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check19} onChange={event => isCheck19(check19 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check20} onChange={event => isCheck20(check20 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                             </div>
                                         </Fieldset>
                                     </div>
 
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                         <Fieldset legend="Task">
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check21} onChange={event => isCheck21(check21 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check22} onChange={event => isCheck22(check22 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check23} onChange={event => isCheck23(check23 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                             </div>
                                             <div className="p-col">
                                                 <Checkbox classname="p-checkbox-lg" checked={check24} onChange={event => isCheck24(check24 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                             </div>
                                         </Fieldset>
                                     </div>

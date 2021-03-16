@@ -90,7 +90,6 @@ export class DriverInspectionReport extends Component {
         this.setState({ checkboxValue: selected });
     }
 
-
     //fetch data of car list from db on page load
     componentDidMount() {
         axios.get(`http://127.0.0.1:8000/api/careta/`)
@@ -240,181 +239,199 @@ export class DriverInspectionReport extends Component {
 
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <h1>Exterior</h1>
-                        <div className="p-grid">
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Not Okay</label></center>
+                        <h1>Exterior</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%'}}>
+                        <div className="p-col" style={{height:'40px', minWidth: '260px'}}></div>
+                            <div className="p-col">
+                                <center><h4>Not Okay</h4></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Okay</label></center>
+                            <div className="p-col">
+                                <center><h4>Okay</h4></center>
                             </div>
-                            <div className="p-col-12 p-md-4"></div>
-
-                            <div className="p-col-12 p-md-4">
-                                <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue1: false})} checked={this.state.radioValue1 === false} /></center>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Cleanliness</h4></div>
+                            <div className="p-col ">
+                                <center><Checkbox inputId="rb1"  onChange={event => this.setState({ radioValue1: false})} checked={this.state.radioValue1 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue1: true})} checked={this.state.radioValue1 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Cleanliness</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Condition Rust</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox  inputId="rb1" onChange={event => this.setState({ radioValue2: false })} checked={this.state.radioValue2 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox  inputId="rb2" onChange={event => this.setState({ radioValue2: true })} checked={this.state.radioValue2 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Condition Rust</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Decals / Livery Intact</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox  inputId="rb1" onChange={event => this.setState({ radioValue3: false })} checked={this.state.radioValue3 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue3: true })} checked={this.state.radioValue3 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Decals</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Windows / Windscreen</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue4: false})} checked={this.state.radioValue4 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue4: true })} checked={this.state.radioValue4 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Windows/ Windscreen</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Rear Door</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox  inputId="rb1" onChange={event => this.setState({ radioValue5: false})} checked={this.state.radioValue5 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue5: true })} checked={this.state.radioValue5 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Rear Door</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Mirrors</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue6: false })} checked={this.state.radioValue6 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue6: true })} checked={this.state.radioValue6 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Mirrors</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Roof Rack</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue7: false })} checked={this.state.radioValue7 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue7: true})} checked={this.state.radioValue7 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Roof Rack</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-11 p-sm-11" style={{ marginLeft:'4%', borderBottom: '1px solid #f0f0f0'}}>
+                        <div className="p-col" style={{margin:'auto', height:'40px', minWidth: '260px'}}><h4>Rear Step</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue8: false })} checked={this.state.radioValue8 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue8: true})} checked={this.state.radioValue8 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Rear Step</label></div>
                         </div>
+                        
                     </div>
                 </div>
 
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <h1>Interior</h1>
-                        <div className="p-grid">
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Not Okay</label></center>
+                        <h1>Interior</h1><hr/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}></div>
+                            <div className="p-col">
+                                <center><h4>Not Okay</h4></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Okay</label></center>
+                            <div className="p-col">
+                                <center><h4>Okay</h4></center>
                             </div>
-                            <div className="p-col-12 p-md-4"></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Seats</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue9: false })} checked={this.state.radioValue9 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue9: true })} checked={this.state.radioValue9 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Seats</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Seat Belts</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue10: false})} checked={this.state.radioValue10 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue10: true })} checked={this.state.radioValue10 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Seat Belts</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>General Condition</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue11: false})} checked={this.state.radioValue11 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue11: true })} checked={this.state.radioValue11 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>General Condition</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Vehicle Documents</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue12: false})} checked={this.state.radioValue12 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue12: true })} checked={this.state.radioValue12 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Vehicle Documents</label></div>
                         </div>
                     </div>
                 </div>
 
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <h1>Engine Bay</h1>
-                        <div className="p-grid">
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Not Okay</label></center>
+                        <h1>Engine Bay</h1><hr/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}></div>
+                            <div className="p-col">
+                                <center><h4>Not Okay</h4></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
-                                <center><label>Okay</label></center>
+                            <div className="p-col">
+                                <center><h4>Okay</h4></center>
                             </div>
-                            <div className="p-col-12 p-md-4"></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Cleanliness</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue13: false})} checked={this.state.radioValue13 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue13: true})} checked={this.state.radioValue13 === true } /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Cleanliness</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Washer Fluid</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue14: false})} checked={this.state.radioValue14 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue14: true})} checked={this.state.radioValue14 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Washer Fluid</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Coolant Level</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox  inputId="rb1" onChange={event => this.setState({ radioValue15: false})} checked={this.state.radioValue15 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox  inputId="rb2" onChange={event => this.setState({ radioValue15: true })} checked={this.state.radioValue15 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Coolant Level</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Brake Fluid Level</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue16: false})} checked={this.state.radioValue16 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue16: true })} checked={this.state.radioValue16 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Brake Fluid Level</label></div>
-
-                            <div className="p-col-12 p-md-4">
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-10">
+                        <div className="p-col" style={{paddingLeft:'8%', height:'40px', minWidth: '200px'}}><h4>Power Steering Fluid</h4></div>
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue17: false })} checked={this.state.radioValue17 === false} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4">
+                            <div className="p-col">
                                 <center><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue17: true })} checked={this.state.radioValue17 === true} /></center>
                             </div>
-                            <div className="p-col-12 p-md-4"><label>Power Steering Fluid</label></div>
                         </div>
                     </div>
                 </div>

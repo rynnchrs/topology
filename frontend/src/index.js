@@ -6,8 +6,6 @@ import ReactDOM from 'react-dom';
 import { HashRouter as Router } from 'react-router-dom';
 
 import ScrollToTop from './ScrollToTop';
-import App from './App';
-
 import LoginDashboardRoute from './LoginDashboardRoute';
 
 ReactDOM.render(
