@@ -1,13 +1,17 @@
-from django.db import models
 import datetime
-from django.db.models import fields
-from django.db.models.deletion import CASCADE # add this
-from django.db.models.fields import AutoField, BooleanField, CharField, DateField, DateTimeField
-from phone_field import PhoneField
+from datetime import date
+
 # Create your models here.
 # add this
-from django.contrib.auth.models import User # authenticate User
-from datetime import date
+from django.contrib.auth.models import User  # authenticate User
+from django.db import models
+from django.db.models import fields
+from django.db.models.deletion import CASCADE  # add this
+from django.db.models.fields import (AutoField, BooleanField, CharField,
+                                     DateField, DateTimeField)
+from django.db.models.fields.related import ForeignKey
+from phone_field import PhoneField
+
 
 class UserInfo(models.Model):  # User Info Model
     user = models.OneToOneField(User, on_delete=CASCADE, related_name='user_info')
@@ -496,6 +500,79 @@ class InspectiontImage(models.Model):
    images = models.ImageField(upload_to = 'images/')
 
 
+class Maintenance(models.Model):
+    maintenance_id = models.AutoField(primary_key=True)
+    vin_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
+    supplier_name = models.CharField(max_length=50)
+    mileage = models.IntegerField(default=0, null=True, blank=True)
+    Level_List = [
+        (1, "CHECK AND OK"),
+        (2, "MAY REQUIRE ATTENTION"),
+        (3, "REQUIRES IMMEDIATE ATTENTION")
+    ]
+    #interior/exterior
+    exterior_body = models.IntegerField(default=1, choices=Level_List)
+    windshield = models.IntegerField(default=1, choices=Level_List)
+    wipers = models.IntegerField(default=1, choices=Level_List)
+    lights = models.IntegerField(default=1, choices=Level_List)
+    interior_lights = models.IntegerField(default=1, choices=Level_List)
+    ac_operation = models.IntegerField(default=1, choices=Level_List)
+    heating = models.IntegerField(default=1, choices=Level_List)
+    interior_other = models.CharField(max_length=30, null=True, blank=True)
+    #underhood
+    engine_oil = models.IntegerField(default=1, choices=Level_List)
+    brake_fluid = models.IntegerField(default=1, choices=Level_List)
+    power_stearing = models.IntegerField(default=1, choices=Level_List)
+    washer = models.IntegerField(default=1, choices=Level_List)
+    belts_hoses = models.IntegerField(default=1, choices=Level_List)
+    coolant = models.IntegerField(default=1, choices=Level_List)
+    air_filter = models.IntegerField(default=1, choices=Level_List)
+    cabin_filter = models.IntegerField(default=1, choices=Level_List)
+    fuel_filter = models.IntegerField(default=1, choices=Level_List)
+    spark_plug = models.IntegerField(default=1, choices=Level_List)
+    underhood_other = models.CharField(max_length=30, null=True, blank=True)
+    battery_charge = models.IntegerField(default=1, choices=Level_List)
+    battery_condition = models.IntegerField(default=1, choices=Level_List)
+    cables = models.IntegerField(default=1, choices=Level_List)
+    #under vehicle
+    brakes = models.IntegerField(default=1, choices=Level_List)
+    brake_lines = models.IntegerField(default=1, choices=Level_List)
+    steering = models.IntegerField(default=1, choices=Level_List)
+    shocks = models.IntegerField(default=1, choices=Level_List)
+    driveline = models.IntegerField(default=1, choices=Level_List)
+    exhaust = models.IntegerField(default=1, choices=Level_List)
+    fuel_lines = models.IntegerField(default=1, choices=Level_List)
+    under_vehicle_other = models.CharField(max_length=30, null=True, blank=True)
+    #tires
+    Tread_List = [
+        (1, "7/32\" or greater"),
+        (2, "3/32\" to 6/32\""),
+        (3, "2/32\" or less")
+    ]
+    tread_depth = models.IntegerField(default=1, choices=Tread_List)
+    tread_lf = models.IntegerField(default=1, choices=Level_List)
+    tread_lr = models.IntegerField(default=1, choices=Level_List)
+    tread_rf = models.IntegerField(default=1, choices=Level_List)
+    tread_rr = models.IntegerField(default=1, choices=Level_List)
+    wear_lf = models.IntegerField(default=1, choices=Level_List)
+    wear_lr = models.IntegerField(default=1, choices=Level_List)
+    wear_rf = models.IntegerField(default=1, choices=Level_List)
+    wear_rr = models.IntegerField(default=1, choices=Level_List)
+    tpms = models.BooleanField(default=False)
+    air_lf = models.IntegerField(default=0, null=True, blank=True)
+    air_lr = models.IntegerField(default=0, null=True, blank=True)
+    air_rf = models.IntegerField(default=0, null=True, blank=True)
+    air_rr = models.IntegerField(default=0, null=True, blank=True)
+    alignment = models.BooleanField(default=False)
+    balance = models.BooleanField(default=False)
+    rotation = models.BooleanField(default=False)
+    new_tire = models.BooleanField(default=False)
+    repair_desc = models.TextField(null=True, blank=True)
+    comments = models.TextField(null=True, blank=True)
+    inspected_by = models.ForeignKey(User, related_name='inspect', on_delete=models.CASCADE)
+    date = models.DateField()
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
 
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)

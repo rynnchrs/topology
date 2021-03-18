@@ -1,11 +1,14 @@
 # todo/serializers.py
+import django.contrib.auth.password_validation as validators  # add this
+from django.contrib.auth.models import User  # add this
+from django.core import exceptions
 from django.db.models import fields
 from rest_framework import serializers
-from .models import Car, Contract, Cost, Repair, TPL, Insurance, UserInfo, Permission, Inspection#, ReportImage # add this
 
-from django.contrib.auth.models import User # add this
-import django.contrib.auth.password_validation as validators    # add this
-from django.core import exceptions
+from .models import (TPL, Car, Contract, Cost,  # , ReportImage # add this
+                     Inspection, Insurance, Maintenance, Permission, Repair,
+                     UserInfo)
+
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
     id = serializers.CharField(read_only=True, source='user.id')
@@ -259,6 +262,39 @@ class InspectionListSerializer(serializers.ModelSerializer): # list of all Inspe
     class Meta:
         model = Inspection
         fields = [  'inspection_id','vin_no','date_created']
+
+
+class MaintenanceSerializer(serializers.ModelSerializer): # Maintenance serializer 
+    vin_no = serializers.CharField()
+    inspected_by = serializers.CharField()
+    class Meta:
+        model = Maintenance
+        fields = '__all__'
+
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['vin_no'] = Car.objects.get(vin_no=obj['vin_no'])
+        except:
+           errors.append({"vin_no": 'Invalid vin_no'})
+        try:
+            obj['inspected_by'] = User.objects.get(username=obj['inspected_by'])
+        except:
+            errors.append({"inspected_by": 'inspected_by'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
+        return super(MaintenanceSerializer, self).to_representation(instance)
+
+class MaintenanceListSerializer(serializers.ModelSerializer): # list of all Maintenance
+    vin_no = serializers.CharField(source='vin_no.vin_no')
+    class Meta:
+        model = Maintenance
+        fields = [  'maintenance_id','vin_no','date_created']
+
 
 class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     class Meta:
