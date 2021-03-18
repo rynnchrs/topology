@@ -1,0 +1,80 @@
+
+
+@media only screen and (min-width : 770px) and (max-width : 1200px) { 
+    .widName {
+      min-Width: 260px;
+      //border: 1px solid green;
+    } 
+  }
+
+@media only screen and (min-width : 501px) and (max-width : 769px) { 
+  .widName {
+    min-Width: 250px;
+    //border: 1px solid blue;
+  }
+}
+
+@media only screen and (min-width : 100px) and (max-width : 500px) { 
+  h4{
+    font-size: 17px;
+    letter-spacing: -1px;
+  }
+  .widName {
+    min-Width: 170px;
+    //border: 1px solid red;
+  }
+  .widCheck {
+    min-Width: 30px;
+    //border: 1px solid red;
+  }
+  .p-checkbox {
+    width: 28px;
+    height: 28px;
+  }
+
+  .p-checkbox .p-checkbox-box {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+
+.report-checklist{
+  @media only screen and (min-width : 770px) and (max-width : 1200px) { 
+    .widName {
+      min-Width: 260px;
+      //border: 1px solid green;
+    } 
+  }
+
+  @media only screen and (min-width : 601px) and (max-width : 769px) { 
+    .widName {
+      min-Width: 230px;
+      //border: 1px solid blue;
+    }
+  }
+
+  @media only screen and (min-width : 100px) and (max-width : 600px) { 
+    h4{
+      font-size: 15.5px;
+      letter-spacing: -1px;
+    }
+    .widName {
+      min-Width: 145px;
+      //border: 1px solid red;
+    }
+    .widCheck {
+      min-Width: 25px;
+      //border: 1px solid red;
+    }
+    .p-checkbox {
+      width: 27px;
+      height: 27px;
+    }
+
+    .p-checkbox .p-checkbox-box {
+      width: 27px;
+      height: 27px;
+    }
+  }
+}
