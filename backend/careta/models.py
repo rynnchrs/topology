@@ -500,7 +500,7 @@ class InspectiontImage(models.Model):
    images = models.ImageField(upload_to = 'images/')
 
 
-class Maintenance(models.Model):
+class Maintenance(models.Model): #Maintenance model
     maintenance_id = models.AutoField(primary_key=True)
     vin_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
     supplier_name = models.CharField(max_length=50)

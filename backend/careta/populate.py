@@ -1,7 +1,10 @@
 import csv
+
+from django.contrib.auth.models import User  # add this
+
 from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
                      Permission, Repair, UserInfo)
-from django.contrib.auth.models import User  # add this
+
 
 def datas():
     with open("C:/Users/sydfr/OneDrive/Desktop/Topology/database.csv") as f:
