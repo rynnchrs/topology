@@ -13,11 +13,11 @@ def datas():
         return (data)
 
 def user_data():
-    superuser = User.objects.create_superuser(
+    superuser = User.objects.create_superuser( #creating super user "admin"
             username = 'admin',
             password = 'password'
         )
-    Permission.objects.create(user=superuser, 
+    Permission.objects.create(user=superuser,  #create permission for admin only
     can_view_users = True,
     can_add_users = True,
     can_edit_users = True,
@@ -43,15 +43,15 @@ def user_data():
     can_edit_task = True,
     can_delete_task = True,)
     for data in datas():
-        password = 'fiberhome'
-        user = User.objects.create(
+        password = 'fiberhome' # default password for inital acounts
+        user = User.objects.create(     # initializing users account
                 username = data[0],
                 first_name = "careta",
                 last_name = data[0],
                 password = password,
             )
         UserInfo.objects.create(user=user)
-        Permission.objects.create(user=user, can_add_inspection_reports=True)
+        Permission.objects.create(user=user, can_add_inspection_reports=True) # set can add inspection report to true 
         user.set_password(password)
         user.save()
 
@@ -124,7 +124,7 @@ def user_data():
         
         
 
-        Car.objects.create(
+        Car.objects.create( # initializing car data
              slug = data[14],
              body_no = data[0],
              cs_no = data[1],
