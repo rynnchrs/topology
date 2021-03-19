@@ -571,8 +571,12 @@ class Maintenance(models.Model): #Maintenance model
     comments = models.TextField(null=True, blank=True)
     inspected_by = models.ForeignKey(User, related_name='inspect', on_delete=models.CASCADE)
     date = models.DateField()
+    status = models.BooleanField(default=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.maintenance_id)
 
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)

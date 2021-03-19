@@ -44,12 +44,22 @@ def can_add_maintenance(user):
     else:
         return False
 
+
 def can_view_maintenance(user):
     permission = Permission.objects.get(user__username=user.username)
     if permission.can_view_maintenance_reports == True:  
         return True
     else:
         return False
+
+
+def can_edit_maintenance(user):
+    permission = Permission.objects.get(user__username=user.username)
+    if permission.can_edit_maintenance_reports == True:  
+        return True
+    else:
+        return False
+
 
 def check_or_date(year):
     if year == 2019:
