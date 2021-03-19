@@ -28,7 +28,7 @@ export class Toasts extends Component {
             this.state.toast.current.show({ severity: 'error', summary: 'Invalid Details', detail: 'Username or Password is incorrect.', life: 5000 });
         }
         if (message !== prevProps.message) {
-            if (message.okayLogin == "okay") {
+            if (message.okayLogin === "okay") {
                 //console.log("rcv message okay login")
                 this.state.toast.current.show({ severity: 'success', summary: 'Login Successful', detail: 'Logging you in...', life: 5000 });
             }

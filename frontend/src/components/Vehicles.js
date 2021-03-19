@@ -2398,9 +2398,18 @@ export class Vehicles extends Component {
 
                             <div className="p-col-12">
                                 <div className="p-grid p-justify-end">
-                                    <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} />
+                                    {/*<Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} />
                                     <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} />
-                                    <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} />
+                                    <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} />*/}
+                                    { localStorage.getItem("addInventory") === "true" ?
+                                     <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} /> :
+                                     <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} disabled/> }
+                                    { localStorage.getItem("editInventory") === "true" ?
+                                     <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} /> :
+                                     <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} disabled/> }
+                                    { localStorage.getItem("deleteInventory") === "true" ?
+                                     <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} /> :
+                                     <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} disabled/> }
                                 </div>
                             </div>
 

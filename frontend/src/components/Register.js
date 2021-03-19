@@ -1,4 +1,4 @@
-import React, { Component, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -52,27 +52,27 @@ export const Register = () => {
     const toast = useRef(null);
 
     const submitData = event => {
-        if (first_name == "") {
+        if (first_name === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Firstname is required.', life: 5000 });
-        } else if (last_name == "") {
+        } else if (last_name === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Lastname is required.', life: 5000 });
-        } else if (email == "") {
+        } else if (email === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Email is required.', life: 5000 });
-        } else if (username == "") {
+        } else if (username === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Username is required.', life: 5000 });
-        } else if (password == "") {
+        } else if (password === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Password is required.', life: 5000 });
-        } else if (mygender.val == null) {
+        } else if (mygender.val === null) {
             toast.current.show({ severity: 'warn', summary: 'No Selected', detail: 'Please select a gender.', life: 5000 });
-        } else if (company == "") {
+        } else if (company === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Company is required.', life: 5000 });
-        } else if (position == "") {
+        } else if (position === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Position is required.', life: 5000 });
-        } else if (address == "") {
+        } else if (address === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Address is required.', life: 5000 });
-        } else if (phone == "") {
+        } else if (phone === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 5000 });
-        } else if (birthday == "") {
+        } else if (birthday === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
         } else {
             let token = localStorage.getItem("token");
@@ -173,38 +173,6 @@ export const Register = () => {
         setPasswordShown(passwordShown ? false : true);
     }
 
-    const permissionTest = event => {
-        console.log(check1);
-        console.log(check2);
-        console.log(check3);
-        console.log(check4);
-        console.log(check5);
-        console.log(check6);
-        console.log(check7);
-        console.log(check8);
-        console.log(check9);
-        console.log(check10);
-        console.log(check11);
-        console.log(check12);
-        console.log(check13);
-        console.log(check14);
-        console.log(check15);
-        console.log(check16);
-        console.log(check17);
-        console.log(check18);
-        console.log(check19);
-        console.log(check20);
-        console.log(check21);
-        console.log(check22);
-        console.log(check23);
-        console.log(check24);
-
-        /*for (var i = 0; i < 25; i++) {
-            
-        }*/
-        
-    }
-
     return (
         <div className="p-grid p-fluid" >
             <Toast ref={toast} />
@@ -286,133 +254,134 @@ export const Register = () => {
                         </div>
                     </div>
 
-                    <div className="p-grid p-fluid" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                    <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
                         <Panel header="PERMISSION" className="p-col-12 p-md-12">
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                     <Fieldset legend="User Data">
-                                        <div className="p-col">
+                                        {/*<div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check1} onChange={event => isCheck1(check1 ? false : true)}> </Checkbox>
                                             <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>
+                                        </div>*/}
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check2} onChange={event => isCheck2(check2 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check3} onChange={event => isCheck3(check3 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check4} onChange={event => isCheck4(check4 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                         </div>
+                                        <div className="p-col" style={{ height:'45px'}}></div>
                                     </Fieldset>
                                 </div>
 
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                     <Fieldset legend="Inventory">
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check5} onChange={event => isCheck5(check5 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check6} onChange={event => isCheck6(check6 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check7} onChange={event => isCheck7(check7 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check8} onChange={event => isCheck8(check8 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                         </div>
                                     </Fieldset>
                                 </div>
 
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                     <Fieldset legend="Inspection Report">
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check9} onChange={event => isCheck9(check9 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check10} onChange={event => isCheck10(check10 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check11} onChange={event => isCheck11(check11 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check12} onChange={event => isCheck12(check12 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                         </div>
                                     </Fieldset>
                                 </div>
                             </div>
 
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                     <Fieldset legend="Maintenance Report">
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check13} onChange={event => isCheck13(check13 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check14} onChange={event => isCheck14(check14 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check15} onChange={event => isCheck15(check15 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check16} onChange={event => isCheck16(check16 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                         </div>
                                     </Fieldset>
                                 </div>
 
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                     <Fieldset legend="Repair Reports">
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check17} onChange={event => isCheck17(check17 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check18} onChange={event => isCheck18(check18 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check19} onChange={event => isCheck19(check19 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check20} onChange={event => isCheck20(check20 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                         </div>
                                     </Fieldset>
                                 </div>
 
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '3%', paddingRight: '3%' }}>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
                                     <Fieldset legend="Task">
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check21} onChange={event => isCheck21(check21 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check22} onChange={event => isCheck22(check22 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> ADD </label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check23} onChange={event => isCheck23(check23 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> EDIT</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
                                         </div>
                                         <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check24} onChange={event => isCheck24(check24 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> DELETE</label>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
                                         </div>
                                     </Fieldset>
                                 </div>

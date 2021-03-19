@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
-import { Link, Redirect, useLocation } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
@@ -74,6 +73,19 @@ export const AppProfile = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         localStorage.removeItem("myfirst");
+
+        localStorage.removeItem("viewUsers"); localStorage.removeItem("addUsers");
+        localStorage.removeItem("editUsers"); localStorage.removeItem("deleteUsers");
+        localStorage.removeItem("viewInventory"); localStorage.removeItem("addInventory");
+        localStorage.removeItem("editInventory"); localStorage.removeItem("deleteInventory");
+        localStorage.removeItem("viewInspectionReport"); localStorage.removeItem("addInspectionReport");
+        localStorage.removeItem("editInspectionReport"); localStorage.removeItem("deleteInspectionReport");
+        localStorage.removeItem("viewMaintenanceReport"); localStorage.removeItem("addMaintenanceReport");
+        localStorage.removeItem("editMaintenanceReport"); localStorage.removeItem("deleteMaintenanceReport");
+        localStorage.removeItem("viewRepairReport"); localStorage.removeItem("addRepairReport");
+        localStorage.removeItem("editRepairReport"); localStorage.removeItem("deleteRepairReport");
+        localStorage.removeItem("viewTask"); localStorage.removeItem("addTask");
+        localStorage.removeItem("editTask"); localStorage.removeItem("deleteTask");
         toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
         setTimeout(() => {
             window.location.href = '/';

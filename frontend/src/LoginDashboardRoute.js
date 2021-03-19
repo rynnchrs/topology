@@ -1,9 +1,7 @@
 import 'react-app-polyfill/ie11';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import { Route } from 'react-router-dom';
-import { HashRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
 

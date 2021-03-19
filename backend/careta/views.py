@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken  # add this
 
 from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
                      Permission, Repair, UserInfo)
-from .populate import car_data, user_data
+from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           ContractSerializer, InspectionListSerializer,
                           InspectionSerializer, InsuranceSerializer,
@@ -32,27 +32,9 @@ from .utils import (check_Com_date, check_cr_date, check_or_date,
                     check_TPL_date, inspection_permission, user_permission)
 
 class Populate(generics.GenericAPIView):  # for register user
-    # serializer_class = UserSerializer 
-    serializer_class = PermissionSerializer 
-    # serializer_class = CarSerializer
 
     def post(self, request):
-        datas = user_data()
-        # for data in user_data():
-            # serializer = UserSerializer(data={
-            #         "username": "18-1654","email": "","first_name": "careta",
-            #         "last_name": "18-1655","password": "fiberhome","user_info": {}
-            #     })
-            # serializer = PermissionSerializer(data={
-            #         "user": data, "can_add_inspection_reports": "True"
-            #     })
-        for data in car_data():
-            serializer = CarSerializer(data={
-                    "slug": data[2],"body_no": data[0],"plate_no": data[1],
-                    "vin_no": data[2],"make": data[3],"current_loc": data[4]
-                })
-            if serializer.is_valid(raise_exception=True):
-                serializer.save() 
+        user_data()
         return Response("Successfully Created", status=status.HTTP_201_CREATED)
 
 class RegisterView(generics.GenericAPIView):  # for register user
@@ -363,9 +345,14 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         if inspection_permission(user):
             queryset =  Inspection.objects.all()
             inspection = get_object_or_404(queryset, pk=pk)
-            inspection.status = False
-            inspection.save()
-            return Response("Status False")
+            if inspection.status is True:
+                inspection.status = False
+                inspection.save()
+                return Response("Status False")
+            else:
+                inspection.status = True
+                inspection.save()
+                return Response("Status True")
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
