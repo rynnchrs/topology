@@ -8,6 +8,8 @@ import { Checkbox } from 'primereact/checkbox';
 import { Calendar } from 'primereact/calendar';
 import { format } from 'date-fns';
 
+import './mycss.scss';
+
 export default function DriverRecordForms() {
         const [selectedCar, setSelectedCar] = useState(['']);
         const [carValues, setcarValues] = useState(['']);
@@ -62,7 +64,8 @@ export default function DriverRecordForms() {
             <ListBox value={selectedCar} options={carValues} onChange={(e) => setSelectedCar(e.value)} filter optionLabel="body_no"/>
 
             
-            <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '75vw' }} onHide={() => onHide('displayBasic')}>
+            <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
+            
                 <div className="card card">
                     <div className="p-grid">
                         <div className="p-col-12 p-md-6">
@@ -86,7 +89,520 @@ export default function DriverRecordForms() {
                         </div>
                     </div>
                 </div>
-                <div className="card card-w-title">
+
+                <div className="p-col-12 p-lg-12 report-checklist">
+                    <div className="card card-w-title">
+                        <h1>Exterior</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                        <div className="p-col widName" style={{height:'40px'}}></div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Not Okay</b></h4></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Okay</b></h4></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Condition Rust</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Decals/Livery Intact</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"/></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Windows/Windscreen</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear Door</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{ height:'40px'}}><h4>Mirrors</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Roof Rack</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear Step</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-col-12 p-lg-12 report-checklist">
+                    <div className="card card-w-title">
+                        <h1>Interior</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                        <div className="p-col widName" style={{height:'40px'}}></div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Not Okay</b></h4></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Okay</b></h4></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Seats</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Seat Belts</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>General Condition</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"/></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Vehicle Documents</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-col-12 p-lg-12 report-checklist">
+                    <div className="card card-w-title">
+                        <h1>Engine Bay</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                        <div className="p-col widName" style={{height:'40px'}}></div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Not Okay</b></h4></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Okay</b></h4></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Washer Fluid</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Coolant Level</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"/></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Brake Fluid Level</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Power Steering Fluid</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-col-12 p-lg-12 report-checklist">
+                    <div className="card card-w-title">
+                        <h1>Electrics</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                        <div className="p-col widName" style={{height:'40px'}}></div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Not Okay</b></h4></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Okay</b></h4></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Main Beam</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Dipped Beam</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Side Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"/></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Tail Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Indicators</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{ height:'40px'}}><h4>Break Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Reverse Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Hazard Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear Fog Light</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Interior Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Screen Washer</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Wiper Blades</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Horn</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Radio/CD</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Front Fog Lights</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Air Conditioning</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-col-12 p-lg-12 report-checklist">
+                    <div className="card card-w-title">
+                        <h1>Wheels and Tyres</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                        <div className="p-col widName" style={{height:'40px'}}></div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Not Okay</b></h4></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><h4><b>Okay</b></h4></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Tyres</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Front (Visual)</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear (Visual)</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"/></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Spare (Visual)</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Wheel Brace</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox  inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{ height:'40px'}}><h4>Jack</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Left Front</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1" /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Right Front</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Left Rear</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                        <div className="p-col widName" style={{height:'40px'}}><h4>Right Rear</h4></div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                            <div className="p-col widCheck">
+                                <center><Checkbox inputId="rb2" /></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div className="p-col-12 p-lg-12">
+                    <div className="card card-w-title">
+                        <h1>Gas and Oil</h1>
+                        <div className="p-grid">
+                            <div className="p-col">
+                                <center><h4><b>Gas Level</b></h4></center>
+                            </div>
+                            <div className="p-col">
+                                <center><h4><b>Oil Level</b></h4></center>
+                            </div>
+                        </div>
+                        <div className="p-grid">
+                            <div className="p-col">
+                                <center><Checkbox inputId="rb1"/></center>
+                            </div>
+                            <div className="p-col">
+                                <center><Checkbox inputId="rb1"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-grid">
+                            <div className="p-col">
+                                <center><Checkbox inputId="rb2"  /></center>
+                            </div>
+                            <div className="p-col">
+                                <center><Checkbox  inputId="rb2"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-grid">
+                            <div className="p-col">
+                                <center><Checkbox  inputId="rb3"  /></center>
+                            </div>
+                            <div className="p-col">
+                                <center><Checkbox  inputId="rb3"  /></center>
+                            </div>
+                        </div>
+                        <div className="p-grid">
+                            <div className="p-col">
+                                <center><Checkbox  inputId="rb4"  /></center>
+                            </div>
+                            <div className="p-col">
+                                <center><Checkbox  inputId="rb4"  /></center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                {/* <div className="card card-w-title">
                     <h4>Exterior</h4>
                     <div className="p-grid">
 
@@ -532,7 +1048,7 @@ export default function DriverRecordForms() {
                     <center><Checkbox  inputId="rb4" checked={selectedCar.oil_level === 1} /></center>
                 </div>
             </div>
-            </div>
+            </div> */}
 
             <div className="card card-w-title">
                 <h1>Checklist Report</h1>
