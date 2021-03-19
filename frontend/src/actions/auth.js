@@ -8,6 +8,10 @@ import {
     LOGIN_FAIL,
 } from './types';
 
+import {
+    SERVER_NAME
+} from '../environment.js';
+
 // LOGIN USER
 export const login = (username, password) => (dispatch) => {
     // Headers
@@ -19,9 +23,9 @@ export const login = (username, password) => (dispatch) => {
 
     // Request Body
     const body = JSON.stringify({ username, password });
-
     axios
-        .post('http://127.0.0.1:8000/api/login/', body, config)
+        //.post('http://127.0.0.1:8000/api/login/', body, config)
+        .post(SERVER_NAME + 'api/login/', body, config)
         .then((res) => {
             //console.log('login token: ' + res.data.access)
             localStorage.setItem('username', username);
@@ -37,18 +41,10 @@ export const login = (username, password) => (dispatch) => {
                 };
             
                 axios
-                .get('http://127.0.0.1:8000/api/permission/' + username + '/', config)
+                .get(SERVER_NAME + 'api/permission/' + username + '/', config)
                 .then((res) => {
                     //console.log("permission login:");
                     //console.log(res.data);
-                    
-                    // if (res.data.can_view_users) {
-                    //     console.log("auth can view users");
-                    //     localStorage.setItem('viewUsers', "true");
-                    // } else {
-                    //     console.log("auth cant view users");
-                    //     localStorage.setItem('viewUsers', "false");
-                    // }
                     res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
                     res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
                     res.data.can_edit_users ? localStorage.setItem('editUsers', "true") : localStorage.setItem('editUsers', "false")
