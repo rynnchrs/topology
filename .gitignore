@@ -117,7 +117,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+*.env
 .venv
 env/
 venv/
@@ -156,5 +156,4 @@ dmypy.json
 *.cfg
 /.vs
 /.vscode
-/frontend/.env
 # End of https://www.toptal.com/developers/gitignore/api/django
