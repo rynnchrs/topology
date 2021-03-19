@@ -156,6 +156,7 @@ dmypy.json
 *.cfg
 /.vs
 /.vscode
+*.csv
 
 frontend/.env
 */*/*/__pycache__
