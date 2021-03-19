@@ -323,7 +323,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
             serializer = InspectionSerializer(data=request.data) 
             if serializer.is_valid(raise_exception=True): 
                 serializer.save() # add this
-                return Response(status=status.HTTP_201_CREATED) 
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors) 
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -357,10 +357,10 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
 
 class InspectionListView(generics.ListAPIView): #list of inspection with filtering
     queryset = Inspection.objects.all()
-    serializer_class = InspectionListSerializer       
+    serializer_class = InspectionListSerializer
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['inspection_id','body_no__body_no']
-    ordering_fields = ['body_no__body_no', 'date_created']
+    filterset_fields = ['inspection_id','body_no__body_no', 'date_created', 'body_no__current_loc']
+    ordering_fields = ['body_no__body_no', 'date_created', 'inspection_id']
 
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]

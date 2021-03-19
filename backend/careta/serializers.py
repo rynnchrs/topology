@@ -257,11 +257,14 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         return super(InspectionSerializer, self).to_representation(instance)
 
+
 class InspectionListSerializer(serializers.ModelSerializer): # list of all Inspection
     body_no = serializers.CharField(source='body_no.body_no')
+    current_loc = serializers.CharField(source='body_no.current_loc')
+
     class Meta:
         model = Inspection
-        fields = [  'inspection_id','body_no','date_created']
+        fields = [  'inspection_id','body_no','date_created', 'current_loc']
 
 
 class MaintenanceSerializer(serializers.ModelSerializer): # Maintenance serializer 
