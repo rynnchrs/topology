@@ -29,7 +29,7 @@ from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           TotalCarSerializer, TPLSerializer,
                           UpdateUserSerializer, UserListSerializer,
                           UserSerializer)
-from .utils import (can_add_maintenance, can_view_maintenance, check_Com_date,
+from .utils import (can_add_maintenance, can_edit_maintenance, can_view_maintenance, check_Com_date,
                     check_cr_date, check_or_date, check_TPL_date,
                     inspection_permission, user_permission)
 
@@ -386,13 +386,31 @@ class MaintenanceView(viewsets.ViewSet):  # inspection report Form
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:   
             return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, pk=None): # update inspection
+        user = self.request.user
+        if can_edit_maintenance(user):
+            queryset =  Maintenance.objects.all()
+            inspection = get_object_or_404(queryset, pk=pk)
+            if inspection.status is True:
+                inspection.status = False
+                inspection.save()
+                return Response("Status False", status=status.HTTP_200_OK)
+            else:
+                inspection.status = True
+                inspection.save()
+                return Response("Status True", status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class MaintenanceListView(generics.ListAPIView): #list of inspection with filtering
     queryset = Maintenance.objects.all()
     serializer_class = MaintenanceListSerializer       
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['maintenance_id','vin_no__vin_no']
-    ordering_fields = ['vin_no__vin_no', 'date_created']
+    filterset_fields = ['date_created','vin_no__vin_no','status']
+    ordering_fields = ['vin_no__vin_no', 'date_created',]
+
 
 class CarView(viewsets.ModelViewSet):  # add this
     queryset = Car.objects.all()  # add this
