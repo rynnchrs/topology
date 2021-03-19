@@ -6,7 +6,7 @@ import axios from "axios";
 
 import {
     SERVER_NAME
-} from '../environment.js';
+} from './environment.js';
 
 export const AppProfile = () => {
 
