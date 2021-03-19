@@ -7,8 +7,6 @@ import axios from "axios";
 
 import './mycss.scss';
 
-//import '../layout/_overrides.scss';
-
 export class DriverInspectionReport extends Component {
 
     constructor() {
@@ -94,7 +92,7 @@ export class DriverInspectionReport extends Component {
 
     //fetch data of car list from db on page load
     componentDidMount() {
-        axios.get(`http://127.0.0.1:8000/api/careta/`)
+        axios.get(process.env.REACT_APP_SERVER_NAME + `api/careta/`)
             .then(res => {
                 const bodyno = res.data;
                 this.setState({
@@ -136,7 +134,7 @@ export class DriverInspectionReport extends Component {
     };*/
 
     submitData = event => {
-        axios.post('http://127.0.0.1:8000/api/report/', {
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'api/report/', {
             car: this.state.bn.car_id,
             body_no: this.state.bn.body_no,
             make: this.state.bn.make,

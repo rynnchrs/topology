@@ -22,8 +22,7 @@ export const AppProfile = () => {
         };
 
         axios
-            .get('http://127.0.0.1:8000/api/users/' + username + '/', config)
-            //.get('http://127.0.0.1:8000/api/users/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
             .then((res) => {
                 //console.log("get users:")
                 //console.log(res.data)
@@ -59,7 +58,7 @@ export const AppProfile = () => {
         console.log('body: ' + body);
 
         axios
-            .post('http://127.0.0.1:8000/api/logout/blacklist/', body, config)
+            .post(process.env.REACT_APP_SERVER_NAME + 'api/logout/blacklist/', body, config)
             .then((res) => {
                 console.log('logout success');
                 console.log(res.data)
