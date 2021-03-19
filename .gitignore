@@ -156,4 +156,5 @@ dmypy.json
 *.cfg
 /.vs
 /.vscode
+/frontend/.env
 # End of https://www.toptal.com/developers/gitignore/api/django
