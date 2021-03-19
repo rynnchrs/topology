@@ -1,8 +1,12 @@
 import datetime
-from datetime import datetime
-from .models import Car, Contract, Permission, TPL, Insurance, UserInfo, Inspection 
-from django.contrib.auth.models import User
 import json
+from datetime import datetime
+
+from django.contrib.auth.models import User
+
+from .models import (TPL, Car, Contract, Inspection, Insurance, Permission,
+                     UserInfo)
+
 
 def user_permission(user):
     permission = Permission.objects.get(user__username=user.username) # get users permission
@@ -29,6 +33,29 @@ def inspection_permission(user):
     elif permission.can_edit_inspection_reports == True:  
         return True
     elif permission.can_delete_inspection_reports == True:  
+        return True
+    else:
+        return False
+
+def can_add_maintenance(user):
+    permission = Permission.objects.get(user__username=user.username)
+    if permission.can_add_maintenance_reports == True:  
+        return True
+    else:
+        return False
+
+
+def can_view_maintenance(user):
+    permission = Permission.objects.get(user__username=user.username)
+    if permission.can_view_maintenance_reports == True:  
+        return True
+    else:
+        return False
+
+
+def can_edit_maintenance(user):
+    permission = Permission.objects.get(user__username=user.username)
+    if permission.can_edit_maintenance_reports == True:  
         return True
     else:
         return False

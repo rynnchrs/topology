@@ -1,11 +1,14 @@
 # todo/serializers.py
+import django.contrib.auth.password_validation as validators  # add this
+from django.contrib.auth.models import User  # add this
+from django.core import exceptions
 from django.db.models import fields
 from rest_framework import serializers
-from .models import Car, Contract, Cost, Repair, TPL, Insurance, UserInfo, Permission, Inspection#, ReportImage # add this
 
-from django.contrib.auth.models import User # add this
-import django.contrib.auth.password_validation as validators    # add this
-from django.core import exceptions
+from .models import (TPL, Car, Contract, Cost,  # , ReportImage # add this
+                     Inspection, Insurance, Maintenance, Permission, Repair,
+                     UserInfo)
+
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
     id = serializers.CharField(read_only=True, source='user.id')
@@ -217,11 +220,11 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
 
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
     #images = InspectionImageSerializer(many=True)
-    vin_no = serializers.CharField()
+    body_no = serializers.CharField()
     driver = serializers.CharField()
     class Meta:
         model = Inspection
-        fields = ['inspection_id','vin_no','mileage','cleanliness_exterior','condition_rust','decals','windows',
+        fields = ['inspection_id','body_no','mileage','cleanliness_exterior','condition_rust','decals','windows',
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition','vehicle_documents','main_beam',
                     'dipped_beam','side_lights','tail_lights','indicators','break_lights','reverse_lights','hazard_light','rear_fog_lights',
                     'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
@@ -232,13 +235,13 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
     def validate(self, obj): # validate if vin_no input is vin_no
         errors = []
         try:
-            obj['vin_no'] = Car.objects.get(vin_no=obj['vin_no'])
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:
-           errors.append({"vin_no": 'Invalid vin_no'})
+           errors.append({"body_no": 'Invalid Body No.'})
         try:
-            obj['driver'] = User.objects.get(first_name=obj['driver'])
+            obj['driver'] = User.objects.get(username=obj['driver'])
         except:
-            errors.append({"driver": 'Invalid driver'})
+            errors.append({"driver": 'Invalid Driver'})
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
@@ -251,14 +254,47 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
         return report
 
     def to_representation(self, instance): # instance of vin_no
-        self.fields['vin_no'] =  CarInfoSerializer(read_only=True)
+        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         return super(InspectionSerializer, self).to_representation(instance)
 
 class InspectionListSerializer(serializers.ModelSerializer): # list of all Inspection
-    vin_no = serializers.CharField(source='vin_no.vin_no')
+    body_no = serializers.CharField(source='body_no.body_no')
     class Meta:
         model = Inspection
-        fields = [  'inspection_id','vin_no','date_created']
+        fields = [  'inspection_id','body_no','date_created']
+
+
+class MaintenanceSerializer(serializers.ModelSerializer): # Maintenance serializer 
+    body_no = serializers.CharField()
+    inspected_by = serializers.CharField()
+    class Meta:
+        model = Maintenance
+        fields = '__all__'
+
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+        except:
+           errors.append({"body_no": 'Invalid Body no'})
+        try:
+            obj['inspected_by'] = User.objects.get(username=obj['inspected_by'])
+        except:
+            errors.append({"inspected_by": 'Invalid Inspected By'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+        return super(MaintenanceSerializer, self).to_representation(instance)
+
+class MaintenanceListSerializer(serializers.ModelSerializer): # list of all Maintenance
+    body_no = serializers.CharField(source='body_no.body_no')
+    class Meta:
+        model = Maintenance
+        fields = [  'maintenance_id','body_no','date_created']
+
 
 class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     class Meta:

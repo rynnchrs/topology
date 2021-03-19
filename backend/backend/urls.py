@@ -42,6 +42,7 @@ router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permi
 router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
 
 router.register(r'inspection', views.InspectionView, 'inspection') # report creation api
+router.register(r'maintenance', views.MaintenanceView, 'maintenance') #maintenance report form api
 router.register(r'total', views.TotalView, 'total') # total list api
 router.register(r'repair', views.RepairView, 'repair') # repair list api
 
