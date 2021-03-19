@@ -22,6 +22,7 @@ import './layout/flags/flags.css';
 import './layout/layout.scss';
 import './App.scss';
 import { Dashboard } from './components/Dashboard';
+import { MainDashboard } from './components/MainDashboard';
 import { Vehicles } from './components/Vehicles';
 import { InspectionReport } from './components/InspectionReport';
 import { InspectionReportDriver } from './components/InspectionReportDriver';
@@ -59,6 +60,7 @@ const App = () => {
     const sidebarSubMenu2 = [];
     
     sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
+    sidebarMenu.push({label: 'MainDashboard', icon: 'pi pi-fw pi-home', to: '/maindashboard'});
     //users permission
     if (localStorage.getItem("addUsers") === "true") {
         sidebarSubMenu1.push({ label: 'Register User', icon: 'pi pi-user-plus', to: '/register'});
@@ -66,13 +68,8 @@ const App = () => {
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
         sidebarSubMenu1.push({ label: 'Edit-Delete user', icon: 'pi pi-user-edit', to: '/editdeleteuser'});
     }
-    //console.log("submenu1");
-    //console.log(sidebarSubMenu1);
-    
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
         sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user',items: sidebarSubMenu1});
-        //console.log("sidebarMenu");
-        //console.log(sidebarMenu);
     } else {
         console.log("permission data none");
     }
@@ -266,6 +263,7 @@ const App = () => {
 
             <div className="layout-main">
                 <Route path="/" exact component={Dashboard} />
+                <Route path="/maindashboard" exact component={MainDashboard} />
                 <Route path="/register" exact component={Register} />
                 <Route path="/editdeleteuser" exact component={EditDeleteUser} />
                 <Route path="/vehicles" exact component={Vehicles} />

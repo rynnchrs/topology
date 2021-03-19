@@ -67,6 +67,7 @@ export const EditDeleteUser = () => {
 
     useEffect(() => {
         getUsers();
+        //console.log(users)
     }, []); 
 
     const toggleShow = () => {
@@ -88,10 +89,12 @@ export const EditDeleteUser = () => {
             .then((res) => {
                 //console.log("users:");
                 //console.log(res.data);
-                setUsers(res.data)
+                //console.log(res.data.username);
+                //console.log(res.data.length);
+                setUsers(res.data);
             })
             .catch((err) => {
-                console.log("users err:");
+                console.log("getusers err:");
                 console.log(err.response);
             });
     }
@@ -201,36 +204,6 @@ export const EditDeleteUser = () => {
                 isCheck22(res.data.can_add_task);
                 isCheck23(res.data.can_edit_task);
                 isCheck24(res.data.can_delete_task);
-
-                // res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
-                // res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
-                // res.data.can_edit_users ? localStorage.setItem('editUsers', "true") : localStorage.setItem('editUsers', "false")
-                // res.data.can_delete_users ? localStorage.setItem('deleteUsers', "true") : localStorage.setItem('deleteUsers', "false")
-                
-                // res.data.can_view_inventory ? localStorage.setItem('viewInventory', "true") : localStorage.setItem('viewInventory', "false")
-                // res.data.can_add_inventory ? localStorage.setItem('addInventory', "true") : localStorage.setItem('addInventory', "false")
-                // res.data.can_edit_inventory ? localStorage.setItem('editInventory', "true") : localStorage.setItem('editInventory', "false")
-                // res.data.can_delete_inventory ? localStorage.setItem('deleteInventory', "true") : localStorage.setItem('deleteInventory', "false")
-
-                // res.data.can_view_inspection_reports ? localStorage.setItem('viewInspectionReport', "true") : localStorage.setItem('viewInspectionReport', "false")
-                // res.data.can_add_inspection_reports ? localStorage.setItem('addInspectionReport', "true") : localStorage.setItem('addInspectionReport', "false")
-                // res.data.can_edit_inspection_reports ? localStorage.setItem('editInspectionReport', "true") : localStorage.setItem('editInspectionReport', "false")
-                // res.data.can_delete_inspection_reports ? localStorage.setItem('deleteInspectionReport', "true") : localStorage.setItem('deleteInspectionReport', "false")
-                
-                // res.data.can_view_maintenance_reports ? localStorage.setItem('viewMaintenanceReport', "true") : localStorage.setItem('viewMaintenanceReport', "false")
-                // res.data.can_add_maintenance_reports ? localStorage.setItem('addMaintenanceReport', "true") : localStorage.setItem('addMaintenanceReport', "false")
-                // res.data.can_edit_maintenance_reports ? localStorage.setItem('editMaintenanceReport', "true") : localStorage.setItem('editMaintenanceReport', "false")
-                // res.data.can_delete_maintenance_reports ? localStorage.setItem('deleteMaintenanceReport', "true") : localStorage.setItem('deleteMaintenanceReport', "false")
-
-                // res.data.can_view_repair_reports ? localStorage.setItem('viewRepairReport', "true") : localStorage.setItem('viewRepairReport', "false")
-                // res.data.can_add_repair_reports ? localStorage.setItem('addRepairReport', "true") : localStorage.setItem('addRepairReport', "false")
-                // res.data.can_edit_repair_reports ? localStorage.setItem('editRepairReport', "true") : localStorage.setItem('editRepairReport', "false")
-                // res.data.can_delete_repair_reports ? localStorage.setItem('deleteRepairReport', "true") : localStorage.setItem('deleteRepairReport', "false")
-
-                // res.data.can_view_task ? localStorage.setItem('viewTask', "true") : localStorage.setItem('viewTask', "false")
-                // res.data.can_add_task ? localStorage.setItem('addTask', "true") : localStorage.setItem('addTask', "false")
-                // res.data.can_edit_task ? localStorage.setItem('editTask', "true") : localStorage.setItem('editTask', "false")
-                // res.data.can_delete_task ? localStorage.setItem('deleteTask', "true") : localStorage.setItem('deleteTask', "false")
             })
             .catch((err) => {
                 console.log("permission err:");
@@ -605,10 +578,10 @@ export const EditDeleteUser = () => {
 
     const actionBody = () => {
         return (
-            localStorage.getItem("deleteUsers") === "true" ?
-            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')}/>
-            :
-            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')} disabled/>
+            localStorage.getItem("deleteUsers") === "true" ? <center>
+            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')}/> </center>
+            : <center>
+            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')} disabled/> </center>
         );
     }
 
@@ -654,12 +627,12 @@ export const EditDeleteUser = () => {
                 <Panel header="USER MANAGEMENT">
                     <DataTable ref={dt} value={users} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                         globalFilter={globalFilter} selectionMode="single" selection={selectedUser} onSelectionChange={e => setSelectedUser(e.value)}
-                        paginator rows={3} emptyMessage="No users found.">
-                        <Column field="user_info.full_name" header="Name"></Column>
-                        <Column field="username" header="Username"></Column>
-                        <Column field="email" header="Email"></Column>
-                        <Column body={actionBody} header="Action (Delete)" style={{ paddingLeft: '2%' }}></Column>
-                        </DataTable>
+                        paginator rows={10} emptyMessage="No users found.">
+                        <Column field="user_info.full_name" header="Name" style={{ paddingLeft: '2%' }}></Column>
+                        {/* <Column field="name" header="Name"></Column> */}
+                        {/* <Column field="email" header="Email"></Column> */}
+                        <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column>
+                    </DataTable>
                 </Panel>
             </div>
 
