@@ -421,7 +421,7 @@ class Insurance(models.Model):
 
 class Inspection(models.Model):
     inspection_id = models.AutoField(primary_key=True)
-    vin_no =  models.ForeignKey(Car, related_name='report', on_delete=models.CASCADE)
+    body_no =  models.ForeignKey(Car, related_name='inspection', on_delete=models.CASCADE, default=None)
     mileage = models.IntegerField(default=0)
     # Exterior
     cleanliness_exterior = models.BooleanField(default=False)
@@ -492,7 +492,7 @@ class Inspection(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.vin_no.vin_no
+        return self.body_no.body_no
 
 
 class InspectiontImage(models.Model):
@@ -502,7 +502,7 @@ class InspectiontImage(models.Model):
 
 class Maintenance(models.Model): #Maintenance model
     maintenance_id = models.AutoField(primary_key=True)
-    vin_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
+    body_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
     supplier_name = models.CharField(max_length=50)
     mileage = models.IntegerField(default=0, null=True, blank=True)
     Level_List = [

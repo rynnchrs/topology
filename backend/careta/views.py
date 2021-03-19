@@ -359,8 +359,8 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
     queryset = Inspection.objects.all()
     serializer_class = InspectionListSerializer       
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['inspection_id','vin_no__vin_no']
-    ordering_fields = ['vin_no__vin_no', 'date_created']
+    filterset_fields = ['inspection_id','body_no__body_no']
+    ordering_fields = ['body_no__body_no', 'date_created']
 
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]
@@ -408,8 +408,8 @@ class MaintenanceListView(generics.ListAPIView): #list of inspection with filter
     queryset = Maintenance.objects.all()
     serializer_class = MaintenanceListSerializer       
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['date_created','vin_no__vin_no','status']
-    ordering_fields = ['vin_no__vin_no', 'date_created',]
+    filterset_fields = ['date_created','body_no__body_no','status']
+    ordering_fields = ['body_no__body_no', 'date_created',]
 
 
 class CarView(viewsets.ModelViewSet):  # add this
