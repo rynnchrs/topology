@@ -8,10 +8,6 @@ import {
     LOGIN_FAIL,
 } from './types';
 
-import {
-    SERVER_NAME
-} from '../environment.js';
-
 // LOGIN USER
 export const login = (username, password) => (dispatch) => {
     // Headers
@@ -23,9 +19,11 @@ export const login = (username, password) => (dispatch) => {
 
     // Request Body
     const body = JSON.stringify({ username, password });
+    console.log("process")
+    console.log(process.env)
     axios
-        //.post('http://127.0.0.1:8000/api/login/', body, config)
-        .post(SERVER_NAME + 'api/login/', body, config)
+        .post(process.env.REACT_APP_SERVER_NAME + 'api/login/', body, config)
+        //.post(SERVER_NAME + 'api/login/', body, config)
         .then((res) => {
             //console.log('login token: ' + res.data.access)
             localStorage.setItem('username', username);
@@ -41,7 +39,7 @@ export const login = (username, password) => (dispatch) => {
                 };
             
                 axios
-                .get(SERVER_NAME + 'api/permission/' + username + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'api/permission/' + username + '/', config)
                 .then((res) => {
                     //console.log("permission login:");
                     //console.log(res.data);

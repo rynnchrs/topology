@@ -9,9 +9,6 @@ import { Calendar } from 'primereact/calendar';
 import { format } from 'date-fns';
 
 import './mycss.scss';
-import {
-    SERVER_NAME
-} from '../environment.js';
 
 export default function DriverRecordForms() {
         const [selectedCar, setSelectedCar] = useState(['']);
@@ -38,7 +35,7 @@ export default function DriverRecordForms() {
 
          const submitSearch = () => {
             console.log(carValues);
-            fetch(SERVER_NAME + 'api/report/?search=' + format(date2, 'yyyy-MM-dd'))
+            fetch(process.env.REACT_APP_SERVER_NAME + 'api/report/?search=' + format(date2, 'yyyy-MM-dd'))
                 .then(response => response.json())
                 .then(data => {
                     setcarValues(data);
@@ -47,7 +44,7 @@ export default function DriverRecordForms() {
 
         
         React.useEffect(function effectFunction() {
-            fetch(SERVER_NAME + 'api/report/')
+            fetch(process.env.REACT_APP_SERVER_NAME + 'api/report/')
                 .then(response => response.json())
                 .then(data => {
                     setcarValues(data);

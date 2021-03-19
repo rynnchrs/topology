@@ -9,10 +9,6 @@ import { Panel } from 'primereact/panel';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
-import {
-    SERVER_NAME
-} from '../environment.js';
-
 export const Register = () => {
 
     const [first_name, setFirst_Name] = useState('');
@@ -95,7 +91,7 @@ export const Register = () => {
             const body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
             console.log('body: ' + body);
             axios
-                .post(SERVER_NAME + 'api/register/', body, config)
+                .post(process.env.REACT_APP_SERVER_NAME + 'api/register/', body, config)
                 .then((res) => {
                     //console.log('succ: ');
                     //console.log(res.data)
@@ -159,7 +155,7 @@ export const Register = () => {
         });
         console.log('body: ' + body);
         axios
-            .post(SERVER_NAME + 'api/permission/', body, config)
+            .post(process.env.REACT_APP_SERVER_NAME + 'api/permission/', body, config)
             .then((res) => {
                 console.log('succ permission: ');
                 console.log(res.data)

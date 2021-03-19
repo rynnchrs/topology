@@ -12,10 +12,6 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
-import {
-    SERVER_NAME
-} from '../environment.js';
-
 export const EditDeleteUser = () => {
     
     const [users, setUsers] = useState([]);
@@ -89,7 +85,7 @@ export const EditDeleteUser = () => {
         };
 
         axios
-            .get(SERVER_NAME + 'api/users/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'api/users/', config)
             .then((res) => {
                 //console.log("users:");
                 //console.log(res.data);
@@ -148,7 +144,7 @@ export const EditDeleteUser = () => {
             }
                 
             axios
-                .put(SERVER_NAME + 'api/users/' + usernames + '/', body, config)
+                .put(process.env.REACT_APP_SERVER_NAME + 'api/users/' + usernames + '/', body, config)
                 .then((res) => {
                     //console.log("save changes:");
                     //console.log(res.data);
@@ -182,7 +178,7 @@ export const EditDeleteUser = () => {
         };
 
         axios
-            .get(SERVER_NAME + 'api/permission/' + username + '/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'api/permission/' + username + '/', config)
             .then((res) => {
                 isCheck1(res.data.can_view_users);
                 isCheck2(res.data.can_add_users);
@@ -230,7 +226,7 @@ export const EditDeleteUser = () => {
             };
     
             axios
-                .get(SERVER_NAME + 'api/permission/' + username + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'api/permission/' + username + '/', config)
                 .then((res) => {
                     res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
                     res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
@@ -290,7 +286,7 @@ export const EditDeleteUser = () => {
         });
         //console.log('body: ' + body);
         axios
-            .put(SERVER_NAME + 'api/permission/user/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/user/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission user: ');
                 //console.log(res.data)
@@ -324,7 +320,7 @@ export const EditDeleteUser = () => {
         });
         //console.log('body: ' + body);
         axios
-            .put(SERVER_NAME + 'api/permission/inventory/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/inventory/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission inventory: ');
                 //console.log(res.data)
@@ -358,7 +354,7 @@ export const EditDeleteUser = () => {
         });
         //console.log('body: ' + body);
         axios
-            .put(SERVER_NAME + 'api/permission/inspection-report/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/inspection-report/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission inspect: ');
                 //console.log(res.data)
@@ -392,7 +388,7 @@ export const EditDeleteUser = () => {
         });
         //console.log('body: ' + body);
         axios
-            .put(SERVER_NAME + 'api/permission/maintenance-report/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/maintenance-report/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission maintenance: ');
                 //console.log(res.data)
@@ -426,7 +422,7 @@ export const EditDeleteUser = () => {
         });
         //console.log('body: ' + body);
         axios
-            .put(SERVER_NAME + 'api/permission/repair-report/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/repair-report/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission repair: ');
                 //console.log(res.data)
@@ -460,7 +456,7 @@ export const EditDeleteUser = () => {
         });
         //console.log('body: ' + body);
         axios
-            .put(SERVER_NAME + 'api/permission/task/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/task/' + username + '/', body, config)
             .then((res) => {
                 //console.log('succ permission task: ');
                 //console.log(res.data)
@@ -529,7 +525,7 @@ export const EditDeleteUser = () => {
         };
 
         axios
-            .delete(SERVER_NAME + 'api/users/' + username + '/', config)
+            .delete(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
             .then((res) => {
                 //console.log('succ delete user: ');
                 //console.log(res.data)

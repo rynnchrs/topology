@@ -4,10 +4,6 @@ import { CSSTransition } from 'react-transition-group';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
-import {
-    SERVER_NAME
-} from './environment.js';
-
 export const AppProfile = () => {
 
     const [expanded, setExpanded] = useState(false);
@@ -26,7 +22,7 @@ export const AppProfile = () => {
         };
 
         axios
-            .get(SERVER_NAME + 'api/users/' + username + '/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
             .then((res) => {
                 //console.log("get users:")
                 //console.log(res.data)
@@ -62,7 +58,7 @@ export const AppProfile = () => {
         console.log('body: ' + body);
 
         axios
-            .post(SERVER_NAME + 'api/logout/blacklist/', body, config)
+            .post(process.env.REACT_APP_SERVER_NAME + 'api/logout/blacklist/', body, config)
             .then((res) => {
                 console.log('logout success');
                 console.log(res.data)
