@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response  # add this
 from rest_framework.views import APIView  # add this
 from rest_framework_simplejwt.tokens import RefreshToken  # add this
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
                      Maintenance, Permission, Repair, UserInfo)
@@ -18,7 +19,7 @@ from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           ContractSerializer, InspectionListSerializer,
                           InspectionSerializer, InsuranceSerializer,
-                          MaintenanceListSerializer, MaintenanceSerializer,
+                          MaintenanceListSerializer, MaintenanceSerializer, MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
                           PermissionMaintenanceReportSerializer,
@@ -34,11 +35,16 @@ from .utils import (can_add_maintenance, can_edit_maintenance, can_view_maintena
                     inspection_permission, user_permission)
 
 
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+    
 class Populate(generics.GenericAPIView):  # for register user
 
     def post(self, request):
         user_data()
         return Response("Successfully Created", status=status.HTTP_201_CREATED)
+
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this

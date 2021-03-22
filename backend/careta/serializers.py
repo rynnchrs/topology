@@ -4,10 +4,27 @@ from django.contrib.auth.models import User  # add this
 from django.core import exceptions
 from django.db.models import fields
 from rest_framework import serializers
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (TPL, Car, Contract, Cost,  # , ReportImage # add this
                      Inspection, Insurance, Maintenance, Permission, Repair,
                      UserInfo)
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        credentials = {
+            'username': '',
+            'password': attrs.get("password")
+        }
+
+        username = User.objects.filter(email=attrs.get("username")).first()
+        email = User.objects.filter(username=attrs.get("username")).first()
+        phone = User.objects.filter(user_info__phone=attrs.get("username")).first()
+
+        user_obj = username or email or phone 
+        if user_obj:
+            credentials['username'] = user_obj.username
+
+        return super().validate(credentials)
 
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
