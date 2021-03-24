@@ -158,7 +158,7 @@ dmypy.json
 /.vscode
 
 frontend/.env
-backend/careta/migrations/__pycache__
-backend/backend/__pycache__
-backend/careta/__pycache__
+*/*/*/__pycache__
+*/*/__pycache__
+*/__pycache__
 # End of https://www.toptal.com/developers/gitignore/api/django

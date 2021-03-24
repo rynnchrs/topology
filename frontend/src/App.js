@@ -59,8 +59,8 @@ const App = () => {
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
     
+    //sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
     sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
-    sidebarMenu.push({label: 'MainDashboard', icon: 'pi pi-fw pi-home', to: '/maindashboard'});
     //users permission
     if (localStorage.getItem("addUsers") === "true") {
         sidebarSubMenu1.push({ label: 'Register User', icon: 'pi pi-user-plus', to: '/register'});
@@ -262,8 +262,8 @@ const App = () => {
                 layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 
             <div className="layout-main">
-                <Route path="/" exact component={Dashboard} />
-                <Route path="/maindashboard" exact component={MainDashboard} />
+                {/* <Route path="/" exact component={Dashboard} /> */}
+                <Route path="/" exact component={MainDashboard} />
                 <Route path="/register" exact component={Register} />
                 <Route path="/editdeleteuser" exact component={EditDeleteUser} />
                 <Route path="/vehicles" exact component={Vehicles} />

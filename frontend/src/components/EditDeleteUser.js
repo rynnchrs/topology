@@ -87,8 +87,8 @@ export const EditDeleteUser = () => {
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'api/users/', config)
             .then((res) => {
-                //console.log("users:");
-                //console.log(res.data);
+                console.log("users:");
+                console.log(res.data);
                 //console.log(res.data.username);
                 //console.log(res.data.length);
                 setUsers(res.data);
@@ -605,15 +605,15 @@ export const EditDeleteUser = () => {
             <Toast ref={toast} />
             <div className="p-col-12">
                 <div className="p-fluid p-grid">
-                <div className="p-col-12 p-lg-2 p-md-2 p-sm-3">
+                    <div className="p-col-12 p-lg-2 p-md-2 p-sm-3">
                     { localStorage.getItem("editUsers") === "true" ?
                         <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')} />
                         :
                         <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')} disabled/> }
-                        </div>
-                        <div className="p-col-12 p-md-6">
+                    </div>
+                    <div className="p-col-12 p-md-6">
 
-                        </div>
+                    </div>
                     <div className="p-col-12 p-lg-4 p-md-4 p-sm-4">
                         <span className="p-input-icon-left">
                             <i className="pi pi-search" />

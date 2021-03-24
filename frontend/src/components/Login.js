@@ -54,7 +54,7 @@ export const Login = (props) => {
                                 <span className="p-inputgroup-addon">
                                     <i className="pi pi-user"></i>
                                 </span>
-                                <InputText placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
+                                <InputText placeholder="Email or Username or Phone " value={username} onChange={event => setUsername(event.target.value)} />
                             </div>
                         </div>
                     </div>

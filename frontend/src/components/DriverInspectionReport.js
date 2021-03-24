@@ -208,8 +208,9 @@ export class DriverInspectionReport extends Component {
                             </div>
                         </div>
                         <div className="p-grid">
-                            <div className="p-col-12 p-md-6">
+                            <div className="p-col-12 p-md-6 p-inputgroup">
                                 <InputText placeholder="Mileage" value={this.state.mil} onChange={event => this.setState({ mil: event.target.value })}/>
+                                <span className="p-inputgroup-addon">km.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
                                 <InputText placeholder="Location" value={this.state.bn.current_loc}/>

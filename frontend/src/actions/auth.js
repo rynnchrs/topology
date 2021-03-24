@@ -19,8 +19,7 @@ export const login = (username, password) => (dispatch) => {
 
     // Request Body
     const body = JSON.stringify({ username, password });
-    console.log("process")
-    console.log(process.env)
+    
     axios
         .post(process.env.REACT_APP_SERVER_NAME + 'api/login/', body, config)
         //.post(SERVER_NAME + 'api/login/', body, config)
