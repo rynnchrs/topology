@@ -607,7 +607,7 @@ export const EditDeleteUser = () => {
                 <div className="p-fluid p-grid">
                     <div className="p-col-12 p-lg-2 p-md-2 p-sm-3">
                     { localStorage.getItem("editUsers") === "true" ?
-                        <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')} />
+                        <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')}/>
                         :
                         <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')} disabled/> }
                     </div>

@@ -1,9 +1,11 @@
-import React, { Component} from 'react';
+import React, { Component, createRef} from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
+import { Toast } from 'primereact/toast';
 import axios from "axios";
+
 
 import './mycss.scss';
 
@@ -71,15 +73,18 @@ export class DriverInspectionReport extends Component {
             loc: "",
             com: "",
             driver: "",
+            drivername: "",
             time: "",
             date: "",
             bodyno: [],
             filteredSuggestions: [],
         };
+        this.toast = createRef(null)
 
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
 
     }
+
 
     onCheckboxChange(event) {
         let selected = [...this.state.checkboxValue];
@@ -92,13 +97,28 @@ export class DriverInspectionReport extends Component {
 
     //fetch data of car list from db on page load
     componentDidMount() {
-        axios.get(process.env.REACT_APP_SERVER_NAME + `api/careta/`)
+        let user = localStorage.getItem("myfirst");
+        this.setState({drivername:user})
+        let username = localStorage.getItem("username");
+        this.setState({driver:username})
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config)
             .then(res => {
                 const bodyno = res.data;
+                bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
+                        : item.make === 'SUV' ? 'Super Carry UV'
+                        : item.make ===  'G15'? 'Gratour midi truck 1.5L'
+                        : 'Gratour midi truck 1.2L' }));
                 this.setState({
-                    bodyno: res.data,
+                    bodyno: bodyno,
                 });
-                console.log(bodyno);
+                //console.log(bodyno);
             })
     }
 
@@ -115,7 +135,7 @@ export class DriverInspectionReport extends Component {
                     filteredSuggestions: this.state.filteredSuggestions,
                 });
             }
-        }, 1000);
+        }, 100);
 
     };
 
@@ -134,8 +154,15 @@ export class DriverInspectionReport extends Component {
     };*/
 
     submitData = event => {
-        axios.post(process.env.REACT_APP_SERVER_NAME + 'api/report/', {
-            car: this.state.bn.car_id,
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'api/inspection/', {
+            //car: this.state.bn.car_id,
             body_no: this.state.bn.body_no,
             make: this.state.bn.make,
             mileage: this.state.mil,
@@ -186,10 +213,16 @@ export class DriverInspectionReport extends Component {
             rear_right_wheel: this.state.radioValue43,
             rear_left_wheel: this.state.radioValue42,
             notes: this.state.com,
+            driver: this.state.driver,
+          }, config)
+          .then((res) => {
+            this.toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});
           })
-          .then(function (response) {
-            console.log(response);
+          .catch((err) => {
+            console.log(err.response);
+            this.toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 5000});
           })
+
     }
 
     render() {
@@ -197,6 +230,7 @@ export class DriverInspectionReport extends Component {
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
+                        <Toast ref={this.toast} />
                         <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6">
@@ -210,7 +244,7 @@ export class DriverInspectionReport extends Component {
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6 p-inputgroup">
                                 <InputText placeholder="Mileage" value={this.state.mil} onChange={event => this.setState({ mil: event.target.value })}/>
-                                <span className="p-inputgroup-addon">km.</span>
+                                <span className="p-inputgroup-addon">KM.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
                                 <InputText placeholder="Location" value={this.state.bn.current_loc}/>
@@ -760,8 +794,9 @@ export class DriverInspectionReport extends Component {
                             </div>
                             <div className="p-col-12 p-md-12">
                                 <label>Driver/ Operator:</label>
-                                <InputText placeholder="Inspected by" value={this.state.driver} onChange={event => this.setState({ driver: event.target.value })}/>
-                            </div>
+                                <InputText placeholder="Driver" value={this.state.drivername} onChange={event => this.setState({ drivername: event.target.value })}/>
+
+                                </div>
                             <div className="p-col-12 p-md-9"> </div>
                             <div className="p-col-12 p-md-3">
                                 {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}

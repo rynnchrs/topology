@@ -10,8 +10,8 @@ import { login } from '../actions/auth';
 
 export const Login = (props) => {
 
-    const [username, setUsername] = useState('admin');
-    const [password, setPassword] = useState('password');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [passwordShown, setPasswordShown] = useState(true);
     
     const propTypes = {

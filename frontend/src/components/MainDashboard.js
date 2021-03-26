@@ -8,27 +8,28 @@ import axios from "axios";
 
 export const MainDashboard = () => {
 
-    const [rcvData, setRcvData] = useState([]);
+    const [rcv, setRcv] = useState([]);
+    const [totalTable, setTotalTable] = useState([]);
     const [withDate, setWithDate] = useState([]);
     const [nrc, setNrc] = useState([]);
     const [nyr, seNyr] = useState([]);
     const [na, setNa] = useState([]);
     const [dnr, setDnr] = useState([]);
 
-    const [datas, setDatas] = useState([{ name: 'Plate Delivery No.', withdate: '184', notyetreleased: '99', norcv: '33' }, 
-    { name: 'Modified Decals', withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: 'EWD', withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: 'Fan', withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: 'Tools', withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "User's Manual", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Warranty Booklet", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Unit Key", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Body Key", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Cigarrtte Plug", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Keychain", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Jack", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Tire Wrench", withdate: '102', notyetreleased: '120', norcv: '45' },
-    { name: "Fire Extinguisher", withdate: '102', notyetreleased: '120', norcv: '45' }
+    const [datas, setDatas] = useState([{ name: 'Plate Delivery No.', wd: '184', nyr: '99', nrc: '33' }, 
+    { name: 'Modified Decals', wd: '102', nyr: '120', nrc: '45' },
+    { name: 'EWD', wd: '102', nyr: '120', nrc: '45' },
+    { name: 'Fan', wd: '102', nyr: '120', nrc: '45' },
+    { name: 'Tools', wd: '102', nyr: '120', nrc: '45' },
+    { name: "User's Manual", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Warranty Booklet", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Unit Key", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Body Key", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Cigarrtte Plug", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Keychain", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Jack", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Tire Wrench", wd: '102', nyr: '120', nrc: '45' },
+    { name: "Fire Extinguisher", wd: '102', nyr: '120', nrc: '45' }
     ]);
 
     const [expiry1, setExpiry1] = useState([
@@ -39,8 +40,7 @@ export const MainDashboard = () => {
         { month: 'May', or: '102', cr: '120', tpl: '45', compre: '33' },
         { month: "June", or: '102', cr: '120', tpl: '45', compre: '33' }
     ]);
-
-
+    
     const items = [
         {label: '2019', icon: 'pi pi-fw pi-calendar'},
         {label: '2020', icon: 'pi pi-fw pi-calendar'},
@@ -53,11 +53,18 @@ export const MainDashboard = () => {
 
     useEffect(() => {
         getTotalTable();
-        //console.log(users)
-        
+        //sorted();
     }, []);
 
-    console.log(rcvData.bodyKey_with_date);
+    // const sorted = () => { 
+    //     setTotalTable(
+    //         {name: "Body Key", "wd": rcv.bodyKey_with_date, "nrc": rcv.bodyKey_with_nrc, "nyr": rcv.bodyKey_with_nyr, "na": rcv.bodyKey_with_na, "dnr": rcv.bodyKey_with_dnr},
+    //         {name: "Cigarette Plug", "wd": rcv.cigarettePlug_with_date, "nrc": rcv.cigarettePlug_with_nrc, "nyr": rcv.cigarettePlug_with_nyr, "na": rcv.bodyKey_with_na, "dnr": rcv.bodyKey_with_dnr},
+    //         {name: "Body Key", "wd": rcv.bodyKey_with_date, "nrc": rcv.bodyKey_with_nrc, "nyr": rcv.bodyKey_with_nyr, na: rcv.bodyKey_with_na, dnr: rcv.bodyKey_with_dnr},
+    //     );
+    //     console.log("sorted");
+    //     console.log(totalTable);
+    // }
 
     const getTotalTable = () => {
         let token = localStorage.getItem("token");
@@ -74,8 +81,7 @@ export const MainDashboard = () => {
             .then((res) => {
                 console.log("total table:");
                 console.log(res.data);
-                setRcvData(res.data);
-                
+                setRcv(res.data);
             })
             .catch((err) => {
                 console.log("getusers err:");
@@ -92,9 +98,9 @@ export const MainDashboard = () => {
                         <DataTable ref={dt} value={datas} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                             emptyMessage="No users found.">
                             <Column field="name" header="Name"></Column>
-                            <Column field="withdate" header="WITH DATE"></Column>
-                            <Column field="notyetreleased" header="NOT YET RELEASED"></Column>
-                            <Column field="norcv" header="NO RECEIVING COPY"></Column>
+                            <Column field="wd" header="WITH DATE"></Column>
+                            <Column field="nrc" header="NOT YET RELEASED"></Column>
+                            <Column field="nyr" header="NO RECEIVING COPY"></Column>
                             {/* <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column> */}
                         </DataTable>
                     </div>

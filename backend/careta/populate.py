@@ -1,54 +1,60 @@
 import csv
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Permission, Repair, UserInfo)
+
 from django.contrib.auth.models import User  # add this
 
+from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
+                     Permission, Repair, UserInfo)
+
+
 def datas():
-    with open("C:/Users/sydfr/OneDrive/Desktop/Topology/database.csv") as f:
+    with open("./database.csv", encoding = "ISO-8859-1") as f:
         reader = csv.reader(f)
         data = [tuple(row) for row in reader]
         return (data)
 
 def user_data():
-    superuser = User.objects.create_superuser(
-            username = 'admin',
-            password = 'password'
-        )
-    Permission.objects.create(user=superuser, 
-    can_view_users = True,
-    can_add_users = True,
-    can_edit_users = True,
-    can_delete_users = True,
-    can_view_inventory = True,
-    can_add_inventory = True,
-    can_edit_inventory = True,
-    can_delete_inventory = True,
-    can_view_inspection_reports = True,
-    can_add_inspection_reports = True,
-    can_edit_inspection_reports = True,
-    can_delete_inspection_reports = True,
-    can_view_maintenance_reports = True,
-    can_add_maintenance_reports = True,
-    can_edit_maintenance_reports = True,
-    can_delete_maintenance_reports = True,
-    can_view_repair_reports = True,
-    can_add_repair_reports = True,
-    can_edit_repair_reports = True,
-    can_delete_repair_reports = True,
-    can_view_task = True,
-    can_add_task = True,
-    can_edit_task = True,
-    can_delete_task = True,)
+    try:
+        superuser = User.objects.create_superuser( #creating super user "admin"
+                username = 'admin',
+                password = 'password'
+            )
+        Permission.objects.create(user=superuser,  #create permission for admin only
+        can_view_users = True,
+        can_add_users = True,
+        can_edit_users = True,
+        can_delete_users = True,
+        can_view_inventory = True,
+        can_add_inventory = True,
+        can_edit_inventory = True,
+        can_delete_inventory = True,
+        can_view_inspection_reports = True,
+        can_add_inspection_reports = True,
+        can_edit_inspection_reports = True,
+        can_delete_inspection_reports = True,
+        can_view_maintenance_reports = True,
+        can_add_maintenance_reports = True,
+        can_edit_maintenance_reports = True,
+        can_delete_maintenance_reports = True,
+        can_view_repair_reports = True,
+        can_add_repair_reports = True,
+        can_edit_repair_reports = True,
+        can_delete_repair_reports = True,
+        can_view_task = True,
+        can_add_task = True,
+        can_edit_task = True,
+        can_delete_task = True,)
+    except:
+        pass
     for data in datas():
-        password = 'fiberhome'
-        user = User.objects.create(
+        password = 'fiberhome' # default password for inital acounts
+        user = User.objects.create(     # initializing users account
                 username = data[0],
                 first_name = "careta",
                 last_name = data[0],
                 password = password,
             )
         UserInfo.objects.create(user=user)
-        Permission.objects.create(user=user, can_add_inspection_reports=True)
+        Permission.objects.create(user=user, can_add_inspection_reports=True) # set can add inspection report to true
         user.set_password(password)
         user.save()
 
@@ -121,7 +127,7 @@ def user_data():
         
         
 
-        Car.objects.create(
+        Car.objects.create( # initializing car data
              slug = data[14],
              body_no = data[0],
              cs_no = data[1],

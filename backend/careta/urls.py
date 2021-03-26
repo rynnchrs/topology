@@ -1,7 +1,7 @@
 from django.urls import include, path  # add this
 from rest_framework_simplejwt import views as jwt_views  # add this
 
-from .views import (BlacklistTokenView, CarListView, ExpiryView, InspectionListView,  # add this
+from .views import (BlacklistTokenView, CarListView, ExpiryView, InspectionListView, MaintenanceListView,  # add this
                     PermissionUserView, Populate, RegisterView, SearchInventoryView,
                     UserListView)
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'), # register api
     path('user-list/', UserListView.as_view(), name='user-list'), # 
     path('inspection-list/', InspectionListView.as_view(), name='inspection-list'), # 
+    path('maintenance-list/', MaintenanceListView.as_view(), name='maintenance-list'),
     path('car-list/', CarListView.as_view(), name='inspection-list'), # 
     path('expiry/', ExpiryView.as_view(), name='expiry'),
     path('populate/', Populate.as_view(), name='populate') 

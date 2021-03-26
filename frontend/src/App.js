@@ -225,7 +225,7 @@ const App = () => {
         return true;
     }
 
-    const logo = layoutColorMode === 'dark' ? 'assets/layout/images/logo-white.svg' : 'assets/layout/images/logo.svg';
+    const logo =  'assets/layout/images/careta-logo.png' ;
 
     const wrapperClass = classNames('layout-wrapper', {
         'layout-overlay': layoutMode === 'overlay',
