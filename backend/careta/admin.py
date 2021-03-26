@@ -2,7 +2,8 @@
 
 from django.contrib import admin
 from .models import Car, Cost, Maintenance, Permission, Repair, UserInfo , Inspection #ReportImage # add this
-
+from reversion.admin import VersionAdmin
+from reversion.models import Version
 
 class CarAdmin(admin.ModelAdmin):  # add this
     list_display = ('vin_no', 'body_no', 'cs_no','dealer_phone')  # add this
@@ -13,8 +14,9 @@ class UserInfoAdmin(admin.ModelAdmin):  # add this
 admin.site.register(Car, CarAdmin)  # add this
 admin.site.register(UserInfo, UserInfoAdmin)  # add this
 admin.site.register(Permission)  # add this
-admin.site.register(Inspection) 
+admin.site.register(Inspection, VersionAdmin) 
 admin.site.register(Maintenance) 
+admin.site.register(Version)
 #class ImageReport(admin.TabularInline):
 #    model = ReportImage
 #    extra = 1
