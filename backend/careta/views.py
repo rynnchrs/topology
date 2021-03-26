@@ -1,10 +1,11 @@
 from abc import abstractmethod
+import datetime
 
 from django.contrib.auth.models import User  # add this
 from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend  # filter
-from rest_framework import filters  # add this; filter
+from rest_framework import filters, serializers  # add this; filter
 from rest_framework import viewsets  # add this
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -329,9 +330,17 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         if user_permission(user, 'can_add_inspection_reports'):
             serializer = InspectionSerializer(data=request.data) 
             if serializer.is_valid(raise_exception=True): 
-                serializer.save() # add this
+                car = request.data.get("body_no")
+                car = Car.objects.get(body_no=car)
+                try:
+                    inspection = Inspection.objects.filter(body_no=car.car_id).filter(date_created=datetime.date.today())
+                except Inspection.DoesNotExist:
+                    serializer.save() # add this
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                inspection.delete()
+                serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors) 
+            return Response(serializer.errors)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     
