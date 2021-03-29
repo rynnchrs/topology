@@ -504,6 +504,7 @@ class TotalView(viewsets.ModelViewSet):
 class ExpiryView(APIView): # expiry 
     def get(self, request):
         year = request.data.get('year')
+        print(year)
         return Response({
             'OR':check_or_date(year), # OR
             'CR':check_cr_date(year), # CR
