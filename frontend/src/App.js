@@ -31,7 +31,7 @@ import { DriverInspectionReport } from './components/DriverInspectionReport';
 import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
 
-import  TSManager  from './components/TSManager';
+import  JSManager  from './components/JobScheduleManager';
 import  DriverRecordForms from './components/DriverRecordForms';
 
 const App = () => {
@@ -102,7 +102,7 @@ const App = () => {
     }
 
     if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
-        sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
+        sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar', to: '/jobschedule_manager' });
     } else {
         console.log("permission data none");
     }
@@ -191,7 +191,7 @@ const App = () => {
                     {label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
                 ]
         },
-        { label: 'Job Schedule', icon: 'pi pi-fw pi-calendar' },
+        { label: 'Job Schedule', icon: 'pi pi-fw pi-table'},
         { label: 'Drivers List', icon: 'pi pi-fw pi-users'}
     ];
 
@@ -271,7 +271,7 @@ const App = () => {
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
                 <Route path="/inspectionreport" exact component={InspectionReport} />
                 <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
-                <Route path="/taskscheduler" exact component={TSManager} />
+                <Route path="/jobschedule_manager" exact component={JSManager} />
             </div>
 
             <AppFooter />

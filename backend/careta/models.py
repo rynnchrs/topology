@@ -645,3 +645,25 @@ class Cost(models.Model):
     @property
     def total_cost(self): # total cost of an item per quantity
         return self.cost * self.quantity
+
+
+class Job(models.Model):
+    job_id = models.AutoField(primary_key=True)
+    slug = models.CharField(max_length=30)
+    car = models.ForeignKey(Car, related_name='job', on_delete=models.CASCADE)
+    manager = models.ForeignKey(User, related_name='job_manager', on_delete=models.CASCADE)
+    fieldman = models.ForeignKey(User, related_name='job_fieldman', on_delete=models.CASCADE)
+    job_desc = models.CharField(max_length=100, null=True, blank=True)
+    job_remarks = models.CharField(max_length=300, null=True, blank=True)
+    job_startdate = models.DateField(auto_now=False, auto_now_add=False, null=True)
+    job_enddate = models.DateField(auto_now=False, auto_now_add=False, null=True)
+    job_startdate_actual = models.DateField(auto_now=False, auto_now_add=False, null=True)
+    job_enddate_actual = models.DateField(auto_now=False, auto_now_add=False, null=True)
+    job_actual_days = models.IntegerField(default=0, null=True, blank=True)
+    job_task_status_fm = models.CharField(max_length=30, null=True, blank=True)
+    job_task_status_mn = models.CharField(max_length=30, null=True, blank=True)
+
+    def __str__(self):
+        return self.job_id
+
+        
