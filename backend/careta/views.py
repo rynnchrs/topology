@@ -493,10 +493,7 @@ class ExpiryView(APIView): # expiry
 class JobsView(viewsets.ModelViewSet):
     serializer_class = JobsListSerializer
     queryset = Job.objects.all()
-    search_fields = ['job_id']
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['job_id']
 
-    def list(self,request):
-        queryset = Job.objects.all()
-        serializer = JobsListSerializer(queryset, many=True)
-        return Response(serializer.data)
+    
