@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 from .models import (TPL, Car, Contract, Cost,  # , ReportImage # add this
                      Inspection, Insurance, Maintenance, Permission, Repair,
-                     UserInfo)
+                     UserInfo,Job)
 
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
@@ -375,5 +375,12 @@ class TotalCarSerializer(serializers.ModelSerializer):
 
                     'plate_with_dnr','fan_date_with_dnr','ewd_date_with_dnr','tools_with_dnr','cigarettePlug_with_dnr','tools_with_dnr',
                     'decals_with_dnr','userManual_with_dnr','warrantyBook_with_dnr','unitKey_with_dnr','bodyKey_with_dnr',
+
+
                  ]
+
+class JobsListSerializer(serializers.ModelSerializer): # list of all jobs
+    class Meta:
+        model = Job
+        fields = '__all__'
 

@@ -3,7 +3,7 @@ from rest_framework_simplejwt import views as jwt_views  # add this
 
 from .views import (BlacklistTokenView, CarListView, ExpiryView, InspectionListView, MaintenanceListView,  # add this
                     PermissionUserView, Populate, RegisterView, SearchInventoryView,
-                    UserListView)
+                    UserListView,JobsView)
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -16,5 +16,5 @@ urlpatterns = [
     path('maintenance-list/', MaintenanceListView.as_view(), name='maintenance-list'),
     path('car-list/', CarListView.as_view(), name='inspection-list'), # 
     path('expiry/', ExpiryView.as_view(), name='expiry'),
-    path('populate/', Populate.as_view(), name='populate') 
+    path('populate/', Populate.as_view(), name='populate')
 ]

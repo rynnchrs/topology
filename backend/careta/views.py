@@ -13,7 +13,7 @@ from rest_framework.views import APIView  # add this
 from rest_framework_simplejwt.tokens import RefreshToken  # add this
 
 from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Maintenance, Permission, Repair, UserInfo)
+                     Maintenance, Permission, Repair, UserInfo, Job)
 from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           ContractSerializer, InspectionListSerializer,
@@ -28,7 +28,7 @@ from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           RepairSerializer, SearchInventorySerializer,
                           TotalCarSerializer, TPLSerializer,
                           UpdateUserSerializer, UserListSerializer,
-                          UserSerializer)
+                          UserSerializer,JobsListSerializer)
 from .utils import (can_add_maintenance, can_edit_maintenance, can_view_maintenance, check_Com_date,
                     check_cr_date, check_or_date, check_TPL_date,
                     inspection_permission, user_permission)
@@ -488,3 +488,15 @@ class ExpiryView(APIView): # expiry
             'TPL':check_TPL_date(year), # TPL Insurance
             'Com':check_Com_date(year), # Comprehensive Insurance
             })
+
+
+class JobsView(viewsets.ModelViewSet):
+    serializer_class = JobsListSerializer
+    queryset = Job.objects.all()
+    search_fields = ['job_id']
+    filter_backends = [filters.SearchFilter]
+
+    def list(self,request):
+        queryset = Job.objects.all()
+        serializer = JobsListSerializer(queryset, many=True)
+        return Response(serializer.data)
