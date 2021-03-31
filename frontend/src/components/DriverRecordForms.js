@@ -109,7 +109,14 @@ export default function DriverRecordForms() {
         const [smallNotes, setSmallNotes] = useState("");
 
         React.useEffect(function effectFunction() {
-            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id')
+            let token = localStorage.getItem("token");
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config)
                 .then(response => response.json())
                 .then(data => {
                     setcarValues(data);
@@ -125,6 +132,26 @@ export default function DriverRecordForms() {
                 console.log(err)
             }
         }, [selectedCar]);
+
+        useEffect(() => {
+            try{
+                console.log("testokay",okay)
+                
+            }catch(err){
+                console.log("okay error")
+                console.log(err)
+            }
+        }, [okay]);
+
+        useEffect(() => {
+            try{
+                console.log("testnotokay",notOkay)
+                
+            }catch(err){
+                console.log("okay error")
+                console.log(err)
+            }
+        }, [notOkay]);
 
         // React.useEffect(() => {
         //     console.log(selectedCar)
@@ -286,15 +313,11 @@ export default function DriverRecordForms() {
             console.log("revised")
             if (selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) { 
                 isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); 
-                onCheckboxChange(selectedCar.revised.cleanliness_exterior, 'cb0'); 
-            } else {
-
-            }
+                onCheckboxChange(selectedCar.revised.cleanliness_exterior, "cb0"); 
+            } 
             if (selectedCar.revised.condition_rust !== selectedCar.condition_rust) { 
                 isConditionRust(selectedCar.revised.condition_rust); 
                 onCheckboxChange(selectedCar.revised.condition_rust, 'cb1');
-            } else {
-                
             }
             // if (selectedCar.revised.decals !== selectedCar.decals) { isDecals(selectedCar.revised.decals); onCheckboxChange(selectedCar.revised.decals, "cb2"); }
             // if (selectedCar.revised.windows !== selectedCar.windows) { isWindows(selectedCar.revised.windows); onCheckboxChange(selectedCar.revised.windows, "cb3"); }
@@ -425,15 +448,30 @@ export default function DriverRecordForms() {
     
         }
 
+        // const updateNotOkay = (index, value) => {
+        //     const copy = notOkay.slice(); //copy the array
+        //     copy[index] = value;
+        //     setNotOkay(prevState, copy);
+        // }
+        // const updateOkay = (index, value) => {
+        //     const copy = okay.slice(); //copy the array
+        //     copy[index] = value;
+        //     setOkay(copy);
+        //     // revised();
+        //     console.log(notOkay); console.log(okay); 
+        // }
+
         const updateNotOkay = (index, value) => {
-            const copy = notOkay.slice(); //copy the array
-            copy[index] = value;
-            setNotOkay(copy);
+            let copyArr = [...notOkay]; //copy the array
+            copyArr[index] = value;
+            console.log("copyarr not okay",copyArr);
+            setNotOkay(copyArr);
         }
         const updateOkay = (index, value) => {
-            const copy = okay.slice(); //copy the array
-            copy[index] = value;
-            setOkay(copy);
+            let copyArr = [...okay]; //copy the array
+            copyArr[index] = value;
+            console.log("copyarr okay",copyArr);
+            setOkay(copyArr);
             // revised();
             //console.log(notOkay); console.log(okay); 
         }
@@ -444,7 +482,9 @@ export default function DriverRecordForms() {
             switch (id) {
                 case 'cb0':
                     console.log("id: cb0");
+                    console.log(selectedCar.cleanliness_exterior);
                     isCleanlinessExterior(value);
+
                     if (selectedCar.cleanliness_exterior !== value){
                         console.log("edit0");
                         value ? (updateNotOkay(0,"gray"),  updateOkay(0,"red")) : (updateNotOkay(0,"red"),  updateOkay(0,"gray"));
@@ -452,12 +492,16 @@ export default function DriverRecordForms() {
                         console.log("same0");
                         updateNotOkay(0,"none"); updateOkay(0,"none");
                     }
-                    //break;
+                    break;
                 case 'cb1':
+                    console.log("id: cb1");
+                    console.log(selectedCar.cleanliness_exterior);
                     isConditionRust(value);
                     if (selectedCar.condition_rust !== value){
+                        console.log("edit1");
                         value ? (updateNotOkay(1,"gray"),  updateOkay(1,"red")) : (updateNotOkay(1,"red"),  updateOkay(1,"gray"));
                     } else {
+                        console.log("same1");
                         updateNotOkay(1,"none"); updateOkay(1,"none");
                     }
                     break;
@@ -943,8 +987,8 @@ export default function DriverRecordForms() {
                         setEditNotes("");
                     }
                     break;
-                // default:
-                //     break;
+                default:
+                    break;
 
             }
         }
