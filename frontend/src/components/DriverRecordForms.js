@@ -1013,19 +1013,25 @@ export default function DriverRecordForms() {
         return(
             <div>
                 <Toast ref={toast} />
-                <div className="p-grid">
-                    <div className="p-col p-md-3">
-                        <span className="p-input-icon-left">
-                            <i className="pi pi-search" />
-                            <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Body No." />
-                        </span>
-                    </div>
-                    <div className="p-col p-md-3">
-                        <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
-                        <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon />
-                    </div>
-                    <div className="p-col p-md-3">
-                        <Dropdown value={selectedLocation} options={cities} onChange={(e) => setSelectedLocation(e.value)} optionLabel="name" placeholder="Select a Location" />
+                <div className="p-col-12">
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <span className="p-input-icon-left">
+                                <i className="pi pi-search" />
+                                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Body No." />
+                            </span>
+                        </div>
+                        <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <Dropdown value={selectedLocation} options={cities} onChange={(e) => setSelectedLocation(e.value)} optionLabel="name" placeholder="Select a Location" />
+                        </div>
+                        <div className="p-col-12 p-lg-4 p-md-6 p-sm-12">
+                            {/* <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
+                            <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon /> */}
+                            <div className="p-d-flex">
+                                <div className="p-mr-3"><Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon /></div>
+                                <div className="p-mr-2"><Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} /></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
