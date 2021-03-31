@@ -34,7 +34,7 @@ from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           UpdateUserSerializer, UserListSerializer,
                           UserSerializer)
 from .utils import (check_Com_date, check_cr_date, check_or_date,
-                    check_TPL_date, reversion, user_permission)
+                    check_TPL_date, maintenance_reversion, reversion, user_permission)
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -353,10 +353,10 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         queryset =  Inspection.objects.all()
         inspection = get_object_or_404(queryset, pk=pk)
         if user_permission(user, 'can_view_inspection_reports'):
-            return Response(reversion(inspection))
+            return Response(reversion(inspection), status=status.HTTP_200_OK)
         else:
             if str(inspection.driver) == user.username:       # if current user is equal to pk
-                return Response(reversion(inspection))
+                return Response(reversion(inspection), status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
     
@@ -377,7 +377,7 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
     queryset = Inspection.objects.all()
     serializer_class = InspectionListSerializer
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['inspection_id','body_no__body_no', 'date_created', 'body_no__current_loc']
+    filterset_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
     ordering_fields = ['body_no__body_no', 'date_created', 'inspection_id']
 
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
@@ -412,10 +412,10 @@ class MaintenanceView(viewsets.ViewSet):  # inspection report Form
         queryset =  Maintenance.objects.all()
         maintenance = get_object_or_404(queryset, pk=pk)
         if user_permission(user,'can_view_maintenance_reports'):
-            return Response(reversion(maintenance))
+            return Response(maintenance_reversion(maintenance), status=status.HTTP_200_OK)
         else:
             if str(maintenance.inspected_by) == user.username:       # if current user is equal to pk
-                return Response(reversion(maintenance))
+                return Response(maintenance_reversion(maintenance), status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
     
@@ -424,7 +424,7 @@ class MaintenanceView(viewsets.ViewSet):  # inspection report Form
         if user_permission(user,'can_edit_maintenance_reports'):
             queryset =  Maintenance.objects.all()
             maintenance = get_object_or_404(queryset, pk=pk)
-            serializer = InspectionSerializer(instance=maintenance, data=request.data)
+            serializer = MaintenanceSerializer(instance=maintenance, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)    
@@ -436,8 +436,8 @@ class MaintenanceListView(generics.ListAPIView): #list of inspection with filter
     queryset = Maintenance.objects.all()
     serializer_class = MaintenanceListSerializer       
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['date_created','body_no__body_no','status']
-    ordering_fields = ['body_no__body_no', 'date_created',]
+    filterset_fields = ['maintenance_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
+    ordering_fields = ['body_no__body_no', 'date_created', 'maintenance_id']
 
 
 class CarView(viewsets.ModelViewSet):  # add this
