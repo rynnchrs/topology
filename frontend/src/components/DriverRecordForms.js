@@ -48,6 +48,7 @@ export default function DriverRecordForms() {
         const toast = useRef(null);
 
         //const [cloneSelectedCar, setCloneSelectedCar] = useState([]);
+        const [mileage, setMileage] = useState("");
 
         const [cleanlinessExterior, isCleanlinessExterior] = useState(false);
         const [conditionRust, isConditionRust] = useState(false);
@@ -107,6 +108,8 @@ export default function DriverRecordForms() {
         const [oil, setOil] = useState(Array(5).fill(""));
         const [editNotes, setEditNotes] = useState("");
         const [smallNotes, setSmallNotes] = useState("");
+        const [editMileage, setEditMileage] = useState("");
+        const [smallMileage, setSmallMileage] = useState("");
 
         React.useEffect(function effectFunction() {
             let token = localStorage.getItem("token");
@@ -132,26 +135,6 @@ export default function DriverRecordForms() {
                 console.log(err)
             }
         }, [selectedCar]);
-
-        useEffect(() => {
-            try{
-                console.log("testokay",okay)
-                
-            }catch(err){
-                console.log("okay error")
-                console.log(err)
-            }
-        }, [okay]);
-
-        useEffect(() => {
-            try{
-                console.log("testnotokay",notOkay)
-                
-            }catch(err){
-                console.log("okay error")
-                console.log(err)
-            }
-        }, [notOkay]);
 
         // React.useEffect(() => {
         //     console.log(selectedCar)
@@ -202,6 +185,8 @@ export default function DriverRecordForms() {
             setOil([]);
             setSmallNotes("");
             setEditNotes("");
+            setSmallMileage("");
+            setEditMileage("");
         }
 
         const getInspectionData = () => {
@@ -258,7 +243,8 @@ export default function DriverRecordForms() {
 
         const revised = () => {
             /* eslint-disable no-unused-expressions */
-            isCleanlinessExterior(selectedCar.cleanliness_exterior)
+            setMileage(selectedCar.mileage);
+            isCleanlinessExterior(selectedCar.cleanliness_exterior);
             isConditionRust(selectedCar.condition_rust);
             isDecals(selectedCar.decals);
             isWindows(selectedCar.windows);
@@ -311,62 +297,57 @@ export default function DriverRecordForms() {
 
             isNotes(selectedCar.notes);
             console.log("revised")
-            if (selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) { 
-                isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); 
-                onCheckboxChange(selectedCar.revised.cleanliness_exterior, "cb0"); 
-            } 
-            if (selectedCar.revised.condition_rust !== selectedCar.condition_rust) { 
-                isConditionRust(selectedCar.revised.condition_rust); 
-                onCheckboxChange(selectedCar.revised.condition_rust, 'cb1');
-            }
-            // if (selectedCar.revised.decals !== selectedCar.decals) { isDecals(selectedCar.revised.decals); onCheckboxChange(selectedCar.revised.decals, "cb2"); }
-            // if (selectedCar.revised.windows !== selectedCar.windows) { isWindows(selectedCar.revised.windows); onCheckboxChange(selectedCar.revised.windows, "cb3"); }
-            // if (selectedCar.revised.rear_door !== selectedCar.rear_door) { isRearDoor(selectedCar.revised.rear_door); onCheckboxChange(selectedCar.revised.rear_door, "cb4"); }
-            // if (selectedCar.revised.mirror !== selectedCar.mirror) { isMirror(selectedCar.revised.mirror); onCheckboxChange(selectedCar.revised.mirror, "cb5"); }
-            // if (selectedCar.revised.roof_rack !== selectedCar.roof_rack) { isRoofRack(selectedCar.revised.roof_rack); onCheckboxChange(selectedCar.revised.roof_rack, "cb6"); }
-            // if (selectedCar.revised.rear_step !== selectedCar.rear_step) { isRearStep(selectedCar.revised.rear_step); onCheckboxChange(selectedCar.revised.rear_step, "cb7"); }
+            console.log(selectedCar.revised.mileage)
+            selectedCar.revised.mileage ? (setMileage(selectedCar.revised.mileage), onCheckboxChange(selectedCar.revised.mileage, "mileage")) : '';
+            if (typeof(selectedCar.revised.cleanliness_exterior) !== 'undefined' && selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) {  isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); onCheckboxChange(selectedCar.revised.cleanliness_exterior, "cb0"); } 
+            if (typeof(selectedCar.revised.condition_rust) !== 'undefined' && selectedCar.revised.condition_rust !== selectedCar.condition_rust) { isConditionRust(selectedCar.revised.condition_rust); onCheckboxChange(selectedCar.revised.condition_rust, 'cb1'); }
+            if (typeof(selectedCar.revised.decals) !== 'undefined' && selectedCar.revised.decals !== selectedCar.decals) { isDecals(selectedCar.revised.decals); onCheckboxChange(selectedCar.revised.decals, "cb2"); }
+            if (typeof(selectedCar.revised.windows) !== 'undefined' && selectedCar.revised.windows !== selectedCar.windows) { isWindows(selectedCar.revised.windows); onCheckboxChange(selectedCar.revised.windows, "cb3"); }
+            if (typeof(selectedCar.revised.rear_door) !== 'undefined' &&  selectedCar.revised.rear_door !== selectedCar.rear_door) { isRearDoor(selectedCar.revised.rear_door); onCheckboxChange(selectedCar.revised.rear_door, "cb4"); }
+            if (typeof(selectedCar.revised.mirror) !== 'undefined' &&  selectedCar.revised.mirror !== selectedCar.mirror) { isMirror(selectedCar.revised.mirror); onCheckboxChange(selectedCar.revised.mirror, "cb5"); }
+            if (typeof(selectedCar.revised.roof_rack) !== 'undefined'  && selectedCar.revised.roof_rack !== selectedCar.roof_rack) { isRoofRack(selectedCar.revised.roof_rack); onCheckboxChange(selectedCar.revised.roof_rack, "cb6"); }
+            if (typeof(selectedCar.revised.rear_step) !== 'undefined'  && selectedCar.revised.rear_step !== selectedCar.rear_step) { isRearStep(selectedCar.revised.rear_step); onCheckboxChange(selectedCar.revised.rear_step, "cb7"); }
             
-            // if (selectedCar.revised.seats !== selectedCar.seats) { isSeats(selectedCar.revised.seats); onCheckboxChange(selectedCar.revised.seats, "cb8"); }
-            // if (selectedCar.revised.seat_belts !== selectedCar.seat_belts) { isSeatBelts(selectedCar.revised.seat_belts); onCheckboxChange(selectedCar.revised.seat_belts, "cb9"); }
-            // if (selectedCar.revised.general_condition !== selectedCar.general_condition) { isGeneralCondition(selectedCar.revised.general_condition); onCheckboxChange(selectedCar.revised.general_condition, "cb10"); }
-            // if (selectedCar.revised.vehicle_documents !== selectedCar.vehicle_documents) { isVehicleDocuments(selectedCar.revised.vehicle_documents); onCheckboxChange(selectedCar.revised.vehicle_documents, "cb11"); }
+            if (typeof(selectedCar.revised.seats) !== 'undefined'  && selectedCar.revised.seats !== selectedCar.seats) { isSeats(selectedCar.revised.seats); onCheckboxChange(selectedCar.revised.seats, "cb8"); }
+            if (typeof(selectedCar.revised.seat_belts) !== 'undefined'  && selectedCar.revised.seat_belts !== selectedCar.seat_belts) { isSeatBelts(selectedCar.revised.seat_belts); onCheckboxChange(selectedCar.revised.seat_belts, "cb9"); }
+            if (typeof(selectedCar.revised.general_condition) !== 'undefined'  && selectedCar.revised.general_condition !== selectedCar.general_condition) { isGeneralCondition(selectedCar.revised.general_condition); onCheckboxChange(selectedCar.revised.general_condition, "cb10"); }
+            if (typeof(selectedCar.revised.vehicle_documents) !== 'undefined'  && selectedCar.revised.vehicle_documents !== selectedCar.vehicle_documents) { isVehicleDocuments(selectedCar.revised.vehicle_documents); onCheckboxChange(selectedCar.revised.vehicle_documents, "cb11"); }
             
-            // if (selectedCar.revised.cleanliness_engine_bay !== selectedCar.cleanliness_engine_bay) { isCleanlinessEngineBay(selectedCar.revised.cleanliness_engine_bay); onCheckboxChange(selectedCar.revised.cleanliness_engine_bay, "cb12"); }
-            // if (selectedCar.revised.washer_fluid !== selectedCar.washer_fluid) { isWasherFluid(selectedCar.revised.washer_fluid); onCheckboxChange(selectedCar.revised.washer_fluid, "cb13"); }
-            // if (selectedCar.revised.coolant_level !== selectedCar.coolant_level) { isCoolantLevel(selectedCar.revised.coolant_level); onCheckboxChange(selectedCar.revised.coolant_level, "cb14"); }
-            // if (selectedCar.revised.brake_fluid_level !== selectedCar.brake_fluid_level) { isBrakeFluidLevel(selectedCar.revised.brake_fluid_level); onCheckboxChange(selectedCar.revised.brake_fluid_level, "cb15"); }
-            // if (selectedCar.revised.power_steering_fluid !== selectedCar.power_steering_fluid) { isPowerSteeringFluid(selectedCar.revised.power_steering_fluid); onCheckboxChange(selectedCar.revised.power_steering_fluid, "cb16"); }
+            if (typeof(selectedCar.revised.cleanliness_engine_bay) !== 'undefined'  && selectedCar.revised.cleanliness_engine_bay !== selectedCar.cleanliness_engine_bay) { isCleanlinessEngineBay(selectedCar.revised.cleanliness_engine_bay); onCheckboxChange(selectedCar.revised.cleanliness_engine_bay, "cb12"); }
+            if (typeof(selectedCar.revised.washer_fluid) !== 'undefined'  && selectedCar.revised.washer_fluid !== selectedCar.washer_fluid) { isWasherFluid(selectedCar.revised.washer_fluid); onCheckboxChange(selectedCar.revised.washer_fluid, "cb13"); }
+            if (typeof(selectedCar.revised.coolant_level) !== 'undefined'  && selectedCar.revised.coolant_level !== selectedCar.coolant_level) { isCoolantLevel(selectedCar.revised.coolant_level); onCheckboxChange(selectedCar.revised.coolant_level, "cb14"); }
+            if (typeof(selectedCar.revised.brake_fluid_level) !== 'undefined'  && selectedCar.revised.brake_fluid_level !== selectedCar.brake_fluid_level) { isBrakeFluidLevel(selectedCar.revised.brake_fluid_level); onCheckboxChange(selectedCar.revised.brake_fluid_level, "cb15"); }
+            if (typeof(selectedCar.revised.power_steering_fluid) !== 'undefined'  && selectedCar.revised.power_steering_fluid !== selectedCar.power_steering_fluid) { isPowerSteeringFluid(selectedCar.revised.power_steering_fluid); onCheckboxChange(selectedCar.revised.power_steering_fluid, "cb16"); }
             
-            // if (selectedCar.revised.main_beam !== selectedCar.main_beam) { isMainBeam(selectedCar.revised.main_beam); onCheckboxChange(selectedCar.revised.main_beam, "cb17"); }
-            // if (selectedCar.revised.dipped_beam !== selectedCar.dipped_beam) { isDippedBeam(selectedCar.revised.dipped_beam); onCheckboxChange(selectedCar.revised.dipped_beam, "cb18"); }
-            // if (selectedCar.revised.side_lights !== selectedCar.side_lights) { isSideLights(selectedCar.revised.side_lights); onCheckboxChange(selectedCar.revised.side_lights, "cb19"); }
-            // if (selectedCar.revised.tail_lights !== selectedCar.tail_lights) { isTailLights(selectedCar.revised.tail_lights); onCheckboxChange(selectedCar.revised.tail_lights, "cb20"); }
-            // if (selectedCar.revised.indicators !== selectedCar.indicators) { isIndicators(selectedCar.revised.indicators); onCheckboxChange(selectedCar.revised.indicators, "cb21"); }
-            // if (selectedCar.revised.break_lights !== selectedCar.break_lights) { isBreakLights(selectedCar.revised.break_lights); onCheckboxChange(selectedCar.revised.break_lights, "cb22"); }
-            // if (selectedCar.revised.reverse_lights !== selectedCar.reverse_lights) { isReverseLights(selectedCar.revised.reverse_lights); onCheckboxChange(selectedCar.revised.reverse_lights, "cb23"); }
-            // if (selectedCar.revised.hazard_light !== selectedCar.hazard_light) { isHazardLights(selectedCar.revised.hazard_light); onCheckboxChange(selectedCar.revised.hazard_light, "cb24"); }
-            // if (selectedCar.revised.rear_fog_lights !== selectedCar.rear_fog_lights) { isRearFogLights(selectedCar.revised.rear_fog_lights); onCheckboxChange(selectedCar.revised.rear_fog_lights, "cb25"); }
-            // if (selectedCar.revised.interior_lights !== selectedCar.interior_lights) { isInteriorLights(selectedCar.revised.interior_lights); onCheckboxChange(selectedCar.revised.interior_lights, "cb26"); }
-            // if (selectedCar.revised.screen_washer !== selectedCar.screen_washer) { isScreenWashers(selectedCar.revised.screen_washer); onCheckboxChange(selectedCar.revised.screen_washer, "cb27"); }
-            // if (selectedCar.revised.wiper_blades !== selectedCar.wiper_blades) { isWiperBlades(selectedCar.revised.wiper_blades); onCheckboxChange(selectedCar.revised.wiper_blades, "cb28"); }
-            // if (selectedCar.revised.horn !== selectedCar.horn) { isHorn(selectedCar.revised.horn); onCheckboxChange(selectedCar.revised.horn, "cb29"); }
-            // if (selectedCar.revised.radio !== selectedCar.radio) { isRadio(selectedCar.revised.radio); onCheckboxChange(selectedCar.revised.radio, "cb30"); }
-            // if (selectedCar.revised.front_fog_lights !== selectedCar.front_fog_lights) { isFrontFogLights(selectedCar.revised.front_fog_lights); onCheckboxChange(selectedCar.revised.front_fog_lights, "cb31"); }
-            // if (selectedCar.revised.air_conditioning !== selectedCar.air_conditioning) { isAirConditioning(selectedCar.revised.air_conditioning); onCheckboxChange(selectedCar.revised.air_conditioning, "cb32"); }
+            if (typeof(selectedCar.revised.main_beam) !== 'undefined'  && selectedCar.revised.main_beam !== selectedCar.main_beam) { isMainBeam(selectedCar.revised.main_beam); onCheckboxChange(selectedCar.revised.main_beam, "cb17"); }
+            if (typeof(selectedCar.revised.dipped_beam) !== 'undefined'  && selectedCar.revised.dipped_beam !== selectedCar.dipped_beam) { isDippedBeam(selectedCar.revised.dipped_beam); onCheckboxChange(selectedCar.revised.dipped_beam, "cb18"); }
+            if (typeof(selectedCar.revised.side_lights) !== 'undefined'  && selectedCar.revised.side_lights !== selectedCar.side_lights) { isSideLights(selectedCar.revised.side_lights); onCheckboxChange(selectedCar.revised.side_lights, "cb19"); }
+            if (typeof(selectedCar.revised.tail_lights) !== 'undefined'  && selectedCar.revised.tail_lights !== selectedCar.tail_lights) { isTailLights(selectedCar.revised.tail_lights); onCheckboxChange(selectedCar.revised.tail_lights, "cb20"); }
+            if (typeof(selectedCar.revised.indicators) !== 'undefined'  && selectedCar.revised.indicators !== selectedCar.indicators) { isIndicators(selectedCar.revised.indicators); onCheckboxChange(selectedCar.revised.indicators, "cb21"); }
+            if (typeof(selectedCar.revised.break_lights) !== 'undefined'  && selectedCar.revised.break_lights !== selectedCar.break_lights) { isBreakLights(selectedCar.revised.break_lights); onCheckboxChange(selectedCar.revised.break_lights, "cb22"); }
+            if (typeof(selectedCar.revised.reverse_lights) !== 'undefined'  && selectedCar.revised.reverse_lights !== selectedCar.reverse_lights) { isReverseLights(selectedCar.revised.reverse_lights); onCheckboxChange(selectedCar.revised.reverse_lights, "cb23"); }
+            if (typeof(selectedCar.revised.hazard_light) !== 'undefined'  && selectedCar.revised.hazard_light !== selectedCar.hazard_light) { isHazardLights(selectedCar.revised.hazard_light); onCheckboxChange(selectedCar.revised.hazard_light, "cb24"); }
+            if (typeof(selectedCar.revised.rear_fog_lights) !== 'undefined'  && selectedCar.revised.rear_fog_lights !== selectedCar.rear_fog_lights) { isRearFogLights(selectedCar.revised.rear_fog_lights); onCheckboxChange(selectedCar.revised.rear_fog_lights, "cb25"); }
+            if (typeof(selectedCar.revised.interior_lights) !== 'undefined'  && selectedCar.revised.interior_lights !== selectedCar.interior_lights) { isInteriorLights(selectedCar.revised.interior_lights); onCheckboxChange(selectedCar.revised.interior_lights, "cb26"); }
+            if (typeof(selectedCar.revised.screen_washer) !== 'undefined'  && selectedCar.revised.screen_washer !== selectedCar.screen_washer) { isScreenWashers(selectedCar.revised.screen_washer); onCheckboxChange(selectedCar.revised.screen_washer, "cb27"); }
+            if (typeof(selectedCar.revised.wiper_blades) !== 'undefined'  && selectedCar.revised.wiper_blades !== selectedCar.wiper_blades) { isWiperBlades(selectedCar.revised.wiper_blades); onCheckboxChange(selectedCar.revised.wiper_blades, "cb28"); }
+            if (typeof(selectedCar.revised.horn) !== 'undefined'  && selectedCar.revised.horn !== selectedCar.horn) { isHorn(selectedCar.revised.horn); onCheckboxChange(selectedCar.revised.horn, "cb29"); }
+            if (typeof(selectedCar.revised.radio) !== 'undefined'  && selectedCar.revised.radio !== selectedCar.radio) { isRadio(selectedCar.revised.radio); onCheckboxChange(selectedCar.revised.radio, "cb30"); }
+            if (typeof(selectedCar.revised.front_fog_lights) !== 'undefined'  && selectedCar.revised.front_fog_lights !== selectedCar.front_fog_lights) { isFrontFogLights(selectedCar.revised.front_fog_lights); onCheckboxChange(selectedCar.revised.front_fog_lights, "cb31"); }
+            if (typeof(selectedCar.revised.air_conditioning) !== 'undefined'  && selectedCar.revised.air_conditioning !== selectedCar.air_conditioning) { isAirConditioning(selectedCar.revised.air_conditioning); onCheckboxChange(selectedCar.revised.air_conditioning, "cb32"); }
             
-            // if (selectedCar.revised.tyres !== selectedCar.tyres) { isTyres(selectedCar.revised.tyres); onCheckboxChange(selectedCar.revised.tyres, "cb33"); }
-            // if (selectedCar.revised.front_visual !== selectedCar.front_visual) { isFrontVisual(selectedCar.revised.front_visual); onCheckboxChange(selectedCar.revised.front_visual, "cb34"); }
-            // if (selectedCar.revised.rear_visual !== selectedCar.rear_visual) { isRearVisual(selectedCar.revised.rear_visual); onCheckboxChange(selectedCar.revised.rear_visual, "cb35"); }
-            // if (selectedCar.revised.spare_visual !== selectedCar.spare_visual) { isSpareVisual(selectedCar.revised.spare_visual); onCheckboxChange(selectedCar.revised.spare_visual, "cb36"); }
-            // if (selectedCar.revised.wheel_brace !== selectedCar.wheel_brace) { isWheelBrace(selectedCar.revised.wheel_brace); onCheckboxChange(selectedCar.revised.wheel_brace, "cb37"); }
-            // if (selectedCar.revised.jack !== selectedCar.jack) { isJack(selectedCar.revised.jack); onCheckboxChange(selectedCar.revised.jack, "cb38"); }
-            // if (selectedCar.revised.front_left_wheel !== selectedCar.front_left_wheel) { isFrontLeftWheel(selectedCar.revised.front_left_wheel); onCheckboxChange(selectedCar.revised.front_left_wheel, "cb39"); }
-            // if (selectedCar.revised.front_right_wheel !== selectedCar.front_right_wheel) { isFrontRightWheel(selectedCar.revised.front_right_wheel); onCheckboxChange(selectedCar.revised.front_right_wheel, "cb40"); }
-            // if (selectedCar.revised.rear_left_wheel !== selectedCar.rear_left_wheel) { isRearLeftWheel(selectedCar.revised.rear_left_wheel); onCheckboxChange(selectedCar.revised.rear_left_wheel, "cb41"); }
-            // if (selectedCar.revised.rear_right_wheel !== selectedCar.rear_right_wheel) { isRearRightWheel(selectedCar.revised.rear_right_wheel); onCheckboxChange(selectedCar.revised.rear_right_wheel, "cb42"); }
+            if (typeof(selectedCar.revised.tyres) !== 'undefined'  && selectedCar.revised.tyres !== selectedCar.tyres) { isTyres(selectedCar.revised.tyres); onCheckboxChange(selectedCar.revised.tyres, "cb33"); }
+            if (typeof(selectedCar.revised.front_visual) !== 'undefined'  && selectedCar.revised.front_visual !== selectedCar.front_visual) { isFrontVisual(selectedCar.revised.front_visual); onCheckboxChange(selectedCar.revised.front_visual, "cb34"); }
+            if (typeof(selectedCar.revised.rear_visual) !== 'undefined'  && selectedCar.revised.rear_visual !== selectedCar.rear_visual) { isRearVisual(selectedCar.revised.rear_visual); onCheckboxChange(selectedCar.revised.rear_visual, "cb35"); }
+            if (typeof(selectedCar.revised.spare_visual) !== 'undefined'  && selectedCar.revised.spare_visual !== selectedCar.spare_visual) { isSpareVisual(selectedCar.revised.spare_visual); onCheckboxChange(selectedCar.revised.spare_visual, "cb36"); }
+            if (typeof(selectedCar.revised.wheel_brace) !== 'undefined'  && selectedCar.revised.wheel_brace !== selectedCar.wheel_brace) { isWheelBrace(selectedCar.revised.wheel_brace); onCheckboxChange(selectedCar.revised.wheel_brace, "cb37"); }
+            if (typeof(selectedCar.revised.jack) !== 'undefined'  && selectedCar.revised.jack !== selectedCar.jack) { isJack(selectedCar.revised.jack); onCheckboxChange(selectedCar.revised.jack, "cb38"); }
+            if (typeof(selectedCar.revised.front_left_wheel) !== 'undefined'  && selectedCar.revised.front_left_wheel !== selectedCar.front_left_wheel) { isFrontLeftWheel(selectedCar.revised.front_left_wheel); onCheckboxChange(selectedCar.revised.front_left_wheel, "cb39"); }
+            if (typeof(selectedCar.revised.front_right_wheel) !== 'undefined'  && selectedCar.revised.front_right_wheel !== selectedCar.front_right_wheel) { isFrontRightWheel(selectedCar.revised.front_right_wheel); onCheckboxChange(selectedCar.revised.front_right_wheel, "cb40"); }
+            if (typeof(selectedCar.revised.rear_left_wheel) !== 'undefined'  && selectedCar.revised.rear_left_wheel !== selectedCar.rear_left_wheel) { isRearLeftWheel(selectedCar.revised.rear_left_wheel); onCheckboxChange(selectedCar.revised.rear_left_wheel, "cb41"); }
+            if (typeof(selectedCar.revised.rear_right_wheel) !== 'undefined'  && selectedCar.revised.rear_right_wheel !== selectedCar.rear_right_wheel) { isRearRightWheel(selectedCar.revised.rear_right_wheel); onCheckboxChange(selectedCar.revised.rear_right_wheel, "cb42"); }
             
             selectedCar.revised.gas_level ? (isOilLevel(selectedCar.revised.gas_level), onCheckboxChange(selectedCar.revised.gas_level, "g"+selectedCar.revised.gas_level)) : '';
-            console.log(gasLevel);
             selectedCar.revised.oil_level ? (isOilLevel(selectedCar.revised.oil_level), onCheckboxChange(selectedCar.revised.oil_level, "o"+selectedCar.revised.oil_level)) : '';
             selectedCar.revised.notes ? (isNotes(selectedCar.revised.notes), onCheckboxChange(selectedCar.revised.notes, "n")) : '';
             
@@ -384,7 +365,7 @@ export default function DriverRecordForms() {
                 //car: this.state.bn.car_id,
                 body_no: selectedBody.body_no,
                 make: selectedBody.make,
-                mileage: selectedCar.mileage,
+                mileage: mileage,
                 location: selectedBody.current_loc,
                 cleanliness_exterior: cleanlinessExterior,
                 condition_rust: conditionRust,
@@ -448,32 +429,11 @@ export default function DriverRecordForms() {
     
         }
 
-        // const updateNotOkay = (index, value) => {
-        //     const copy = notOkay.slice(); //copy the array
-        //     copy[index] = value;
-        //     setNotOkay(prevState, copy);
-        // }
-        // const updateOkay = (index, value) => {
-        //     const copy = okay.slice(); //copy the array
-        //     copy[index] = value;
-        //     setOkay(copy);
-        //     // revised();
-        //     console.log(notOkay); console.log(okay); 
-        // }
-
         const updateNotOkay = (index, value) => {
-            let copyArr = [...notOkay]; //copy the array
-            copyArr[index] = value;
-            console.log("copyarr not okay",copyArr);
-            setNotOkay(copyArr);
+            notOkay[index] = value;
         }
         const updateOkay = (index, value) => {
-            let copyArr = [...okay]; //copy the array
-            copyArr[index] = value;
-            console.log("copyarr okay",copyArr);
-            setOkay(copyArr);
-            // revised();
-            //console.log(notOkay); console.log(okay); 
+            okay[index] = value; 
         }
         
         const onCheckboxChange = (value, id) => {
@@ -482,9 +442,7 @@ export default function DriverRecordForms() {
             switch (id) {
                 case 'cb0':
                     console.log("id: cb0");
-                    console.log(selectedCar.cleanliness_exterior);
                     isCleanlinessExterior(value);
-
                     if (selectedCar.cleanliness_exterior !== value){
                         console.log("edit0");
                         value ? (updateNotOkay(0,"gray"),  updateOkay(0,"red")) : (updateNotOkay(0,"red"),  updateOkay(0,"gray"));
@@ -494,14 +452,10 @@ export default function DriverRecordForms() {
                     }
                     break;
                 case 'cb1':
-                    console.log("id: cb1");
-                    console.log(selectedCar.cleanliness_exterior);
                     isConditionRust(value);
                     if (selectedCar.condition_rust !== value){
-                        console.log("edit1");
                         value ? (updateNotOkay(1,"gray"),  updateOkay(1,"red")) : (updateNotOkay(1,"red"),  updateOkay(1,"gray"));
                     } else {
-                        console.log("same1");
                         updateNotOkay(1,"none"); updateOkay(1,"none");
                     }
                     break;
@@ -987,9 +941,18 @@ export default function DriverRecordForms() {
                         setEditNotes("");
                     }
                     break;
+                case 'mileage':
+                    setMileage(value);
+                    if (selectedCar.notes !== value){
+                        setSmallMileage("Previous Mileage: " + selectedCar.mileage);
+                        setEditMileage("red-inputtext");
+                    } else {
+                        setSmallMileage("");
+                        setEditMileage("");
+                    }
+                    break;
                 default:
                     break;
-
             }
         }
 
@@ -1078,7 +1041,7 @@ export default function DriverRecordForms() {
 
                 <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
                     <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-lg-8">
+                        <div className="p-col-12 p-lg-8 report-checklist">
                             <div className="card card">
                                 <div className="p-grid">
                                     <div className="p-col-12 p-md-6">
@@ -1093,7 +1056,9 @@ export default function DriverRecordForms() {
                                 <div className="p-grid">
                                     <div className="p-col-12 p-md-6">
                                         <label htmlFor="mileage">Mileage:</label>
-                                        <InputText id="mileage" value={selectedCar.mileage} />
+                                        <InputText id="mileage" className={editMileage} value={mileage}
+                                        onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
+                                        <small className="p-invalid p-d-block">{smallMileage}</small>
                                     </div>
                                     <div className="p-col-12 p-md-6">
                                         <label htmlFor="location">Location:</label>
@@ -1638,571 +1603,566 @@ export default function DriverRecordForms() {
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </Dialog>
             
 
-            <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic2} style={{ width: '85vw' }} onHide={() => onHide('displayBasic2')}>
-            
-                <div className="card card">
-                    <div className="p-grid">
-                        <div className="p-col-12 p-md-6">
-                            <label htmlFor="bodyno">Body No.:</label>
-                            <InputText id="bodyno" value={selectedBody.body_no} />
+                <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic2} style={{ width: '85vw' }} onHide={() => onHide('displayBasic2')}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-8">
+                            <div className="card card">
+                                <div className="p-grid">
+                                    <div className="p-col-12 p-md-6">
+                                        <label htmlFor="bodyno">Body No.:</label>
+                                        <InputText id="bodyno" value={selectedBody.body_no} />
+                                    </div>
+                                    <div className="p-col-12 p-md-6">
+                                        <label htmlFor="make">Make:</label>
+                                        <InputText id="make" value={selectedBody.make= selectedBody.make === 'L30' ? 'L300 Exceed 2.5D MT': selectedBody.make === 'SUV' ? 'Super Carry UV': selectedBody.make ===  'G15'? 'Gratour midi truck 1.5L': selectedBody.make ===  'G12'? 'Gratour midi truck 1.2L': '' } />
+                                    </div>
+                                </div>
+                                <div className="p-grid">
+                                    <div className="p-col-12 p-md-6">
+                                        <label htmlFor="mileage">Mileage:</label>
+                                        <InputText id="mileage" value={selectedCar.mileage} />
+                                    </div>
+                                    <div className="p-col-12 p-md-6">
+                                        <label htmlFor="location">Location:</label>
+                                        <InputText id="location" value={selectedBody.current_loc} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <div className="p-col-12 p-lg-12 report-checklist">
+                            <div className="card card-w-title">
+                                <h1>Exterior</h1><hr style={{ borderTop:'1px solid black'}}/>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                                <div className="p-col widName" style={{height:'40px'}}></div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Not Okay</b></h4></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Okay</b></h4></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.cleanliness_exterior}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.cleanliness_exterior}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Condition Rust</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1" checked={!selectedCar.condition_rust}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb2" checked={selectedCar.condition_rust}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Decals/Livery Intact</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"  checked={!selectedCar.decals}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"   checked={selectedCar.decals}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Windows/Windscreen</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.windows}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.windows} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Rear Door</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"   checked={!selectedCar.rear_door}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.rear_door} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{ height:'40px'}}><h4>Mirrors</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.mirror} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.mirror} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Roof Rack</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.roof_rack}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.roof_rack}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Rear Step</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.rear_step} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.rear_step}/></center>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="p-col-12 p-md-6">
-                            <label htmlFor="make">Make:</label>
-                            <InputText id="make" value={selectedBody.make= selectedBody.make === 'L30' ? 'L300 Exceed 2.5D MT': selectedBody.make === 'SUV' ? 'Super Carry UV': selectedBody.make ===  'G15'? 'Gratour midi truck 1.5L': selectedBody.make ===  'G12'? 'Gratour midi truck 1.2L': '' } />
-                        </div>
-                    </div>
-                    <div className="p-grid">
-                        <div className="p-col-12 p-md-6">
-                            <label htmlFor="mileage">Mileage:</label>
-                            <InputText id="mileage" value={selectedCar.mileage} />
-                        </div>
-                        <div className="p-col-12 p-md-6">
-                            <label htmlFor="location">Location:</label>
-                            <InputText id="location" value={selectedBody.current_loc} />
-                        </div>
-                    </div>
-                </div>
 
-                <div className="p-col-12 p-lg-12 report-checklist">
-                    <div className="card card-w-title">
-                        <h1>Exterior</h1><hr style={{ borderTop:'1px solid black'}}/>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
-                        <div className="p-col widName" style={{height:'40px'}}></div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Not Okay</b></h4></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Okay</b></h4></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.cleanliness_exterior}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.cleanliness_exterior}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Condition Rust</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1" checked={!selectedCar.condition_rust}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb2" checked={selectedCar.condition_rust}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Decals/Livery Intact</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"  checked={!selectedCar.decals}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"   checked={selectedCar.decals}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Windows/Windscreen</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.windows}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.windows} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear Door</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"   checked={!selectedCar.rear_door}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.rear_door} /></center>
+                        <div className="p-col-12 p-lg-12 report-checklist">
+                            <div className="card card-w-title">
+                                <h1>Interior</h1><hr style={{ borderTop:'1px solid black'}}/>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                                <div className="p-col widName" style={{height:'40px'}}></div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Not Okay</b></h4></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Okay</b></h4></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Seats</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.seats} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.seats} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Seat Belts</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1" checked={!selectedCar.seat_belts}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb2" checked={selectedCar.seat_belts}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>General Condition</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"  checked={!selectedCar.general_condition}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"   checked={selectedCar.general_condition}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Vehicle Documents</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.vehicle_documents}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.vehicle_documents}/></center>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{ height:'40px'}}><h4>Mirrors</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.mirror} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.mirror} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Roof Rack</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.roof_rack}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.roof_rack}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear Step</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.rear_step} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.rear_step}/></center>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="p-col-12 p-lg-12 report-checklist">
-                    <div className="card card-w-title">
-                        <h1>Interior</h1><hr style={{ borderTop:'1px solid black'}}/>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
-                        <div className="p-col widName" style={{height:'40px'}}></div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Not Okay</b></h4></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Okay</b></h4></center>
+                        <div className="p-col-12 p-lg-12 report-checklist">
+                            <div className="card card-w-title">
+                                <h1>Engine Bay</h1><hr style={{ borderTop:'1px solid black'}}/>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                                <div className="p-col widName" style={{height:'40px'}}></div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Not Okay</b></h4></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Okay</b></h4></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.cleanliness_engine_bay} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.cleanliness_engine_bay} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Washer Fluid</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"  checked={!selectedCar.washer_fluid}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb2" checked={selectedCar.washer_fluid}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Coolant Level</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"  checked={!selectedCar.coolant_level}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.coolant_level}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Brake Fluid Level</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.brake_fluid_level}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.brake_fluid_level} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Power Steering Fluid</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.power_steering_fluid}  /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.power_steering_fluid}/></center>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Seats</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.seats} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.seats} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Seat Belts</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1" checked={!selectedCar.seat_belts}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb2" checked={selectedCar.seat_belts}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>General Condition</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"  checked={!selectedCar.general_condition}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"   checked={selectedCar.general_condition}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Vehicle Documents</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.vehicle_documents}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.vehicle_documents}/></center>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="p-col-12 p-lg-12 report-checklist">
-                    <div className="card card-w-title">
-                        <h1>Engine Bay</h1><hr style={{ borderTop:'1px solid black'}}/>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
-                        <div className="p-col widName" style={{height:'40px'}}></div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Not Okay</b></h4></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Okay</b></h4></center>
+                        <div className="p-col-12 p-lg-12 report-checklist">
+                            <div className="card card-w-title">
+                                <h1>Electrics</h1><hr style={{ borderTop:'1px solid black'}}/>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                                <div className="p-col widName" style={{height:'40px'}}></div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Not Okay</b></h4></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Okay</b></h4></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Main Beam</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.main_beam}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.main_beam}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Dipped Beam</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"  checked={!selectedCar.dipped_beam} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb2" checked={selectedCar.dipped_beam} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Side Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1" checked={!selectedCar.side_lights} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.side_lights} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Tail Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.tail_lights} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.tail_lights}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Indicators</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"  checked={!selectedCar.indicators}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.indicators}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{ height:'40px'}}><h4>Break Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.break_lights}  /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.break_lights}  /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Reverse Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.reverse_lights}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.reverse_lights}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Hazard Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.hazard_light}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.hazard_light}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Rear Fog Light</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.rear_fog_lights} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.rear_fog_lights}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Interior Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.interior_lights}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.interior_lights} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Screen Washer</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.screen_washer} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"checked={selectedCar.screen_washer} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Wiper Blades</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.wiper_blades} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.wiper_blades}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Horn</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.horn}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.horn} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Radio/CD</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.radio} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.radio}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Front Fog Lights</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.front_fog_lights} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.front_fog_lights}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Air Conditioning</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.air_conditioning}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.air_conditioning}/></center>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.cleanliness_engine_bay} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.cleanliness_engine_bay} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Washer Fluid</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"  checked={!selectedCar.washer_fluid}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb2" checked={selectedCar.washer_fluid}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Coolant Level</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"  checked={!selectedCar.coolant_level}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.coolant_level}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Brake Fluid Level</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.brake_fluid_level}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.brake_fluid_level} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Power Steering Fluid</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.power_steering_fluid}  /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.power_steering_fluid}/></center>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="p-col-12 p-lg-12 report-checklist">
-                    <div className="card card-w-title">
-                        <h1>Electrics</h1><hr style={{ borderTop:'1px solid black'}}/>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
-                        <div className="p-col widName" style={{height:'40px'}}></div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Not Okay</b></h4></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Okay</b></h4></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Main Beam</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.main_beam}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.main_beam}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Dipped Beam</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"  checked={!selectedCar.dipped_beam} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb2" checked={selectedCar.dipped_beam} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Side Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1" checked={!selectedCar.side_lights} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.side_lights} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Tail Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.tail_lights} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.tail_lights}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Indicators</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"  checked={!selectedCar.indicators}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.indicators}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{ height:'40px'}}><h4>Break Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.break_lights}  /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.break_lights}  /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Reverse Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.reverse_lights}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.reverse_lights}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Hazard Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.hazard_light}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.hazard_light}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear Fog Light</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.rear_fog_lights} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.rear_fog_lights}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Interior Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.interior_lights}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.interior_lights} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Screen Washer</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.screen_washer} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"checked={selectedCar.screen_washer} /></center>
+                        <div className="p-col-12 p-lg-12 report-checklist">
+                            <div className="card card-w-title">
+                                <h1>Wheels and Tyres</h1><hr style={{ borderTop:'1px solid black'}}/>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
+                                <div className="p-col widName" style={{height:'40px'}}></div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Not Okay</b></h4></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><h4><b>Okay</b></h4></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Tyres</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.tyres}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.tyres}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Front (Visual)</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1" checked={!selectedCar.front_visual}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb2" checked={selectedCar.front_visual}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Rear (Visual)</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1" checked={!selectedCar.rear_visual}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.rear_visual} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Spare (Visual)</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.spare_visual}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.spare_visual}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Wheel Brace</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox  inputId="rb1"   checked={!selectedCar.wheel_brace}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.wheel_brace}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{ height:'40px'}}><h4>Jack</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.jack}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.jack}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Left Front</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.front_left_wheel} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.front_left_wheel} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Right Front</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1" checked={!selectedCar.front_right_wheel} /></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.front_right_wheel}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Left Rear</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.rear_left_wheel}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.rear_left_wheel}/></center>
+                                    </div>
+                                </div>
+                                <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Right Rear</h4></div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb1"  checked={!selectedCar.rear_right_wheel}/></center>
+                                    </div>
+                                    <div className="p-col widCheck">
+                                        <center><Checkbox inputId="rb2" checked={selectedCar.rear_right_wheel}/></center>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Wiper Blades</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.wiper_blades} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.wiper_blades}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Horn</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.horn}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.horn} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Radio/CD</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.radio} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.radio}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Front Fog Lights</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.front_fog_lights} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.front_fog_lights}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Air Conditioning</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.air_conditioning}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.air_conditioning}/></center>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="p-col-12 p-lg-12 report-checklist">
-                    <div className="card card-w-title">
-                        <h1>Wheels and Tyres</h1><hr style={{ borderTop:'1px solid black'}}/>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}>
-                        <div className="p-col widName" style={{height:'40px'}}></div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Not Okay</b></h4></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><h4><b>Okay</b></h4></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Tyres</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.tyres}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.tyres}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Front (Visual)</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1" checked={!selectedCar.front_visual}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb2" checked={selectedCar.front_visual}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Rear (Visual)</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1" checked={!selectedCar.rear_visual}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.rear_visual} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Spare (Visual)</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.spare_visual}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.spare_visual}/></center>
+                        <div className="p-col-12 p-lg-12">
+                            <div className="card card-w-title">
+                                <h1>Gas and Oil</h1>
+                                <div className="p-grid">
+                                    <div className="p-col">
+                                        <center><h4><b>Gas Level</b></h4></center>
+                                    </div>
+                                    <div className="p-col">
+                                        <center><h4><b>Oil Level</b></h4></center>
+                                    </div>
+                                </div>
+                                <div className="p-grid">
+                                    <div className="p-col">
+                                        <center><Checkbox inputId="rb1"  checked={selectedCar.gas_level === 4} /></center>
+                                    </div>
+                                    <div className="p-col">
+                                        <center><Checkbox inputId="rb1"  checked={selectedCar.oil_level === 4} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-grid">
+                                    <div className="p-col">
+                                        <center><Checkbox inputId="rb2"  checked={selectedCar.gas_level === 3}/></center>
+                                    </div>
+                                    <div className="p-col">
+                                        <center><Checkbox  inputId="rb2" checked={selectedCar.oil_level === 3} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-grid">
+                                    <div className="p-col">
+                                        <center><Checkbox  inputId="rb3" checked={selectedCar.gas_level === 2} /></center>
+                                    </div>
+                                    <div className="p-col">
+                                        <center><Checkbox  inputId="rb3" checked={selectedCar.oil_level === 2} /></center>
+                                    </div>
+                                </div>
+                                <div className="p-grid">
+                                    <div className="p-col">
+                                        <center><Checkbox  inputId="rb4"  checked={selectedCar.gas_level === 1}/></center>
+                                    </div>
+                                    <div className="p-col">
+                                        <center><Checkbox  inputId="rb4"  checked={selectedCar.oil_level === 1}/></center>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Wheel Brace</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox  inputId="rb1"   checked={!selectedCar.wheel_brace}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.wheel_brace}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{ height:'40px'}}><h4>Jack</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.jack}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.jack}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Left Front</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.front_left_wheel} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.front_left_wheel} /></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Right Front</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1" checked={!selectedCar.front_right_wheel} /></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.front_right_wheel}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Left Rear</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.rear_left_wheel}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.rear_left_wheel}/></center>
-                            </div>
-                        </div>
-                        <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                        <div className="p-col widName" style={{height:'40px'}}><h4>Right Rear</h4></div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb1"  checked={!selectedCar.rear_right_wheel}/></center>
-                            </div>
-                            <div className="p-col widCheck">
-                                <center><Checkbox inputId="rb2" checked={selectedCar.rear_right_wheel}/></center>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-
-                <div className="p-col-12 p-lg-12">
-                    <div className="card card-w-title">
-                        <h1>Gas and Oil</h1>
-                        <div className="p-grid">
-                            <div className="p-col">
-                                <center><h4><b>Gas Level</b></h4></center>
-                            </div>
-                            <div className="p-col">
-                                <center><h4><b>Oil Level</b></h4></center>
-                            </div>
-                        </div>
-                        <div className="p-grid">
-                            <div className="p-col">
-                                <center><Checkbox inputId="rb1"  checked={selectedCar.gas_level === 4} /></center>
-                            </div>
-                            <div className="p-col">
-                                <center><Checkbox inputId="rb1"  checked={selectedCar.oil_level === 4} /></center>
-                            </div>
-                        </div>
-                        <div className="p-grid">
-                            <div className="p-col">
-                                <center><Checkbox inputId="rb2"  checked={selectedCar.gas_level === 3}/></center>
-                            </div>
-                            <div className="p-col">
-                                <center><Checkbox  inputId="rb2" checked={selectedCar.oil_level === 3} /></center>
-                            </div>
-                        </div>
-                        <div className="p-grid">
-                            <div className="p-col">
-                                <center><Checkbox  inputId="rb3" checked={selectedCar.gas_level === 2} /></center>
-                            </div>
-                            <div className="p-col">
-                                <center><Checkbox  inputId="rb3" checked={selectedCar.oil_level === 2} /></center>
-                            </div>
-                        </div>
-                        <div className="p-grid">
-                            <div className="p-col">
-                                <center><Checkbox  inputId="rb4"  checked={selectedCar.gas_level === 1}/></center>
-                            </div>
-                            <div className="p-col">
-                                <center><Checkbox  inputId="rb4"  checked={selectedCar.oil_level === 1}/></center>
+                        <div className="p-col-12 p-lg-12 report-checklist">
+                            <div className="card card-w-title">
+                            <h1>Checklist Report</h1>
+                                <div className="p-grid">
+                                    <div className="p-col-12 p-md-8">
+                                        <label>Comments:</label>
+                                        <InputText placeholder="Comments" value={selectedCar.notes}/>
+                                    </div>
+                                    <div className="p-col-12 p-md-8">
+                                        <label>Driver/ Operator:</label>
+                                        <InputText placeholder="Inspected by" value={selectedCar.driver}/>
+                                    </div>
+                                    <div className="p-col-12 p-md-8">
+                                        <label>Date:</label>
+                                        <InputText placeholder="Inspected by" value={selectedCar.date_created}/>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-
-            <div className="card card-w-title">
-                <h1>Checklist Report</h1>
-                <div className="p-grid">
-                    <div className="p-col-12 p-md-12">
-                        <label>Comments:</label>
-                        <div className="p-col-12 p-md-12">
-                        <InputText placeholder="Comments" value={selectedCar.notes}/>
-                        </div>
-                    </div>
-                    <div className="p-col-12 p-md-12">
-                        <label>Driver/ Operator:</label>
-                        <div className="p-col-12 p-md-12">
-                        <InputText placeholder="Inspected by" value={selectedCar.driver}/>
-                        </div>
-                    </div>
-                    <div className="p-col-12 p-md-12">
-                        <label>Date:</label>
-                        <div className="p-col-12 p-md-12">
-                        <InputText placeholder="Inspected by" value={selectedCar.date_created}/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </Dialog>
+                </Dialog>
             </div>
         )
 
