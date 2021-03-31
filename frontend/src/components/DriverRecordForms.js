@@ -116,6 +116,16 @@ export default function DriverRecordForms() {
                 });
         }, []);
 
+        useEffect(() => {
+            try{
+                console.log("test",selectedCar )
+                revised();
+            }catch(err){
+                console.log("revised error")
+                console.log(err)
+            }
+        }, [selectedCar]);
+
         // React.useEffect(() => {
         //     console.log(selectedCar)
         //     if (selectedCar) {
@@ -145,7 +155,7 @@ export default function DriverRecordForms() {
         const onClick = (name, position) => {
             if (selected != null) {
                 //console.log(selected.inspection_id);
-                getInspectionData();
+                //getInspectionData();
                 dialogFuncMap[`${name}`](true);
                 if (position) {
                     setPosition(position);
@@ -167,6 +177,254 @@ export default function DriverRecordForms() {
             setEditNotes("");
         }
 
+        const getInspectionData = () => {
+            if (selected != null) {
+                let token = localStorage.getItem("token");
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                };
+                fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
+                .then(response => response.json())
+                .then(data => {
+                    setSelectedCar(data);
+                    setSelectedBody(data.body_no);
+                    onClick('displayBasic');
+                })
+                .catch((error) => {
+                    console.log('error: ');
+                    console.log(error);
+                });
+            } else {
+                console.log("no selected");
+                toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
+            }
+        }
+
+        const getInspectionData2 = () => {
+            if (selected != null) {
+                let token = localStorage.getItem("token");
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                };
+                fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
+                .then(response => response.json())
+                .then(data => {
+                    setSelectedCar(data);
+                    setSelectedBody(data.body_no);
+                    onClick('displayBasic2');
+                })
+                .catch((error) => {
+                    console.log('error: ');
+                    console.log(error);
+                });
+            } else {
+                console.log("no selected");
+                toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
+            }
+        }
+
+        const revised = () => {
+            /* eslint-disable no-unused-expressions */
+            isCleanlinessExterior(selectedCar.cleanliness_exterior)
+            isConditionRust(selectedCar.condition_rust);
+            isDecals(selectedCar.decals);
+            isWindows(selectedCar.windows);
+            isRearDoor(selectedCar.rear_door);
+            isMirror(selectedCar.mirror);
+            isRoofRack(selectedCar.roof_rack);
+            isRearStep(selectedCar.rear_step);
+
+            isSeats(selectedCar.seats);
+            isSeatBelts(selectedCar.seat_belts);
+            isGeneralCondition(selectedCar.general_condition);
+            isVehicleDocuments(selectedCar.vehicle_documents);
+
+            isCleanlinessEngineBay(selectedCar.cleanliness_engine_bay);
+            isWasherFluid(selectedCar.washer_fluid);
+            isCoolantLevel(selectedCar.coolant_level);
+            isBrakeFluidLevel(selectedCar.brake_fluid_level);
+            isPowerSteeringFluid(selectedCar.power_steering_fluid);
+
+            isMainBeam(selectedCar.main_beam);
+            isDippedBeam(selectedCar.dipped_beam);
+            isSideLights(selectedCar.side_lights);
+            isTailLights(selectedCar.tail_lights);
+            isIndicators(selectedCar.indicators);
+            isBreakLights(selectedCar.break_lights);
+            isReverseLights(selectedCar.reverse_lights);
+            isHazardLights(selectedCar.hazard_light);
+            isRearFogLights(selectedCar.rear_fog_lights);
+            isInteriorLights(selectedCar.interior_lights);
+            isScreenWashers(selectedCar.screen_washer);
+            isWiperBlades(selectedCar.wiper_blades);
+            isHorn(selectedCar.horn);
+            isRadio(selectedCar.radio);
+            isFrontFogLights(selectedCar.front_fog_lights);
+            isAirConditioning(selectedCar.air_conditioning);
+
+            isTyres(selectedCar.tyres);
+            isFrontVisual(selectedCar.front_visual);
+            isRearVisual(selectedCar.rear_visual);
+            isSpareVisual(selectedCar.spare_visual);
+            isWheelBrace(selectedCar.wheel_brace);
+            isJack(selectedCar.jack);
+            isFrontLeftWheel(selectedCar.front_left_wheel);
+            isFrontRightWheel(selectedCar.front_right_wheel);
+            isRearLeftWheel(selectedCar.rear_left_wheel);
+            isRearRightWheel(selectedCar.rear_right_wheel);
+
+            isGasLevel(selectedCar.gas_level);
+            isOilLevel(selectedCar.oil_level);
+
+            isNotes(selectedCar.notes);
+            console.log("revised")
+            if (selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) { 
+                isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); 
+                onCheckboxChange(selectedCar.revised.cleanliness_exterior, 'cb0'); 
+            } else {
+
+            }
+            if (selectedCar.revised.condition_rust !== selectedCar.condition_rust) { 
+                isConditionRust(selectedCar.revised.condition_rust); 
+                onCheckboxChange(selectedCar.revised.condition_rust, 'cb1');
+            } else {
+                
+            }
+            // if (selectedCar.revised.decals !== selectedCar.decals) { isDecals(selectedCar.revised.decals); onCheckboxChange(selectedCar.revised.decals, "cb2"); }
+            // if (selectedCar.revised.windows !== selectedCar.windows) { isWindows(selectedCar.revised.windows); onCheckboxChange(selectedCar.revised.windows, "cb3"); }
+            // if (selectedCar.revised.rear_door !== selectedCar.rear_door) { isRearDoor(selectedCar.revised.rear_door); onCheckboxChange(selectedCar.revised.rear_door, "cb4"); }
+            // if (selectedCar.revised.mirror !== selectedCar.mirror) { isMirror(selectedCar.revised.mirror); onCheckboxChange(selectedCar.revised.mirror, "cb5"); }
+            // if (selectedCar.revised.roof_rack !== selectedCar.roof_rack) { isRoofRack(selectedCar.revised.roof_rack); onCheckboxChange(selectedCar.revised.roof_rack, "cb6"); }
+            // if (selectedCar.revised.rear_step !== selectedCar.rear_step) { isRearStep(selectedCar.revised.rear_step); onCheckboxChange(selectedCar.revised.rear_step, "cb7"); }
+            
+            // if (selectedCar.revised.seats !== selectedCar.seats) { isSeats(selectedCar.revised.seats); onCheckboxChange(selectedCar.revised.seats, "cb8"); }
+            // if (selectedCar.revised.seat_belts !== selectedCar.seat_belts) { isSeatBelts(selectedCar.revised.seat_belts); onCheckboxChange(selectedCar.revised.seat_belts, "cb9"); }
+            // if (selectedCar.revised.general_condition !== selectedCar.general_condition) { isGeneralCondition(selectedCar.revised.general_condition); onCheckboxChange(selectedCar.revised.general_condition, "cb10"); }
+            // if (selectedCar.revised.vehicle_documents !== selectedCar.vehicle_documents) { isVehicleDocuments(selectedCar.revised.vehicle_documents); onCheckboxChange(selectedCar.revised.vehicle_documents, "cb11"); }
+            
+            // if (selectedCar.revised.cleanliness_engine_bay !== selectedCar.cleanliness_engine_bay) { isCleanlinessEngineBay(selectedCar.revised.cleanliness_engine_bay); onCheckboxChange(selectedCar.revised.cleanliness_engine_bay, "cb12"); }
+            // if (selectedCar.revised.washer_fluid !== selectedCar.washer_fluid) { isWasherFluid(selectedCar.revised.washer_fluid); onCheckboxChange(selectedCar.revised.washer_fluid, "cb13"); }
+            // if (selectedCar.revised.coolant_level !== selectedCar.coolant_level) { isCoolantLevel(selectedCar.revised.coolant_level); onCheckboxChange(selectedCar.revised.coolant_level, "cb14"); }
+            // if (selectedCar.revised.brake_fluid_level !== selectedCar.brake_fluid_level) { isBrakeFluidLevel(selectedCar.revised.brake_fluid_level); onCheckboxChange(selectedCar.revised.brake_fluid_level, "cb15"); }
+            // if (selectedCar.revised.power_steering_fluid !== selectedCar.power_steering_fluid) { isPowerSteeringFluid(selectedCar.revised.power_steering_fluid); onCheckboxChange(selectedCar.revised.power_steering_fluid, "cb16"); }
+            
+            // if (selectedCar.revised.main_beam !== selectedCar.main_beam) { isMainBeam(selectedCar.revised.main_beam); onCheckboxChange(selectedCar.revised.main_beam, "cb17"); }
+            // if (selectedCar.revised.dipped_beam !== selectedCar.dipped_beam) { isDippedBeam(selectedCar.revised.dipped_beam); onCheckboxChange(selectedCar.revised.dipped_beam, "cb18"); }
+            // if (selectedCar.revised.side_lights !== selectedCar.side_lights) { isSideLights(selectedCar.revised.side_lights); onCheckboxChange(selectedCar.revised.side_lights, "cb19"); }
+            // if (selectedCar.revised.tail_lights !== selectedCar.tail_lights) { isTailLights(selectedCar.revised.tail_lights); onCheckboxChange(selectedCar.revised.tail_lights, "cb20"); }
+            // if (selectedCar.revised.indicators !== selectedCar.indicators) { isIndicators(selectedCar.revised.indicators); onCheckboxChange(selectedCar.revised.indicators, "cb21"); }
+            // if (selectedCar.revised.break_lights !== selectedCar.break_lights) { isBreakLights(selectedCar.revised.break_lights); onCheckboxChange(selectedCar.revised.break_lights, "cb22"); }
+            // if (selectedCar.revised.reverse_lights !== selectedCar.reverse_lights) { isReverseLights(selectedCar.revised.reverse_lights); onCheckboxChange(selectedCar.revised.reverse_lights, "cb23"); }
+            // if (selectedCar.revised.hazard_light !== selectedCar.hazard_light) { isHazardLights(selectedCar.revised.hazard_light); onCheckboxChange(selectedCar.revised.hazard_light, "cb24"); }
+            // if (selectedCar.revised.rear_fog_lights !== selectedCar.rear_fog_lights) { isRearFogLights(selectedCar.revised.rear_fog_lights); onCheckboxChange(selectedCar.revised.rear_fog_lights, "cb25"); }
+            // if (selectedCar.revised.interior_lights !== selectedCar.interior_lights) { isInteriorLights(selectedCar.revised.interior_lights); onCheckboxChange(selectedCar.revised.interior_lights, "cb26"); }
+            // if (selectedCar.revised.screen_washer !== selectedCar.screen_washer) { isScreenWashers(selectedCar.revised.screen_washer); onCheckboxChange(selectedCar.revised.screen_washer, "cb27"); }
+            // if (selectedCar.revised.wiper_blades !== selectedCar.wiper_blades) { isWiperBlades(selectedCar.revised.wiper_blades); onCheckboxChange(selectedCar.revised.wiper_blades, "cb28"); }
+            // if (selectedCar.revised.horn !== selectedCar.horn) { isHorn(selectedCar.revised.horn); onCheckboxChange(selectedCar.revised.horn, "cb29"); }
+            // if (selectedCar.revised.radio !== selectedCar.radio) { isRadio(selectedCar.revised.radio); onCheckboxChange(selectedCar.revised.radio, "cb30"); }
+            // if (selectedCar.revised.front_fog_lights !== selectedCar.front_fog_lights) { isFrontFogLights(selectedCar.revised.front_fog_lights); onCheckboxChange(selectedCar.revised.front_fog_lights, "cb31"); }
+            // if (selectedCar.revised.air_conditioning !== selectedCar.air_conditioning) { isAirConditioning(selectedCar.revised.air_conditioning); onCheckboxChange(selectedCar.revised.air_conditioning, "cb32"); }
+            
+            // if (selectedCar.revised.tyres !== selectedCar.tyres) { isTyres(selectedCar.revised.tyres); onCheckboxChange(selectedCar.revised.tyres, "cb33"); }
+            // if (selectedCar.revised.front_visual !== selectedCar.front_visual) { isFrontVisual(selectedCar.revised.front_visual); onCheckboxChange(selectedCar.revised.front_visual, "cb34"); }
+            // if (selectedCar.revised.rear_visual !== selectedCar.rear_visual) { isRearVisual(selectedCar.revised.rear_visual); onCheckboxChange(selectedCar.revised.rear_visual, "cb35"); }
+            // if (selectedCar.revised.spare_visual !== selectedCar.spare_visual) { isSpareVisual(selectedCar.revised.spare_visual); onCheckboxChange(selectedCar.revised.spare_visual, "cb36"); }
+            // if (selectedCar.revised.wheel_brace !== selectedCar.wheel_brace) { isWheelBrace(selectedCar.revised.wheel_brace); onCheckboxChange(selectedCar.revised.wheel_brace, "cb37"); }
+            // if (selectedCar.revised.jack !== selectedCar.jack) { isJack(selectedCar.revised.jack); onCheckboxChange(selectedCar.revised.jack, "cb38"); }
+            // if (selectedCar.revised.front_left_wheel !== selectedCar.front_left_wheel) { isFrontLeftWheel(selectedCar.revised.front_left_wheel); onCheckboxChange(selectedCar.revised.front_left_wheel, "cb39"); }
+            // if (selectedCar.revised.front_right_wheel !== selectedCar.front_right_wheel) { isFrontRightWheel(selectedCar.revised.front_right_wheel); onCheckboxChange(selectedCar.revised.front_right_wheel, "cb40"); }
+            // if (selectedCar.revised.rear_left_wheel !== selectedCar.rear_left_wheel) { isRearLeftWheel(selectedCar.revised.rear_left_wheel); onCheckboxChange(selectedCar.revised.rear_left_wheel, "cb41"); }
+            // if (selectedCar.revised.rear_right_wheel !== selectedCar.rear_right_wheel) { isRearRightWheel(selectedCar.revised.rear_right_wheel); onCheckboxChange(selectedCar.revised.rear_right_wheel, "cb42"); }
+            
+            selectedCar.revised.gas_level ? (isOilLevel(selectedCar.revised.gas_level), onCheckboxChange(selectedCar.revised.gas_level, "g"+selectedCar.revised.gas_level)) : '';
+            console.log(gasLevel);
+            selectedCar.revised.oil_level ? (isOilLevel(selectedCar.revised.oil_level), onCheckboxChange(selectedCar.revised.oil_level, "o"+selectedCar.revised.oil_level)) : '';
+            selectedCar.revised.notes ? (isNotes(selectedCar.revised.notes), onCheckboxChange(selectedCar.revised.notes, "n")) : '';
+            
+        }
+
+        const submitData = () => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            axios.put(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/", {
+                //car: this.state.bn.car_id,
+                body_no: selectedBody.body_no,
+                make: selectedBody.make,
+                mileage: selectedCar.mileage,
+                location: selectedBody.current_loc,
+                cleanliness_exterior: cleanlinessExterior,
+                condition_rust: conditionRust,
+                decals: decals,
+                windows: windows,
+                rear_door: rearDoor,
+                mirror: mirror,
+                roof_rack: roofRack,
+                rear_step: rearStep,
+                seats: seats,
+                seat_belts: seatBelts,
+                general_condition: generalCondition,
+                vehicle_documents: vehicleDocuments,
+                main_beam: mainBeam,
+                dipped_beam: dippedBeam,
+                side_lights: sideLights,
+                tail_lights: tailLights,
+                indicators: indicators,
+                break_lights: breakLights,
+                reverse_lights: reverseLights,
+                hazard_light: hazardLights,
+                rear_fog_lights: rearFogLights,
+                interior_lights: interiorLights,
+                screen_washer: screenWasher,
+                wiper_blades: wiperBlades,
+                horn: horn,
+                radio: radio,
+                front_fog_lights: frontFogLights,
+                air_conditioning: airConditioning,
+                cleanliness_engine_bay: cleanlinessEngineBay,
+                washer_fluid: washerFluid,
+                coolant_level: coolantLevel,
+                brake_fluid_level: brakeFluidLevel,
+                power_steering_fluid: powerSteeringFluid,
+                gas_level: gasLevel,
+                oil_level: oilLevel,
+                tyres: tyres,
+                front_visual: frontVisual,
+                rear_visual: rearVisual,
+                spare_visual: spareVisual,
+                wheel_brace: wheelBrace,
+                jack: jack,
+                front_right_wheel: frontRightWheel,
+                front_left_wheel: frontLeftWheel,
+                rear_right_wheel: rearRightWheel,
+                rear_left_wheel: rearLeftWheel,
+                notes: notes,
+                driver: selectedCar.driver,
+              }, config)
+              .then((res) => {
+                toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});
+                //refreshPage();
+                //onHide('displayBasic');
+                onClick('displayBasic');
+                console.log("Changes saved.");
+              })
+              .catch((err) => {
+                console.log(err.response);
+               toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 5000});
+              })
+    
+        }
+
         const updateNotOkay = (index, value) => {
             const copy = notOkay.slice(); //copy the array
             copy[index] = value;
@@ -176,6 +434,7 @@ export default function DriverRecordForms() {
             const copy = okay.slice(); //copy the array
             copy[index] = value;
             setOkay(copy);
+            // revised();
             //console.log(notOkay); console.log(okay); 
         }
         
@@ -193,7 +452,7 @@ export default function DriverRecordForms() {
                         console.log("same0");
                         updateNotOkay(0,"none"); updateOkay(0,"none");
                     }
-                    break;
+                    //break;
                 case 'cb1':
                     isConditionRust(value);
                     if (selectedCar.condition_rust !== value){
@@ -684,83 +943,13 @@ export default function DriverRecordForms() {
                         setEditNotes("");
                     }
                     break;
-                default:
-                    break;
+                // default:
+                //     break;
 
             }
         }
 
-        const getInspectionData = () => {
-            let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
-            .then(response => response.json())
-            .then(data => {
-                setSelectedCar(data);
-                setSelectedBody(data.body_no);
-                isCleanlinessExterior(data.cleanliness_exterior)
-                isConditionRust(data.condition_rust);
-                isDecals(data.decals);
-                isWindows(data.windows);
-                isRearDoor(data.rear_door);
-                isMirror(data.mirror);
-                isRoofRack(data.roof_rack);
-                isRearStep(data.rear_step);
-                isSeats(data.seats);
-                isSeatBelts(data.seat_belts);
-                isGeneralCondition(data.general_condition);
-                isVehicleDocuments(data.vehicle_documents);
-                isCleanlinessEngineBay(data.cleanliness_engine_bay);
-                isWasherFluid(data.washer_fluid);
-                isCoolantLevel(data.coolant_level);
-                isBrakeFluidLevel(data.brake_fluid_level);
-                isPowerSteeringFluid(data.power_steering_fluid);
-                isMainBeam(data.main_beam);
-                isDippedBeam(data.dipped_beam);
-                isSideLights(data.side_lights);
-                isTailLights(data.tail_lights);
-                isIndicators(data.indicators);
-                isBreakLights(data.break_lights);
-                isReverseLights(data.reverse_lights);
-                isHazardLights(data.hazard_light);
-                isRearFogLights(data.rear_fog_lights);
-                isInteriorLights(data.interior_lights);
-                isScreenWashers(data.screen_washer);
-                isWiperBlades(data.wiper_blades);
-                isHorn(data.horn);
-                isRadio(data.radio);
-                isFrontFogLights(data.front_fog_lights);
-                isAirConditioning(data.air_conditioning);
-                isTyres(data.tyres);
-                isFrontVisual(data.front_visual);
-                isRearVisual(data.rear_visual);
-                isSpareVisual(data.spare_visual);
-                isWheelBrace(data.wheel_brace);
-                isJack(data.jack);
-                isFrontLeftWheel(data.front_left_wheel);
-                isFrontRightWheel(data.front_right_wheel);
-                isRearLeftWheel(data.rear_left_wheel);
-                isRearRightWheel(data.rear_right_wheel);
-
-                isGasLevel(data.gas_level);
-                isOilLevel(data.oil_level);
-
-                isNotes(data.notes);
-
-                console.log(data);
-            })
-            .catch((error) => {
-                console.log('error: ');
-                console.log(error);
-            });
-        }
-
-         const submitSearch = () => {
+        const submitSearch = () => {
             console.log(selectedLocation);
             let token = localStorage.getItem("token");
                 const config = {
@@ -769,7 +958,6 @@ export default function DriverRecordForms() {
                         'Authorization': 'Bearer ' + token,
                     },
                 };
-            //console.log(selectedLocation.code);
             if(date2 === null && selectedLocation === null){
                 axios.get(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/', config)
                 .then(response => response.json())
@@ -784,9 +972,7 @@ export default function DriverRecordForms() {
                     setcarValues(data);
                 });
             }
-
             else if (date2 === null && selectedLocation !== null){
-
                 fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?body_no__current_loc=' + selectedLocation.code, config)
                 .then(response => response.json())
                 .then(data => {
@@ -800,7 +986,7 @@ export default function DriverRecordForms() {
                     setcarValues(data);
                 });
             }
-         }
+        }
 
         const onChangeHandler = (e) => {
             console.log(e.target.value);
@@ -811,9 +997,9 @@ export default function DriverRecordForms() {
         const actionBody = () => {
             return (
                 localStorage.getItem("deleteUsers") === "true" ? <center>
-                <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => onClick('displayBasic')}/> </center>
+                <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData()}/> </center>
                 : <center>
-                <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => onClick('displayBasic2')}/> </center>
+                <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2()}/> </center>
             );
         }
 
@@ -821,11 +1007,17 @@ export default function DriverRecordForms() {
             <div>
                 <Toast ref={toast} />
                 <div className="p-grid">
-                    <div className="p-col-12 p-md-3">
+                    <div className="p-col p-md-3">
+                        <span className="p-input-icon-left">
+                            <i className="pi pi-search" />
+                            <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Body No." />
+                        </span>
+                    </div>
+                    <div className="p-col p-md-3">
                         <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
                         <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon />
                     </div>
-                    <div className="p-col-12 p-md-3">
+                    <div className="p-col p-md-3">
                         <Dropdown value={selectedLocation} options={cities} onChange={(e) => setSelectedLocation(e.value)} optionLabel="name" placeholder="Select a Location" />
                     </div>
                 </div>
@@ -1394,9 +1586,15 @@ export default function DriverRecordForms() {
                                         <label>Date:</label>
                                         <InputText placeholder="Inspected Date" value={selectedCar.date_created} disabled/>
                                     </div>
+                                    <div className="p-col-12 p-md-5"> </div>
+                                    <div className="p-col-12 p-md-3">
+                                        {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}
+                                        <Button label="Save Changes" onClick={submitData}> </Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </Dialog>
             
