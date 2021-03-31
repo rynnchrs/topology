@@ -10,8 +10,8 @@ import { login } from '../actions/auth';
 
 export const Login = (props) => {
 
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('admin');
+    const [password, setPassword] = useState('password');
     const [passwordShown, setPasswordShown] = useState(true);
     
     const propTypes = {
@@ -54,7 +54,7 @@ export const Login = (props) => {
                                 <span className="p-inputgroup-addon">
                                     <i className="pi pi-user"></i>
                                 </span>
-                                <InputText placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
+                                <InputText placeholder="Email or Username or Phone " value={username} onChange={event => setUsername(event.target.value)} />
                             </div>
                         </div>
                     </div>

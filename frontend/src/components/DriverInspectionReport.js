@@ -242,8 +242,9 @@ export class DriverInspectionReport extends Component {
                             </div>
                         </div>
                         <div className="p-grid">
-                            <div className="p-col-12 p-md-6">
+                            <div className="p-col-12 p-md-6 p-inputgroup">
                                 <InputText placeholder="Mileage" value={this.state.mil} onChange={event => this.setState({ mil: event.target.value })}/>
+                                <span className="p-inputgroup-addon">KM.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
                                 <InputText placeholder="Location" value={this.state.bn.current_loc}/>
@@ -793,9 +794,9 @@ export class DriverInspectionReport extends Component {
                             </div>
                             <div className="p-col-12 p-md-12">
                                 <label>Driver/ Operator:</label>
-                                <InputText placeholder="Driver" value={this.state.drivername} onChange={event => this.setState({ drivername: event.target.value })}/>
+                                <InputText placeholder="Driver" value={localStorage.getItem("myfirst")} onChange={event => this.setState({ drivername: event.target.value })} disabled/>
 
-                                </div>
+                            </div>
                             <div className="p-col-12 p-md-9"> </div>
                             <div className="p-col-12 p-md-3">
                                 {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}

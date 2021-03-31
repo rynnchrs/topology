@@ -3,14 +3,14 @@
 @media only screen and (min-width : 770px) and (max-width : 1200px) { 
     .widName {
       min-Width: 260px;
-      //border: 1px solid green;
+      /* border: 1px solid green; */
     } 
   }
 
 @media only screen and (min-width : 501px) and (max-width : 769px) { 
   .widName {
     min-Width: 250px;
-    //border: 1px solid blue;
+    /* border: 1px solid blue; */
   }
 }
 
@@ -21,11 +21,11 @@
   }
   .widName {
     min-Width: 170px;
-    //border: 1px solid red;
+    /* border: 1px solid red; */
   }
   .widCheck {
     min-Width: 30px;
-    //border: 1px solid red;
+    /* border: 1px solid red; */
   }
   .p-checkbox {
     width: 28px;
@@ -38,8 +38,31 @@
   }
 }
 
-
+/* css for driver inspection records checklist  */
 .report-checklist{
+
+  .none .p-checkbox .p-checkbox-box {
+    background-color: none; 
+  }
+  .gray .p-checkbox .p-checkbox-box  {
+    background-color: rgb(177, 176, 176); 
+  }
+  .red .p-checkbox .p-checkbox-box {
+       background-color: rgb(250, 76, 76);
+       border: 1px solid rgb(255, 49, 49);
+       &:hover {
+        background-color: rgb(255, 49, 49);
+       }
+  }
+
+  .red-inputtext {
+    border: 1px solid rgb(255, 49, 49);
+  }
+  .red-inputtext:focus {
+    border: 1px solid rgb(255, 49, 49);
+    box-shadow: 5px rgb(255, 49, 49);
+  }
+
   @media only screen and (min-width : 770px) and (max-width : 1200px) { 
     .widName {
       min-Width: 260px;
@@ -77,4 +100,6 @@
       height: 27px;
     }
   }
+  
 }
+
