@@ -374,11 +374,21 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
 
 
 class InspectionListView(generics.ListAPIView): #list of inspection with filtering
-    queryset = Inspection.objects.all()
+    #queryset = Inspection.objects.all()
     serializer_class = InspectionListSerializer
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
     filterset_fields = ['inspection_id','body_no__body_no', 'date_created', 'body_no__current_loc']
     ordering_fields = ['body_no__body_no', 'date_created', 'inspection_id']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user_permission(user, 'can_edit_inspection_reports'):
+            queryset = Inspection.objects.all()
+        else:
+            queryset = Inspection.objects.filter(driver=user.id)
+        return queryset
+
+
 
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]
