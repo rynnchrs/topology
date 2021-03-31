@@ -60,7 +60,7 @@ const App = () => {
     const sidebarSubMenu2 = [];
     
     //sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
-    sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
+    sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
     //users permission
     if (localStorage.getItem("addUsers") === "true") {
         sidebarSubMenu1.push({ label: 'Register User', icon: 'pi pi-user-plus', to: '/register'});

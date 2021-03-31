@@ -53,18 +53,7 @@ export const MainDashboard = () => {
 
     useEffect(() => {
         getTotalTable();
-        //sorted();
     }, []);
-
-    // const sorted = () => { 
-    //     setTotalTable(
-    //         {name: "Body Key", "wd": rcv.bodyKey_with_date, "nrc": rcv.bodyKey_with_nrc, "nyr": rcv.bodyKey_with_nyr, "na": rcv.bodyKey_with_na, "dnr": rcv.bodyKey_with_dnr},
-    //         {name: "Cigarette Plug", "wd": rcv.cigarettePlug_with_date, "nrc": rcv.cigarettePlug_with_nrc, "nyr": rcv.cigarettePlug_with_nyr, "na": rcv.bodyKey_with_na, "dnr": rcv.bodyKey_with_dnr},
-    //         {name: "Body Key", "wd": rcv.bodyKey_with_date, "nrc": rcv.bodyKey_with_nrc, "nyr": rcv.bodyKey_with_nyr, na: rcv.bodyKey_with_na, dnr: rcv.bodyKey_with_dnr},
-    //     );
-    //     console.log("sorted");
-    //     console.log(totalTable);
-    // }
 
     const getTotalTable = () => {
         let token = localStorage.getItem("token");
@@ -78,14 +67,27 @@ export const MainDashboard = () => {
 
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'api/total/', config)
-            .then((res) => {
+            .then(res => {
                 console.log("total table:");
                 console.log(res.data);
-                setRcv(res.data);
+                const reply = res.data[0];
+                //setRcv([res.data[0]]);
+                setTotalTable([
+                    {name: "Body Key", "wd": reply.bodyKey_with_date, "nrc": reply.bodyKey_with_nrc, "nyr": reply.bodyKey_with_nyr, "na": reply.bodyKey_with_na, "dnr": reply.bodyKey_with_dnr},
+                    {name: "Cigarette Plug", "wd": reply.cigarettePlug_with_date, "nrc": reply.cigarettePlug_with_nrc, "nyr": reply.cigarettePlug_with_nyr, "na": reply.cigarettePlug_with_na, "dnr": reply.cigarettePlug_with_dnr},
+                    {name: "Modified Decals", "wd": reply.decals_with_date, "nrc": reply.decals_with_nrc, "nyr": reply.decals_with_nyr, "na":reply.decals_with_na, "dnr": reply.decals_with_dnr},
+                    {name: "Early Warning Device", "wd": reply.ewd_date_with_date, "nrc": reply.ewd_date_with_nrc, "nyr": reply.ewd_date_with_nyr, "na":reply.ewd_date_with_na, "dnr": reply.ewd_date_with_dnr},
+                    {name: "Fan", "wd": reply.fan_date_with_date, "nrc": reply.fan_date_with_nrc, "nyr": reply.fan_date_with_nyr, "na":reply.fan_date_with_na, "dnr": reply.fan_date_with_dnr},
+                    {name: "Plate No. Delivery", "wd": reply.plate_with_date, "nrc": reply.plate_with_nrc, "nyr": reply.plate_with_nyr, "na":reply.plate_with_na, "dnr": reply.plate_with_dnr},
+                    {name: "Tools", "wd": reply.tools_with_date, "nrc": reply.tools_with_nrc, "nyr": reply.tools_with_nyr, "na":reply.tools_with_na, "dnr": reply.tools_with_dnr},
+                    {name: "Unit Key", "wd": reply.unitKey_with_date, "nrc": reply.unitKey_with_nrc, "nyr": reply.unitKey_with_nyr, "na":reply.unitKey_with_na, "dnr": reply.unitKey_with_dnr},
+                    {name: "User's Manual", "wd": reply.userManual_with_date, "nrc": reply.userManual_with_nrc, "nyr": reply.userManual_with_nyr, "na":reply.userManual_with_na, "dnr": reply.userManual_with_dnr},
+                    {name: "Warranty Booklet", "wd": reply.warrantyBook_with_date, "nrc": reply.warrantyBook_with_nrc, "nyr": reply.warrantyBook_with_nyr, "na":reply.warrantyBook_with_na, "dnr": reply.warrantyBook_with_dnr}
+                ]);
             })
             .catch((err) => {
-                console.log("getusers err:");
-                console.log(err.response);
+                console.log("totaltable err:");
+                console.log(err);
             });
     }
 
@@ -95,18 +97,18 @@ export const MainDashboard = () => {
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 ">
                 <h2>DATA</h2>
                     <div className="datatable-doc-demo">
-                        <DataTable ref={dt} value={datas} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
+                        <DataTable ref={dt} value={totalTable} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                             emptyMessage="No users found.">
-                            <Column field="name" header="Name"></Column>
+                            <Column field="name" header="NAME"></Column>
                             <Column field="wd" header="WITH DATE"></Column>
                             <Column field="nrc" header="NOT YET RELEASED"></Column>
                             <Column field="nyr" header="NO RECEIVING COPY"></Column>
-                            {/* <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column> */}
+                            <Column field="na" header="N/A"></Column>
+                            <Column field="dnr" header="DID NOT RECEIVE"></Column>
                         </DataTable>
                     </div>
                 </div>
             </div>
-                
                 
             <div className="p-col-12">
                 <div className="p-col-12 p-lg-8 p-md-8 p-sm-8">
