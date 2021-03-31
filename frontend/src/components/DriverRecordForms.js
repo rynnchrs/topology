@@ -48,7 +48,7 @@ export default function DriverRecordForms() {
         const toast = useRef(null);
 
         //const [cloneSelectedCar, setCloneSelectedCar] = useState([]);
-        const [mileage, setMileage] = useState("");
+        const [mil, setMileage] = useState("");
 
         const [cleanlinessExterior, isCleanlinessExterior] = useState(false);
         const [conditionRust, isConditionRust] = useState(false);
@@ -298,7 +298,7 @@ export default function DriverRecordForms() {
             isNotes(selectedCar.notes);
             console.log("revised")
             console.log(selectedCar.revised.mileage)
-            selectedCar.revised.mileage ? (setMileage(selectedCar.revised.mileage), onCheckboxChange(selectedCar.revised.mileage, "mileage")) : '';
+            selectedCar.revised.mileage ? (setMileage(selectedCar.revised.mileage), onCheckboxChange(selectedCar.revised.mileage, "mil")) : '';
             if (typeof(selectedCar.revised.cleanliness_exterior) !== 'undefined' && selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) {  isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); onCheckboxChange(selectedCar.revised.cleanliness_exterior, "cb0"); } 
             if (typeof(selectedCar.revised.condition_rust) !== 'undefined' && selectedCar.revised.condition_rust !== selectedCar.condition_rust) { isConditionRust(selectedCar.revised.condition_rust); onCheckboxChange(selectedCar.revised.condition_rust, 'cb1'); }
             if (typeof(selectedCar.revised.decals) !== 'undefined' && selectedCar.revised.decals !== selectedCar.decals) { isDecals(selectedCar.revised.decals); onCheckboxChange(selectedCar.revised.decals, "cb2"); }
@@ -365,7 +365,7 @@ export default function DriverRecordForms() {
                 //car: this.state.bn.car_id,
                 body_no: selectedBody.body_no,
                 make: selectedBody.make,
-                mileage: mileage,
+                mileage: mil,
                 location: selectedBody.current_loc,
                 cleanliness_exterior: cleanlinessExterior,
                 condition_rust: conditionRust,
@@ -941,9 +941,9 @@ export default function DriverRecordForms() {
                         setEditNotes("");
                     }
                     break;
-                case 'mileage':
+                case 'mil':
                     setMileage(value);
-                    if (selectedCar.notes !== value){
+                    if (selectedCar.mileage !== parseInt(value)){
                         setSmallMileage("Previous Mileage: " + selectedCar.mileage);
                         setEditMileage("red-inputtext");
                     } else {
@@ -1055,10 +1055,13 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-grid">
                                     <div className="p-col-12 p-md-6">
-                                        <label htmlFor="mileage">Mileage:</label>
-                                        <InputText id="mileage" className={editMileage} value={mileage}
+                                        <label>Mileage:</label>
+                                        <InputText id="mil" className={editMileage} placeholder="Mileage" value={mil}
                                         onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
                                         <small className="p-invalid p-d-block">{smallMileage}</small>
+                                        {/* <InputText id="n" className={editNotes} placeholder="Comments" value={notes} 
+                                         onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
+                                         <small className="p-invalid p-d-block">{smallNotes}</small> */}
                                     </div>
                                     <div className="p-col-12 p-md-6">
                                         <label htmlFor="location">Location:</label>
