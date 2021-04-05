@@ -60,13 +60,14 @@ class RegisterView(generics.GenericAPIView):  # for register user
 
 
 class BlacklistTokenView(APIView):      # for Logout
+    permission_classes = [IsAuthenticated]
     def post(self, request):    
         try:       
             refresh_token = request.data.get("refresh_token")   
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response(status=status.HTTP_200_OK) 
-        except Exception as e:  
+        except:  
             return Response(status=status.HTTP_400_BAD_REQUEST) 
 
 class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, update, delete
@@ -126,7 +127,8 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
 
 
 class UserListView(generics.ListAPIView):
-    queryset = Permission.objects.all()
+    permission_classes = [IsAuthenticated]
+    queryset = Permission.objects.all().order_by('id')
     serializer_class = UserListSerializer            
     filter_backends = [DjangoFilterBackend]
     filterset_fields  = ['can_view_users','can_add_users','can_edit_users','can_delete_users',
@@ -288,7 +290,7 @@ class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance 
     serializer_class = UserSerializer
     def list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_view_users'): # permission
+        if user_permission(user, 'can_add_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_maintenance_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
@@ -301,7 +303,7 @@ class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection re
     serializer_class = UserSerializer
     def list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_view_users'): # permission
+        if user_permission(user, 'can_add_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_inspection_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
@@ -374,7 +376,8 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
 
 
 class InspectionListView(generics.ListAPIView): #list of inspection with filtering
-    #queryset = Inspection.objects.all()
+    permission_classes = [IsAuthenticated]
+    # queryset = Inspection.objects.all().order_by('inpsection_id')
     serializer_class = InspectionListSerializer
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
     filterset_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
@@ -383,9 +386,9 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
     def get_queryset(self):
         user = self.request.user
         if user_permission(user, 'can_edit_inspection_reports'):
-            queryset = Inspection.objects.all()
+            queryset = Inspection.objects.all().order_by('inspection_id')
         else:
-            queryset = Inspection.objects.filter(driver=user.id)
+            queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
         return queryset
 
 
@@ -443,7 +446,8 @@ class MaintenanceView(viewsets.ViewSet):  # inspection report Form
 
 
 class MaintenanceListView(generics.ListAPIView): #list of inspection with filtering
-    queryset = Maintenance.objects.all()
+    permission_classes = [IsAuthenticated]
+    queryset = Maintenance.objects.all().order_by('maintenance_id')
     serializer_class = MaintenanceListSerializer       
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
     filterset_fields = ['maintenance_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
@@ -451,6 +455,7 @@ class MaintenanceListView(generics.ListAPIView): #list of inspection with filter
 
 
 class CarView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
@@ -459,13 +464,15 @@ class CarView(viewsets.ModelViewSet):  # add this
 
 
 class CarListView(generics.ListAPIView):  #list of all car with filtering
-    queryset = Car.objects.all()  # add this
+    permission_classes = [IsAuthenticated]
+    queryset = Car.objects.all().order_by('car_id')  # add this
     serializer_class = CarInfoSerializer  # add this
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['body_no', 'plate_no', 'vin_no','make','current_loc']
 
 
 class SearchInventoryView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         value = request.query_params.get('search_field', None)
@@ -475,24 +482,28 @@ class SearchInventoryView(viewsets.ViewSet):
 
 
 class ContractView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
     queryset = Contract.objects.all()  # add this
     serializer_class = ContractSerializer  # add this
     lookup_field = 'slug'
 
 
 class TPLView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
     queryset = TPL.objects.all()  # add this
     serializer_class = TPLSerializer  # add this
     lookup_field = 'slug'
 
 
 class InsuranceView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
     queryset = Insurance.objects.all()  # add this
     serializer_class = InsuranceSerializer  # add this
     lookup_field = 'slug'
     
 
 class InsuranceList(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = InsuranceSerializer
 
     def get_queryset(self):
@@ -501,6 +512,7 @@ class InsuranceList(generics.ListAPIView):
 
 
 class RepairView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
     queryset = Repair.objects.all()  # add this
     serializer_class = RepairSerializer  # add this
     search_fields = ['vin_no__vin_no','date_created']
@@ -513,11 +525,13 @@ class RepairView(viewsets.ModelViewSet):  # add this
 
 
 class TotalView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = TotalCarSerializer
     queryset = Car.objects.all().order_by('date_created')[:1]
 
 
 class ExpiryView(APIView): # expiry 
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         year = request.data.get('year')
         print(year)
