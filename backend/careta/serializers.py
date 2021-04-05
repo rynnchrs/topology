@@ -247,7 +247,7 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
                     'interior_lights','screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning','cleanliness_engine_bay',
                     'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','gas_level','oil_level','tyres','front_visual',
                     'rear_visual','spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel','driver',
-                    'notes','status','date_updated','date_created']#,'images']
+                    'notes','date_updated','date_created']#,'images']
 
     def validate(self, obj): # validate if vin_no input is vin_no
         errors = []
@@ -263,6 +263,11 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
             raise serializers.ValidationError({'errors':errors})
         return obj
 
+    def update(self, instance, validated_data):
+        validated_data.pop('body_no', None)  # prevent myfield from being updated
+        validated_data.pop('driver', None)  # prevent driver from being updated
+        return super().update(instance, validated_data)
+
     def create(self, validated_data):       # Creating report
         # images_data = validated_data.pop('images')
         report = Inspection.objects.create(**validated_data)
@@ -276,12 +281,13 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
 
 
 class InspectionListSerializer(serializers.ModelSerializer): # list of all Inspection
+    vin_no = serializers.CharField(source='body_no.vin_no')
     body_no = serializers.CharField(source='body_no.body_no')
     current_loc = serializers.CharField(source='body_no.current_loc')
 
     class Meta:
         model = Inspection
-        fields = [  'inspection_id','body_no','date_created', 'current_loc']
+        fields = [  'inspection_id','body_no','vin_no','date_created', 'current_loc']
 
 
 class MaintenanceSerializer(serializers.ModelSerializer): # Maintenance serializer 
@@ -305,15 +311,23 @@ class MaintenanceSerializer(serializers.ModelSerializer): # Maintenance serializ
             raise serializers.ValidationError({'errors':errors})
         return obj
 
+    def update(self, instance, validated_data):
+        validated_data.pop('body_no', None)  # prevent myfield from being updated
+        validated_data.pop('inspected_by', None)  # prevent inspected_by from being updated
+        return super().update(instance, validated_data)
+
     def to_representation(self, instance): # instance of vin_no
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         return super(MaintenanceSerializer, self).to_representation(instance)
 
 class MaintenanceListSerializer(serializers.ModelSerializer): # list of all Maintenance
+    vin_no = serializers.CharField(source='body_no.vin_no')
     body_no = serializers.CharField(source='body_no.body_no')
+    current_loc = serializers.CharField(source='body_no.current_loc')
+
     class Meta:
         model = Maintenance
-        fields = [  'maintenance_id','body_no','date_created']
+        fields = [  'maintenance_id','body_no','vin_no','date_created', 'current_loc']
 
 
 class CostSerializer(serializers.ModelSerializer): # cost info ingeritance

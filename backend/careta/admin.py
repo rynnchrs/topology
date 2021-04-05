@@ -15,7 +15,7 @@ admin.site.register(Car, CarAdmin)  # add this
 admin.site.register(UserInfo, UserInfoAdmin)  # add this
 admin.site.register(Permission)  # add this
 admin.site.register(Inspection, VersionAdmin) 
-admin.site.register(Maintenance) 
+admin.site.register(Maintenance,VersionAdmin) 
 admin.site.register(TPL) 
 admin.site.register(Insurance) 
 admin.site.register(Version)
