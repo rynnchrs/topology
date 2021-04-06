@@ -14,7 +14,7 @@ urlpatterns = [
     path('user-list/', UserListView.as_view(), name='user-list'), # 
     path('inspection-list/', InspectionListView.as_view(), name='inspection-list'), # 
     path('maintenance-list/', MaintenanceListView.as_view(), name='maintenance-list'),
-    path('car-list/', CarListView.as_view(), name='inspection-list'), # 
+    path('car-list/', CarListView.as_view(), name='car-list'), # 
     path('expiry/', ExpiryView.as_view(), name='expiry'),
     path('populate/', Populate.as_view(), name='populate') 
 ]

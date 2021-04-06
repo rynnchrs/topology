@@ -466,14 +466,14 @@ class Inspection(models.Model):
         (3, 3),
         (4, 4)
     ]
-    gas_level = models.IntegerField(choices=Gas_List)
+    gas_level = models.IntegerField(choices=Gas_List, default=1)
     Oil_List = [
         (1, 1),
         (2, 2),
         (3, 3),
         (4, 4)
     ]
-    oil_level = models.IntegerField(choices=Oil_List)
+    oil_level = models.IntegerField(choices=Oil_List, default=1)
     # Wheels and Tyres
     tyres = models.BooleanField(default=False)
     front_visual = models.BooleanField(default=False)
@@ -487,7 +487,6 @@ class Inspection(models.Model):
     rear_left_wheel = models.BooleanField(default=False)
     notes = models.TextField(null=True, blank=True)
     driver = models.ForeignKey(User, related_name='driver', on_delete=models.CASCADE)
-    status = models.BooleanField(default=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
@@ -503,7 +502,7 @@ class InspectiontImage(models.Model):
 class Maintenance(models.Model): #Maintenance model
     maintenance_id = models.AutoField(primary_key=True)
     body_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=50)
+    supplier_name = models.CharField(max_length=50, null=True, blank=True)
     mileage = models.IntegerField(default=0, null=True, blank=True)
     Level_List = [
         (1, "CHECK AND OK"),
@@ -570,13 +569,12 @@ class Maintenance(models.Model): #Maintenance model
     repair_desc = models.TextField(null=True, blank=True)
     comments = models.TextField(null=True, blank=True)
     inspected_by = models.ForeignKey(User, related_name='inspect', on_delete=models.CASCADE)
-    date = models.DateField()
-    status = models.BooleanField(default=True)
+    date = models.DateField(default=datetime.date.today)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.maintenance_id)
+        return self.body_no.body_no
 
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
