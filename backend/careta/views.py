@@ -1,13 +1,12 @@
-from abc import abstractmethod
 import datetime
+from abc import abstractmethod
 
 from django.contrib.auth.models import User  # add this
 from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend  # filter
-from rest_framework import filters, serializers  # add this; filter
-from rest_framework import viewsets  # add this
-from rest_framework import generics, status
+from rest_framework import viewsets  # add this; filter; add this
+from rest_framework import filters, generics, serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response  # add this
 from rest_framework.views import APIView  # add this
@@ -19,10 +18,10 @@ from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
                      Maintenance, Permission, Repair, UserInfo)
 from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
-                          ContractSerializer, InspectionListSerializer,
-                          InspectionSerializer, InsuranceSerializer,
-                          MaintenanceListSerializer, MaintenanceSerializer,
-                          MyTokenObtainPairSerializer,
+                          ContractSerializer, InspectionLastFourListSerializer,
+                          InspectionListSerializer, InspectionSerializer,
+                          InsuranceSerializer, MaintenanceListSerializer,
+                          MaintenanceSerializer, MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
                           PermissionMaintenanceReportSerializer,
@@ -34,7 +33,8 @@ from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           UpdateUserSerializer, UserListSerializer,
                           UserSerializer)
 from .utils import (check_Com_date, check_cr_date, check_or_date,
-                    check_TPL_date, maintenance_reversion, reversion, user_permission)
+                    check_TPL_date, maintenance_reversion, reversion,
+                    user_permission)
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -328,6 +328,12 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]
     serializer_class = InspectionSerializer
 
+    def list(self, request):        # User List
+        user = self.request.user
+        queryset = Inspection.objects.all().filter(driver=user.id).order_by('-inspection_id')[:4]
+        serializer = InspectionLastFourListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)    
+
     def create(self, request): # create report 
         user = self.request.user
         if user_permission(user, 'can_add_inspection_reports'):
@@ -390,7 +396,6 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
         else:
             queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
         return queryset
-
 
 
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
