@@ -155,7 +155,7 @@ class InspectionReportTestCase(APITestCase):
                 "email": "sample@email.com",
                 "first_name": "sample",
                 "last_name": "sample",
-                "password": "sample!23"
+                "password": "sample!23",
             }
     TEST_PERMISSION = {
                 "slug": "sample",
@@ -175,6 +175,7 @@ class InspectionReportTestCase(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
+        UserInfo.objects.create(user=self.user)
         self.client.force_authenticate(self.user) # authenticate user
         self.permission = Permission.objects.create(user = self.user,**self.TEST_PERMISSION) # create permission
         self.car = Car.objects.create(**self.TEST_CAR) # create car
