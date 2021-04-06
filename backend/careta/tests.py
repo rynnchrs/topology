@@ -112,31 +112,42 @@ class InspectionReportTestCase(APITestCase):
             "body_no": "18-1654",  
             "mileage": 10000,  
             "driver": "sample",
+            "edited_by": "",
         } 
     
     TEST_REPORT2 = {  
             "body_no": "18-1654",  
             "mileage": 20000,  
             "driver": "sample",
+            "edited_by": "",
         } 
     TEST_REPORT3 = {  
             "body_no": "18-1654",  
             "mileage": 30000,  
             "driver": "sample",
+            "edited_by": "",
         } 
     INVALID_REPORT1 = {  
             "body_no": "invalid",  
             "driver": "sample",
+            "edited_by": "",
     }  
     INVALID_REPORT2 = {  
             "body_no": "18-1654",  
             "driver": "invalid",
+            "edited_by": "",
     }  
     INVALID_REPORT3 = {  
             "body_no": "18-1654",  
             "gas_level": 5,  
             "oil_level": 5,  
             "driver": "sample",
+            "edited_by": "",
+    }  
+    INVALID_REPORT4 = {  
+            "body_no": "18-1654",  
+            "driver": "sample",
+            "edited_by": "invalid",
     } 
 
     TEST_USER = {
@@ -144,7 +155,7 @@ class InspectionReportTestCase(APITestCase):
                 "email": "sample@email.com",
                 "first_name": "sample",
                 "last_name": "sample",
-                "password": "sample!23"
+                "password": "sample!23",
             }
     TEST_PERMISSION = {
                 "slug": "sample",
@@ -164,6 +175,7 @@ class InspectionReportTestCase(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
+        UserInfo.objects.create(user=self.user)
         self.client.force_authenticate(self.user) # authenticate user
         self.permission = Permission.objects.create(user = self.user,**self.TEST_PERMISSION) # create permission
         self.car = Car.objects.create(**self.TEST_CAR) # create car
@@ -193,9 +205,12 @@ class InspectionReportTestCase(APITestCase):
         response2 = self.client.post('/api/inspection/', self.INVALID_REPORT2, format='json')
         #invalid choice fields
         response3 = self.client.post('/api/inspection/', self.INVALID_REPORT3, format='json')
+        #invalid edited_by
+        response4 = self.client.post('/api/inspection/', self.INVALID_REPORT4, format='json')
         self.assertEquals(response1.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(response2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(response3.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(response4.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_inspection_report_create_multiple(self): # create multiple inspection report with same body_no
