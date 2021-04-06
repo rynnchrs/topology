@@ -15,7 +15,6 @@ def user_permission(user, permission):
     perm = Permission.objects.get(user__username=user.username) # get users permission
     user = User.objects.get(username=user) 
     result = getattr(perm, permission)
-    print(result)
     if result is True:
         return True
     else:
@@ -26,7 +25,7 @@ def reversion(inspection):
     first = json.loads(str(first.serialized_data).replace('[','').replace(']','')) # convert to json
     latest = Version.objects.get_for_object(inspection)[0] # get the latest version
     latest = json.loads(str(latest.serialized_data).replace('[','').replace(']','')) #convert to json
-
+    
     revised = diff(first['fields'],latest['fields']) # get the updated item only
     first = first['fields'] 
     car = Car.objects.get(pk=first['body_no']) # get car instance
