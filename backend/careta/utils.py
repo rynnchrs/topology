@@ -25,8 +25,12 @@ def reversion(inspection):
     first = json.loads(str(first.serialized_data).replace('[','').replace(']','')) # convert to json
     latest = Version.objects.get_for_object(inspection)[0] # get the latest version
     latest = json.loads(str(latest.serialized_data).replace('[','').replace(']','')) #convert to json
-    
     revised = diff(first['fields'],latest['fields']) # get the updated item only
+    try:
+        user = User.objects.get(pk=revised['edited_by'])
+        revised['edited_by'] = user.user_info.full_name
+    except:
+        pass
     first = first['fields'] 
     car = Car.objects.get(pk=first['body_no']) # get car instance
     driver = User.objects.get(pk=first['driver']) # get driver instance
@@ -41,6 +45,7 @@ def reversion(inspection):
     }
     first.pop('body_no', None) # remove the body_no item in first json
     first.pop('driver', None) # remove the driver item
+    first.pop('edited_by', None)
     old.update(first) # merge first json and latest json
     data = old
     data['driver'] = driver.username

@@ -487,6 +487,7 @@ class Inspection(models.Model):
     rear_left_wheel = models.BooleanField(default=False)
     notes = models.TextField(null=True, blank=True)
     driver = models.ForeignKey(User, related_name='driver', on_delete=models.CASCADE)
+    edited_by = models.ForeignKey(User, related_name='edited_by', on_delete=models.CASCADE, null=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
