@@ -161,40 +161,6 @@ const App = () => {
         }
     }
 
-    const menu = [
-        {
-            label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}
-        },
-        {
-            label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'
-        },
-        {
-            label: 'Parts Info', icon: 'pi pi-fw pi-briefcase',
-                /*items: [
-                    {label: 'Dark', icon: 'pi pi-fw pi-bars',  command: () => this.setState({layoutColorMode: 'dark'}) },
-                    {label: 'Light', icon: 'pi pi-fw pi-bars',  command: () => this.setState({layoutColorMode: 'light'}) }
-                ]*/
-        },
-        {
-             label: 'Reports', icon: 'pi pi-fw pi-file',
-                items: [
-                    { label: 'Driver Inspection Report', icon: 'pi pi-fw pi-file', to: '/driverinspectionreport' },
-                    { label: 'Inspection Report (Careta)', icon: 'pi pi-fw pi-file', to: '/inspectionreport'},
-                    { label: 'Inspection Report (Driver)', icon: 'pi pi-fw pi-file', to: '/forms'},
-                    { label: 'Repair Report', icon: 'pi pi-fw pi-file', to: '/empty'},
-                ]
-        },
-        {
-            label: 'Records', icon: 'pi pi-fw pi-table',
-                items: [
-                    { label: 'Driver Inspection Records', icon: 'pi pi-fw pi-table', to: '/driverrecordforms' },
-                    {label: 'Repair Records', icon: 'pi pi-fw pi-table', to: '/empty'},
-                ]
-        },
-        { label: 'Job Schedule', icon: 'pi pi-fw pi-calendar' },
-        { label: 'Drivers List', icon: 'pi pi-fw pi-users'}
-    ];
-
     const addClass = (element, className) => {
         if (element.classList)
             element.classList.add(className);

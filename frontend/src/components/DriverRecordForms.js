@@ -11,7 +11,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { format, isToday } from 'date-fns';
-import './mycss.scss';
 
 export default function DriverRecordForms() {
         const [selectedCar, setSelectedCar] = useState([]);
@@ -101,15 +100,19 @@ export default function DriverRecordForms() {
         const [gasLevel, isGasLevel] = useState("");
         const [oilLevel, isOilLevel] = useState("");
         const [notes, isNotes] = useState("");
+        const [editor, setEditor] = useState("");
 
         const [notOkay, setNotOkay] = useState(Array(46).fill(""));
         const [okay, setOkay] = useState(Array(46).fill(""));
         const [gas, setGas] = useState(Array(5).fill(""));
         const [oil, setOil] = useState(Array(5).fill(""));
-        const [editNotes, setEditNotes] = useState("");
-        const [smallNotes, setSmallNotes] = useState("");
         const [editMileage, setEditMileage] = useState("");
         const [smallMileage, setSmallMileage] = useState("");
+        const [editNotes, setEditNotes] = useState("");
+        const [smallNotes, setSmallNotes] = useState("");
+        const [editEditor, setEditEditor] = useState("");
+        const [smallEditor, setSmallEditor] = useState("");
+        
 
         React.useEffect(function effectFunction() {
             let token = localStorage.getItem("token");
@@ -183,10 +186,13 @@ export default function DriverRecordForms() {
             setOkay([]);
             setGas([]);
             setOil([]);
-            setSmallNotes("");
-            setEditNotes("");
             setSmallMileage("");
             setEditMileage("");
+            setSmallNotes("");
+            setEditNotes("");
+            setEditEditor("");
+            setSmallEditor("");
+            
         }
 
         const getInspectionData = () => {
@@ -416,15 +422,11 @@ export default function DriverRecordForms() {
                 driver: selectedCar.driver,
               }, config)
               .then((res) => {
-                toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});
-                //refreshPage();
-                //onHide('displayBasic');
-                onClick('displayBasic');
-                console.log("Changes saved.");
+                toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 3000});
               })
               .catch((err) => {
                 console.log(err.response);
-               toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 5000});
+               toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 3000});
               })
     
         }
@@ -438,7 +440,6 @@ export default function DriverRecordForms() {
         
         const onCheckboxChange = (value, id) => {
             /* eslint-disable no-unused-expressions */
-            //console.log(value); console.log(id);
             switch (id) {
                 case 'cb0':
                     console.log("id: cb0");
@@ -949,6 +950,16 @@ export default function DriverRecordForms() {
                     } else {
                         setSmallMileage("");
                         setEditMileage("");
+                    }
+                    break;
+                case 'e':
+                    setEditor(value);
+                    if (selectedCar.mileage !== parseInt(value)){
+                        setSmallEditor("Previous Editor: " + selectedCar.mileage);
+                        setEditEditor("red-inputtext");
+                    } else {
+                        setSmallEditor("");
+                        setEditEditor("");
                     }
                     break;
                 default:
@@ -1597,6 +1608,12 @@ export default function DriverRecordForms() {
                                          <small className="p-invalid p-d-block">{smallNotes}</small>
                                     </div>
                                     <div className="p-col-12 p-md-8">
+                                        <label>Edited by:</label>
+                                        <InputText id="e" className={editNotes} placeholder="Edited by" value={editor} 
+                                         onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
+                                         <small className="p-invalid p-d-block">{smallEditor}</small>
+                                    </div>
+                                    <div className="p-col-12 p-md-8">
                                         <label>Driver/ Operator:</label>
                                         <InputText placeholder="Inspected by" value={selectedCar.driver} disabled/>
                                     </div>
@@ -1607,7 +1624,7 @@ export default function DriverRecordForms() {
                                     <div className="p-col-12 p-md-5"> </div>
                                     <div className="p-col-12 p-md-3">
                                         {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}
-                                        <Button label="Save Changes" onClick={submitData}> </Button>
+                                        <Button label="SAVE CHANGES" onClick={submitData}> </Button>
                                     </div>
                                 </div>
                             </div>
@@ -2158,6 +2175,10 @@ export default function DriverRecordForms() {
                                     <div className="p-col-12 p-md-8">
                                         <label>Comments:</label>
                                         <InputText placeholder="Comments" value={selectedCar.notes}/>
+                                    </div>
+                                    <div className="p-col-12 p-md-8">
+                                        <label>Edited by:</label>
+                                        <InputText placeholder="Edited by" value={selectedCar.driver}/>
                                     </div>
                                     <div className="p-col-12 p-md-8">
                                         <label>Driver/ Operator:</label>

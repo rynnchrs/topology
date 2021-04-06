@@ -27,7 +27,6 @@ export const EditDeleteUser = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    //const password = 'qwerty12345()';
     const genderOptions = [{ name: 'Female', val: 'F' }, { name: 'Male', val: 'M' }];
     const [mygender, setGender] = useState([]);
     const [company, setCompany] = useState('');
@@ -67,7 +66,6 @@ export const EditDeleteUser = () => {
 
     useEffect(() => {
         getUsers();
-        //console.log(users)
     }, []); 
 
     const toggleShow = () => {
@@ -87,10 +85,6 @@ export const EditDeleteUser = () => {
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'api/users/', config)
             .then((res) => {
-                console.log("users:");
-                console.log(res.data);
-                //console.log(res.data.username);
-                //console.log(res.data.length);
                 setUsers(res.data);
             })
             .catch((err) => {
@@ -137,17 +131,13 @@ export const EditDeleteUser = () => {
             let body = "";
             if (password === "") {
                 body = JSON.stringify({ username, email, first_name, last_name, user_info });
-                //console.log('body no pass: ' + body);
             } else {
                 body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
-                //console.log('body w/ pass: ' + body);
             }
                 
             axios
                 .put(process.env.REACT_APP_SERVER_NAME + 'api/users/' + usernames + '/', body, config)
                 .then((res) => {
-                    //console.log("save changes:");
-                    //console.log(res.data);
                     updatePermissionUser();
                 })
                 .catch((err) => {
@@ -284,7 +274,7 @@ export const EditDeleteUser = () => {
             "can_edit_users": check3,
             "can_delete_users": check4
         });
-        //console.log('body: ' + body);
+        
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/user/' + username + '/', body, config)
             .then((res) => {
@@ -302,7 +292,6 @@ export const EditDeleteUser = () => {
     const updatePermissionInventory = event => {
         let token = localStorage.getItem("token");
         //let username = selectedUser.username;
-
         const config = {
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -318,7 +307,7 @@ export const EditDeleteUser = () => {
             "can_edit_inventory": check7,
             "can_delete_inventory": check8
         });
-        //console.log('body: ' + body);
+        
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/inventory/' + username + '/', body, config)
             .then((res) => {
@@ -336,7 +325,6 @@ export const EditDeleteUser = () => {
     const updatePermissionInspectionReport = event => {
         let token = localStorage.getItem("token");
         //let username = selectedUser.username;
-
         const config = {
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -352,7 +340,7 @@ export const EditDeleteUser = () => {
             "can_edit_inspection_reports": check11,
             "can_delete_inspection_reports": check12
         });
-        //console.log('body: ' + body);
+        
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/inspection-report/' + username + '/', body, config)
             .then((res) => {
@@ -370,7 +358,6 @@ export const EditDeleteUser = () => {
     const updatePermissionMaintenanceReport = event => {
         let token = localStorage.getItem("token");
         //let username = selectedUser.username;
-
         const config = {
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -386,7 +373,7 @@ export const EditDeleteUser = () => {
             "can_edit_maintenance_reports": check15,
             "can_delete_maintenance_reports": check16
         });
-        //console.log('body: ' + body);
+        
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/maintenance-report/' + username + '/', body, config)
             .then((res) => {
@@ -404,7 +391,6 @@ export const EditDeleteUser = () => {
     const updatePermissionRepairReport = event => {
         let token = localStorage.getItem("token");
         //let username = selectedUser.username;
-
         const config = {
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -420,7 +406,7 @@ export const EditDeleteUser = () => {
             "can_edit_repair_reports": check19,
             "can_delete_repair_reports": check20
         });
-        //console.log('body: ' + body);
+        
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/repair-report/' + username + '/', body, config)
             .then((res) => {
@@ -438,7 +424,6 @@ export const EditDeleteUser = () => {
     const updatePermissionTask = event => {
         let token = localStorage.getItem("token");
         //let username = selectedUser.username;
-
         const config = {
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -454,7 +439,7 @@ export const EditDeleteUser = () => {
             "can_edit_task": check23,
             "can_delete_task": check24
         });
-        //console.log('body: ' + body);
+        
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/task/' + username + '/', body, config)
             .then((res) => {
@@ -463,9 +448,6 @@ export const EditDeleteUser = () => {
                 toast.current.show({ severity: 'success', summary: 'Save Successfully', detail: 'User details updated.', life: 3000 });
                 getUsers();
                 updateLocalPermission();
-                //setIsChanged(true);
-                //refreshPage()
-
             })
             .catch((err) => {
                 console.log('err permission task: ');
@@ -566,7 +548,6 @@ export const EditDeleteUser = () => {
     //         });
     // }
 
-
     const renderFooter = (name) => {
         return (
             <div>
@@ -629,14 +610,10 @@ export const EditDeleteUser = () => {
                         globalFilter={globalFilter} selectionMode="single" selection={selectedUser} onSelectionChange={e => setSelectedUser(e.value)}
                         paginator rows={10} emptyMessage="No users found.">
                         <Column field="user_info.full_name" header="Name" style={{ paddingLeft: '2%' }}></Column>
-                        {/* <Column field="name" header="Name"></Column> */}
-                        {/* <Column field="email" header="Email"></Column> */}
                         <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column>
                     </DataTable>
                 </Panel>
             </div>
-
-
 
             <Dialog header="Edit Form" visible={displayBasic} style={{  width: '85vw' }} onHide={() => onHide('displayBasic')}>
                 <div className="p-col-12">
@@ -680,7 +657,7 @@ export const EditDeleteUser = () => {
                         <div className="p-grid p-fluid">
                             <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>GENDER:</b></h6>
-                            <Dropdown value={mygender} options={genderOptions} optionLabel="name" placeholder="Select Gender" onChange={event => setGender(event.target.value)} />
+                                <Dropdown value={mygender} options={genderOptions} optionLabel="name" placeholder="Select Gender" onChange={event => setGender(event.target.value)} />
                             </div>
                         </div>
 

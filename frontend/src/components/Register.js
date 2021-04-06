@@ -16,7 +16,6 @@ export const Register = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    //const password = 'qwerty12345()';
     const genderOptions = [{ name: 'Female', val: 'F' }, { name: 'Male', val: 'M' }];
     const [mygender, setGender] = useState([]);
     const [company, setCompany] = useState('');
@@ -93,10 +92,7 @@ export const Register = () => {
             axios
                 .post(process.env.REACT_APP_SERVER_NAME + 'api/register/', body, config)
                 .then((res) => {
-                    //console.log('succ: ');
-                    //console.log(res.data)
                     submitPermission();
-                    //toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
                 })
                 .catch((err) => {
                     console.log('err: ');
@@ -386,7 +382,6 @@ export const Register = () => {
                                     </Fieldset>
                                 </div>
                             </div>
-
                         </Panel>
                     </div>
 

@@ -24,12 +24,8 @@ export const AppProfile = () => {
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
             .then((res) => {
-                //console.log("get users:")
-                //console.log(res.data)
-                //localStorage.setItem('myfirst', res.data.username);
                 localStorage.setItem('myfirst', res.data.user_info.full_name);
                 setUserData(localStorage.getItem("myfirst"))
-                //toast.current.show({ severity: 'success', summary: 'Login Successful', detail: 'You are now log in.', life: 5000 });
             })
             .catch((err) => {
                 console.log("get users err:")
@@ -43,7 +39,6 @@ export const AppProfile = () => {
     }
     
     const logout = () => {
-        //alert("logoout");
         let token = localStorage.getItem("token");
         const refresh_token = token;
 
