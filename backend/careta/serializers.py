@@ -300,6 +300,11 @@ class InspectionListSerializer(serializers.ModelSerializer): # list of all Inspe
         model = Inspection
         fields = [  'inspection_id','body_no','vin_no','date_created', 'current_loc']
 
+class InspectionLastFourListSerializer(serializers.ModelSerializer): # list of all Inspection
+    body_no = serializers.CharField(source='body_no.body_no')
+    class Meta:
+        model = Inspection
+        fields = ['body_no']
 
 class MaintenanceSerializer(serializers.ModelSerializer): # Maintenance serializer 
     body_no = serializers.CharField()

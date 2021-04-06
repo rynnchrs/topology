@@ -48,7 +48,7 @@ def reversion(inspection):
     first.pop('edited_by', None)
     old.update(first) # merge first json and latest json
     data = old
-    data['driver'] = driver.username
+    data['driver'] = driver.user_info.full_name
     data['revised'] = revised
     return data
 
