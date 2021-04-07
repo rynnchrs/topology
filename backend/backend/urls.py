@@ -45,6 +45,8 @@ router.register(r'maintenance', views.MaintenanceView, 'maintenance') #maintenan
 router.register(r'total', views.TotalView, 'total') # total list api
 router.register(r'repair', views.RepairView, 'repair') # repair list api
 
+router.register(r'job-order', views.JobOrderView, 'job-order') # repair list api
+
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),

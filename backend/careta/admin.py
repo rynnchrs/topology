@@ -1,7 +1,7 @@
 # todo/admin.py
 
 from django.contrib import admin
-from .models import Car, Cost, Insurance, Maintenance, Permission, Repair, TPL, UserInfo , Inspection #ReportImage # add this
+from .models import Car, Cost, Fieldman, Insurance, JobOrder, Maintenance, Permission, Repair, TPL, Task, UserInfo , Inspection #ReportImage # add this
 from reversion.admin import VersionAdmin
 from reversion.models import Version
 
@@ -18,6 +18,7 @@ admin.site.register(Inspection, VersionAdmin)
 admin.site.register(Maintenance,VersionAdmin) 
 admin.site.register(TPL) 
 admin.site.register(Insurance) 
+admin.site.register(JobOrder) 
 admin.site.register(Version)
 #class ImageReport(admin.TabularInline):
 #    model = ReportImage
@@ -43,5 +44,14 @@ class RepairAdmin(admin.ModelAdmin):
     search_fields = ['vin_no__vin_no']
     inlines = [CostAdmin]
 
+class FieldmanAdmin(admin.TabularInline):
+    model = Fieldman
+    extra = 1
+
+class TaskAdmin(admin.ModelAdmin):
+    inlines = [FieldmanAdmin]
+
+admin.site.register(Task, TaskAdmin)  
+admin.site.register(Fieldman)  
 admin.site.register(Repair, RepairAdmin)
 admin.site.register(Cost)

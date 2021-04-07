@@ -5,8 +5,8 @@ from django.core import exceptions
 from django.db.models import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import (TPL, Car, Contract, Cost,  # , ReportImage # add this
-                     Inspection, Insurance, Maintenance, Permission, Repair,
+from .models import (JobOrder, TPL, Car, Contract, Cost,  # , ReportImage # add this
+                     Inspection, Insurance, Maintenance, Permission, Repair, Task,
                      UserInfo)
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -345,6 +345,22 @@ class MaintenanceListSerializer(serializers.ModelSerializer): # list of all Main
         model = Maintenance
         fields = [  'maintenance_id','body_no','vin_no','date_created', 'current_loc']
 
+
+class TaskSerializer(serializers.ModelSerializer):
+    body_no = serializers.CharField()
+    class Meta:
+        model= Task
+        fields = ['body_no']
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+        return super(TaskSerializer, self).to_representation(instance)
+
+class JobOrderSerializer(serializers.ModelSerializer): # list of all Maintenance
+    task = TaskSerializer()
+    class Meta:
+        model = JobOrder
+        fields = ['job_id','job_no','task']
 
 class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     class Meta:

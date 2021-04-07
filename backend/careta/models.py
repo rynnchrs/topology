@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models import fields
 from django.db.models.deletion import CASCADE  # add this
 from django.db.models.fields import (AutoField, BooleanField, CharField,
-                                     DateField, DateTimeField)
+                                     DateField, DateTimeField, IntegerField)
 from django.db.models.fields.related import ForeignKey
 from phone_field import PhoneField
 
@@ -500,11 +500,39 @@ class InspectiontImage(models.Model):
    images = models.ImageField(upload_to = 'images/')
 
 
+class JobOrder(models.Model):
+    job_id = models.AutoField(primary_key=True)
+    job_no = models.IntegerField(default=0)
+    type = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.job_id)
+
+
+class Task(models.Model):
+    task_id = models.AutoField(primary_key=True)
+    job_order = models.OneToOneField(JobOrder, related_name='task', on_delete=models.CASCADE)
+    body_no = models.ForeignKey(Car, related_name='task', on_delete=models.CASCADE, default="")
+
+    def __str__(self):
+        return str(self.task_id)
+
+
+class Fieldman(models.Model):
+    fieldman_id = models.AutoField(primary_key=True)
+    task = models.ForeignKey(Task, related_name='fieldman', on_delete=models.CASCADE)
+    field_man = models.ForeignKey(User, related_name='fieldman', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.fieldman_id)
+
+
 class Maintenance(models.Model): #Maintenance model
     maintenance_id = models.AutoField(primary_key=True)
     body_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
     supplier_name = models.CharField(max_length=50, null=True, blank=True)
     mileage = models.IntegerField(default=0, null=True, blank=True)
+    job_order = models.ForeignKey(JobOrder, related_name='maintenance', on_delete=models.CASCADE)
     Level_List = [
         (1, "CHECK AND OK"),
         (2, "MAY REQUIRE ATTENTION"),
@@ -576,6 +604,7 @@ class Maintenance(models.Model): #Maintenance model
 
     def __str__(self):
         return self.body_no.body_no
+
 
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)

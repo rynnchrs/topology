@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend  # filter
 from rest_framework import viewsets  # add this; filter; add this
 from rest_framework import filters, generics, serializers, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response  # add this
 from rest_framework.views import APIView  # add this
@@ -14,13 +15,13 @@ from rest_framework_simplejwt.tokens import RefreshToken  # add this
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reversion.models import Version
 
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
+from .models import (JobOrder, TPL, Car, Contract, Inspection, Insurance,  # add this
                      Maintenance, Permission, Repair, UserInfo)
 from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           ContractSerializer, InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
-                          InsuranceSerializer, MaintenanceListSerializer,
+                          InsuranceSerializer, JobOrderSerializer, MaintenanceListSerializer,
                           MaintenanceSerializer, MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
@@ -407,20 +408,8 @@ class MaintenanceView(viewsets.ViewSet):  # inspection report Form
         if user_permission(user,'can_add_maintenance_reports'):
             serializer = MaintenanceSerializer(data=request.data) 
             if serializer.is_valid(raise_exception=True): 
-                car = request.data.get("body_no")
-                car = Car.objects.get(body_no=car)
-                try:
-                    maintenance = Maintenance.objects.filter(body_no=car.car_id).filter(date_created=datetime.date.today())[0]
-                except:
-                    serializer.save() # add this
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                queryset =  Maintenance.objects.all()
-                maintenance = Maintenance.objects.get(pk=maintenance.pk)
-                reversion = Version.objects.get_for_object(maintenance)
-                reversion.delete()
-                maintenance.delete()
                 serializer.save()
-                return Response(status=status.HTTP_201_CREATED) 
+                return Response(status=status.HTTP_201_CREATED)
             return Response(serializer.errors) 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -457,6 +446,84 @@ class MaintenanceListView(generics.ListAPIView): #list of inspection with filter
     filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
     filterset_fields = ['maintenance_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
     ordering_fields = ['body_no__body_no', 'date_created', 'maintenance_id']
+
+class JobOrderView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = JobOrderSerializer
+
+    @action(detail=False)
+    def maintenance_list(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_view_task'):
+            queryset = JobOrder.objects.all().filter(type=True) # get all True(Maintenance)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def maintenance_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in maintenance table
+            maintenance = Maintenance.objects.values_list('job_order', flat=True)
+            # filter True(Maintenance) and used job order
+            queryset = JobOrder.objects.filter(type=True).filter(job_no__in=maintenance) 
+            # filter the job order with the fieldman = current user 
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def maintenance_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in maintenance table
+            maintenance = Maintenance.objects.all().values_list('job_order', flat=True)
+            # filter True(Maintenance) and remove all used job order
+            queryset = JobOrder.objects.all().filter(type=True).exclude(job_no__in=maintenance)
+            # filter the job order with the fieldman = current user 
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def repair_list(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_view_task'):
+            queryset = JobOrder.objects.all().filter(type=False)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def repair_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            maintenance = Maintenance.objects.values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).filter(job_no__in=maintenance)
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def repair_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            maintenance = Maintenance.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=maintenance)
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CarView(viewsets.ModelViewSet):  # add this
