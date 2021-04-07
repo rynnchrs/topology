@@ -71,6 +71,7 @@ export class DriverInspectionReport extends Component {
             com: "",
             driver: "",
             drivername: "",
+            editor: "",
             time: "",
             date: "",
             bodyno: [],
@@ -138,19 +139,19 @@ export class DriverInspectionReport extends Component {
             fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
-            bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
-                        : item.make === 'SUV' ? 'Super Carry UV'
-                        : item.make ===  'G15'? 'Gratour midi truck 1.5L'
-                        : 'Gratour midi truck 1.2L' }));
+            // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
+            //             : item.make === 'SUV' ? 'Super Carry UV'
+            //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
+            //             : 'Gratour midi truck 1.2L' }));
             this.setState({
                 bodyno: bodyno,
-                carValues: res2
+                carValues: res2.results
             });
         })
     }
 
     showBodyNumberTags () {
-        if (this.state.carValues.length <= 0) {
+        if (this.state.carValues.length <= 4) {
             console.log("recent null");
         } else {
             return <div> 
@@ -299,6 +300,7 @@ export class DriverInspectionReport extends Component {
             rear_left_wheel: this.state.radioValue42,
             notes: this.state.com,
             driver: this.state.driver,
+            edited_by: this.state.editor,
           }, config)
           .then((res) => {
             this.toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});

@@ -10,6 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import { Paginator } from 'primereact/paginator';
 import { format, isToday } from 'date-fns';
 
 export default function DriverRecordForms() {
@@ -112,7 +113,11 @@ export default function DriverRecordForms() {
         const [smallNotes, setSmallNotes] = useState("");
         const [editEditor, setEditEditor] = useState("");
         const [smallEditor, setSmallEditor] = useState("");
-        
+
+        const [first, setFirst] = useState(0);
+        const [rows, setRows] = useState(10);
+        const [flagPages, setFlagPages] = useState(1);
+        const [totalCount, setTotalCount] = useState(1);
 
         React.useEffect(function effectFunction() {
             let token = localStorage.getItem("token");
@@ -125,19 +130,51 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config)
                 .then(response => response.json())
                 .then(data => {
-                    setcarValues(data);
+                    //console.log("fr reactuseeffect")
+                    console.log(data)
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
                 });
         }, []);
 
         useEffect(() => {
-            try{
+            try {
                 console.log("test",selectedCar )
                 revised();
-            }catch(err){
+            } catch(err) {
                 console.log("revised error")
                 console.log(err)
             }
         }, [selectedCar]);
+
+        useEffect(() => {
+            try {
+                console.log("test flagPages: ", flagPages);
+                console.log("firstVariable: ", first);
+
+                const sentPage = (first / rows) + 1;
+                console.log("sentPage: ",sentPage);
+
+                let token = localStorage.getItem("token");
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                };
+                fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("from pages");
+                        console.log(data);
+                        setTotalCount(data.count);
+                        setcarValues(data.results);
+                });
+            } catch(err) {
+                console.log("pages error")
+                console.log(err)
+            }
+        }, [flagPages]);
 
         // React.useEffect(() => {
         //     console.log(selectedCar)
@@ -980,6 +1017,7 @@ export default function DriverRecordForms() {
                 axios.get(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/', config)
                 .then(response => response.json())
                 .then(data => {
+                    //console.log(data)
                     setcarValues(data);
                 });
             }
@@ -1021,6 +1059,20 @@ export default function DriverRecordForms() {
             );
         }
 
+        const onPageChange = (event) =>  {
+            setFirst(event.first);
+            if (event.first > first) {
+                console.log("greater add page");
+                setFlagPages(flagPages + 1);
+            } else if (event.first < first) {
+                console.log("less than minus page");
+                setFlagPages(flagPages - 1);
+            } else {
+                console.log("same first")
+            } 
+            // now look at useEffect at top          
+        }
+
         return(
             <div>
                 <Toast ref={toast} />
@@ -1048,13 +1100,23 @@ export default function DriverRecordForms() {
 
                 {/* <ListBox value={selectedCar} options={carValues} onChange={(e) =>  onChangeHandler(e)} filter optionLabel="body_no"/> */}
 
-                <DataTable ref={dt} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
+                {/* <DataTable ref={dt} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                     globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
                     paginator rows={10} emptyMessage="No users found.">
                     <Column selectionMode="single" style={{width:'3em'}}/>
                     <Column field="body_no" header="Body No." style={{ paddingLeft: '2%' }}></Column>
                     <Column body={actionBody}></Column>
+                </DataTable> */}
+
+                <DataTable ref={dt} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
+                    globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
+                    >
+                    <Column selectionMode="single" style={{width:'3em'}}/>
+                    <Column field="body_no" header="Body No." style={{ paddingLeft: '2%' }}></Column>
+                    <Column body={actionBody}></Column>
                 </DataTable>
+                <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
+                
 
                 <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
                     <div className="p-grid p-fluid">

@@ -8,13 +8,7 @@ import axios from "axios";
 
 export const MainDashboard = () => {
 
-    const [rcv, setRcv] = useState([]);
     const [totalTable, setTotalTable] = useState([]);
-    const [withDate, setWithDate] = useState([]);
-    const [nrc, setNrc] = useState([]);
-    const [nyr, seNyr] = useState([]);
-    const [na, setNa] = useState([]);
-    const [dnr, setDnr] = useState([]);
 
     const [datas, setDatas] = useState([{ name: 'Plate Delivery No.', wd: '184', nyr: '99', nrc: '33' }, 
     { name: 'Modified Decals', wd: '102', nyr: '120', nrc: '45' },
@@ -70,8 +64,7 @@ export const MainDashboard = () => {
             .then(res => {
                 console.log("total table:");
                 console.log(res.data);
-                const reply = res.data[0];
-                //setRcv([res.data[0]]);
+                const reply = res.data.results[0];
                 setTotalTable([
                     {name: "Body Key", "wd": reply.bodyKey_with_date, "nrc": reply.bodyKey_with_nrc, "nyr": reply.bodyKey_with_nyr, "na": reply.bodyKey_with_na, "dnr": reply.bodyKey_with_dnr},
                     {name: "Cigarette Plug", "wd": reply.cigarettePlug_with_date, "nrc": reply.cigarettePlug_with_nrc, "nyr": reply.cigarettePlug_with_nyr, "na": reply.cigarettePlug_with_na, "dnr": reply.cigarettePlug_with_dnr},
