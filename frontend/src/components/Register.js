@@ -16,7 +16,6 @@ export const Register = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    //const password = 'qwerty12345()';
     const genderOptions = [{ name: 'Female', val: 'F' }, { name: 'Male', val: 'M' }];
     const [mygender, setGender] = useState([]);
     const [company, setCompany] = useState('');
@@ -93,10 +92,7 @@ export const Register = () => {
             axios
                 .post(process.env.REACT_APP_SERVER_NAME + 'api/register/', body, config)
                 .then((res) => {
-                    //console.log('succ: ');
-                    //console.log(res.data)
                     submitPermission();
-                    //toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
                 })
                 .catch((err) => {
                     console.log('err: ');
@@ -249,7 +245,7 @@ export const Register = () => {
                             <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>BIRTHDAY:</b></h6>
+                            <h6><b>BIRTHDAY: </b><i>(ex. 1990-12-30)</i></h6>
                             <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
                         </div>
                     </div>
@@ -386,7 +382,6 @@ export const Register = () => {
                                     </Fieldset>
                                 </div>
                             </div>
-
                         </Panel>
                     </div>
 

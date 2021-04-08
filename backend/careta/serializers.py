@@ -238,7 +238,7 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
     #images = InspectionImageSerializer(many=True)
     body_no = serializers.CharField()
-    driver = serializers.CharField()
+    driver = serializers.CharField(required=False, allow_blank=True)
     edited_by = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model = Inspection
@@ -259,7 +259,10 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
         except:
            errors.append({"body_no": 'Invalid Body No.'})
         try:
-            obj['driver'] = User.objects.get(username=obj['driver'])
+            if obj['driver'] == "" or None:
+                pass
+            else:
+                obj['driver'] = User.objects.get(username=obj['driver'])
         except:
             errors.append({"driver": 'Invalid Driver'})
         try:
