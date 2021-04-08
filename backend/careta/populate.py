@@ -1,11 +1,10 @@
 import csv
 import datetime
-from datetime import datetime, date
+from datetime import date, datetime
 
 from django.contrib.auth.models import User  # add this
 
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Permission, Repair, UserInfo)
+from .models import TPL, Car, Insurance, Permission, UserInfo  # add this
 
 
 def datas():

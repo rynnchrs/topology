@@ -20,7 +20,7 @@ from rest_framework import routers                    # add this
 from careta import views                            # add this
 from django.conf.urls.static import static
 from django.conf import settings
-
+from report.views import InspectionView,MaintenanceView
 router = routers.DefaultRouter()                      # add this
 router.register(r'careta', views.CarView, 'careta')     # add this
 router.register(r'careta-contract', views.ContractView, 'careta-contract')     # add this
@@ -40,16 +40,16 @@ router.register(r'permission/add-list/inspection', views.AddInspectionReportView
 router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permission-repair-list')  # list of can add repair report
 router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
 
-router.register(r'inspection', views.InspectionView, 'inspection') # report creation api
-router.register(r'maintenance', views.MaintenanceView, 'maintenance') #maintenance report form api
 router.register(r'total', views.TotalView, 'total') # total list api
-router.register(r'repair', views.RepairView, 'repair') # repair list api
 
 router.register(r'job-order', views.JobOrderView, 'job-order') # repair list api
+router.register(r'inspection', InspectionView, 'inspection'), # report creation api
+router.register(r'maintenance', MaintenanceView, 'maintenance'), #maintenance report form api
 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
     path('api/',  include('careta.urls')), # add this
+    path('api/',  include('report.urls')), # add this
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
