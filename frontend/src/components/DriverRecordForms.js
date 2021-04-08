@@ -14,9 +14,9 @@ import { Paginator } from 'primereact/paginator';
 import { format, isToday } from 'date-fns';
 
 export default function DriverRecordForms() {
-        const [selectedCar, setSelectedCar] = useState([]);
+        const [selectedCar, setSelectedCar] = useState(['']);
         //const [selectedBody, setSelectedBody] = useState(['']);
-        const [selectedBody, setSelectedBody] = useState([]);
+        const [selectedBody, setSelectedBody] = useState(['']);
         const [carValues, setcarValues] = useState([]);
         const [displayBasic, setDisplayBasic] = useState(false);
         const [displayBasic2, setDisplayBasic2] = useState(false);
@@ -41,6 +41,8 @@ export default function DriverRecordForms() {
         { name: 'Bataan', code: 'Bataan' },
         { name: 'Zambales', code: 'Zambales' },
         ];
+
+        const [makes, setMakes] = useState("");
 
         const [selected, setSelected] = useState(null);
         const [globalFilter, setGlobalFilter] = useState(null);
@@ -111,8 +113,6 @@ export default function DriverRecordForms() {
         const [smallMileage, setSmallMileage] = useState("");
         const [editNotes, setEditNotes] = useState("");
         const [smallNotes, setSmallNotes] = useState("");
-        const [editEditor, setEditEditor] = useState("");
-        const [smallEditor, setSmallEditor] = useState("");
 
         const [first, setFirst] = useState(0);
         const [rows, setRows] = useState(10);
@@ -131,54 +131,31 @@ export default function DriverRecordForms() {
                 .then(response => response.json())
                 .then(data => {
                     //console.log("fr reactuseeffect")
-                    console.log(data)
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
+                    //console.log(data)
+                    //setTotalCount(data.count);
+                    setcarValues(data);
                 });
         }, []);
 
         useEffect(() => {
             try {
-                console.log("test",selectedCar )
+                //console.log("test: ",selectedCar )
                 revised();
             } catch(err) {
-                console.log("revised error")
-                console.log(err)
+                //console.log("revised error")
+                //console.log(err)
             }
         }, [selectedCar]);
 
-        useEffect(() => {
-            try {
-                console.log("test flagPages: ", flagPages);
-                console.log("firstVariable: ", first);
+        //for paginator
+        // useEffect(() => {
+        //     try {
+        //         console.log("test flagPages: ", flagPages);
+        //         console.log("firstVariable: ", first);
 
-                const sentPage = (first / rows) + 1;
-                console.log("sentPage: ",sentPage);
+        //         const sentPage = (first / rows) + 1;
+        //         console.log("sentPage: ",sentPage);
 
-                let token = localStorage.getItem("token");
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token,
-                    },
-                };
-                fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("from pages");
-                        console.log(data);
-                        setTotalCount(data.count);
-                        setcarValues(data.results);
-                });
-            } catch(err) {
-                console.log("pages error")
-                console.log(err)
-            }
-        }, [flagPages]);
-
-        // React.useEffect(() => {
-        //     console.log(selectedCar)
-        //     if (selectedCar) {
         //         let token = localStorage.getItem("token");
         //         const config = {
         //             headers: {
@@ -186,16 +163,19 @@ export default function DriverRecordForms() {
         //                 'Authorization': 'Bearer ' + token,
         //             },
         //         };
-        //         console.log(selectedCar.inspection_id);
-        //         fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selectedCar.inspection_id + "/",config)
+        //         fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
         //             .then(response => response.json())
         //             .then(data => {
-        //                 setSelectedCar(data);
-        //                 setSelectedBody(data.body_no,onClick('displayBasic'));
-                        
-        //             });
+        //                 console.log("from pages");
+        //                 console.log(data);
+        //                 setTotalCount(data.count);
+        //                 setcarValues(data.results);
+        //         });
+        //     } catch(err) {
+        //         console.log("pages error")
+        //         console.log(err)
         //     }
-        // }, [selectedCar.inspection_id]);
+        // }, [flagPages]);
 
         const dialogFuncMap = {
             'displayBasic': setDisplayBasic,
@@ -211,7 +191,7 @@ export default function DriverRecordForms() {
                     setPosition(position);
                 }
             } else {
-                console.log("no selected");
+                //console.log("no selected");
                 toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
             }
         }
@@ -227,9 +207,6 @@ export default function DriverRecordForms() {
             setEditMileage("");
             setSmallNotes("");
             setEditNotes("");
-            setEditEditor("");
-            setSmallEditor("");
-            
         }
 
         const getInspectionData = () => {
@@ -241,13 +218,15 @@ export default function DriverRecordForms() {
                         'Authorization': 'Bearer ' + token,
                     },
                 };
-                fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
-                .then(response => response.json())
-                .then(data => {
-                    setSelectedCar(data);
-                    setSelectedBody(data.body_no);
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
+                //.then(response => response.json())
+                .then((res) => {
+                    setSelectedCar(res.data);
+                    setSelectedBody(res.data.body_no);
+                    setMakes(res.data.body_no.make);
                     onClick('displayBasic');
                 })
+                
                 .catch((error) => {
                     console.log('error: ');
                     console.log(error);
@@ -267,11 +246,12 @@ export default function DriverRecordForms() {
                         'Authorization': 'Bearer ' + token,
                     },
                 };
-                fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
-                .then(response => response.json())
-                .then(data => {
-                    setSelectedCar(data);
-                    setSelectedBody(data.body_no);
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/",config)
+                //.then(response => response.json())
+                .then((res) => {
+                    setSelectedCar(res.data);
+                    setSelectedBody(res.data.body_no);
+                    setMakes(res.data.body_no.make);
                     onClick('displayBasic2');
                 })
                 .catch((error) => {
@@ -279,7 +259,6 @@ export default function DriverRecordForms() {
                     console.log(error);
                 });
             } else {
-                console.log("no selected");
                 toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
             }
         }
@@ -339,8 +318,10 @@ export default function DriverRecordForms() {
             isOilLevel(selectedCar.oil_level);
 
             isNotes(selectedCar.notes);
-            console.log("revised")
-            console.log(selectedCar.revised.mileage)
+            //console.log("revised")
+            //console.log("editor", selectedCar.editor)
+            //console.log("driver", selectedCar.driver)
+            if (typeof(selectedCar.editor) === 'undefined') {setEditor("None");}
             selectedCar.revised.mileage ? (setMileage(selectedCar.revised.mileage), onCheckboxChange(selectedCar.revised.mileage, "mil")) : '';
             if (typeof(selectedCar.revised.cleanliness_exterior) !== 'undefined' && selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) {  isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); onCheckboxChange(selectedCar.revised.cleanliness_exterior, "cb0"); } 
             if (typeof(selectedCar.revised.condition_rust) !== 'undefined' && selectedCar.revised.condition_rust !== selectedCar.condition_rust) { isConditionRust(selectedCar.revised.condition_rust); onCheckboxChange(selectedCar.revised.condition_rust, 'cb1'); }
@@ -393,11 +374,14 @@ export default function DriverRecordForms() {
             selectedCar.revised.gas_level ? (isOilLevel(selectedCar.revised.gas_level), onCheckboxChange(selectedCar.revised.gas_level, "g"+selectedCar.revised.gas_level)) : '';
             selectedCar.revised.oil_level ? (isOilLevel(selectedCar.revised.oil_level), onCheckboxChange(selectedCar.revised.oil_level, "o"+selectedCar.revised.oil_level)) : '';
             selectedCar.revised.notes ? (isNotes(selectedCar.revised.notes), onCheckboxChange(selectedCar.revised.notes, "n")) : '';
+            selectedCar.revised.edited_by ? setEditor(selectedCar.revised.edited_by) : '';
             
         }
 
         const submitData = () => {
             let token = localStorage.getItem("token");
+            let accfullname = localStorage.getItem("username");
+            
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -456,9 +440,12 @@ export default function DriverRecordForms() {
                 rear_right_wheel: rearRightWheel,
                 rear_left_wheel: rearLeftWheel,
                 notes: notes,
-                driver: selectedCar.driver,
+               // driver: selectedCar.driver,
+                driver: "",
+                edited_by: accfullname,
               }, config)
               .then((res) => {
+                getInspectionData();
                 toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 3000});
               })
               .catch((err) => {
@@ -479,13 +466,13 @@ export default function DriverRecordForms() {
             /* eslint-disable no-unused-expressions */
             switch (id) {
                 case 'cb0':
-                    console.log("id: cb0");
+                    //console.log("id: cb0");
                     isCleanlinessExterior(value);
                     if (selectedCar.cleanliness_exterior !== value){
-                        console.log("edit0");
+                        //console.log("edit0");
                         value ? (updateNotOkay(0,"gray"),  updateOkay(0,"red")) : (updateNotOkay(0,"red"),  updateOkay(0,"gray"));
                     } else {
-                        console.log("same0");
+                        //console.log("same0");
                         updateNotOkay(0,"none"); updateOkay(0,"none");
                     }
                     break;
@@ -989,16 +976,6 @@ export default function DriverRecordForms() {
                         setEditMileage("");
                     }
                     break;
-                case 'e':
-                    setEditor(value);
-                    if (selectedCar.mileage !== parseInt(value)){
-                        setSmallEditor("Previous Editor: " + selectedCar.mileage);
-                        setEditEditor("red-inputtext");
-                    } else {
-                        setSmallEditor("");
-                        setEditEditor("");
-                    }
-                    break;
                 default:
                     break;
             }
@@ -1044,21 +1021,21 @@ export default function DriverRecordForms() {
             }
         }
 
-        const onChangeHandler = (e) => {
-            console.log(e.target.value);
-            setSelectedCar(e.target.value);
-
-        }
+        // const onChangeHandler = (e) => {
+        //     console.log(e.target.value);
+        //     setSelectedCar(e.target.value);
+        // }
         
         const actionBody = () => {
             return (
-                localStorage.getItem("deleteUsers") === "true" ? <center>
+                localStorage.getItem("editInspectionReport") === "true" ? <center>
                 <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData()}/> </center>
                 : <center>
                 <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2()}/> </center>
             );
         }
-
+        
+        //for paginator
         const onPageChange = (event) =>  {
             setFirst(event.first);
             if (event.first > first) {
@@ -1110,12 +1087,13 @@ export default function DriverRecordForms() {
 
                 <DataTable ref={dt} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                     globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
+                    paginator rows={10} emptyMessage="No data found"
                     >
                     <Column selectionMode="single" style={{width:'3em'}}/>
                     <Column field="body_no" header="Body No." style={{ paddingLeft: '2%' }}></Column>
                     <Column body={actionBody}></Column>
                 </DataTable>
-                <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
+                {/* <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator> */}
                 
 
                 <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
@@ -1129,7 +1107,7 @@ export default function DriverRecordForms() {
                                     </div>
                                     <div className="p-col-12 p-md-6">
                                         <label htmlFor="make">Make:</label>
-                                        <InputText id="make" value={selectedBody.make = selectedBody.make === 'L30' ? 'L300 Exceed 2.5D MT': selectedBody.make === 'SUV' ? 'Super Carry UV': selectedBody.make ===  'G15'? 'Gratour midi truck 1.5L': selectedBody.make ===  'G12'? 'Gratour midi truck 1.2L': '' } />
+                                        <InputText id="make" value={makes} />
                                     </div>
                                 </div>
                                 <div className="p-grid">
@@ -1671,9 +1649,7 @@ export default function DriverRecordForms() {
                                     </div>
                                     <div className="p-col-12 p-md-8">
                                         <label>Edited by:</label>
-                                        <InputText id="e" className={editNotes} placeholder="Edited by" value={editor} 
-                                         onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
-                                         <small className="p-invalid p-d-block">{smallEditor}</small>
+                                        <InputText placeholder="Editor Name" value={editor} disabled/>
                                     </div>
                                     <div className="p-col-12 p-md-8">
                                         <label>Driver/ Operator:</label>

@@ -245,7 +245,7 @@ export const Register = () => {
                             <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>BIRTHDAY:</b></h6>
+                            <h6><b>BIRTHDAY: </b><i>(ex. 1990-12-30)</i></h6>
                             <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
                         </div>
                     </div>

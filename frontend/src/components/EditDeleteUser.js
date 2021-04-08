@@ -74,38 +74,39 @@ export const EditDeleteUser = () => {
         getUsers();
     }, []); 
 
-    useEffect(() => {
-        try {
-            console.log("test flagPages: ", flagPages);
-            console.log("firstVariable: ", first);
+    //for paginator
+    // useEffect(() => {
+    //     try {
+    //         console.log("test flagPages: ", flagPages);
+    //         console.log("firstVariable: ", first);
 
-            const sentPage = (first / rows) + 1;
-            console.log("sentPage: ",sentPage);
+    //         const sentPage = (first / rows) + 1;
+    //         console.log("sentPage: ",sentPage);
 
-            let token = localStorage.getItem("token");
+    //         let token = localStorage.getItem("token");
 
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
+    //         const config = {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': 'Bearer ' + token,
+    //             },
+    //         };
 
-            axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'api/user-list/?page=' + sentPage, config)
-                .then((res) => {
-                    console.log(res.data);
-                    setUsers(res.data.results);
-                })
-                .catch((err) => {
-                    console.log("getusersflag err:");
-                    console.log(err.response);
-                });
-        } catch(err) {
-            console.log("pages error")
-            console.log(err)
-        }
-    }, [flagPages]);
+    //         axios
+    //             .get(process.env.REACT_APP_SERVER_NAME + 'api/user-list/?page=' + sentPage, config)
+    //             .then((res) => {
+    //                 console.log(res.data);
+    //                 setUsers(res.data.results);
+    //             })
+    //             .catch((err) => {
+    //                 console.log("getusersflag err:");
+    //                 console.log(err.response);
+    //             });
+    //     } catch(err) {
+    //         console.log("pages error")
+    //         console.log(err)
+    //     }
+    // }, [flagPages]);
 
     const toggleShow = () => {
         setPasswordShown(passwordShown ? false : true);
@@ -124,10 +125,10 @@ export const EditDeleteUser = () => {
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'api/user-list/', config)
             .then((res) => {
-                console.log(res.data.results);
-                console.log(res.data.count);
-                setTotalCount(res.data.count);
-                setUsers(res.data.results);
+                //console.log(res.data);
+                //console.log(res.data.count);
+                //setTotalCount(res.data.count);
+                setUsers(res.data);
             })
             .catch((err) => {
                 console.log("getusers err:");
@@ -213,7 +214,7 @@ export const EditDeleteUser = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
                 .then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     setFirst_Name(res.data.first_name);
                     setLast_Name(res.data.last_name);
                     setEmail(res.data.email);
@@ -550,7 +551,7 @@ export const EditDeleteUser = () => {
     }
 
     const onClick = (name) => {
-        console.log(selectedUser.username)
+        //console.log(selectedUser.username)
         if (selectedUser != null) {
             dialogFuncMap[`${name}`](true);
             //getPermission();
@@ -655,9 +656,9 @@ export const EditDeleteUser = () => {
         if (isChanged) {
             refreshPage();
             setIsChanged(false);
-            } else {
-               console.log("nothing change")
-            }
+        } else {
+            //console.log("nothing change")
+        }
     }
 
     const onHideDelete = (name) => {
@@ -665,6 +666,11 @@ export const EditDeleteUser = () => {
         dialogFuncMap[`${name}`](false);
     }
 
+    // const searchUser = (values) => {
+    //     console.log("searchUser: ",values);
+    // }
+
+    //for paginator
     const onPageChange = (event) =>  {
         setFirst(event.first);
         if (event.first > first) {
@@ -697,6 +703,7 @@ export const EditDeleteUser = () => {
                         <span className="p-input-icon-left">
                             <i className="pi pi-search" />
                             <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Users" />
+                            {/* <InputText type="search" onInput={(e) => searchUser(e.target.value)} placeholder="Search Users" /> */}
                         </span>
                     </div>
                 </div>
@@ -706,11 +713,12 @@ export const EditDeleteUser = () => {
                 <Panel header="USER MANAGEMENT">
                     <DataTable ref={dt} value={users} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                         globalFilter={globalFilter} selectionMode="single" selection={selectedUser} onSelectionChange={e => setSelectedUser(e.value)}
-                        emptyMessage="No data found">
+                        paginator rows={10} emptyMessage="No data found"
+                        >
                         <Column field="full_name" header="Name" style={{ paddingLeft: '2%' }}></Column>
                         <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column>
                     </DataTable>
-                    <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
+                    {/* <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator> */}
                 </Panel>
             </div>
 

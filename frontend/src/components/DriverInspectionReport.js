@@ -65,6 +65,7 @@ export class DriverInspectionReport extends Component {
             selectedFile: undefined,
             text: "No File Chosen",
             bn: "",
+            make: "",
             mod: "",
             mil: "",
             loc: "",
@@ -136,24 +137,51 @@ export class DriverInspectionReport extends Component {
 
         Promise.all([
             fetch(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config).then(res => res.json()),
-            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
+            //fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
+            //console.log("res", res2)
             // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
             //             : item.make === 'SUV' ? 'Super Carry UV'
             //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
             //             : 'Gratour midi truck 1.2L' }));
             this.setState({
                 bodyno: bodyno,
-                carValues: res2.results
+                carValues: res2
             });
         })
     }
 
     showBodyNumberTags () {
-        if (this.state.carValues.length <= 4) {
-            console.log("recent null");
-        } else {
+        if (this.state.carValues.length <= 0) {
+            //console.log("recent null");
+        } else if (this.state.carValues.length == 1) { //1
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        } else if (this.state.carValues.length == 2) { //2
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[1].body_no)}>
+                        {this.state.carValues[1].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        } else if (this.state.carValues.length == 3) { //3
             return <div> 
             <ul>
                 <li>
@@ -169,6 +197,31 @@ export class DriverInspectionReport extends Component {
                 <li>
                     <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[2].body_no)}>
                         {this.state.carValues[2].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        } else if (this.state.carValues.length == 4) { //4
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[1].body_no)}>
+                        {this.state.carValues[1].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[2].body_no)}>
+                        {this.state.carValues[2].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[3].body_no)}>
+                        {this.state.carValues[3].body_no}
                     </span>
                 </li>
             </ul>
@@ -204,7 +257,7 @@ export class DriverInspectionReport extends Component {
             } else {
                 //error when i use item.car_id.includes(event.query), uncomment to try
                 //this.state.filteredSuggestions = this.state.bodyno.filter(item => item.car_id.includes(event.query));
-                this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.includes(event.query))});
+                this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
                 this.setState({
                     filteredSuggestions: this.state.filteredSuggestions,
                 });
@@ -213,15 +266,15 @@ export class DriverInspectionReport extends Component {
     };
 
     onChangeAutoCompelete = (event) => {
-        console.log("auto", event.target.value);
+        //console.log("auto", event.target.value);
         this.setState({
             bn: event.target.value,
         });
 
         if (this.state.bn === null){
-            console.log("bn is null");
+           // console.log("bn is null");
         }else {
-            console.log("bn is no null");
+            //console.log("bn is no null");
         }
     }
 
@@ -241,6 +294,7 @@ export class DriverInspectionReport extends Component {
 
     submitData = event => {
         let token = localStorage.getItem("token");
+        console.log("make", this.state.bn.make);
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -324,7 +378,8 @@ export class DriverInspectionReport extends Component {
                                 {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onChange={event => this.setState({ bn: event.target.value })}  /> */}
                             </div>
                             <div className="p-col-12 p-md-6">
-                                <InputText placeholder="Make/Model" value={this.state.bn.make}/>
+                                <InputText placeholder="Make/Model" value={this.state.make = this.state.bn.make === "L30" ? 'L300 Exceed 2.5D MT': this.state.bn.make === "SUV" ? 'Super Carry UV': this.state.bn.make ===  'G15'? 'Gratour midi truck 1.5L': this.state.bn.make ===  'G12'? 'Gratour midi truck 1.2L' : '' }/>
+                                {/* <InputText placeholder="Make/Model" value={this.state.bn.make}/> */}
                             </div>
                         </div>
                         <div className="p-grid">
