@@ -32,8 +32,8 @@ class Task(models.Model):
     job_startdate_actual = models.DateField(auto_now=False, auto_now_add=False)
     job_enddate_actual = models.DateField(auto_now=False, auto_now_add=False)
     job_actualdays = models.IntegerField(default=0, null=True, blank=True)
-    job_status_fm = models.CharField(max_length=50)
-    job_status_mn = models.CharField(max_length=50)
+    job_status_fm = models.BooleanField(default=False)
+    job_status_mn = models.BooleanField(default=False)
     job_scheduledate = models.DateField(auto_now=False, auto_now_add=False)
     
     def __str__(self):
