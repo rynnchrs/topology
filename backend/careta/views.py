@@ -474,6 +474,7 @@ class CarListView(generics.ListAPIView):  #list of all car with filtering
     serializer_class = CarInfoSerializer  # add this
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['body_no', 'plate_no', 'vin_no','make','current_loc']
+    pagination_class=None
 
 
 class SearchInventoryView(viewsets.ViewSet):

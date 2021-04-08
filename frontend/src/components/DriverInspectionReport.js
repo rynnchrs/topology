@@ -6,11 +6,8 @@ import { AutoComplete } from 'primereact/autocomplete';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
-
-import './mycss.scss';
-
 export class DriverInspectionReport extends Component {
-
+    
     constructor() {
         super();
         this.state = {
@@ -68,23 +65,25 @@ export class DriverInspectionReport extends Component {
             selectedFile: undefined,
             text: "No File Chosen",
             bn: "",
+            make: "",
             mod: "",
             mil: "",
             loc: "",
             com: "",
             driver: "",
             drivername: "",
+            editor: "",
             time: "",
             date: "",
             bodyno: [],
             filteredSuggestions: [],
+            carValues: [],
         };
-        this.toast = createRef(null)
-
+        this.toast = createRef(null);
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
+        this.onTagBodyNo = this.onTagBodyNo.bind(this);
 
     }
-
 
     onCheckboxChange(event) {
         let selected = [...this.state.checkboxValue];
@@ -94,6 +93,33 @@ export class DriverInspectionReport extends Component {
             selected.splice(selected.indexOf(event.value), 1);
         this.setState({ checkboxValue: selected });
     }
+
+    // //fetch data of car list from db on page load
+    // componentDidMount() {
+    //     let user = localStorage.getItem("myfirst");
+    //     this.setState({drivername:user})
+    //     let username = localStorage.getItem("username");
+    //     this.setState({driver:username})
+    //     let token = localStorage.getItem("token");
+    //     const config = {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + token,
+    //         },
+    //     };
+    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config)
+    //         .then(res => {
+    //             const bodyno = res.data;
+    //             bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
+    //                     : item.make === 'SUV' ? 'Super Carry UV'
+    //                     : item.make ===  'G15'? 'Gratour midi truck 1.5L'
+    //                     : 'Gratour midi truck 1.2L' }));
+    //             this.setState({
+    //                 bodyno: bodyno,
+    //             });
+    //             //console.log(bodyno);
+    //         })
+    // }
 
     //fetch data of car list from db on page load
     componentDidMount() {
@@ -108,18 +134,119 @@ export class DriverInspectionReport extends Component {
                 'Authorization': 'Bearer ' + token,
             },
         };
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config)
-            .then(res => {
-                const bodyno = res.data;
-                bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
-                        : item.make === 'SUV' ? 'Super Carry UV'
-                        : item.make ===  'G15'? 'Gratour midi truck 1.5L'
-                        : 'Gratour midi truck 1.2L' }));
+
+        Promise.all([
+            fetch(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config).then(res => res.json()),
+            //fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/',config).then(res => res.json())
+        ]).then(([res1, res2]) => {
+            const bodyno = res1;
+            //console.log("res", res2)
+            // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
+            //             : item.make === 'SUV' ? 'Super Carry UV'
+            //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
+            //             : 'Gratour midi truck 1.2L' }));
+            this.setState({
+                bodyno: bodyno,
+                carValues: res2
+            });
+        })
+    }
+
+    showBodyNumberTags () {
+        if (this.state.carValues.length <= 0) {
+            //console.log("recent null");
+        } else if (this.state.carValues.length == 1) { //1
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        } else if (this.state.carValues.length == 2) { //2
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[1].body_no)}>
+                        {this.state.carValues[1].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        } else if (this.state.carValues.length == 3) { //3
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[1].body_no)}>
+                        {this.state.carValues[1].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[2].body_no)}>
+                        {this.state.carValues[2].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        } else if (this.state.carValues.length == 4) { //4
+            return <div> 
+            <ul>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[0].body_no)}>
+                        {this.state.carValues[0].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[1].body_no)}>
+                        {this.state.carValues[1].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[2].body_no)}>
+                        {this.state.carValues[2].body_no}
+                    </span>
+                </li>
+                <li>
+                    <span className="p-tag p-tag-rounded p-tag-info" onClick={() => this.onTagBodyNo(this.state.carValues[3].body_no)}>
+                        {this.state.carValues[3].body_no}
+                    </span>
+                </li>
+            </ul>
+            </div>
+        }
+    }
+
+    onTagBodyNo = (values) => {
+        setTimeout(() => {
+            if (!values.trim().length) {
+                
+            } else {
                 this.setState({
-                    bodyno: bodyno,
+                    filteredSuggestions: this.state.bodyno.filter(item => item.body_no.includes(values))
                 });
-                //console.log(bodyno);
-            })
+                if (this.state.filteredSuggestions.length <= 0){
+                    
+                } else {
+                    this.setState({
+                        filteredSuggestions: this.state.filteredSuggestions,
+                        bn: this.state.filteredSuggestions[0],
+                    });
+                }
+            }
+        }, 100);
     }
 
     //this will filter all "slug" data from api and show as suggestions on Autocomplete component below
@@ -130,14 +257,26 @@ export class DriverInspectionReport extends Component {
             } else {
                 //error when i use item.car_id.includes(event.query), uncomment to try
                 //this.state.filteredSuggestions = this.state.bodyno.filter(item => item.car_id.includes(event.query));
-                this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.includes(event.query))});
+                this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
                 this.setState({
                     filteredSuggestions: this.state.filteredSuggestions,
                 });
             }
         }, 100);
-
     };
+
+    onChangeAutoCompelete = (event) => {
+        //console.log("auto", event.target.value);
+        this.setState({
+            bn: event.target.value,
+        });
+
+        if (this.state.bn === null){
+           // console.log("bn is null");
+        }else {
+            //console.log("bn is no null");
+        }
+    }
 
     //This will get the filename/filepath that can be use in post request*
     /*fileSelect = event => {
@@ -155,6 +294,7 @@ export class DriverInspectionReport extends Component {
 
     submitData = event => {
         let token = localStorage.getItem("token");
+        console.log("make", this.state.bn.make);
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -214,6 +354,7 @@ export class DriverInspectionReport extends Component {
             rear_left_wheel: this.state.radioValue42,
             notes: this.state.com,
             driver: this.state.driver,
+            edited_by: this.state.editor,
           }, config)
           .then((res) => {
             this.toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});
@@ -222,7 +363,6 @@ export class DriverInspectionReport extends Component {
             console.log(err.response);
             this.toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 5000});
           })
-
     }
 
     render() {
@@ -234,11 +374,12 @@ export class DriverInspectionReport extends Component {
                         <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6">
-                                <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onChange={event => this.setState({ bn: event.target.value })}  />
-                                {/*<InputText placeholder="Body No." value={this.state.value} onChange={event => this.setState({ bn: event.target.value })}/> */}
+                                <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onChange={event => this.onChangeAutoCompelete(event)}/>
+                                {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onChange={event => this.setState({ bn: event.target.value })}  /> */}
                             </div>
                             <div className="p-col-12 p-md-6">
-                                <InputText placeholder="Make/Model" value={this.state.bn.make}/>
+                                <InputText placeholder="Make/Model" value={this.state.make = this.state.bn.make === "L30" ? 'L300 Exceed 2.5D MT': this.state.bn.make === "SUV" ? 'Super Carry UV': this.state.bn.make ===  'G15'? 'Gratour midi truck 1.5L': this.state.bn.make ===  'G12'? 'Gratour midi truck 1.2L' : '' }/>
+                                {/* <InputText placeholder="Make/Model" value={this.state.bn.make}/> */}
                             </div>
                         </div>
                         <div className="p-grid">
@@ -248,6 +389,11 @@ export class DriverInspectionReport extends Component {
                             </div>
                             <div className="p-col-12 p-md-6">
                                 <InputText placeholder="Location" value={this.state.bn.current_loc}/>
+                            </div>
+                        </div>
+                        <div className="p-grid">
+                            <div className="p-col-12 p-md-6 driver-insp-rep">
+                                {this.showBodyNumberTags()}
                             </div>
                         </div>
                     </div>
@@ -800,7 +946,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-md-9"> </div>
                             <div className="p-col-12 p-md-3">
                                 {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}
-                                <Button label="Submit" onClick={this.submitData}> </Button>
+                                <Button label="SUBMIT" onClick={this.submitData}> </Button>
                             </div>
                         </div>
                     </div>
