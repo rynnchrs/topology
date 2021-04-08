@@ -7,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (JobOrder,Task,FieldManAssignment)
 
 
-class TaskListSerializer(serializers.ModelSerializer):  # user info serializer
+class TaskListSerializer(serializers.ModelSerializer):
     manager_un = serializers.CharField(read_only=True, source='user.username')
     car_vn = serializers.CharField(read_only=True, source='car.vin_no')
     job_order = serializers.CharField(read_only=True, source='joborder.job_number')
@@ -29,13 +29,13 @@ class TaskListSerializer(serializers.ModelSerializer):  # user info serializer
                   'job_actualdays','job_status_fm','job_status_mn','job_scheduledate']
 
 
-class JobOrderSerializer(serializers.ModelSerializer):  # user info serializer
+class JobOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobOrder
         fields = '__all__'
 
 
-class FieldmanAssignmentSerializer(serializers.ModelSerializer):  # user info serializer
+class FieldmanAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = FieldManAssignment
         fields = '__all__'        
