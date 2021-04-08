@@ -24,3 +24,12 @@ class TaskView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
+
+    def list(self, request):        
+        user = self.request.user    
+        if user_permission(user, 'can_view_users'):    # permission
+            queryset = Task.objects.all()
+            serializer = TaskListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)            
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
