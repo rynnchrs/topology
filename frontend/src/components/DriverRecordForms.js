@@ -251,7 +251,7 @@ export default function DriverRecordForms() {
                 .then((res) => {
                     setSelectedCar(res.data);
                     setSelectedBody(res.data.body_no);
-                    setMakes(res.data.body_no.make);
+                    setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                     onClick('displayBasic2');
                 })
                 .catch((error) => {
@@ -1682,7 +1682,7 @@ export default function DriverRecordForms() {
                                     </div>
                                     <div className="p-col-12 p-md-6">
                                         <label htmlFor="make">Make:</label>
-                                        <InputText id="make" value={selectedBody.make= selectedBody.make === 'L30' ? 'L300 Exceed 2.5D MT': selectedBody.make === 'SUV' ? 'Super Carry UV': selectedBody.make ===  'G15'? 'Gratour midi truck 1.5L': selectedBody.make ===  'G12'? 'Gratour midi truck 1.2L': '' } />
+                                        <InputText id="make" value={makes} />
                                     </div>
                                 </div>
                                 <div className="p-grid">
@@ -2216,7 +2216,7 @@ export default function DriverRecordForms() {
                                     </div>
                                     <div className="p-col-12 p-md-8">
                                         <label>Edited by:</label>
-                                        <InputText placeholder="Edited by" value={selectedCar.driver}/>
+                                        <InputText placeholder="Editor Name" value={editor} disabled/>
                                     </div>
                                     <div className="p-col-12 p-md-8">
                                         <label>Driver/ Operator:</label>

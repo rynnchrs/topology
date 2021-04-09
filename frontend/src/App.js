@@ -71,7 +71,7 @@ const App = () => {
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
         sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user',items: sidebarSubMenu1});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     //inventory permission
@@ -84,7 +84,7 @@ const App = () => {
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     //inspection permission
@@ -98,13 +98,13 @@ const App = () => {
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
         sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file',items: sidebarSubMenu2});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
         sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
