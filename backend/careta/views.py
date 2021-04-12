@@ -1,4 +1,3 @@
-from report.models import Maintenance
 import datetime
 from abc import abstractmethod
 
@@ -6,6 +5,7 @@ from django.contrib.auth.models import User  # add this
 from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend  # filter
+from report.models import Maintenance
 from rest_framework import viewsets  # add this; filter; add this
 from rest_framework import filters, generics, serializers, status
 from rest_framework.decorators import action
@@ -136,7 +136,6 @@ class UserListView(generics.ListAPIView):
                   'can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports','can_view_task',
                   'can_add_task','can_edit_task','can_delete_task']
 
-    
 
 class PermissionView(viewsets.ViewSet):  # permission ViewSet
     permission_classes = [IsAuthenticated]
@@ -186,10 +185,8 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionUserSerializer  # add this
-    def update(self, request, pk=None):     # update user permission
+    @action(detail=True, methods=['put'])
+    def user(self, request, pk=None):     # update user permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -201,10 +198,8 @@ class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionInventorySerializer
-    def update(self, request, pk=None): # update inventory permission
+    @action(detail=True, methods=['put'])
+    def inventory(self, request, pk=None): # update inventory permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -216,11 +211,8 @@ class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionInspectionReportSerializer
-
-    def update(self, request, pk=None):     # update report permission
+    @action(detail=True, methods=['put'])
+    def inspection(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -232,11 +224,8 @@ class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permiss
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionMaintenanceReportSerializer
-    def update(self, request, pk=None):     # update report permission
+    @action(detail=True, methods=['put'])
+    def maintenance(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -248,11 +237,8 @@ class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permi
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionRepairReportSerializer
-    def update(self, request, pk=None):     # update report permission
+    @action(detail=True, methods=['put'])
+    def repair(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -264,12 +250,8 @@ class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission View
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionTaskSerializer
-
-    def update(self, request, pk=None):     # update task permission
+    @action(detail=True, methods=['put'])
+    def task(self, request, pk=None):     # update task permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -281,39 +263,30 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance report s
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-    def list(self, request):        # User List
+    @action(detail=False)
+    def add_maintenance_list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_add_users'): # permission
+        if user_permission(user, 'can_view_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_maintenance_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection reports
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-    def list(self, request):        # User List
+    @action(detail=False)
+    def add_inspection_list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_add_users'): # permission
+        if user_permission(user, 'can_view_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_inspection_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports 
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-    def list(self, request):        # User List
+    @action(detail=False)
+    def add_repair_list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_add_users'): # permission
+        if user_permission(user, 'can_view_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_repair_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            

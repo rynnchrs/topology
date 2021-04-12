@@ -1,7 +1,7 @@
 # todo/serializers.py
 import django.contrib.auth.password_validation as validators  # add this
-from report.serializers import CarInfoSerializer
 from django.contrib.auth.models import User  # add this
+from report.serializers import CarInfoSerializer
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 

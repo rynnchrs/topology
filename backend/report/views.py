@@ -1,15 +1,21 @@
-from datetime import datetime
+import datetime
+# from datetime import datetime
+
+from careta.models import Car
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
-from careta.models import Car
-from .utils import maintenance_reversion, reversion, user_permission
-from .models import Inspection, Maintenance, Repair
-from .serializers import InspectionLastFourListSerializer, InspectionListSerializer, InspectionSerializer, MaintenanceListSerializer, MaintenanceSerializer, RepairListSerializer, RepairSerializer
-from rest_framework import viewsets
+from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import filters, generics, serializers, status
 from reversion.models import Version
+
+from .models import Inspection, Maintenance, Repair
+from .serializers import (InspectionLastFourListSerializer,
+                          InspectionListSerializer, InspectionSerializer,
+                          MaintenanceListSerializer, MaintenanceSerializer,
+                          RepairListSerializer, RepairSerializer)
+from .utils import maintenance_reversion, reversion, user_permission
+
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]

@@ -1,14 +1,14 @@
-
-
-from django.contrib.auth.models import User
-from .models import Cost, Inspection, Maintenance, Repair
-from rest_framework import serializers
 from careta.models import Car
+from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from .models import Cost, Inspection, Maintenance, Repair
 
 #class InspectionImageSerializer(serializers.ModelSerializer):
 #    class Meta:
 #        model = InspectionImage
 #        fields = ['id','images']
+ 
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
     class Meta:
         model = Car
@@ -39,7 +39,7 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
         except:
            errors.append({"body_no": 'Invalid Body No.'})
         try:
-            if obj['driver'] or None:
+            if obj['driver'] == "":
                 pass
             else:
                 obj['driver'] = User.objects.get(username=obj['driver'])

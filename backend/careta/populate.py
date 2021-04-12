@@ -19,6 +19,7 @@ def user_data():
                 username = 'admin',
                 password = 'password'
             )
+        UserInfo.objects.create(user=superuser)
         Permission.objects.create(user=superuser,  #create permission for admin only
         can_view_users = True,
         can_add_users = True,

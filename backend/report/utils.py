@@ -1,8 +1,10 @@
 import json
-from jsondiff import diff
-from django.contrib.auth.models import User
+
 from careta.models import Car, Permission
+from django.contrib.auth.models import User
+from jsondiff import diff
 from reversion.models import Version
+
 
 def user_permission(user, permission):
     perm = Permission.objects.get(user__username=user.username) # get users permission
