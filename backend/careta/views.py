@@ -5,36 +5,33 @@ from django.contrib.auth.models import User  # add this
 from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend  # filter
+from report.models import Maintenance
 from rest_framework import viewsets  # add this; filter; add this
 from rest_framework import filters, generics, serializers, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response  # add this
 from rest_framework.views import APIView  # add this
 from rest_framework_simplejwt.tokens import RefreshToken  # add this
 from rest_framework_simplejwt.views import TokenObtainPairView
-from reversion.models import Version
 
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Maintenance, Permission, Repair, UserInfo)
+from .models import (TPL, Car, Contract, Insurance, JobOrder,  # add this
+                     Permission)
 from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
-                          ContractSerializer, InspectionLastFourListSerializer,
-                          InspectionListSerializer, InspectionSerializer,
-                          InsuranceSerializer, MaintenanceListSerializer,
-                          MaintenanceSerializer, MyTokenObtainPairSerializer,
+                          ContractSerializer, InsuranceSerializer,
+                          JobOrderSerializer, MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
                           PermissionMaintenanceReportSerializer,
                           PermissionRepairReportSerializer,
                           PermissionSerializer, PermissionTaskSerializer,
-                          PermissionUserSerializer, RepairListSerializer,
-                          RepairSerializer, SearchInventorySerializer,
+                          PermissionUserSerializer, SearchInventorySerializer,
                           TotalCarSerializer, TPLSerializer,
                           UpdateUserSerializer, UserListSerializer,
                           UserSerializer)
 from .utils import (check_Com_date, check_cr_date, check_or_date,
-                    check_TPL_date, maintenance_reversion, reversion,
-                    user_permission)
+                    check_TPL_date, user_permission)
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -139,7 +136,6 @@ class UserListView(generics.ListAPIView):
                   'can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports','can_view_task',
                   'can_add_task','can_edit_task','can_delete_task']
 
-    
 
 class PermissionView(viewsets.ViewSet):  # permission ViewSet
     permission_classes = [IsAuthenticated]
@@ -189,10 +185,8 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionUserSerializer  # add this
-    def update(self, request, pk=None):     # update user permission
+    @action(detail=True, methods=['put'])
+    def user(self, request, pk=None):     # update user permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -204,10 +198,8 @@ class PermissionUserView(viewsets.ViewSet): # User permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionInventorySerializer
-    def update(self, request, pk=None): # update inventory permission
+    @action(detail=True, methods=['put'])
+    def inventory(self, request, pk=None): # update inventory permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -219,11 +211,8 @@ class PermissionInventoryView(viewsets.ViewSet): # Inventory permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionInspectionReportSerializer
-
-    def update(self, request, pk=None):     # update report permission
+    @action(detail=True, methods=['put'])
+    def inspection(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -235,11 +224,8 @@ class PermissionInspectionReport(viewsets.ViewSet): # Inspection Reports permiss
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionMaintenanceReportSerializer
-    def update(self, request, pk=None):     # update report permission
+    @action(detail=True, methods=['put'])
+    def maintenance(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -251,11 +237,8 @@ class PermissionMaintenanceReport(viewsets.ViewSet): # Maintenance Reports permi
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionRepairReportSerializer
-    def update(self, request, pk=None):     # update report permission
+    @action(detail=True, methods=['put'])
+    def repair(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -267,12 +250,8 @@ class PermissionRepairReport(viewsets.ViewSet): # Repair Reports permission View
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
-    permission_classes = [IsAuthenticated]
-    serializer_class = PermissionTaskSerializer
-
-    def update(self, request, pk=None):     # update task permission
+    @action(detail=True, methods=['put'])
+    def task(self, request, pk=None):     # update task permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
             queryset = Permission.objects.all()
@@ -284,39 +263,30 @@ class PermissionTaskView(viewsets.ViewSet):     # Task Permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class AddMaintenanceReportView(viewsets.ViewSet): # list of can add maintenance report s
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-    def list(self, request):        # User List
+    @action(detail=False)
+    def add_maintenance_list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_add_users'): # permission
+        if user_permission(user, 'can_view_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_maintenance_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class AddInspectionReportView(viewsets.ViewSet): # list of can add Inspection reports
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-    def list(self, request):        # User List
+    @action(detail=False)
+    def add_inspection_list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_add_users'): # permission
+        if user_permission(user, 'can_view_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_inspection_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports 
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-    def list(self, request):        # User List
+    @action(detail=False)
+    def add_repair_list(self, request):        # User List
         user = self.request.user
-        if user_permission(user, 'can_add_users'): # permission
+        if user_permission(user, 'can_view_users'): # permission
             queryset = User.objects.all().filter(permission__can_add_repair_reports=True)
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)            
@@ -324,139 +294,84 @@ class AddRepairReportView(viewsets.ViewSet): # list of can add Repair reports
             return Response(status=status.HTTP_401_UNAUTHORIZED)   
 
 
-class InspectionView(viewsets.ViewSet):  # inspection report Form
+
+class JobOrderView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = InspectionSerializer
+    serializer_class = JobOrderSerializer
 
-    def list(self, request):        # User List
+    @action(detail=False)
+    def maintenance_list(self, request):
         user = self.request.user
-        queryset = Inspection.objects.all().filter(driver=user.id).order_by('-inspection_id')[:4]
-        serializer = InspectionLastFourListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)    
-
-    def create(self, request): # create report 
-        user = self.request.user
-        if user_permission(user, 'can_add_inspection_reports'):
-            serializer = InspectionSerializer(data=request.data) 
-            if serializer.is_valid(raise_exception=True): 
-                car = request.data.get("body_no")
-                car = Car.objects.get(body_no=car)
-                try:
-                    inspection = Inspection.objects.all().filter(body_no=car.car_id).filter(date_created=datetime.date.today())[0]
-                except:
-                    serializer.save() # add this
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                inspection = Inspection.objects.get(pk=inspection.pk)
-                reversion = Version.objects.get_for_object(inspection)
-                reversion.delete()
-                inspection.delete()
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors)
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
-    def retrieve(self, request, pk=None): #retrieve inspection
-        user = self.request.user
-        queryset =  Inspection.objects.all()
-        inspection = get_object_or_404(queryset, pk=pk)
-        if user_permission(user, 'can_view_inspection_reports'):
-            return Response(reversion(inspection), status=status.HTTP_200_OK)
-        else:
-            if str(inspection.driver) == user.username:       # if current user is equal to pk
-                return Response(reversion(inspection), status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
-    def update(self, request, pk=None): # update inspection
-        user = self.request.user
-        if user_permission(user, 'can_edit_inspection_reports'):
-            queryset =  Inspection.objects.all()
-            inspection = get_object_or_404(queryset, pk=pk)
-            serializer = InspectionSerializer(instance=inspection, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)    
+        if user_permission(user, 'can_view_task'):
+            queryset = JobOrder.objects.all().filter(type=True) # get all True(Maintenance)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class InspectionListView(generics.ListAPIView): #list of inspection with filtering
-    permission_classes = [IsAuthenticated]
-    # queryset = Inspection.objects.all().order_by('inpsection_id')
-    serializer_class = InspectionListSerializer
-    filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
-    ordering_fields = ['body_no__body_no', 'date_created', 'inspection_id']
-
-    def get_queryset(self):
+    @action(detail=False)
+    def maintenance_created(self, request):
         user = self.request.user
-        if user_permission(user, 'can_edit_inspection_reports'):
-            queryset = Inspection.objects.all().order_by('inspection_id')
-        else:
-            queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
-        return queryset
-
-
-class MaintenanceView(viewsets.ViewSet):  # inspection report Form
-    permission_classes = [IsAuthenticated]
-    serializer_class = MaintenanceSerializer
-
-    def create(self, request): # create report 
-        user = self.request.user
-        if user_permission(user,'can_add_maintenance_reports'):
-            serializer = MaintenanceSerializer(data=request.data) 
-            if serializer.is_valid(raise_exception=True): 
-                car = request.data.get("body_no")
-                car = Car.objects.get(body_no=car)
-                try:
-                    maintenance = Maintenance.objects.filter(body_no=car.car_id).filter(date_created=datetime.date.today())[0]
-                except:
-                    serializer.save() # add this
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                queryset =  Maintenance.objects.all()
-                maintenance = Maintenance.objects.get(pk=maintenance.pk)
-                reversion = Version.objects.get_for_object(maintenance)
-                reversion.delete()
-                maintenance.delete()
-                serializer.save()
-                return Response(status=status.HTTP_201_CREATED) 
-            return Response(serializer.errors) 
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
-    def retrieve(self, request, pk=None): #retrieve inspection
-        user = self.request.user
-        queryset =  Maintenance.objects.all()
-        maintenance = get_object_or_404(queryset, pk=pk)
-        if user_permission(user,'can_view_maintenance_reports'):
-            return Response(maintenance_reversion(maintenance), status=status.HTTP_200_OK)
-        else:
-            if str(maintenance.inspected_by) == user.username:       # if current user is equal to pk
-                return Response(maintenance_reversion(maintenance), status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
-    def update(self, request, pk=None): # update inspection
-        user = self.request.user
-        if user_permission(user,'can_edit_maintenance_reports'):
-            queryset =  Maintenance.objects.all()
-            maintenance = get_object_or_404(queryset, pk=pk)
-            serializer = MaintenanceSerializer(instance=maintenance, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)    
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in maintenance table
+            maintenance = Maintenance.objects.values_list('job_order', flat=True)
+            # filter True(Maintenance) and used job order
+            queryset = JobOrder.objects.filter(type=True).filter(job_no__in=maintenance) 
+            # filter the job order with the fieldman = current user 
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+    @action(detail=False)
+    def maintenance_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in maintenance table
+            maintenance = Maintenance.objects.all().values_list('job_order', flat=True)
+            # filter True(Maintenance) and remove all used job order
+            queryset = JobOrder.objects.all().filter(type=True).exclude(job_no__in=maintenance)
+            # filter the job order with the fieldman = current user 
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-class MaintenanceListView(generics.ListAPIView): #list of inspection with filtering
-    permission_classes = [IsAuthenticated]
-    queryset = Maintenance.objects.all().order_by('maintenance_id')
-    serializer_class = MaintenanceListSerializer       
-    filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['maintenance_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
-    ordering_fields = ['body_no__body_no', 'date_created', 'maintenance_id']
+    @action(detail=False)
+    def repair_list(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_view_task'):
+            queryset = JobOrder.objects.all().filter(type=False)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def repair_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            maintenance = Maintenance.objects.values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).filter(job_no__in=maintenance)
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False)
+    def repair_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            maintenance = Maintenance.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=maintenance)
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = JobOrderSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CarView(viewsets.ModelViewSet):  # add this
@@ -516,18 +431,6 @@ class InsuranceList(generics.ListAPIView):
         username = self.kwargs['username']
         return Insurance.objects.filter(car=username)
 
-
-class RepairView(viewsets.ModelViewSet):  # add this
-    permission_classes = [IsAuthenticated]
-    queryset = Repair.objects.all()  # add this
-    serializer_class = RepairSerializer  # add this
-    search_fields = ['vin_no__vin_no','date_created']
-    filter_backends = [filters.SearchFilter]
-
-    def list(self, request): # list of all repair
-        queryset =  Repair.objects.all()
-        serializer = RepairListSerializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class TotalView(viewsets.ModelViewSet):

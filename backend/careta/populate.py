@@ -1,11 +1,10 @@
 import csv
 import datetime
-from datetime import datetime, date
+from datetime import date, datetime
 
 from django.contrib.auth.models import User  # add this
 
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Permission, Repair, UserInfo)
+from .models import TPL, Car, Insurance, Permission, UserInfo  # add this
 
 
 def datas():
@@ -20,6 +19,7 @@ def user_data():
                 username = 'admin',
                 password = 'password'
             )
+        UserInfo.objects.create(user=superuser)
         Permission.objects.create(user=superuser,  #create permission for admin only
         can_view_users = True,
         can_add_users = True,
