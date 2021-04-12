@@ -10,8 +10,8 @@ import { login } from '../actions/auth';
 
 export const Login = (props) => {
 
-    const [username, setUsername] = useState('admin');
-    const [password, setPassword] = useState('password');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [passwordShown, setPasswordShown] = useState(true);
     
     const propTypes = {
@@ -22,6 +22,13 @@ export const Login = (props) => {
     const submitData = event => {
         //alert("U: " + this.state.username + "\nP: " + this.state.password)
         props.login(username, password);
+    }
+
+    const keyPress = event => {
+        if(event.key === "Enter"){
+            //console.log("key press", event.key);
+            submitData();
+        }
     }
 
     const toggleShow = () => {
@@ -54,7 +61,7 @@ export const Login = (props) => {
                                 <span className="p-inputgroup-addon">
                                     <i className="pi pi-user"></i>
                                 </span>
-                                <InputText placeholder="Email or Username or Phone " value={username} onChange={event => setUsername(event.target.value)} />
+                                <InputText placeholder="Email or Username or Phone " value={username} onChange={event => setUsername(event.target.value)} onKeyPress={keyPress}/>
                             </div>
                         </div>
                     </div>
@@ -69,7 +76,7 @@ export const Login = (props) => {
                                 <span className="p-inputgroup-addon">
                                     <i className="pi pi-lock"></i>
                                 </span>
-                                <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
+                                <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} onKeyPress={keyPress}/>
                                 <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
                             </div>
                         </div>
@@ -77,7 +84,7 @@ export const Login = (props) => {
 
                     <div className="p-grid p-fluid">
                         <div className="p-field p-col"> </div>
-                        <div className="p-field p-col">  <Button label="LOGIN" className="p-button-lg p-shadow-5" onClick={submitData}> </Button> </div>
+                        <div className="p-field p-col">  <Button label="LOGIN" className="p-button-lg p-shadow-5" onClick={submitData} > </Button> </div>
                         <div className="p-field p-col"> </div>
                     </div>
 
