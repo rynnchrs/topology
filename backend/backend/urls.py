@@ -33,7 +33,7 @@ router.register(r'job-order', views.JobOrderView, 'job-order') # job-order list 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
-    path('api/',  include('careta.urls')), # add this
-    path('api/',  include('report.urls')), # add this
+    path('careta/',  include('careta.urls')), # add this
+    path('report/',  include('report.urls')), # add this
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
