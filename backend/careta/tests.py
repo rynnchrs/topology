@@ -30,8 +30,7 @@ class RegistrationTestCase(APITestCase):
                     "address": "test"
                 }
                }
-        url = reverse('register')
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(('/careta/register/'), data, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
 class UserTestCase(APITestCase):
@@ -42,7 +41,6 @@ class UserTestCase(APITestCase):
                 "last_name": "sample",
                 "password": "sample!23"
             }
-    url = reverse('users-list')
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER)
         self.TEST_PERMISSION = {
@@ -54,40 +52,34 @@ class UserTestCase(APITestCase):
                 "can_delete_users": True,
             }
         self.permission = Permission.objects.create(**self.TEST_PERMISSION)
-        self.refresh = RefreshToken.for_user(self.user)
-        self.api_auth()
-
-    def api_auth(self):
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.refresh.access_token}')
+        self.client.force_authenticate(self.user) # authenticate user
 
     def test_user_list(self):
-        response = self.client.get(self.url)
+        response = self.client.get('/careta/user-list/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_user_retrieve_detail(self):
-        response = self.client.get(reverse('users-detail', kwargs={"pk":"sample"}))
+        response = self.client.get('/careta/users/sample/') 
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_permission_list(self):
-        self.url = reverse('permission-list')
-        response = self.client.get(self.url)
+        response = self.client.get('/careta/permission/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_permission_retrieve_detail(self):
-        self.url = reverse('permission-detail', kwargs={"pk":"sample"})
-        response = self.client.get(self.url)
+        response = self.client.get('/careta/permission/sample/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_permission_maintenance_list(self):
-        response = self.client.get('/api/permission/add_maintenance_list/')
+        response = self.client.get('/careta/permission/add_maintenance_list/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_permission_inspection_list(self):
-        response = self.client.get('/api/permission/add_inspection_list/')
+        response = self.client.get('/careta/permission/add_inspection_list/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_permission_repair_list(self):
-        response = self.client.get('/api/permission/add_repair_list/')
+        response = self.client.get('/careta/permission/add_repair_list/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
 
