@@ -26,28 +26,14 @@ router.register(r'careta', views.CarView, 'careta')     # add this
 router.register(r'careta-contract', views.ContractView, 'careta-contract')     # add this
 router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
 router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance') # add this
-
-router.register(r'users', views.UserView, 'users') # users api
-router.register(r'permission', views.PermissionView, 'permission') # permission api
-router.register(r'permission/user', views.PermissionUserView, 'permission-user') # user permission api
-router.register(r'permission/inventory', views.PermissionInventoryView, 'permission-inventory') # inventory permission api
-router.register(r'permission/inspection-report', views.PermissionInspectionReport, 'permission-inspection-report')    # update inspection report
-router.register(r'permission/maintenance-report', views.PermissionMaintenanceReport, 'permission-maintenance-report') # update maintenance report
-router.register(r'permission/repair-report', views.PermissionRepairReport, 'permission-repair-report') # update repair report
-router.register(r'permission/task', views.PermissionTaskView, 'permission-task')    # task permission api
-router.register(r'permission/add-list/maintenance', views.AddMaintenanceReportView, 'permission-maintenance-list') # list of can add maintenance report
-router.register(r'permission/add-list/inspection', views.AddInspectionReportView, 'permission-inspection-list')  # list of can add inspection report
-router.register(r'permission/add-list/repair', views.AddRepairReportView, 'permission-repair-list')  # list of can add repair report
 router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
-
-router.register(r'inspection', views.InspectionView, 'inspection') # report creation api
-router.register(r'maintenance', views.MaintenanceView, 'maintenance') #maintenance report form api
 router.register(r'total', views.TotalView, 'total') # total list api
-router.register(r'repair', views.RepairView, 'repair') # repair list api
+router.register(r'job-order', views.JobOrderView, 'job-order') # job-order list api
 
 urlpatterns = [
     path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
-    path('api/',  include('careta.urls')), # add this
+    path('careta/',  include('careta.urls')), # add this
+    path('report/',  include('report.urls')), # add this
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
