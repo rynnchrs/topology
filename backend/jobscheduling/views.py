@@ -14,10 +14,14 @@ from rest_framework_simplejwt.tokens import RefreshToken  # add this
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reversion.models import Version
 
-from .models import (Task)
+from rest_framework.decorators import action
+
+from .models import (Task,JobOrder)
 from .serializers import (TaskListSerializer,TaskSerializer,JobOrderSerializer,FieldmanAssignmentSerializer)
 
 from careta.utils import (user_permission)
+from .utils import (get_jo_maxid)
+
 
 class TaskView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -70,7 +74,25 @@ class TaskView(viewsets.ViewSet):
             targettask.delete()
             return Response(status=status.HTTP_200_OK)          
         else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)                        
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class JobOrderView(viewsets.ViewSet):
+
+    def list(self, request):
+        jtype = self.request.query_params.get('job_type')
+        queryset = JobOrder.objects.filter(job_type=jtype).order_by('-id')
+        serializer_class = JobOrderSerializer(queryset, many=True)
+        return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def get_max(self, request):
+        jtype = self.request.query_params.get('job_type')
+        return Response({
+            'max_id': get_jo_maxid(jtype)
+            })                
+
+
 
     
       
