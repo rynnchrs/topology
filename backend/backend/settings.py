@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reversion',
     'careta',
     'report',
+    'jobscheduling',
 ]
 
 REST_FRAMEWORK = {

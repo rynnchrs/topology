@@ -35,5 +35,6 @@ urlpatterns = [
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
     path('careta/',  include('careta.urls')), # add this
     path('report/',  include('report.urls')), # add this
+    path('jobscheduling/',  include('jobscheduling.urls')), # add this
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

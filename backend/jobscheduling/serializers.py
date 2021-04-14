@@ -10,9 +10,8 @@ from .models import (JobOrder,Task,FieldManAssignment)
 class TaskListSerializer(serializers.ModelSerializer):
     manager_un = serializers.CharField(read_only=True, source='user.username')
     car_vn = serializers.CharField(read_only=True, source='car.vin_no')
-    job_order = serializers.CharField(read_only=True, source='joborder.job_number')
-    start = serializers.DateField(auto_now=False, auto_now_add=False)
-    end = serializers.DateField(auto_now=False, auto_now_add=False)
+    start = serializers.DateField(source='job_startdate')
+    end = serializers.DateField(source='job_enddate')
     
     class Meta:
         model = Task

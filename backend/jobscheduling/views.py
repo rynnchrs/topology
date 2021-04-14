@@ -14,22 +14,12 @@ from rest_framework_simplejwt.tokens import RefreshToken  # add this
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reversion.models import Version
 
-from .models import (TPL, Car, Contract, Inspection, Insurance,  # add this
-                     Maintenance, Permission, Repair, Task, UserInfo)
+from .models import (Task)
 from .serializers import (TaskListSerializer,JobOrderSerializer,FieldmanAssignmentSerializer)
-from careta.utils import (user_permission)
 
 
-class TaskView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+class TaskView(generics.ListAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
-
-    def list(self, request):        
-        user = self.request.user    
-        if user_permission(user, 'can_view_users'):    # permission
-            queryset = Task.objects.all()
-            serializer = TaskListSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)            
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+      
