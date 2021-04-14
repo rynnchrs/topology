@@ -1,14 +1,15 @@
 import datetime
-# from datetime import datetime
 
 from careta.models import Car
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import filters, generics, serializers, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from reversion.models import Version
 
+from .export import export
 from .models import Inspection, Maintenance, Repair
 from .serializers import (InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
@@ -18,7 +19,7 @@ from .utils import maintenance_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = InspectionSerializer
 
     def list(self, request):        # User List
@@ -73,6 +74,10 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+    @action(detail=False)
+    def export_list(self, request):
+        return export()  
+        
 
 class InspectionListView(generics.ListAPIView): #list of inspection with filtering
     permission_classes = [IsAuthenticated]
