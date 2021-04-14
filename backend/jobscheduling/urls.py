@@ -6,8 +6,9 @@ from rest_framework_simplejwt import views as jwt_views  # add this
 from .views import (TaskView)
 
 router = routers.DefaultRouter()  
-router.register(r'tasks', TaskView.as_view, 'tasks') # tasks api
+router.register(r'task', TaskView, 'task') # tasks api
 
 urlpatterns = [
-    path('task/', TaskView.as_view(), name='tasklist')
+    path('', include(router.urls)),
+ 
 ]
