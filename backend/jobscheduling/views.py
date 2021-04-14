@@ -60,7 +60,17 @@ class TaskView(viewsets.ViewSet):
                 serializer.save()
             return Response(status=status.HTTP_200_OK)          
         else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)            
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def destroy(self, request,pk=None):      
+        user = self.request.user
+        if user_permission(user, 'can_delete_task'):    # permission
+            queryset = Task.objects.all()
+            targettask = get_object_or_404(queryset, id=pk)
+            targettask.delete()
+            return Response(status=status.HTTP_200_OK)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)                        
 
     
       
