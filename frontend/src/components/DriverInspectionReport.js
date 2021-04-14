@@ -5,6 +5,7 @@ import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
+import { isThisISOWeek } from 'date-fns';
 
 export class DriverInspectionReport extends Component {
     
@@ -66,9 +67,8 @@ export class DriverInspectionReport extends Component {
             text: "No File Chosen",
             bn: "",
             make: "",
-            mod: "",
             mil: "",
-            loc: "",
+            locc: "",
             com: "",
             driver: "",
             drivername: "",
@@ -141,7 +141,7 @@ export class DriverInspectionReport extends Component {
             fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
-            //console.log("res", res2)
+            console.log("res", res2)
             // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
             //             : item.make === 'SUV' ? 'Super Carry UV'
             //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
@@ -294,7 +294,6 @@ export class DriverInspectionReport extends Component {
 
     submitData = event => {
         let token = localStorage.getItem("token");
-        console.log("make", this.state.bn.make);
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -358,6 +357,66 @@ export class DriverInspectionReport extends Component {
           }, config)
           .then((res) => {
             this.toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});
+            this.setState({
+                radioValue1: null,
+                radioValue2: null,
+                radioValue3: null,
+                radioValue4: null,
+                radioValue5: null,
+                radioValue6: null,
+                radioValue7: null,
+                radioValue8: null,
+                radioValue9: null,
+                radioValue10: null,
+                radioValue11: null,
+                radioValue12: null,
+                radioValue13: null,
+                radioValue14: null,
+                radioValue15: null,
+                radioValue16: null,
+                radioValue17: null,
+                radioValue18: null,
+                radioValue19: null,
+                radioValue20: null,
+                radioValue21: null,
+                radioValue22: null,
+                radioValue23: null,
+                radioValue24: null,
+                radioValue25: null,
+                radioValue26: null,
+                radioValue27: null,
+                radioValue28: null,
+                radioValue29: null,
+                radioValue30: null,
+                radioValue31: null,
+                radioValue32: null,
+                radioValue33: null,
+                radioValue34: null,
+                radioValue35: null,
+                radioValue36: null,
+                radioValue37: null,
+                radioValue38: null,
+                radioValue39: null,
+                radioValue40: null,
+                radioValue41: null,
+                radioValue42: null,
+                radioValue43: null,
+                radioValue44: null,
+                radioValue45: null,
+                radioValue46: null,
+                radioValue47: null,
+                radioValue48: null,
+                radioValue49: null,
+                radioValue50: null,
+                radioValue51: null,
+                bn: "",
+                make: "",
+                mil: "",
+                locc: "",
+                com: "",
+            })
+            //console.log("make:", this.state.make);
+            //console.log("locc: ",this.state.locc);
           })
           .catch((err) => {
             console.log(err.response);
@@ -388,7 +447,7 @@ export class DriverInspectionReport extends Component {
                                 <span className="p-inputgroup-addon">KM.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
-                                <InputText placeholder="Location" value={this.state.bn.current_loc}/>
+                                <InputText placeholder="Location" value={this.state.locc = this.state.bn.current_loc ? this.state.bn.current_loc:''}/>
                             </div>
                         </div>
                         <div className="p-grid">

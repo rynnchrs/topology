@@ -22,16 +22,12 @@ import './layout/flags/flags.css';
 import './layout/layout.scss';
 import './App.scss';
 import { Dashboard } from './components/Dashboard';
-import { MainDashboard } from './components/MainDashboard';
 import { Vehicles } from './components/Vehicles';
-import { InspectionReport } from './components/InspectionReport';
-import { InspectionReportDriver } from './components/InspectionReportDriver';
 import { DriverInspectionReport } from './components/DriverInspectionReport';
 
 import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
 
-import  TSManager  from './components/TSManager';
 import  DriverRecordForms from './components/DriverRecordForms';
 
 const App = () => {
@@ -59,7 +55,6 @@ const App = () => {
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
     
-    //sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'});
     sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
     //users permission
     if (localStorage.getItem("addUsers") === "true") {
@@ -71,7 +66,7 @@ const App = () => {
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
         sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user',items: sidebarSubMenu1});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     //inventory permission
@@ -84,7 +79,7 @@ const App = () => {
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     //inspection permission
@@ -98,13 +93,13 @@ const App = () => {
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
         sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file',items: sidebarSubMenu2});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
         sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
     } else {
-        console.log("permission data none");
+        //console.log("permission data none");
     }
 
     //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
@@ -228,16 +223,12 @@ const App = () => {
                 layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 
             <div className="layout-main">
-                {/* <Route path="/" exact component={Dashboard} /> */}
-                <Route path="/" exact component={MainDashboard} />
+                <Route path="/" exact component={Dashboard} />
                 <Route path="/register" exact component={Register} />
                 <Route path="/editdeleteuser" exact component={EditDeleteUser} />
                 <Route path="/vehicles" exact component={Vehicles} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
-                <Route path="/inspectionreport" exact component={InspectionReport} />
-                <Route path="/inspectionreportdriver" exact component={InspectionReportDriver} />
-                <Route path="/taskscheduler" exact component={TSManager} />
             </div>
 
             <AppFooter />
