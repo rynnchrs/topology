@@ -1,9 +1,11 @@
 import React, { Component, createRef} from 'react';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
-import { Toast } from 'primereact/toast';
+import { Dialog } from 'primereact/dialog';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import axios from "axios";
 import { isThisISOWeek } from 'date-fns';
 
@@ -78,10 +80,19 @@ export class DriverInspectionReport extends Component {
             bodyno: [],
             filteredSuggestions: [],
             carValues: [],
+            displayError: false,
+            displaySuccess: false,
+            errorMessage: { title: "", content: ""},
+            isBtnSubmit: false,
+            labelBtnSubmit: "SUBMIT",
+            iconBtnSubmit: "",
+            isLoading: false,
         };
-        this.toast = createRef(null);
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
         this.onTagBodyNo = this.onTagBodyNo.bind(this);
+
+        this.onClick = this.onClick.bind(this);
+        this.onHide = this.onHide.bind(this);
 
     }
 
@@ -141,7 +152,7 @@ export class DriverInspectionReport extends Component {
             fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
-            console.log("res", res2)
+            //console.log("res", res1)
             // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
             //             : item.make === 'SUV' ? 'Super Carry UV'
             //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
@@ -273,8 +284,15 @@ export class DriverInspectionReport extends Component {
 
         if (this.state.bn === null){
            // console.log("bn is null");
-        }else {
+        } else {
             //console.log("bn is no null");
+        }
+    }
+
+    onChangeMileage = (event) => {
+       let re = /^[0-9\b]+$/;
+       if (event.target.value === '' || re.test(event.target.value)) {
+           this.setState({mil: event.target.value})
         }
     }
 
@@ -293,6 +311,13 @@ export class DriverInspectionReport extends Component {
     };*/
 
     submitData = event => {
+        this.setState({
+            labelBtnSubmit:"SUBMITTING...",
+            isBtnSubmit: true,
+            iconBtnSubmit: "pi pi-spin pi-spinner",
+            isLoading: true,
+        });
+
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -356,7 +381,6 @@ export class DriverInspectionReport extends Component {
             edited_by: this.state.editor,
           }, config)
           .then((res) => {
-            this.toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 5000});
             this.setState({
                 radioValue1: null,
                 radioValue2: null,
@@ -414,14 +438,148 @@ export class DriverInspectionReport extends Component {
                 mil: "",
                 locc: "",
                 com: "",
+                labelBtnSubmit:"SUBMIT",
+                isBtnSubmit: false,
+                iconBtnSubmit: "",
+                isLoading: false,
             })
-            //console.log("make:", this.state.make);
-            //console.log("locc: ",this.state.locc);
+            window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+            this.onClick('displaySuccess');
           })
           .catch((err) => {
             console.log(err.response);
-            this.toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 5000});
+            // incomplete: windows/windscreen
+            if (err.toJSON().message === 'Network Error'){
+                this.setState({errorMessage: {title:"NETWEORK ERROR:", content: "Please check internet connection."}});
+            } else if (err.response.data.body_no) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Body No."}});
+            } else if (err.response.data.mileage) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Mileage"}});
+            } else if (err.response.data.cleanliness_exterior) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Exterior: Cleanliness"}});
+            } else if (err.response.data.condition_rust) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Condition Rust"}});
+            } else if (err.response.data.decals) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Decals/Livery Intact"}});
+            } else if (err.response.data.rear_door) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Read Door"}});
+            } else if (err.response.data.mirror) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Mirror"}});
+            } else if (err.response.data.roof_rack) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Roof Rack"}});
+            } else if (err.response.data.rear_step) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear Step"}});
+            } else if (err.response.data.seats) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Seats"}});
+            } else if (err.response.data.seat_belts) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Seat Belts"}});
+            } else if (err.response.data.general_condition) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "General Condition"}});
+            } else if (err.response.data.vehicle_documents) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Vehicle Documents"}});
+            } else if (err.response.data.cleanliness_engine_bay) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Engine Bay: Cleanliness"}});
+            } else if (err.response.data.washer_fluid) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Washer Fluid"}});
+            } else if (err.response.data.coolant_level) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Coolant Level"}});
+            } else if (err.response.data.brake_fluid_level) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Brake Fluid Level"}});
+            } else if (err.response.data.power_steering_fluid) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Power Steering Fluid"}});
+            } else if (err.response.data.main_beam) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Main Beam"}});
+            } else if (err.response.data.dipped_beam) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Dipped Beam"}});
+            } else if (err.response.data.side_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Side Lights"}});
+            } else if (err.response.data.tail_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Tail Lights"}});
+            } else if (err.response.data.indicators) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Indicators"}});
+            } else if (err.response.data.break_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Break Lights"}});
+            } else if (err.response.data.reverse_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Reverse Lights"}});
+            } else if (err.response.data.hazard_light) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Hazard Lights"}});
+            } else if (err.response.data.rear_fog_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear Fog Light"}});
+            } else if (err.response.data.interior_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Interior Lights"}});
+            } else if (err.response.data.screen_washer) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Screen Washer"}});
+            } else if (err.response.data.wiper_blades) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Wiper Blades"}});
+            } else if (err.response.data.horn) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Horn"}});
+            } else if (err.response.data.radio) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Radio/CD"}});
+            } else if (err.response.data.front_fog_lights) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Front Fog Lights"}});
+            } else if (err.response.data.air_conditioning) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Air Conditioning"}});
+            } else if (err.response.data.tyres) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Tyres"}});
+            } else if (err.response.data.front_visual) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Front (Visual)"}});
+            } else if (err.response.data.rear_visual) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear (Visual)"}});
+            } else if (err.response.data.spare_visual) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Spare (Visual)"}});
+            } else if (err.response.data.wheel_brace) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Wheel Brace"}});
+            } else if (err.response.data.jack) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Jack"}});
+            } else if (err.response.data.front_left_wheel) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Left Front"}});
+            } else if (err.response.data.front_right_wheel) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Right Front"}});
+            } else if (err.response.data.rear_left_wheel) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Left Rear"}});
+            } else if (err.response.data.rear_right_wheel) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Right Rear"}});
+            } else if (err.response.data.gas_level) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Gas Level"}});
+            } else if (err.response.data.oil_level) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Oil Level"}});
+            } 
+            this.onClick('displayError');
           })
+    }
+
+    onClick(name) {
+        let state = {
+            [`${name}`]: true
+        };
+        this.setState(state);
+    }
+
+    onHide(name) {
+        this.setState({
+            [`${name}`]: false,
+            errorMessage: "",
+            labelBtnSubmit:"SUBMIT",
+            isBtnSubmit: false,
+            iconBtnSubmit: "",
+            isLoading: false,
+        });
+    }
+
+    renderFooter(name) {
+        if (name === "displayError"){
+            return (
+                <div>
+                    <Button label="CLOSE" className="p-button-danger" onClick={() => this.onHide(name)} autoFocus />
+                </div>
+            );
+        } else if (name === "displaySuccess"){
+            return (
+                <div>
+                    <Button label="CLOSE" className="p-button-success" onClick={() => this.onHide(name)} autoFocus />
+                </div>
+            );
+        }
     }
 
     render() {
@@ -429,7 +587,6 @@ export class DriverInspectionReport extends Component {
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
-                        <Toast ref={this.toast} />
                         <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6">
@@ -443,7 +600,7 @@ export class DriverInspectionReport extends Component {
                         </div>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6 p-inputgroup">
-                                <InputText placeholder="Mileage" value={this.state.mil} onChange={event => this.setState({ mil: event.target.value })}/>
+                                <InputText placeholder="Mileage" value={this.state.mil} onChange={event => this.onChangeMileage(event)}/>
                                 <span className="p-inputgroup-addon">KM.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
@@ -941,10 +1098,50 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-
-                <div className="p-col-12 p-lg-12">
+                <div className="p-col-12">
                     <div className="card card-w-title">
-                        <h1>Gas and Oil</h1>
+                        <h1>Gas and Oil</h1><hr style={{ borderTop:'1px solid black'}}/>
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-6 p-md-6">
+                                <div className="p-grid p-fluid">
+                                    <div className="p-field p-col gas-oil-img">
+                                        <center><img src='/assets/layout/images/fuelindicator.png'/></center>
+                                    </div>
+                                    <div className="p-field p-col">
+                                        <center>
+                                            <h4><b>Gas Level</b></h4>
+                                            <div className="p-col"><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue44: 4})} checked={this.state.radioValue44 === 4} /></div>
+                                            <div className="p-col"><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue44: 3})} checked={this.state.radioValue44 === 3} /></div>
+                                            <div className="p-col"><Checkbox inputId="rb3" onChange={event => this.setState({ radioValue44: 2})} checked={this.state.radioValue44 === 2} /></div>
+                                            <div className="p-col"><Checkbox inputId="rb4" onChange={event => this.setState({ radioValue44: 1})} checked={this.state.radioValue44 === 1} /></div>
+                                        </center>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-col-12 p-lg-6 p-md-6">
+                                <div className="p-grid p-fluid">
+                                    <div className="p-field p-col gas-oil-img">
+                                        <center><img src='/assets/layout/images/oilindicator.png'/></center>
+                                    </div>
+                                    <div className="p-field p-col">
+                                        <center>
+                                            <h4><b>Oil  Level</b></h4>
+                                            <div className="p-col"><Checkbox inputId="rb1" onChange={event => this.setState({ radioValue45: 4})} checked={this.state.radioValue45 === 4} /></div>
+                                            <div className="p-col"><Checkbox inputId="rb2" onChange={event => this.setState({ radioValue45: 3})} checked={this.state.radioValue45 === 3} /></div>
+                                            <div className="p-col"><Checkbox inputId="rb3" onChange={event => this.setState({ radioValue45: 2})} checked={this.state.radioValue45 === 2} /></div>
+                                            <div className="p-col"><Checkbox inputId="rb4" onChange={event => this.setState({ radioValue45: 1})} checked={this.state.radioValue45 === 1} /></div>
+                                        </center>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+
+
+                {/* <div className="p-col-12 p-lg-12">
+                    <div className="card card-w-title">
+                        <h1>Gas and Oil</h1><hr style={{ borderTop:'1px solid black'}}/>
                         <div className="p-grid">
                             <div className="p-col">
                                 <center><h4><b>Gas Level</b></h4></center>
@@ -986,7 +1183,7 @@ export class DriverInspectionReport extends Component {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
 
                 <div className="p-col-12 p-lg-12">
@@ -1004,11 +1201,40 @@ export class DriverInspectionReport extends Component {
                             </div>
                             <div className="p-col-12 p-md-9"> </div>
                             <div className="p-col-12 p-md-3">
-                                {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}
-                                <Button label="SUBMIT" onClick={this.submitData}> </Button>
+                                {/*submit button is okay but not getting autocomplete value after clicking on suggestions submitData*/}
+                                <Button icon={this.state.iconBtnSubmit} iconPos="right" label={this.state.labelBtnSubmit} onClick={this.submitData} disabled={this.state.isBtnSubmit}> </Button>
+                                {/* <Button label="SUBMIT" onClick={() => this.onClick('displayError')}> </Button> */}
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <Dialog header="SUBMIT FAILURE" visible={this.state.displayError} style={{ width: '310px' }} footer={this.renderFooter('displayError')} onHide={() => this.onHide('displayError')}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-exclamation-triangle" style={{fontSize: '30px', color: 'red'}}/>
+                        </div>
+                        <div className="p-col">
+                            <h5><b>{this.state.errorMessage.title}</b></h5>
+                            <div style={{fontSize: '16px'}}>{this.state.errorMessage.content}</div>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="SUBMIT SUCCESS" visible={this.state.displaySuccess} style={{ width: '310px' }} footer={this.renderFooter('displaySuccess')} onHide={() => this.onHide('displaySuccess')}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-check-circle" style={{fontSize: '30px', color: 'green'}}/>
+                        </div>
+                        <div className="p-col">
+                            <h5><b>SAVE REPORT</b></h5>
+                            <div style={{fontSize: '16px'}}>Report save successfully.</div>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <div className="gray-out" style={{display: this.state.isLoading ? "flex": "none"}}>
+                    <ProgressSpinner />
                 </div>
 
             </div>

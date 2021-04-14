@@ -110,6 +110,18 @@
   }
 }
 
+.gray-out{
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  //justify-content: center;
+  align-items: center;
+}
+
 /* css for driver inspection records checklist  */
 .report-checklist{
 
@@ -173,6 +185,19 @@
     }
   }
 }
+
+.gas-oil-img {
+  padding-top: 4%;
+
+  img{
+    //box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
+    max-width: 100%;
+    height: fit-content;
+  }
+  
+}
+
+/*end css for driver inspection records checklist  */
 
 
 

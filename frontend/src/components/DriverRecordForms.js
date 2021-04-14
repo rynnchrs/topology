@@ -10,6 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { Paginator } from 'primereact/paginator';
 import { format, isToday } from 'date-fns';
 
@@ -20,7 +21,14 @@ export default function DriverRecordForms() {
         const [carValues, setcarValues] = useState([]);
         const [displayBasic, setDisplayBasic] = useState(false);
         const [displayBasic2, setDisplayBasic2] = useState(false);
+        const [displayError, setDisplayError] = useState(false);
+        const [displaySuccess, setDisplaySuccess] = useState(false);
         const [position, setPosition] = useState('center');
+        const [errorMessage, setErrorMessage] = useState({title:"", content:""});
+        const [isLoading, setIsLoading] = useState(false);
+        const [iconBtnSave, setIconBtnSave] = useState("");
+        const [labelBtnSave, setLabelBtnSave] = useState("SAVE CHANGES");
+        const [isBtnSave, setIsBtnSave] = useState(false);
         const [date2, setDate2] = useState(null);
         const [selectedLocation, setSelectedLocation] = useState(null);
         const cities = [
@@ -180,12 +188,18 @@ export default function DriverRecordForms() {
         const dialogFuncMap = {
             'displayBasic': setDisplayBasic,
             'displayBasic2': setDisplayBasic2,
+            'displayError': setDisplayError,
+            'displaySuccess': setDisplaySuccess,
         }
 
         const onClick = (name, position) => {
-            if (selected != null) {
+            console.log("selected: ",selected);
+            if (name === "displayError") {
+                dialogFuncMap[`${name}`](true);
+            } else if (name === "displaySuccess") {
+                dialogFuncMap[`${name}`](true);
+            } else if (selected != null) {
                 //console.log(selected.inspection_id);
-                //getInspectionData();
                 dialogFuncMap[`${name}`](true);
                 if (position) {
                     setPosition(position);
@@ -198,15 +212,42 @@ export default function DriverRecordForms() {
     
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
-            setSelectedCar([]);
-            setNotOkay([]);
-            setOkay([]);
-            setGas([]);
-            setOil([]);
-            setSmallMileage("");
-            setEditMileage("");
-            setSmallNotes("");
-            setEditNotes("");
+            if (name === "displayError") {
+                setIconBtnSave("");
+                setLabelBtnSave("SAVE CHANGES");
+                setIsBtnSave(false);
+                setIsLoading(false);
+            } else {
+                setSelectedCar([]);
+                setNotOkay([]);
+                setOkay([]);
+                setGas([]);
+                setOil([]);
+                setSmallMileage("");
+                setEditMileage("");
+                setSmallNotes("");
+                setEditNotes("");
+                setIconBtnSave("");
+                setLabelBtnSave("SAVE CHANGES");
+                setIsBtnSave(false); 
+                setIsLoading(false);   
+            }
+        }
+
+        const renderFooter = (name) =>{
+            if (name === "displayError"){
+                return (
+                    <div>
+                        <Button label="CLOSE" className="p-button-danger" onClick={() => onHide(name)} autoFocus />
+                    </div>
+                );
+            } else if (name === "displaySuccess"){
+                return (
+                    <div>
+                        <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus />
+                    </div>
+                );
+            }
         }
 
         const getInspectionData = () => {
@@ -378,81 +419,189 @@ export default function DriverRecordForms() {
             
         }
 
-        const submitData = () => {
-            let token = localStorage.getItem("token");
-            let accfullname = localStorage.getItem("username");
-            
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-            axios.put(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/", {
-                //car: this.state.bn.car_id,
-                body_no: selectedBody.body_no,
-                make: selectedBody.make,
-                mileage: mil,
-                location: selectedBody.current_loc,
-                cleanliness_exterior: cleanlinessExterior,
-                condition_rust: conditionRust,
-                decals: decals,
-                windows: windows,
-                rear_door: rearDoor,
-                mirror: mirror,
-                roof_rack: roofRack,
-                rear_step: rearStep,
-                seats: seats,
-                seat_belts: seatBelts,
-                general_condition: generalCondition,
-                vehicle_documents: vehicleDocuments,
-                main_beam: mainBeam,
-                dipped_beam: dippedBeam,
-                side_lights: sideLights,
-                tail_lights: tailLights,
-                indicators: indicators,
-                break_lights: breakLights,
-                reverse_lights: reverseLights,
-                hazard_light: hazardLights,
-                rear_fog_lights: rearFogLights,
-                interior_lights: interiorLights,
-                screen_washer: screenWasher,
-                wiper_blades: wiperBlades,
-                horn: horn,
-                radio: radio,
-                front_fog_lights: frontFogLights,
-                air_conditioning: airConditioning,
-                cleanliness_engine_bay: cleanlinessEngineBay,
-                washer_fluid: washerFluid,
-                coolant_level: coolantLevel,
-                brake_fluid_level: brakeFluidLevel,
-                power_steering_fluid: powerSteeringFluid,
-                gas_level: gasLevel,
-                oil_level: oilLevel,
-                tyres: tyres,
-                front_visual: frontVisual,
-                rear_visual: rearVisual,
-                spare_visual: spareVisual,
-                wheel_brace: wheelBrace,
-                jack: jack,
-                front_right_wheel: frontRightWheel,
-                front_left_wheel: frontLeftWheel,
-                rear_right_wheel: rearRightWheel,
-                rear_left_wheel: rearLeftWheel,
-                notes: notes,
-               // driver: selectedCar.driver,
-                driver: "",
-                edited_by: accfullname,
-              }, config)
-              .then((res) => {
-                getInspectionData();
-                toast.current.show({severity:'success', summary: 'Save Successfully', detail:'Inspection Report Saved', life: 3000});
-              })
-              .catch((err) => {
-                console.log(err.response);
-               toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 3000});
-              })
-    
+        const saveChanges = () => {
+            console.log("select save:", selected);
+            if (selected != null) {
+                setIconBtnSave("pi pi-spin pi-spinner");
+                setLabelBtnSave("SAVING...");
+                setIsBtnSave(true);
+                setIsLoading(true);
+                let token = localStorage.getItem("token");
+                let accfullname = localStorage.getItem("username");
+                
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                };
+                axios.put(process.env.REACT_APP_SERVER_NAME + 'api/inspection/'+ selected.inspection_id + "/", {
+                    //car: this.state.bn.car_id,
+                    body_no: selectedBody.body_no,
+                    make: selectedBody.make,
+                    mileage: mil,
+                    location: selectedBody.current_loc,
+                    cleanliness_exterior: cleanlinessExterior,
+                    condition_rust: conditionRust,
+                    decals: decals,
+                    windows: windows,
+                    rear_door: rearDoor,
+                    mirror: mirror,
+                    roof_rack: roofRack,
+                    rear_step: rearStep,
+                    seats: seats,
+                    seat_belts: seatBelts,
+                    general_condition: generalCondition,
+                    vehicle_documents: vehicleDocuments,
+                    main_beam: mainBeam,
+                    dipped_beam: dippedBeam,
+                    side_lights: sideLights,
+                    tail_lights: tailLights,
+                    indicators: indicators,
+                    break_lights: breakLights,
+                    reverse_lights: reverseLights,
+                    hazard_light: hazardLights,
+                    rear_fog_lights: rearFogLights,
+                    interior_lights: interiorLights,
+                    screen_washer: screenWasher,
+                    wiper_blades: wiperBlades,
+                    horn: horn,
+                    radio: radio,
+                    front_fog_lights: frontFogLights,
+                    air_conditioning: airConditioning,
+                    cleanliness_engine_bay: cleanlinessEngineBay,
+                    washer_fluid: washerFluid,
+                    coolant_level: coolantLevel,
+                    brake_fluid_level: brakeFluidLevel,
+                    power_steering_fluid: powerSteeringFluid,
+                    gas_level: gasLevel,
+                    oil_level: oilLevel,
+                    tyres: tyres,
+                    front_visual: frontVisual,
+                    rear_visual: rearVisual,
+                    spare_visual: spareVisual,
+                    wheel_brace: wheelBrace,
+                    jack: jack,
+                    front_right_wheel: frontRightWheel,
+                    front_left_wheel: frontLeftWheel,
+                    rear_right_wheel: rearRightWheel,
+                    rear_left_wheel: rearLeftWheel,
+                    notes: notes,
+                // driver: selectedCar.driver,
+                    driver: "",
+                    edited_by: accfullname,
+                }, config)
+                .then((res) => {
+                    console.log("res")
+                    onClick('displaySuccess');
+                    onHide('displayBasic')
+                    setIconBtnSave("");
+                    setLabelBtnSave("SAVE CHANGES");
+                    setIsBtnSave(false);
+                    setIsLoading(false);
+                })
+                .catch((err) => {
+                    console.log(err.response);
+                    if (err.toJSON().message === 'Network Error'){
+                        setErrorMessage({title:"NETWEORK ERROR:", content:"Please check internet connection."});
+                    } else if (err.response.data.body_no) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Body No."});
+                    } else if (err.response.data.mileage) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Mileage"});
+                    } else if (err.response.data.cleanliness_exterior) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Exterior: Cleanliness"});
+                    } else if (err.response.data.condition_rust) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Condition Rust"});
+                    } else if (err.response.data.decals) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Decals/Livery Intact"});
+                    } else if (err.response.data.rear_door) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Read Door"});
+                    } else if (err.response.data.mirror) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Mirror"});
+                    } else if (err.response.data.roof_rack) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Roof Rack"});
+                    } else if (err.response.data.rear_step) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Rear Step"});
+                    } else if (err.response.data.seats) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Seats"});
+                    } else if (err.response.data.seat_belts) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Seat Belts"});
+                    } else if (err.response.data.general_condition) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"General Condition"});
+                    } else if (err.response.data.vehicle_documents) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Vehicle Documents"});
+                    } else if (err.response.data.cleanliness_engine_bay) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Engine Bay: Cleanliness"});
+                    } else if (err.response.data.washer_fluid) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Washer Fluid"});
+                    } else if (err.response.data.coolant_level) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Coolant Level"});
+                    } else if (err.response.data.brake_fluid_level) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Brake Fluid Level"});
+                    } else if (err.response.data.power_steering_fluid) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Power Steering Fluid"});
+                    } else if (err.response.data.main_beam) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Main Beam"});
+                    } else if (err.response.data.dipped_beam) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Dipped Beam"});
+                    } else if (err.response.data.side_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Side Lights"});
+                    } else if (err.response.data.tail_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Tail Lights"});
+                    } else if (err.response.data.indicators) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Indicators"});
+                    } else if (err.response.data.break_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Break Lights"});
+                    } else if (err.response.data.reverse_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Reverse Lights"});
+                    } else if (err.response.data.hazard_light) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Hazard Lights"});
+                    } else if (err.response.data.rear_fog_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Rear Fog Light"});
+                    } else if (err.response.data.interior_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Interior Lights"});
+                    } else if (err.response.data.screen_washer) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Screen Washer"});
+                    } else if (err.response.data.wiper_blades) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Wiper Blades"});
+                    } else if (err.response.data.horn) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Horn"});
+                    } else if (err.response.data.radio) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Radio/CD"});
+                    } else if (err.response.data.front_fog_lights) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Front Fog Lights"});
+                    } else if (err.response.data.air_conditioning) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Air Conditioning"});
+                    } else if (err.response.data.tyres) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Tyres"});
+                    } else if (err.response.data.front_visual) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Front (Visual)"});
+                    } else if (err.response.data.rear_visual) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Rear (Visual)"});
+                    } else if (err.response.data.spare_visual) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Spare (Visual)"});
+                    } else if (err.response.data.wheel_brace) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Wheel Brace"});
+                    } else if (err.response.data.jack) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Jack"});
+                    } else if (err.response.data.front_left_wheel) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Left Front"});
+                    } else if (err.response.data.front_right_wheel) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Right Front"});
+                    } else if (err.response.data.rear_left_wheel) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Left Rear"});
+                    } else if (err.response.data.rear_right_wheel) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Right Rear"});
+                    } else if (err.response.data.gas_level) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Gas Level"});
+                    } else if (err.response.data.oil_level) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Oil Level"});
+                    } 
+                    onClick('displayError');
+                })
+            } else {
+                toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
+            }
         }
 
         const updateNotOkay = (index, value) => {
@@ -967,13 +1116,16 @@ export default function DriverRecordForms() {
                     }
                     break;
                 case 'mil':
-                    setMileage(value);
-                    if (selectedCar.mileage !== parseInt(value)){
-                        setSmallMileage("Previous Mileage: " + selectedCar.mileage);
-                        setEditMileage("red-inputtext");
-                    } else {
-                        setSmallMileage("");
-                        setEditMileage("");
+                    let re = /^[0-9\b]+$/;
+                    if (value === '' || re.test(value)) {
+                        setMileage(value);
+                        if (selectedCar.mileage !== parseInt(value)){
+                            setSmallMileage("Previous Mileage: " + selectedCar.mileage);
+                            setEditMileage("red-inputtext");
+                        } else {
+                            setSmallMileage("");
+                            setEditMileage("");
+                        }
                     }
                     break;
                 default:
@@ -1095,7 +1247,6 @@ export default function DriverRecordForms() {
                 </DataTable>
                 {/* <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator> */}
                 
-
                 <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-8 report-checklist">
@@ -1662,11 +1813,15 @@ export default function DriverRecordForms() {
                                     <div className="p-col-12 p-md-5"> </div>
                                     <div className="p-col-12 p-md-3">
                                         {/*submit button is okay but not getting autocomplete value after clicking on suggestions*/}
-                                        <Button label="SAVE CHANGES" onClick={submitData}> </Button>
+                                        <Button icon={iconBtnSave} iconPos="right" label={labelBtnSave} onClick={saveChanges} disabled={isBtnSave}> </Button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="gray-out" style={{display: isLoading ? "flex": "none"}}>
+                        <ProgressSpinner />
                     </div>
                 </Dialog>
             
@@ -2231,6 +2386,33 @@ export default function DriverRecordForms() {
                         </div>
                     </div>
                 </Dialog>
+
+                <Dialog header="UPDATE FAILURE" visible={displayError} style={{ width: '310px' }} footer={renderFooter('displayError')} onHide={() => onHide('displayError')}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-exclamation-triangle" style={{fontSize: '30px', color: 'red'}}/>
+                        </div>
+                        <div className="p-col">
+                            <h5><b>{errorMessage.title}</b></h5>
+                            <div style={{fontSize: '16px'}}>{errorMessage.content}</div>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="UPDATE SUCCESS" visible={displaySuccess} style={{ width: '310px' }} footer={renderFooter('displaySuccess')} onHide={() => onHide('displaySuccess')}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-check-circle" style={{fontSize: '30px', color: 'green'}}/>
+                        </div>
+                        <div className="p-col">
+                            <h5><b>SAVE CHANGES</b></h5>
+                            <div style={{fontSize: '16px'}}>Report update successfully.</div>
+                        </div>
+                    </div>
+                </Dialog>
+
+                
+
             </div>
         )
 
