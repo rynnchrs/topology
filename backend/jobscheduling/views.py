@@ -15,7 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from reversion.models import Version
 
 from .models import (Task)
-from .serializers import (TaskListSerializer,JobOrderSerializer,FieldmanAssignmentSerializer)
+from .serializers import (TaskListSerializer,TaskSerializer,JobOrderSerializer,FieldmanAssignmentSerializer)
 
 from careta.utils import (user_permission)
 
@@ -44,7 +44,7 @@ class TaskView(viewsets.ViewSet):
     def create(self, request):      # create permission
         user = self.request.user
         if user_permission(user, 'can_add_task'):    # permission
-            serializer = TaskListSerializer(data=request.data)
+            serializer = TaskSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(status=status.HTTP_201_CREATED)          

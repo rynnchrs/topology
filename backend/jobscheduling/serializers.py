@@ -8,8 +8,8 @@ from .models import (JobOrder,Task,FieldManAssignment)
 
 
 class TaskListSerializer(serializers.ModelSerializer):
-    manager_un = serializers.CharField(read_only=True, source='user.username')
-    car_vn = serializers.CharField(read_only=True, source='car.vin_no')
+    manager_un = serializers.CharField(source='user.username')
+    car_vn = serializers.CharField(source='car.vin_no')
     start = serializers.DateField(source='job_startdate')
     end = serializers.DateField(source='job_enddate')
     
@@ -18,6 +18,13 @@ class TaskListSerializer(serializers.ModelSerializer):
         fields = ['id','manager_un','car_vn','job_order','job_desc','job_remarks',
                   'start','end','job_startdate_actual','job_enddate_actual',
                   'job_actualdays','job_status_fm','job_status_mn','job_scheduledate']
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Task
+        fields = '__all__'
 
 
 class JobOrderSerializer(serializers.ModelSerializer):
