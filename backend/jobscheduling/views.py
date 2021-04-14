@@ -35,7 +35,6 @@ class TaskView(viewsets.ViewSet):
         user = self.request.user
         if user_permission(user, 'can_view_task'):   
             queryset = Task.objects.filter(manager_id__username=pk)
-            #tasklist = get_object_or_404(queryset, manager_id__username=pk) 
             serializer_class = TaskListSerializer(queryset, many=True)
             return Response(serializer_class.data, status=status.HTTP_200_OK)            
         else:
@@ -49,6 +48,19 @@ class TaskView(viewsets.ViewSet):
                 serializer.save()
             return Response(status=status.HTTP_201_CREATED)          
         else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)              
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def update(self, request,pk=None):      
+        user = self.request.user
+        if user_permission(user, 'can_edit_task'):    # permission
+            queryset = Task.objects.all()
+            targettask = get_object_or_404(queryset, id=pk)
+            serializer = TaskSerializer(instance = targettask, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(status=status.HTTP_200_OK)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)            
+
     
       
