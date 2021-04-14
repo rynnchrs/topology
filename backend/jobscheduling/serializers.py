@@ -8,7 +8,7 @@ from .models import (JobOrder,Task,FieldManAssignment)
 
 
 class TaskListSerializer(serializers.ModelSerializer):
-    manager_un = serializers.CharField(source='user.username')
+    manager_un = serializers.CharField(source='manager.username')
     car_vn = serializers.CharField(source='car.vin_no')
     start = serializers.DateField(source='job_startdate')
     end = serializers.DateField(source='job_enddate')

@@ -22,7 +22,7 @@ from careta.utils import (user_permission)
 class TaskView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     
-    def list(self, request):    # Permission List
+    def list(self, request):    
         user = self.request.user
         if user_permission(user, 'can_view_task'):   
             queryset = Task.objects.all()
@@ -31,17 +31,17 @@ class TaskView(viewsets.ViewSet):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def retrieve(self, request, pk=None):    # Permission List
+    def retrieve(self, request, pk=None):    
         user = self.request.user
         if user_permission(user, 'can_view_task'):   
-            queryset = Task.objects.all()
-            tasklist = get_object_or_404(queryset, manager_id__username=pk) 
-            serializer_class = TaskListSerializer(tasklist, many=False)
+            queryset = Task.objects.filter(manager_id__username=pk)
+            #tasklist = get_object_or_404(queryset, manager_id__username=pk) 
+            serializer_class = TaskListSerializer(queryset, many=True)
             return Response(serializer_class.data, status=status.HTTP_200_OK)            
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)  
 
-    def create(self, request):      # create permission
+    def create(self, request):      
         user = self.request.user
         if user_permission(user, 'can_add_task'):    # permission
             serializer = TaskSerializer(data=request.data)
