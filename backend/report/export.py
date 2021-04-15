@@ -6,8 +6,8 @@ from openpyxl import Workbook
 from .models import Inspection
 
 
-def export():
-    datas = Inspection.objects.all()
+def export(inspection):
+    datas = inspection
     
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -383,6 +383,5 @@ def export():
         for col_num, cell_value in enumerate(row, 1):
             cell = worksheet.cell(row=row_num, column=col_num)
             cell.value = cell_value
-        print(data.inspection_id)
     workbook.save(response)
     return response
