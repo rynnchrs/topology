@@ -203,6 +203,7 @@ def export():
             
             ins20.company,
             ins20.po_no,
+            ins20.insurance_no,
             ins20.date_issued,
             ins20.start_date,
             ins20.end_date,
