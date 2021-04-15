@@ -32,6 +32,33 @@ class RegistrationTestCase(APITestCase):
                }
         response = self.client.post(('/careta/register/'), data, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+class LoginTestCase(APITestCase):
+    TEST_USER = {
+                "username": "testuser",
+                "email": "testuser@basicbrix.com",
+                "first_name": "basic",
+                "last_name": "brix",
+                "password": "p@ssword",
+            }
+
+    def setUp(self):
+        self.user = User.objects.create_user(**self.TEST_USER)
+        UserInfo.objects.create(user=self.user, phone="09123456789")
+
+    def test_email_login(self):
+        self.account = {'username': 'testuser@basicbrix.com', 'password': 'p@ssword'}
+        response = self.client.post('/careta/login/', self.account, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_username_login(self):
+        self.account = {'username': 'testuser', 'password': 'p@ssword'}
+        response = self.client.post('/careta/login/', self.account, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_phone_login(self):
+        self.account = {'username': '09123456789', 'password': 'p@ssword'}
+        response = self.client.post('/careta/login/', self.account, format='json')
+        self.assertEqual(response.status_code, 200)
 
 class UserTestCase(APITestCase):
     TEST_USER = {
