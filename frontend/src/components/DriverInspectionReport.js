@@ -18,6 +18,7 @@ export class DriverInspectionReport extends Component {
             radioValue1: null,
             radioValue2: null,
             radioValue3: null,
+            radioValue4: null,
             radioValue5: null,
             radioValue6: null,
             radioValue7: null,
@@ -118,7 +119,7 @@ export class DriverInspectionReport extends Component {
     //             'Authorization': 'Bearer ' + token,
     //         },
     //     };
-    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config)
+    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config)
     //         .then(res => {
     //             const bodyno = res.data;
     //             bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
@@ -147,9 +148,9 @@ export class DriverInspectionReport extends Component {
         };
 
         Promise.all([
-            fetch(process.env.REACT_APP_SERVER_NAME + 'api/car-list/', config).then(res => res.json()),
-            //fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
-            fetch(process.env.REACT_APP_SERVER_NAME + 'api/inspection/',config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json()),
+            //fetch(process.env.REACT_APP_SERVER_NAME + 'careta/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
             //console.log("res", res1)
@@ -289,13 +290,6 @@ export class DriverInspectionReport extends Component {
         }
     }
 
-    onChangeMileage = (event) => {
-       let re = /^[0-9\b]+$/;
-       if (event.target.value === '' || re.test(event.target.value)) {
-           this.setState({mil: event.target.value})
-        }
-    }
-
     //This will get the filename/filepath that can be use in post request*
     /*fileSelect = event => {
         console.log(event.target.files.length);
@@ -325,7 +319,7 @@ export class DriverInspectionReport extends Component {
                 'Authorization': 'Bearer ' + token,
             },
         };
-        axios.post(process.env.REACT_APP_SERVER_NAME + 'api/inspection/', {
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/', {
             //car: this.state.bn.car_id,
             body_no: this.state.bn.body_no,
             make: this.state.bn.make,
@@ -445,10 +439,27 @@ export class DriverInspectionReport extends Component {
             })
             window.scrollTo({top: 0, left: 0, behavior:'smooth'});
             this.onClick('displaySuccess');
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config)
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({
+                        carValues: data
+                    });
+                })
+                .catch((error) => {
+                    console.log('error report insp: ');
+                    console.log(error);
+                });
           })
           .catch((err) => {
             console.log(err.response);
-            // incomplete: windows/windscreen
             if (err.toJSON().message === 'Network Error'){
                 this.setState({errorMessage: {title:"NETWEORK ERROR:", content: "Please check internet connection."}});
             } else if (err.response.data.body_no) {
@@ -461,6 +472,8 @@ export class DriverInspectionReport extends Component {
                 this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Condition Rust"}});
             } else if (err.response.data.decals) {
                 this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Decals/Livery Intact"}});
+            } else if (err.response.data.windows) {
+                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Windows/Windscreen"}});
             } else if (err.response.data.rear_door) {
                 this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Read Door"}});
             } else if (err.response.data.mirror) {
@@ -600,7 +613,7 @@ export class DriverInspectionReport extends Component {
                         </div>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6 p-inputgroup">
-                                <InputText placeholder="Mileage" value={this.state.mil} onChange={event => this.onChangeMileage(event)}/>
+                                <InputText placeholder="Mileage" value={this.state.mil} keyfilter="int" onChange={event => this.setState({mil: event.target.value})}/>
                                 <span className="p-inputgroup-addon">KM.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
@@ -1098,14 +1111,14 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-                <div className="p-col-12">
+                <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
                         <h1>Gas and Oil</h1><hr style={{ borderTop:'1px solid black'}}/>
                         <div className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-6 p-md-6">
                                 <div className="p-grid p-fluid">
                                     <div className="p-field p-col gas-oil-img">
-                                        <center><img src='/assets/layout/images/fuelindicator.png'/></center>
+                                        <center><img src='/assets/layout/images/fuelindicator.png' alt="fuel"/></center>
                                     </div>
                                     <div className="p-field p-col">
                                         <center>
@@ -1121,7 +1134,7 @@ export class DriverInspectionReport extends Component {
                             <div className="p-col-12 p-lg-6 p-md-6">
                                 <div className="p-grid p-fluid">
                                     <div className="p-field p-col gas-oil-img">
-                                        <center><img src='/assets/layout/images/oilindicator.png'/></center>
+                                        <center><img src='/assets/layout/images/oilindicator.png' alt="oil"/></center>
                                     </div>
                                     <div className="p-field p-col">
                                         <center>

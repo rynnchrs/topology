@@ -93,7 +93,7 @@ export const EditDeleteUser = () => {
     //         };
 
     //         axios
-    //             .get(process.env.REACT_APP_SERVER_NAME + 'api/user-list/?page=' + sentPage, config)
+    //             .get(process.env.REACT_APP_SERVER_NAME + 'careta/user-list/?page=' + sentPage, config)
     //             .then((res) => {
     //                 console.log(res.data);
     //                 setUsers(res.data.results);
@@ -123,7 +123,7 @@ export const EditDeleteUser = () => {
         };
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'api/user-list/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'careta/user-list/', config)
             .then((res) => {
                 //console.log(res.data);
                 //console.log(res.data.count);
@@ -179,7 +179,7 @@ export const EditDeleteUser = () => {
             }
                 
             axios
-                .put(process.env.REACT_APP_SERVER_NAME + 'api/users/' + usernames + '/', body, config)
+                .put(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + usernames + '/', body, config)
                 .then((res) => {
                     updatePermissionUser();
                 })
@@ -212,7 +212,7 @@ export const EditDeleteUser = () => {
             };
 
             axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
                 .then((res) => {
                     //console.log(res.data);
                     setFirst_Name(res.data.first_name);
@@ -236,7 +236,7 @@ export const EditDeleteUser = () => {
                     console.log(err.response);
                 });
         } else {
-            console.log("no selected");
+            //console.log("no selected");
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
         }
     }
@@ -252,7 +252,7 @@ export const EditDeleteUser = () => {
         };
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'api/permission/' + username + '/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/', config)
             .then((res) => {
                 isCheck1(res.data.can_view_users);
                 isCheck2(res.data.can_add_users);
@@ -291,7 +291,7 @@ export const EditDeleteUser = () => {
         let user = localStorage.getItem("username");
         let username = selectedUser.username;
         if(user !== username){
-            console.log("not username")
+            //console.log("not username")
         } else {
             const config = {
                 headers: {
@@ -301,7 +301,7 @@ export const EditDeleteUser = () => {
             };
     
             axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'api/permission/' + username + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/', config)
                 .then((res) => {
                     res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
                     res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
@@ -361,7 +361,7 @@ export const EditDeleteUser = () => {
         });
         
         axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/user/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/user/', body, config)
             .then((res) => {
                 //console.log('succ permission user: ');
                 //console.log(res.data)
@@ -394,7 +394,7 @@ export const EditDeleteUser = () => {
         });
         
         axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/inventory/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/inventory/', body, config)
             .then((res) => {
                 //console.log('succ permission inventory: ');
                 //console.log(res.data)
@@ -427,7 +427,7 @@ export const EditDeleteUser = () => {
         });
         
         axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/inspection-report/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/inspection/', body, config)
             .then((res) => {
                 //console.log('succ permission inspect: ');
                 //console.log(res.data)
@@ -460,7 +460,7 @@ export const EditDeleteUser = () => {
         });
         
         axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/maintenance-report/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/maintenance/', body, config)
             .then((res) => {
                 //console.log('succ permission maintenance: ');
                 //console.log(res.data)
@@ -493,7 +493,7 @@ export const EditDeleteUser = () => {
         });
         
         axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/repair-report/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/repair/', body, config)
             .then((res) => {
                 //console.log('succ permission repair: ');
                 //console.log(res.data)
@@ -526,7 +526,7 @@ export const EditDeleteUser = () => {
         });
         
         axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'api/permission/task/' + username + '/', body, config)
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/task/', body, config)
             .then((res) => {
                 //console.log('succ permission task: ');
                 //console.log(res.data)
@@ -551,29 +551,13 @@ export const EditDeleteUser = () => {
     }
 
     const onClick = (name) => {
-        //console.log(selectedUser.username)
-        if (selectedUser != null) {
-            dialogFuncMap[`${name}`](true);
-            //getPermission();
-            // let myData = users.find(x => x.username === selectedUser.username);
-            // setFirst_Name(myData.first_name);
-            // setLast_Name(myData.last_name);
-            // setEmail(myData.email);
-            // setUsername(myData.username);
-            // setGender(genderOptions.find(x => x.val === myData.user_info.gender));
-            // setCompany(myData.user_info.company);
-            // setPosition(myData.user_info.position);
-            // setAddress(myData.user_info.address);
-            // setPhone(myData.user_info.phone);
-            // setBirthday(myData.user_info.birthday);
-        } else {
-            toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
-        }
+        dialogFuncMap[`${name}`](true);
     }
 
-    const confirmDelete = (name) => {
-        if (selectedUser != null) {
-            setWord(selectedUser.username);
+    const confirmDelete = (name, values) => {
+        setSelectedUser(values);
+        if (values != null) {
+            setWord(values.full_name);
             dialogFuncMap[`${name}`](true);
         } else {
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to delete.', life: 5000 });
@@ -592,12 +576,13 @@ export const EditDeleteUser = () => {
         };
 
         axios
-            .delete(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
+            .delete(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
             .then((res) => {
                 //console.log('succ delete user: ');
                 //console.log(res.data)
                 toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
                 getUsers();
+                setSelectedUser(null);
                 //deletePermission();
             })
             .catch((err) => {
@@ -619,7 +604,7 @@ export const EditDeleteUser = () => {
     //     };
 
     //     axios
-    //         .delete('http://127.0.0.1:8000/api/permission/' + username + '/', config)
+    //         .delete('http://127.0.0.1:8000/careta/permission/' + username + '/', config)
     //         .then((res) => {
     //             console.log('succ delete permission: ');
     //             console.log(res.data)
@@ -633,6 +618,12 @@ export const EditDeleteUser = () => {
     //         });
     // }
 
+    const renderHeader = () => {
+        return (
+            <div style={{paddingTop:'1%'}}><h5><b>USER MANAGEMENT</b></h5></div>
+        );
+    }
+
     const renderFooter = (name) => {
         return (
             <div>
@@ -642,12 +633,12 @@ export const EditDeleteUser = () => {
         );
     }
 
-    const actionBody = () => {
+    const actionBody = (rowData) => {
         return (
             localStorage.getItem("deleteUsers") === "true" ? <center>
-            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')}/> </center>
+            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2', rowData)}/> </center>
             : <center>
-            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2')} disabled/> </center>
+            <Button icon="pi pi-times" className="p-button-rounded p-button-danger" onClick={() => confirmDelete('displayBasic2', rowData)} disabled/> </center>
         );
     }
 
@@ -710,8 +701,8 @@ export const EditDeleteUser = () => {
             </div>
 
             <div className="p-col-12">
-                <Panel header="USER MANAGEMENT">
-                    <DataTable ref={dt} value={users} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
+                {/* <Panel header="USER MANAGEMENT" > */}
+                    <DataTable ref={dt} header={renderHeader()} value={users} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                         globalFilter={globalFilter} selectionMode="single" selection={selectedUser} onSelectionChange={e => setSelectedUser(e.value)}
                         paginator rows={10} emptyMessage="No data found"
                         >
@@ -719,246 +710,238 @@ export const EditDeleteUser = () => {
                         <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column>
                     </DataTable>
                     {/* <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator> */}
-                </Panel>
+                {/* </Panel> */}
             </div>
 
             <Dialog header="Edit Form" visible={displayBasic} style={{  width: '85vw' }} onHide={() => onHide('displayBasic')}>
                 <div className="p-col-12">
-                    
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>FIRSTNAME:</b></h6>
-                                <InputText placeholder="First Name" value={first_name} onChange={event => setFirst_Name(event.target.value)} />
-                            </div>
-                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>LASTNAME:</b></h6>
-                                <InputText placeholder="Last Name" value={last_name} onChange={event => setLast_Name(event.target.value)} />
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>FIRSTNAME:</b></h6>
+                            <InputText placeholder="First Name" value={first_name} onChange={event => setFirst_Name(event.target.value)} />
+                        </div>
+                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>LASTNAME:</b></h6>
+                            <InputText placeholder="Last Name" value={last_name} onChange={event => setLast_Name(event.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>EMAIL:</b></h6>
+                            <InputText placeholder="Email" value={email} onChange={event => setEmail(event.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>USERNAME:</b></h6>
+                            <InputText placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
+                        </div>
+                    </div>
+
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>PASSWORD:</b></h6>
+                            <div className="p-inputgroup">
+                                <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
+                                <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>EMAIL:</b></h6>
-                                <InputText placeholder="Email" value={email} onChange={event => setEmail(event.target.value)} />
-                            </div>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                        <h6><b>GENDER:</b></h6>
+                            <Dropdown value={mygender} options={genderOptions} optionLabel="name" placeholder="Select Gender" onChange={event => setGender(event.target.value)} />
                         </div>
+                    </div>
 
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>USERNAME:</b></h6>
-                                <InputText placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
-                            </div>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>COMPANY:</b></h6>
+                            <InputText placeholder="Company" value={company} onChange={event => setCompany(event.target.value)} />
                         </div>
+                    </div>
 
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>PASSWORD:</b></h6>
-                                <div className="p-inputgroup">
-                                    <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
-                                    {/*<Button icon="pi pi-eye" onClick={toggleShow}> </Button>*/}
-                                    <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
-                                </div>
-                            </div>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>POSITION:</b></h6>
+                            <InputText placeholder="Position" value={position} onChange={event => setPosition(event.target.value)} />
                         </div>
+                    </div>
 
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>GENDER:</b></h6>
-                                <Dropdown value={mygender} options={genderOptions} optionLabel="name" placeholder="Select Gender" onChange={event => setGender(event.target.value)} />
-                            </div>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>ADDRESS:</b></h6>
+                            <InputText placeholder="Address" value={address} onChange={event => setAddress(event.target.value)} />
                         </div>
+                    </div>
 
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>COMPANY:</b></h6>
-                                <InputText placeholder="Company" value={company} onChange={event => setCompany(event.target.value)} />
-                            </div>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>PHONE NUMBER:</b></h6>
+                            <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
                         </div>
-
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>POSITION:</b></h6>
-                                <InputText placeholder="Position" value={position} onChange={event => setPosition(event.target.value)} />
-                            </div>
+                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>BIRTHDAY: </b><i>(e.g. 1990-12-30)</i></h6>
+                            <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
                         </div>
+                    </div>
 
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>ADDRESS:</b></h6>
-                                <InputText placeholder="Address" value={address} onChange={event => setAddress(event.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>PHONE NUMBER:</b></h6>
-                                <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
-                            </div>
-                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                                <h6><b>BIRTHDAY:</b></h6>
-                                <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
-                            <Panel header="PERMISSION" className="p-col-12 p-md-12">
-                                <div className="p-grid p-fluid">
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                        <Fieldset legend="User Data">
-                                            {/*<div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check1} onChange={event => isCheck1(check1 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>*/}
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check2} onChange={event => isCheck2(check2 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check3} onChange={event => isCheck3(check3 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check4} onChange={event => isCheck4(check4 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                            </div>
-                                            <div className="p-col" style={{ height:'45px'}}></div>
-                                        </Fieldset>
-                                    </div>
-
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                        <Fieldset legend="Inventory">
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check5} onChange={event => isCheck5(check5 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check6} onChange={event => isCheck6(check6 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check7} onChange={event => isCheck7(check7 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check8} onChange={event => isCheck8(check8 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                            </div>
-                                        </Fieldset>
-                                    </div>
-
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                        <Fieldset legend="Inspection Report">
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check9} onChange={event => isCheck9(check9 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check10} onChange={event => isCheck10(check10 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check11} onChange={event => isCheck11(check11 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check12} onChange={event => isCheck12(check12 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                            </div>
-                                        </Fieldset>
-                                    </div>
+                    <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
+                        <Panel header="PERMISSION" className="p-col-12 p-md-12">
+                            <div className="p-grid p-fluid">
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
+                                    <Fieldset legend="User Data">
+                                        {/*<div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check1} onChange={event => isCheck1(check1 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                        </div>*/}
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check2} onChange={event => isCheck2(check2 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check3} onChange={event => isCheck3(check3 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check4} onChange={event => isCheck4(check4 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
+                                        </div>
+                                        <div className="p-col" style={{ height:'45px'}}></div>
+                                    </Fieldset>
                                 </div>
 
-                                <div className="p-grid p-fluid">
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                        <Fieldset legend="Maintenance Report">
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check13} onChange={event => isCheck13(check13 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check14} onChange={event => isCheck14(check14 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check15} onChange={event => isCheck15(check15 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check16} onChange={event => isCheck16(check16 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                            </div>
-                                        </Fieldset>
-                                    </div>
-
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                        <Fieldset legend="Repair Reports">
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check17} onChange={event => isCheck17(check17 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check18} onChange={event => isCheck18(check18 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check19} onChange={event => isCheck19(check19 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check20} onChange={event => isCheck20(check20 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                            </div>
-                                        </Fieldset>
-                                    </div>
-
-                                    <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                        <Fieldset legend="Task">
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check21} onChange={event => isCheck21(check21 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check22} onChange={event => isCheck22(check22 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check23} onChange={event => isCheck23(check23 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                            </div>
-                                            <div className="p-col">
-                                                <Checkbox classname="p-checkbox-lg" checked={check24} onChange={event => isCheck24(check24 ? false : true)}> </Checkbox>
-                                                <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                            </div>
-                                        </Fieldset>
-                                    </div>
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
+                                    <Fieldset legend="Inventory">
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check5} onChange={event => isCheck5(check5 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check6} onChange={event => isCheck6(check6 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check7} onChange={event => isCheck7(check7 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check8} onChange={event => isCheck8(check8 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
+                                        </div>
+                                    </Fieldset>
                                 </div>
 
-                            </Panel>
-                        </div>
-
-                        <div className="p-grid p-fluid">
-                            <div className="p-field p-col"> </div>
-                            <div className="p-field p-col"> </div>
-                            <div className="p-field p-col" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <Button label="SAVE CHANGES" className="p-button-md p-shadow-6 p-button-rounded" onClick={saveChanges} />
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
+                                    <Fieldset legend="Inspection Report">
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check9} onChange={event => isCheck9(check9 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check10} onChange={event => isCheck10(check10 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check11} onChange={event => isCheck11(check11 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check12} onChange={event => isCheck12(check12 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
+                                        </div>
+                                    </Fieldset>
+                                </div>
                             </div>
+
+                            <div className="p-grid p-fluid">
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
+                                    <Fieldset legend="Maintenance Report">
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check13} onChange={event => isCheck13(check13 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check14} onChange={event => isCheck14(check14 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check15} onChange={event => isCheck15(check15 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check16} onChange={event => isCheck16(check16 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
+                                        </div>
+                                    </Fieldset>
+                                </div>
+
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
+                                    <Fieldset legend="Repair Reports">
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check17} onChange={event => isCheck17(check17 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check18} onChange={event => isCheck18(check18 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check19} onChange={event => isCheck19(check19 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check20} onChange={event => isCheck20(check20 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
+                                        </div>
+                                    </Fieldset>
+                                </div>
+
+                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
+                                    <Fieldset legend="Task">
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check21} onChange={event => isCheck21(check21 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check22} onChange={event => isCheck22(check22 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check23} onChange={event => isCheck23(check23 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
+                                        </div>
+                                        <div className="p-col">
+                                            <Checkbox classname="p-checkbox-lg" checked={check24} onChange={event => isCheck24(check24 ? false : true)}> </Checkbox>
+                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
+                                        </div>
+                                    </Fieldset>
+                                </div>
+                            </div>
+
+                        </Panel>
+                    </div>
+
+                    <div className="p-grid">
+                        <div className="p-col-12 p-md-9"> </div>
+                        <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '2%' }}>
+                        {/* <div className="p-field p-col" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}> */}
+                        <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={saveChanges} />
                         </div>
-
-
-                    
+                    </div>
                 </div>
             </Dialog>
 
-            <Dialog header="Confirm Delete" visible={displayBasic2} style={{ width: '40vw' }} footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
-                Are you sure to delete this record of
-                <label style={{ fontWeight: 'bold' }}> {word} </label>
-                ?
+            <Dialog header="Confirm Delete" visible={displayBasic2} style={{ width: '310px' }} footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
+                Are you sure to delete this record of <label style={{ fontWeight: 'bold' }}> {word} </label> ?
             </Dialog>
             
         </div>
 
     )
-
 
 }
 
