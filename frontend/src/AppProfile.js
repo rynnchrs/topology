@@ -22,7 +22,7 @@ export const AppProfile = () => {
         };
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'api/users/' + username + '/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
             .then((res) => {
                 localStorage.setItem('myfirst', res.data.user_info.full_name);
                 setUserData(localStorage.getItem("myfirst"))
@@ -53,7 +53,7 @@ export const AppProfile = () => {
         console.log('body: ' + body);
 
         axios
-            .post(process.env.REACT_APP_SERVER_NAME + 'api/logout/blacklist/', body, config)
+            .post(process.env.REACT_APP_SERVER_NAME + 'careta/logout/blacklist/', body, config)
             .then((res) => {
                 console.log('logout success');
                 console.log(res.data)

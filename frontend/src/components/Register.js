@@ -88,9 +88,9 @@ export const Register = () => {
 
             // Request Body
             const body = JSON.stringify({ username, email, first_name, last_name, password, user_info });
-            console.log('body: ' + body);
+
             axios
-                .post(process.env.REACT_APP_SERVER_NAME + 'api/register/', body, config)
+                .post(process.env.REACT_APP_SERVER_NAME + 'careta/register/', body, config)
                 .then((res) => {
                     submitPermission();
                 })
@@ -149,12 +149,12 @@ export const Register = () => {
             "can_edit_task": check23,
             "can_delete_task": check24
         });
-        console.log('body: ' + body);
+
         axios
-            .post(process.env.REACT_APP_SERVER_NAME + 'api/permission/', body, config)
+            .post(process.env.REACT_APP_SERVER_NAME + 'careta/permission/', body, config)
             .then((res) => {
-                console.log('succ permission: ');
-                console.log(res.data)
+                // console.log('succ permission: ');
+                // console.log(res.data)
                 toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
             })
             .catch((err) => {
@@ -173,7 +173,7 @@ export const Register = () => {
         <div className="p-grid p-fluid" >
             <Toast ref={toast} />
             <div className="p-col-12">
-                <div className="card card-w-title p-shadow-5">
+                <div className="card card-w-title p-shadow-3">
                     <center><h2 style={{ marginTop: '2%' }}><b>Registration Form</b></h2></center>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
@@ -205,7 +205,6 @@ export const Register = () => {
                             <h6><b>PASSWORD:</b></h6>
                             <div className="p-inputgroup">
                                 <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
-                                {/*<Button icon="pi pi-eye" onClick={toggleShow}> </Button>*/}
                                 <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
                             </div>
                         </div>
@@ -245,7 +244,7 @@ export const Register = () => {
                             <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>BIRTHDAY: </b><i>(ex. 1990-12-30)</i></h6>
+                            <h6><b>BIRTHDAY: </b><i>(e.g. 1990-12-30)</i></h6>
                             <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
                         </div>
                     </div>
@@ -389,11 +388,9 @@ export const Register = () => {
                         <div className="p-field p-col"> </div>
                         <div className="p-field p-col"> </div>
                         <div className="p-field p-col" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <Button label="REGISTER" className="p-button-md p-shadow-6 p-button-rounded" onClick={submitData} />
+                            <Button label="REGISTER" className="p-button-md p-shadow-4 p-button-rounded" onClick={submitData} />
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>

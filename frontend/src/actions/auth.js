@@ -21,7 +21,7 @@ export const login = (username, password) => (dispatch) => {
     const body = JSON.stringify({ username, password });
     
     axios
-        .post(process.env.REACT_APP_SERVER_NAME + 'api/login/', body, config)
+        .post(process.env.REACT_APP_SERVER_NAME + 'careta/login/', body, config)
         //.post(SERVER_NAME + 'api/login/', body, config)
         .then((res) => {
             //console.log('login token: ' + res.data.access)
@@ -38,7 +38,7 @@ export const login = (username, password) => (dispatch) => {
                 };
             
                 axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'api/permission/' + username + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/', config)
                 .then((res) => {
                     //console.log("permission login:");
                     //console.log(res.data);

@@ -4,6 +4,7 @@ import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column'
 import {InputText} from 'primereact/inputtext';
 import { AutoComplete } from 'primereact/autocomplete';
+import { Menubar } from 'primereact/menubar';
 
 import {Button} from 'primereact/button';
 import {Fieldset} from 'primereact/fieldset';
@@ -21,12 +22,10 @@ import { isThisISOWeek } from 'date-fns';
 
 
 export class Vehicles extends Component {
-
-
-
+    
     constructor() {
         super();
-
+        
         this.state = {
 
             //vehicle data object
@@ -92,10 +91,7 @@ export class Vehicles extends Component {
                 i2_po_no: '', i2_date_issued: '', i2_start_date: '', i2_end_date: '', i2_cost: 0,
             },
 
-            
-
             //filter option for search
-
             filterOption:'VIN', //possible values: VIN, BDN or PLN
             vmModalMode: 'Add', //possible values: Add, Modify, Remove
             vmVisibility: false, //modal form visibility
@@ -115,28 +111,22 @@ export class Vehicles extends Component {
 
             layout: 'list',
 
-            activeIndexMain: 0,
+            activeIndexMain: null,
             activeIndexModal: 0,
 
             carValues: null,
 
             sampleValue: '',
-            
-
         };
 
-
         this.toast = createRef(null)
-
         this.radioChange = this.radioChange.bind(this);
 
     }
 
     componentDidMount() {
 
-      }
-
-     
+    }
 
     refreshList = () => {
         axios
@@ -148,16 +138,14 @@ export class Vehicles extends Component {
     logTest = () =>{
         console.log(this.state.vehicleData);
         //this.forceUpdate();
-
     }
-
 
     // search option function
     radioChange(e) {
         this.setState({
             filterOption: e.currentTarget.value
         });
-      }
+    }
 
     //ADD VEHICLE ALGORITHM
     addVehicle = () => {
@@ -249,9 +237,9 @@ export class Vehicles extends Component {
 
         }
         axios
-                .post("http://localhost:8000/api/careta-tpl/",data_tpl)
-                .then(res => this.setState({ todoList_tpl: res.data },this.addContract))
-                .catch(err => console.log(err));
+            .post("http://localhost:8000/api/careta-tpl/",data_tpl)
+            .then(res => this.setState({ todoList_tpl: res.data },this.addContract))
+            .catch(err => console.log(err));
 
     }
 
@@ -1671,9 +1659,11 @@ export class Vehicles extends Component {
 
         
 
+        
+
         return (
 
-            <div className="p-grid">
+            <div className="p-grid p-fluid">
 
                 <div className="p-col-12">
 
@@ -2362,7 +2352,6 @@ export class Vehicles extends Component {
                         <div className="p-d-flex p-mb-2" name="searchbox">                           
                             <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} />
                         </div>
-                       
 
                         <div className="p-grid p-mb-2">
                             <div className="p-col">
@@ -2389,41 +2378,254 @@ export class Vehicles extends Component {
                         </div>
 
                     </Fieldset>
-
                 </div>
+
                 <div className="p-col-12">
-                    <Fieldset legend="Vehicle Data" className="p-grid p-dir-col">
+                    <Fieldset legend="Vehicle Data">
+                        <div className="p-grid">
+                            <div className="p-col-12 p-lg-4 p-md-4"> </div>
+                            <div className="p-col-12 p-lg-8 p-md-8">
+                                <div className="p-grid">
+                                    <div className="p-col-12 p-lg-4 p-md-4">
+                                        { localStorage.getItem("addInventory") === "true" ?
+                                            <Button label="Add New" icon="pi pi-plus" onClick={() => onShow("Add")} /> :
+                                            <Button label="Add New" icon="pi pi-plus" onClick={() => onShow("Add")} disabled/> }
+                                    </div>
+                                    <div className="p-col-12 p-lg-4 p-md-4">
+                                        { localStorage.getItem("editInventory") === "true" ?
+                                            <Button label="Modify" icon="pi pi-pencil" onClick={() => onShow("Modify")} /> :
+                                            <Button label="Modify" icon="pi pi-pencil" onClick={() => onShow("Modify")} disabled/> }
+                                    </div>
+                                    <div className="p-col-12 p-lg-4 p-md-4">
+                                        { localStorage.getItem("deleteInventory") === "true" ?
+                                            <Button label="Remove" icon="pi pi-ban" onClick={() => RemoveButtonHandler()} /> :
+                                            <Button label="Remove" icon="pi pi-ban" onClick={() => RemoveButtonHandler()} disabled/> }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="p-grid">
-
-                            <div className="p-col-12">
-                                <div className="p-grid p-justify-end">
-                                    {/*<Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} />
-                                    <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} />
-                                    <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} />*/}
-                                    { localStorage.getItem("addInventory") === "true" ?
-                                     <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} /> :
-                                     <Button label="Add New" icon="pi pi-plus" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Add")} disabled/> }
-                                    { localStorage.getItem("editInventory") === "true" ?
-                                     <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} /> :
-                                     <Button label="Modify" icon="pi pi-pencil" className="p-col-1 p-md-2 p-mr-2" onClick={() => onShow("Modify")} disabled/> }
-                                    { localStorage.getItem("deleteInventory") === "true" ?
-                                     <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} /> :
-                                     <Button label="Remove" icon="pi pi-ban" className="p-col-1 p-md-2 p-mr-2" onClick={() => RemoveButtonHandler()} disabled/> }
-                                </div>
-                            </div>
-
-                            <div className="p-col-3">
-
+                            <div className="p-col-12 p-lg-4 p-md-4">
                                 <div class="p-d-flex p-jc-center">
-                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="250" alt="car"></img>
+                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="100%" alt="car"></img>
                                 </div>
-
                             </div>
 
-                            <div className="p-col-9">
+                             <div className="p-col-12 p-lg-8 p-md-8">
+
                                 <TabView activeIndex={this.state.activeIndexMain} onTabChange={(e) => this.setState({activeIndexMain: e.index})}>
-                                    <TabPanel header="Identification" className="btn-block">
+                                    
+                                        <TabPanel header="Identification" className="btn-block">
+                                            <div className="p-fluid">
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dStatus" className="p-col-12 p-md-2">Status:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dStatus" type="text" value = {this.state.vehicleData.status} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dOperational" className="p-col-12 p-md-2">Operational:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dOperational" type="text" value = {this.state.vehicleData.operational} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dBodyNum" className="p-col-12 p-md-2">Body Number:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dBodyNum" type="text" value={this.state.vehicleData.body_no} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dCSNum" className="p-col-12 p-md-2">CS Number:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dCSNum" type="text" value={this.state.vehicleData.cs_no} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="vPlateNum" className="p-col-12 p-md-2">Plate Number:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="vPlateNum" type="text" value={this.state.vehicleData.plate_no} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="vRemarks" className="p-col-12 p-md-2">Remarks:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="vRemarks" type="text" value={this.state.vehicleData.remarks} readOnly/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabPanel>
+                                        <TabPanel header="Vehicle Info">
+                                            <div className="p-fluid">
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dBrand" className="p-col-12 p-md-2">Brand:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dBrand" type="text" value = {this.state.vehicleData.brand} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dYear" className="p-col-12 p-md-2">Year:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dYear" type="text" value = {this.state.vehicleData.release_year} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dMake" className="p-col-12 p-md-2">Make:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dMake" type="text" value = {this.state.vehicleData.make} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dSeries" className="p-col-12 p-md-2">Series:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dSeries" type="text" value = {this.state.vehicleData.series} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dBodyType" className="p-col-12 p-md-2">Body Type:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dBodyType" type="text" value = {this.state.vehicleData.body_type} readOnly/>
+                                                    </div>
+                                                </div>
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dColor" className="p-col-12 p-md-2">Color:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <InputText id="dColor" type="text" value = {this.state.vehicleData.color} readOnly/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabPanel>
+                                    
+                                    <TabPanel header="Suppliers">
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDealer" className="p-col-12 p-md-2">Dealer:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDealer" type="text" value = {this.state.vehicleData.dealer} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dPONumber" className="p-col-12 p-md-2">PO Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dPONumber" type="text" value = {this.state.vehicleData.po_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dPODate" className="p-col-12 p-md-2">PO Date:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dPODate" type="text" value = {this.state.vehicleData.po_date} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dBodyBuilder" className="p-col-12 p-md-2">Body Builder:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dBodyBuilder" type="text" value = {this.state.vehicleData.body_builder} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dFabricator" className="p-col-12 p-md-2">Fabricator:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dFabricator" type="text" value = {this.state.vehicleData.fabricator} readOnly/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </TabPanel>
+                                    <TabPanel header="Engine and Body Info">
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dChassisN" className="p-col-12 p-md-2">Chassis Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dChassisN" type="text" value = {this.state.vehicleData.vin_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dEngineN" className="p-col-12 p-md-2">Engine Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dEngineN" type="text" value = {this.state.vehicleData.engine_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dBatteryN" className="p-col-12 p-md-2">Battery Number:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dBatteryN" type="text" value = {this.state.vehicleData.battery_no} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dFuelType" className="p-col-12 p-md-2">Fuel Type:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dFuelType" type="text" value = {this.state.vehicleData.fuel_type} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dTransmission" className="p-col-12 p-md-2">Transmission:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dTransmission" type="text" value = {this.state.vehicleData.transmission} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dDenomination" className="p-col-12 p-md-2">Denomination:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dDenomination" type="text" value = {this.state.vehicleData.denomination} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dPistonD" className="p-col-12 p-md-2">Piston Displacement:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dPistonD" type="text" value = {this.state.vehicleData.piston} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dNumCylinders" className="p-col-12 p-md-2">Number of Cylinders:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dNumCylinders" type="text" value = {this.state.vehicleData.cylinder} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dProcEntity" className="p-col-12 p-md-2">Procuring Entity:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dProcEntity" type="text" value = {this.state.vehicleData.procuring_entity} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dCapacity" className="p-col-12 p-md-2">Capacity:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dCapacity" type="text" value = {this.state.vehicleData.capacity} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dGrossW" className="p-col-12 p-md-2">Gross Weight:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dGrossW" type="text" value = {this.state.vehicleData.gross_weight} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dNetW" className="p-col-12 p-md-2">Net Weight:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dNetW" type="text" value = {this.state.vehicleData.net_weight} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dShippingW" className="p-col-12 p-md-2">Shipping Weight:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dShippingW" type="text" value = {this.state.vehicleData.shipping_weight} readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dNetCapacity" className="p-col-12 p-md-2">Net Capacity:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <InputText id="dNetCapacity" type="text" value = {this.state.vehicleData.net_capacity} readOnly/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </TabPanel>
+                                </TabView>
+
+                                <TabView activeIndex={this.state.activeIndexMain} onTabChange={(e) => this.setState({activeIndexMain: e.index})}>
+                                    {/* <TabPanel header="Identification" className="btn-block">
                                         <div className="p-fluid">
                                             <div className="p-field p-grid">
                                                 <label htmlFor="dStatus" className="p-col-12 p-md-2">Status:</label>
@@ -2627,7 +2829,7 @@ export class Vehicles extends Component {
                                             </div>
 
                                         </div>
-                                    </TabPanel>
+                                    </TabPanel> */}
                                     <TabPanel header="LTO">
                                         <div className="p-fluid">
                                             <div className="p-field p-grid">
@@ -3043,10 +3245,12 @@ export class Vehicles extends Component {
                                 </TabView>
                             </div>
 
+
+
+
+
                         </div>
-
                     </Fieldset>
-
                 </div>
             </div>
 
