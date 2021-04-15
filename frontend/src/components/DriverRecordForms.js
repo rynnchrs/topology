@@ -610,6 +610,31 @@ export default function DriverRecordForms() {
         }
     }
 
+    const exportData = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        const body = JSON.stringify([{
+            "inspection_id": 8
+        }]);
+
+        console.log("body:", body)
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_list/', body, config)
+        .then((res) => {
+            console.log(res.data);
+        })
+        .catch((error) => {
+            console.log('error export: ');
+            console.log(error);
+        });
+    }
+
     const updateNotOkay = (index, value) => {
         notOkay[index] = value;
     }
@@ -1236,7 +1261,7 @@ export default function DriverRecordForms() {
                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                             <div className="p-d-flex">
                                 <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
-                                <div className="p-mr-2"><Button label="EXPORT" icon="pi pi-file" className="p-button-success"/></div>
+                                <div className="p-mr-2"><Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => exportData()}/></div>
                             </div>
                         </div>
                     </div>
