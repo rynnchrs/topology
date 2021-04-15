@@ -1,3 +1,4 @@
+from .export import export
 import datetime
 from abc import abstractmethod
 
@@ -375,12 +376,16 @@ class JobOrderView(viewsets.ViewSet):
 
 
 class CarView(viewsets.ModelViewSet):  # add this
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
+
+    @action(detail=False)
+    def export_list(self, request):
+        return export()  
 
 
 class CarListView(generics.ListAPIView):  #list of all car with filtering
