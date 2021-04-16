@@ -1,11 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.conf import settings
 
-from django.http import HttpResponse
 from openpyxl import Workbook
-
-from .models import Inspection
-from django.conf.urls.static import static
 
 def export(inspection):
     datas = inspection
