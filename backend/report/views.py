@@ -82,9 +82,11 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
     def export_post(self, request, pk=None):
         # print(request.data)
         inspection_id = []
-        for i in range(0, len(request.data)):
-            inspection_id.append(request.data[i]['inspection_id'])
+        print(request.data['inspection_id'])
+        for data in (request.data['inspection_id']):
+            inspection_id.append(data)
         inspection = Inspection.objects.filter(inspection_id__in=inspection_id)
+        print(inspection)
         if export(inspection):
             return Response(status=status.HTTP_200_OK)
         else:
