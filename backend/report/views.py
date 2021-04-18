@@ -1,6 +1,10 @@
 import datetime
+from datetime import datetime as date
+from wsgiref.util import FileWrapper
 
 from careta.models import Car
+from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import filters, generics, serializers, status, viewsets
@@ -75,15 +79,34 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=False, methods=['post'])
-    def export_list(self, request, pk=None):
+    def export_post(self, request, pk=None):
         # print(request.data)
         inspection_id = []
-        for i in range(0, len(request.data)):
-            inspection_id.append(request.data[i]['inspection_id'])
+        print(request.data['inspection_id'])
+        for data in (request.data['inspection_id']):
+            inspection_id.append(data)
         inspection = Inspection.objects.filter(inspection_id__in=inspection_id)
-        return export(inspection)  
+        print(inspection)
+        if export(inspection):
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        
+    @action(detail=False)
+    def export_get(self, request):
+        # print(request.data)
+        filename = '{date}-Inspection-Report.xlsx'.format(
+        date=date.now().strftime('%Y-%m-%d'))
+
+        file_path = '.'+settings.MEDIA_URL+filename
+        file = open(file_path,"rb")
+        response = HttpResponse(FileWrapper(file),
+         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+
+        return response
+
 
 class InspectionListView(generics.ListAPIView): #list of inspection with filtering
     permission_classes = [IsAuthenticated]
