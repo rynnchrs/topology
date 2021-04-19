@@ -1,25 +1,16 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from django.conf import settings
 
-from django.http import HttpResponse
 from openpyxl import Workbook
-
-from .models import Inspection
-
 
 def export(inspection):
     datas = inspection
-    
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    )
-    response['Content-Disposition'] = 'attachment; filename={date}-Inspection-Report.xlsx'.format(
-        date=datetime.now().strftime('%Y-%m-%d'),
-    )
     workbook = Workbook()
     
     # Get active worksheet/tab
     worksheet = workbook.active
-    worksheet.title = 'Inspection Report'
+    worksheet.title = '{date}-Inspection-Report.xlsx'.format(
+        date=datetime.now().strftime('%Y-%m-%d'))
 
     # Define the titles for columns
     columns = [
@@ -383,5 +374,8 @@ def export(inspection):
         for col_num, cell_value in enumerate(row, 1):
             cell = worksheet.cell(row=row_num, column=col_num)
             cell.value = cell_value
-    workbook.save(response)
-    return response
+    try:
+        workbook.save('.'+settings.MEDIA_URL+worksheet.title)
+        return True
+    except:
+        return False
