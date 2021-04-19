@@ -91,6 +91,20 @@ class InspectionReportTestCase(APITestCase):
         response = self.client.get('/report/inspection-list/') # list of inspection report
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
+    def test_inspection_report_list(self):
+        response1 = self.client.post('/report/inspection/', self.TEST_REPORT1, format='json')
+        response = self.client.get('/report/inspection/can_view_list/') # list of inspection report
+        self.assertEqual( response.status_code , status.HTTP_200_OK)
+        response = self.client.get('/report/inspection/can_view_list/?search=18-1654') # filter with body no
+        self.assertNotEquals( response.content , response1.content)
+        response = self.client.get('/report/inspection/can_view_list/?search=NCT4511') # filter with plate no
+        self.assertNotEquals( response.status_code , response1.content)
+        response = self.client.get('/report/inspection/can_view_list/?search=Marikina') # lfilter with location
+        self.assertNotEquals( response.status_code , response1.content)
+        response = self.client.get('/report/inspection/can_view_list/?search=PAEL65NYHJB005043') # filter with vin no
+        self.assertNotEquals( response.status_code , response1.content)
+        response = self.client.get('/report/inspection/can_view_list/?search=L30') # filter with make
+        self.assertNotEquals( response.status_code , response1.content)
 
     def test_inspection_report_retrieve(self): # retrieve inspection report
         response = self.client.get('/report/inspection/1/')

@@ -26,11 +26,11 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition',
                     'vehicle_documents','main_beam','dipped_beam','side_lights','tail_lights','indicators',
                     'break_lights','reverse_lights','hazard_light','rear_fog_lights','interior_lights',
-                    'screen_washer','wiper_blades','horn','radio','front_fog_lights','air_conditioning',
-                    'cleanliness_engine_bay','washer_fluid','coolant_level','brake_fluid_level',
-                    'power_steering_fluid','gas_level','oil_level','tyres','front_visual','rear_visual',
-                    'spare_visual','wheel_brace','jack','front_right_wheel','front_left_wheel','rear_right_wheel',
-                    'rear_left_wheel','driver','edited_by','notes','date_updated','date_created']#,'images']
+                    'screen_washer','wiper_blades','horn','radio','front_fog_lights','cleanliness_engine_bay',
+                    'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','liquid_leak',
+                    'gas_level','oil_level','tyres','front_visual','rear_visual','spare_visual','wheel_brace',
+                    'jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel','driver',
+                    'edited_by','notes','date_updated','date_created']#,'images']
 
     def validate(self, obj): # validate if vin_no input is vin_no
         errors = []

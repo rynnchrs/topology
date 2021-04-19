@@ -25,12 +25,26 @@ from .utils import maintenance_reversion, reversion, user_permission
 class InspectionView(viewsets.ViewSet):  # inspection report Form
     # permission_classes = [IsAuthenticated]
     serializer_class = InspectionSerializer
+    search_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
+    filter_backends = [filters.SearchFilter]
 
-    def list(self, request):        # User List
+    def list(self, request):        
         user = self.request.user
         queryset = Inspection.objects.all().filter(driver=user.id).order_by('-inspection_id')[:4]
         serializer = InspectionLastFourListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)    
+
+    @action(detail=False)
+    def can_view_list(self, request): 
+        user = self.request.user
+        if user_permission(user, 'can_view_inspection_reports'):
+            queryset = Inspection.objects.all().order_by('inspection_id')
+            serializer = InspectionListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)    
+        else:
+            queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
+            serializer = InspectionListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)    
 
     def create(self, request): # create report 
         user = self.request.user
