@@ -619,15 +619,39 @@ export default function DriverRecordForms() {
             },
         };
 
-        const body = JSON.stringify([{
-            "inspection_id": 8
-        }]);
+        let ids = [];
+        carValues.map((iddata, index) => {
+            ids.push(iddata.inspection_id);
+        });
+        console.log("ids:", ids)
 
-        console.log("body:", body)
+        //const body = { "inspection_id": [9,8] }; //carValues
+        const body = { "inspection_id": ids }; 
+        console.log("body:", body);
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_list/', body, config)
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
         .then((res) => {
-            console.log(res.data);
+            //console.log('post',res.data);
+            console.log('post success');
+            let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
+            window.open(url);
+            //const w = window.open(url);
+            //w.focus();
+            // let token = localStorage.getItem("token");
+            // const config = {
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': 'Bearer ' + token,
+            //     },
+            // };
+            // axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/', config)
+            // .then((res) => {
+            //     //console.log('get',res.data);
+            // })
+            // .catch((error) => {
+            //     console.log('error export get: ');
+            //     console.log(error);
+            // });
         })
         .catch((error) => {
             console.log('error export: ');
