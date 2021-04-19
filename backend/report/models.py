@@ -39,13 +39,13 @@ class Inspection(models.Model):
     horn = models.BooleanField(default=False)
     radio = models.BooleanField(default=False)
     front_fog_lights = models.BooleanField(default=False)
-    air_conditioning = models.BooleanField(default=False)
     # Engine Bay
     cleanliness_engine_bay = models.BooleanField(default=False)
     washer_fluid = models.BooleanField(default=False)
     coolant_level = models.BooleanField(default=False)
     brake_fluid_level = models.BooleanField(default=False)
     power_steering_fluid = models.BooleanField(default=False)
+    liquid_leak = models.BooleanField(default=False)
     Gas_List = [
         (1, 1),
         (2, 2),
