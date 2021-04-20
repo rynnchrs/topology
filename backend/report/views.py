@@ -99,12 +99,15 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         print(request.data['inspection_id'])
         for data in (request.data['inspection_id']):
             inspection_id.append(data)
-        inspection = Inspection.objects.filter(inspection_id__in=inspection_id)
-        print(inspection)
+            try:
+                inspection = Inspection.objects.get(inspection_id=data)
+            except Inspection.DoesNotExist:
+                return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
+        inspection = Inspection.objects.all().filter(inspection_id__in=inspection_id)
         if export(inspection):
-            return Response(status=status.HTTP_200_OK)
+            return Response("Excel generated",status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False)
     def export_get(self, request):
