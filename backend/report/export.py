@@ -226,10 +226,10 @@ def export(inspection):
         else:
             data.front_fog_lights = "Not Okay"
 
-        if data.air_conditioning is True:
-            data.air_conditioning = "Okay"
+        if data.liquid_leak is True:
+            data.liquid_leak = "Okay"
         else:
-            data.air_conditioning = "Not Okay"
+            data.liquid_leak = "Not Okay"
 
         if data.cleanliness_engine_bay is True:
             data.cleanliness_engine_bay = "Okay"
@@ -346,12 +346,12 @@ def export(inspection):
             data.horn,
             data.radio,
             data.front_fog_lights,
-            data.air_conditioning,
             data.cleanliness_engine_bay,
             data.washer_fluid,
             data.coolant_level,
             data.brake_fluid_level,
             data.power_steering_fluid,
+            data.liquid_leak,
             data.gas_level,
             data.oil_level,
             data.tyres,
