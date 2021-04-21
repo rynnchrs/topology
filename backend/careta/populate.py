@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from django.contrib.auth.models import User  # add this
 
-from .models import TPL, Car, Insurance, Permission, UserInfo  # add this
+from .models import Contract, TPL, Car, Insurance, Permission, UserInfo  # add this
 
 
 def datas():
@@ -353,6 +353,16 @@ def user_data():
              fan_date = fan_date
         )
         car = Car.objects.get(body_no=data[0])
+
+        Contract.objects.create(
+            car = car,
+            slug = car,
+            contract_no = data[47],
+            bid_no = data[46],
+            bid_name = data[45],
+            bid_date = data[44],
+        )
+        
         TPL.objects.create(
             car = car,
             slug = car,
