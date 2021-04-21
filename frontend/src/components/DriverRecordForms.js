@@ -75,7 +75,8 @@ export default function DriverRecordForms() {
     const [seatBelts, isSeatBelts] = useState(false);
     const [generalCondition, isGeneralCondition] = useState(false);
     const [vehicleDocuments, isVehicleDocuments] = useState(false);
-
+    const [liquidLeak, isLiquidLeak] = useState(false);
+    
     const [cleanlinessEngineBay, isCleanlinessEngineBay] = useState(false);
     const [washerFluid, isWasherFluid] = useState(false);
     const [coolantLevel, isCoolantLevel] = useState(false);
@@ -97,7 +98,6 @@ export default function DriverRecordForms() {
     const [horn, isHorn] = useState(false);
     const [radio, isRadio] = useState(false);
     const [frontFogLights, isFrontFogLights] = useState(false);
-    const [airConditioning, isAirConditioning] = useState(false);
 
     const [tyres, isTyres] = useState(false);
     const [frontVisual, isFrontVisual] = useState(false);
@@ -112,6 +112,7 @@ export default function DriverRecordForms() {
 
     const [gasLevel, isGasLevel] = useState("");
     const [oilLevel, isOilLevel] = useState("");
+    const [emergency, setEmergency] = useState("09465657944");
     const [notes, isNotes] = useState("");
     const [editor, setEditor] = useState("");
 
@@ -247,10 +248,14 @@ export default function DriverRecordForms() {
         }
     }
 
+    const lbl = () => {
+        return( <span><i className="pi pi-pencil"></i> Edit <big>/</big> <i className="pi pi-search"></i> Show</span>);
+    }
+
     const actionBody = (rowData) => {
         return (
             localStorage.getItem("editInspectionReport") === "true" ? <center>
-            <Button label="Edit" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
+            <Button label={lbl()} className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
             : <center>
             <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2(rowData)}/></center>
         );
@@ -270,9 +275,10 @@ export default function DriverRecordForms() {
             .then((res) => {  
                 setSelectedCar(res.data);
                 setSelectedBody(res.data.body_no);
-                setMakes(res.data.body_no.make);
+                setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                 setSelected(values);
                 onClick('displayBasic');
+                console.log("make1: ", res.data.body_no.make);
             })
             
             .catch((error) => {
@@ -302,6 +308,7 @@ export default function DriverRecordForms() {
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                 setSelected(values);
                 onClick('displayBasic2');
+                console.log("make2", res.data.body_no.make);
             })
             .catch((error) => {
                 console.log('error: ');
@@ -328,6 +335,7 @@ export default function DriverRecordForms() {
         isSeatBelts(selectedCar.seat_belts);
         isGeneralCondition(selectedCar.general_condition);
         isVehicleDocuments(selectedCar.vehicle_documents);
+        isLiquidLeak(selectedCar.liquid_leak);
 
         isCleanlinessEngineBay(selectedCar.cleanliness_engine_bay);
         isWasherFluid(selectedCar.washer_fluid);
@@ -350,7 +358,6 @@ export default function DriverRecordForms() {
         isHorn(selectedCar.horn);
         isRadio(selectedCar.radio);
         isFrontFogLights(selectedCar.front_fog_lights);
-        isAirConditioning(selectedCar.air_conditioning);
 
         isTyres(selectedCar.tyres);
         isFrontVisual(selectedCar.front_visual);
@@ -385,29 +392,29 @@ export default function DriverRecordForms() {
         if (typeof(selectedCar.revised.seat_belts) !== 'undefined'  && selectedCar.revised.seat_belts !== selectedCar.seat_belts) { isSeatBelts(selectedCar.revised.seat_belts); onCheckboxChange(selectedCar.revised.seat_belts, "cb9"); }
         if (typeof(selectedCar.revised.general_condition) !== 'undefined'  && selectedCar.revised.general_condition !== selectedCar.general_condition) { isGeneralCondition(selectedCar.revised.general_condition); onCheckboxChange(selectedCar.revised.general_condition, "cb10"); }
         if (typeof(selectedCar.revised.vehicle_documents) !== 'undefined'  && selectedCar.revised.vehicle_documents !== selectedCar.vehicle_documents) { isVehicleDocuments(selectedCar.revised.vehicle_documents); onCheckboxChange(selectedCar.revised.vehicle_documents, "cb11"); }
+        if (typeof(selectedCar.revised.liquid_leak) !== 'undefined'  && selectedCar.revised.liquid_leak !== selectedCar.liquid_leak) { isLiquidLeak(selectedCar.revised.liquid_leak); onCheckboxChange(selectedCar.revised.liquid_leak, "cb12"); }
+
+        if (typeof(selectedCar.revised.cleanliness_engine_bay) !== 'undefined'  && selectedCar.revised.cleanliness_engine_bay !== selectedCar.cleanliness_engine_bay) { isCleanlinessEngineBay(selectedCar.revised.cleanliness_engine_bay); onCheckboxChange(selectedCar.revised.cleanliness_engine_bay, "cb13"); }
+        if (typeof(selectedCar.revised.washer_fluid) !== 'undefined'  && selectedCar.revised.washer_fluid !== selectedCar.washer_fluid) { isWasherFluid(selectedCar.revised.washer_fluid); onCheckboxChange(selectedCar.revised.washer_fluid, "cb14"); }
+        if (typeof(selectedCar.revised.coolant_level) !== 'undefined'  && selectedCar.revised.coolant_level !== selectedCar.coolant_level) { isCoolantLevel(selectedCar.revised.coolant_level); onCheckboxChange(selectedCar.revised.coolant_level, "cb15"); }
+        if (typeof(selectedCar.revised.brake_fluid_level) !== 'undefined'  && selectedCar.revised.brake_fluid_level !== selectedCar.brake_fluid_level) { isBrakeFluidLevel(selectedCar.revised.brake_fluid_level); onCheckboxChange(selectedCar.revised.brake_fluid_level, "cb16"); }
+        if (typeof(selectedCar.revised.power_steering_fluid) !== 'undefined'  && selectedCar.revised.power_steering_fluid !== selectedCar.power_steering_fluid) { isPowerSteeringFluid(selectedCar.revised.power_steering_fluid); onCheckboxChange(selectedCar.revised.power_steering_fluid, "cb17"); }
         
-        if (typeof(selectedCar.revised.cleanliness_engine_bay) !== 'undefined'  && selectedCar.revised.cleanliness_engine_bay !== selectedCar.cleanliness_engine_bay) { isCleanlinessEngineBay(selectedCar.revised.cleanliness_engine_bay); onCheckboxChange(selectedCar.revised.cleanliness_engine_bay, "cb12"); }
-        if (typeof(selectedCar.revised.washer_fluid) !== 'undefined'  && selectedCar.revised.washer_fluid !== selectedCar.washer_fluid) { isWasherFluid(selectedCar.revised.washer_fluid); onCheckboxChange(selectedCar.revised.washer_fluid, "cb13"); }
-        if (typeof(selectedCar.revised.coolant_level) !== 'undefined'  && selectedCar.revised.coolant_level !== selectedCar.coolant_level) { isCoolantLevel(selectedCar.revised.coolant_level); onCheckboxChange(selectedCar.revised.coolant_level, "cb14"); }
-        if (typeof(selectedCar.revised.brake_fluid_level) !== 'undefined'  && selectedCar.revised.brake_fluid_level !== selectedCar.brake_fluid_level) { isBrakeFluidLevel(selectedCar.revised.brake_fluid_level); onCheckboxChange(selectedCar.revised.brake_fluid_level, "cb15"); }
-        if (typeof(selectedCar.revised.power_steering_fluid) !== 'undefined'  && selectedCar.revised.power_steering_fluid !== selectedCar.power_steering_fluid) { isPowerSteeringFluid(selectedCar.revised.power_steering_fluid); onCheckboxChange(selectedCar.revised.power_steering_fluid, "cb16"); }
-        
-        if (typeof(selectedCar.revised.main_beam) !== 'undefined'  && selectedCar.revised.main_beam !== selectedCar.main_beam) { isMainBeam(selectedCar.revised.main_beam); onCheckboxChange(selectedCar.revised.main_beam, "cb17"); }
-        if (typeof(selectedCar.revised.dipped_beam) !== 'undefined'  && selectedCar.revised.dipped_beam !== selectedCar.dipped_beam) { isDippedBeam(selectedCar.revised.dipped_beam); onCheckboxChange(selectedCar.revised.dipped_beam, "cb18"); }
-        if (typeof(selectedCar.revised.side_lights) !== 'undefined'  && selectedCar.revised.side_lights !== selectedCar.side_lights) { isSideLights(selectedCar.revised.side_lights); onCheckboxChange(selectedCar.revised.side_lights, "cb19"); }
-        if (typeof(selectedCar.revised.tail_lights) !== 'undefined'  && selectedCar.revised.tail_lights !== selectedCar.tail_lights) { isTailLights(selectedCar.revised.tail_lights); onCheckboxChange(selectedCar.revised.tail_lights, "cb20"); }
-        if (typeof(selectedCar.revised.indicators) !== 'undefined'  && selectedCar.revised.indicators !== selectedCar.indicators) { isIndicators(selectedCar.revised.indicators); onCheckboxChange(selectedCar.revised.indicators, "cb21"); }
-        if (typeof(selectedCar.revised.break_lights) !== 'undefined'  && selectedCar.revised.break_lights !== selectedCar.break_lights) { isBreakLights(selectedCar.revised.break_lights); onCheckboxChange(selectedCar.revised.break_lights, "cb22"); }
-        if (typeof(selectedCar.revised.reverse_lights) !== 'undefined'  && selectedCar.revised.reverse_lights !== selectedCar.reverse_lights) { isReverseLights(selectedCar.revised.reverse_lights); onCheckboxChange(selectedCar.revised.reverse_lights, "cb23"); }
-        if (typeof(selectedCar.revised.hazard_light) !== 'undefined'  && selectedCar.revised.hazard_light !== selectedCar.hazard_light) { isHazardLights(selectedCar.revised.hazard_light); onCheckboxChange(selectedCar.revised.hazard_light, "cb24"); }
-        if (typeof(selectedCar.revised.rear_fog_lights) !== 'undefined'  && selectedCar.revised.rear_fog_lights !== selectedCar.rear_fog_lights) { isRearFogLights(selectedCar.revised.rear_fog_lights); onCheckboxChange(selectedCar.revised.rear_fog_lights, "cb25"); }
-        if (typeof(selectedCar.revised.interior_lights) !== 'undefined'  && selectedCar.revised.interior_lights !== selectedCar.interior_lights) { isInteriorLights(selectedCar.revised.interior_lights); onCheckboxChange(selectedCar.revised.interior_lights, "cb26"); }
-        if (typeof(selectedCar.revised.screen_washer) !== 'undefined'  && selectedCar.revised.screen_washer !== selectedCar.screen_washer) { isScreenWashers(selectedCar.revised.screen_washer); onCheckboxChange(selectedCar.revised.screen_washer, "cb27"); }
-        if (typeof(selectedCar.revised.wiper_blades) !== 'undefined'  && selectedCar.revised.wiper_blades !== selectedCar.wiper_blades) { isWiperBlades(selectedCar.revised.wiper_blades); onCheckboxChange(selectedCar.revised.wiper_blades, "cb28"); }
-        if (typeof(selectedCar.revised.horn) !== 'undefined'  && selectedCar.revised.horn !== selectedCar.horn) { isHorn(selectedCar.revised.horn); onCheckboxChange(selectedCar.revised.horn, "cb29"); }
-        if (typeof(selectedCar.revised.radio) !== 'undefined'  && selectedCar.revised.radio !== selectedCar.radio) { isRadio(selectedCar.revised.radio); onCheckboxChange(selectedCar.revised.radio, "cb30"); }
-        if (typeof(selectedCar.revised.front_fog_lights) !== 'undefined'  && selectedCar.revised.front_fog_lights !== selectedCar.front_fog_lights) { isFrontFogLights(selectedCar.revised.front_fog_lights); onCheckboxChange(selectedCar.revised.front_fog_lights, "cb31"); }
-        if (typeof(selectedCar.revised.air_conditioning) !== 'undefined'  && selectedCar.revised.air_conditioning !== selectedCar.air_conditioning) { isAirConditioning(selectedCar.revised.air_conditioning); onCheckboxChange(selectedCar.revised.air_conditioning, "cb32"); }
+        if (typeof(selectedCar.revised.main_beam) !== 'undefined'  && selectedCar.revised.main_beam !== selectedCar.main_beam) { isMainBeam(selectedCar.revised.main_beam); onCheckboxChange(selectedCar.revised.main_beam, "cb18"); }
+        if (typeof(selectedCar.revised.dipped_beam) !== 'undefined'  && selectedCar.revised.dipped_beam !== selectedCar.dipped_beam) { isDippedBeam(selectedCar.revised.dipped_beam); onCheckboxChange(selectedCar.revised.dipped_beam, "cb19"); }
+        if (typeof(selectedCar.revised.side_lights) !== 'undefined'  && selectedCar.revised.side_lights !== selectedCar.side_lights) { isSideLights(selectedCar.revised.side_lights); onCheckboxChange(selectedCar.revised.side_lights, "cb20"); }
+        if (typeof(selectedCar.revised.tail_lights) !== 'undefined'  && selectedCar.revised.tail_lights !== selectedCar.tail_lights) { isTailLights(selectedCar.revised.tail_lights); onCheckboxChange(selectedCar.revised.tail_lights, "cb21"); }
+        if (typeof(selectedCar.revised.indicators) !== 'undefined'  && selectedCar.revised.indicators !== selectedCar.indicators) { isIndicators(selectedCar.revised.indicators); onCheckboxChange(selectedCar.revised.indicators, "cb22"); }
+        if (typeof(selectedCar.revised.break_lights) !== 'undefined'  && selectedCar.revised.break_lights !== selectedCar.break_lights) { isBreakLights(selectedCar.revised.break_lights); onCheckboxChange(selectedCar.revised.break_lights, "cb23"); }
+        if (typeof(selectedCar.revised.reverse_lights) !== 'undefined'  && selectedCar.revised.reverse_lights !== selectedCar.reverse_lights) { isReverseLights(selectedCar.revised.reverse_lights); onCheckboxChange(selectedCar.revised.reverse_lights, "cb24"); }
+        if (typeof(selectedCar.revised.hazard_light) !== 'undefined'  && selectedCar.revised.hazard_light !== selectedCar.hazard_light) { isHazardLights(selectedCar.revised.hazard_light); onCheckboxChange(selectedCar.revised.hazard_light, "cb25"); }
+        if (typeof(selectedCar.revised.rear_fog_lights) !== 'undefined'  && selectedCar.revised.rear_fog_lights !== selectedCar.rear_fog_lights) { isRearFogLights(selectedCar.revised.rear_fog_lights); onCheckboxChange(selectedCar.revised.rear_fog_lights, "cb26"); }
+        if (typeof(selectedCar.revised.interior_lights) !== 'undefined'  && selectedCar.revised.interior_lights !== selectedCar.interior_lights) { isInteriorLights(selectedCar.revised.interior_lights); onCheckboxChange(selectedCar.revised.interior_lights, "cb27"); }
+        if (typeof(selectedCar.revised.screen_washer) !== 'undefined'  && selectedCar.revised.screen_washer !== selectedCar.screen_washer) { isScreenWashers(selectedCar.revised.screen_washer); onCheckboxChange(selectedCar.revised.screen_washer, "cb28"); }
+        if (typeof(selectedCar.revised.wiper_blades) !== 'undefined'  && selectedCar.revised.wiper_blades !== selectedCar.wiper_blades) { isWiperBlades(selectedCar.revised.wiper_blades); onCheckboxChange(selectedCar.revised.wiper_blades, "cb29"); }
+        if (typeof(selectedCar.revised.horn) !== 'undefined'  && selectedCar.revised.horn !== selectedCar.horn) { isHorn(selectedCar.revised.horn); onCheckboxChange(selectedCar.revised.horn, "cb30"); }
+        if (typeof(selectedCar.revised.radio) !== 'undefined'  && selectedCar.revised.radio !== selectedCar.radio) { isRadio(selectedCar.revised.radio); onCheckboxChange(selectedCar.revised.radio, "cb31"); }
+        if (typeof(selectedCar.revised.front_fog_lights) !== 'undefined'  && selectedCar.revised.front_fog_lights !== selectedCar.front_fog_lights) { isFrontFogLights(selectedCar.revised.front_fog_lights); onCheckboxChange(selectedCar.revised.front_fog_lights, "cb32"); }
         
         if (typeof(selectedCar.revised.tyres) !== 'undefined'  && selectedCar.revised.tyres !== selectedCar.tyres) { isTyres(selectedCar.revised.tyres); onCheckboxChange(selectedCar.revised.tyres, "cb33"); }
         if (typeof(selectedCar.revised.front_visual) !== 'undefined'  && selectedCar.revised.front_visual !== selectedCar.front_visual) { isFrontVisual(selectedCar.revised.front_visual); onCheckboxChange(selectedCar.revised.front_visual, "cb34"); }
@@ -460,6 +467,7 @@ export default function DriverRecordForms() {
                 seat_belts: seatBelts,
                 general_condition: generalCondition,
                 vehicle_documents: vehicleDocuments,
+                liquid_leak: liquidLeak,
                 main_beam: mainBeam,
                 dipped_beam: dippedBeam,
                 side_lights: sideLights,
@@ -475,7 +483,6 @@ export default function DriverRecordForms() {
                 horn: horn,
                 radio: radio,
                 front_fog_lights: frontFogLights,
-                air_conditioning: airConditioning,
                 cleanliness_engine_bay: cleanlinessEngineBay,
                 washer_fluid: washerFluid,
                 coolant_level: coolantLevel,
@@ -511,97 +518,97 @@ export default function DriverRecordForms() {
                 if (err.toJSON().message === 'Network Error'){
                     setErrorMessage({title:"NETWEORK ERROR:", content:"Please check internet connection."});
                 } else if (err.response.data.body_no) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Body No."});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Body No."});
                 } else if (err.response.data.mileage) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Mileage"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Mileage"});
                 } else if (err.response.data.cleanliness_exterior) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Exterior: Cleanliness"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Exterior: Cleanliness"});
                 } else if (err.response.data.condition_rust) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Condition Rust"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Condition Rust"});
                 } else if (err.response.data.decals) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Decals/Livery Intact"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Decals/Livery Intact"});
                 } else if (err.response.data.rear_door) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Read Door"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Read Door"});
                 } else if (err.response.data.mirror) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Mirror"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Mirror"});
                 } else if (err.response.data.roof_rack) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Roof Rack"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Roof Rack"});
                 } else if (err.response.data.rear_step) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Rear Step"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Rear Step"});
                 } else if (err.response.data.seats) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Seats"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Seats"});
                 } else if (err.response.data.seat_belts) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Seat Belts"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Seat Belts"});
                 } else if (err.response.data.general_condition) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"General Condition"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"General Condition"});
                 } else if (err.response.data.vehicle_documents) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Vehicle Documents"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Vehicle Documents"});
+                } else if (err.response.data.liquid_leak) {
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Liquid Leak"});
                 } else if (err.response.data.cleanliness_engine_bay) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Engine Bay: Cleanliness"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Engine Bay: Cleanliness"});
                 } else if (err.response.data.washer_fluid) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Washer Fluid"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Washer Fluid"});
                 } else if (err.response.data.coolant_level) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Coolant Level"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Coolant Level"});
                 } else if (err.response.data.brake_fluid_level) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Brake Fluid Level"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Brake Fluid Level"});
                 } else if (err.response.data.power_steering_fluid) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Power Steering Fluid"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Power Steering Fluid"});
                 } else if (err.response.data.main_beam) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Main Beam"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Main Beam"});
                 } else if (err.response.data.dipped_beam) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Dipped Beam"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Dipped Beam"});
                 } else if (err.response.data.side_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Side Lights"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Side Lights"});
                 } else if (err.response.data.tail_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Tail Lights"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Tail Lights"});
                 } else if (err.response.data.indicators) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Indicators"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Indicators"});
                 } else if (err.response.data.break_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Break Lights"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Break Lights"});
                 } else if (err.response.data.reverse_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Reverse Lights"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Reverse Lights"});
                 } else if (err.response.data.hazard_light) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Hazard Lights"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Hazard Lights"});
                 } else if (err.response.data.rear_fog_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Rear Fog Light"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Rear Fog Light"});
                 } else if (err.response.data.interior_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Interior Lights"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Interior Lights"});
                 } else if (err.response.data.screen_washer) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Screen Washer"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Screen Washer"});
                 } else if (err.response.data.wiper_blades) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Wiper Blades"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Wiper Blades"});
                 } else if (err.response.data.horn) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Horn"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Horn"});
                 } else if (err.response.data.radio) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Radio/CD"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Radio/CD"});
                 } else if (err.response.data.front_fog_lights) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Front Fog Lights"});
-                } else if (err.response.data.air_conditioning) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Air Conditioning"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Front Fog Lights"});
                 } else if (err.response.data.tyres) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Tyres"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Tyres"});
                 } else if (err.response.data.front_visual) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Front (Visual)"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Front (Visual)"});
                 } else if (err.response.data.rear_visual) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Rear (Visual)"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Rear (Visual)"});
                 } else if (err.response.data.spare_visual) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Spare (Visual)"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Spare (Visual)"});
                 } else if (err.response.data.wheel_brace) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Wheel Brace"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Wheel Brace"});
                 } else if (err.response.data.jack) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Jack"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Jack"});
                 } else if (err.response.data.front_left_wheel) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Left Front"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Left Front"});
                 } else if (err.response.data.front_right_wheel) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Right Front"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Right Front"});
                 } else if (err.response.data.rear_left_wheel) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Left Rear"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Left Rear"});
                 } else if (err.response.data.rear_right_wheel) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Right Rear"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Right Rear"});
                 } else if (err.response.data.gas_level) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Gas Level"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Gas Level"});
                 } else if (err.response.data.oil_level) {
-                setErrorMessage({title:"REQUIRED FIELD:", content:"Oil Level"});
+                    setErrorMessage({title:"REQUIRED FIELD:", content:"Oil Level"});
                 } 
                 onClick('displayError');
             })
@@ -619,15 +626,39 @@ export default function DriverRecordForms() {
             },
         };
 
-        const body = JSON.stringify([{
-            "inspection_id": 8
-        }]);
+        let ids = [];
+        carValues.map((iddata, index) => {
+            ids.push(iddata.inspection_id);
+        });
+        console.log("ids:", ids)
 
-        console.log("body:", body)
+        //const body = { "inspection_id": [9,8] }; //carValues
+        const body = { "inspection_id": ids }; 
+        console.log("body:", body);
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_list/', body, config)
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
         .then((res) => {
-            console.log(res.data);
+            //console.log('post',res.data);
+            console.log('post success');
+            let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
+            window.open(url);
+            //const w = window.open(url);
+            //w.focus();
+            // let token = localStorage.getItem("token");
+            // const config = {
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': 'Bearer ' + token,
+            //     },
+            // };
+            // axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/', config)
+            // .then((res) => {
+            //     //console.log('get',res.data);
+            // })
+            // .catch((error) => {
+            //     console.log('error export get: ');
+            //     console.log(error);
+            // });
         })
         .catch((error) => {
             console.log('error export: ');
@@ -745,168 +776,168 @@ export default function DriverRecordForms() {
                 }
                 break;
             case 'cb12':
-                isCleanlinessEngineBay(value);
-                if (selectedCar.cleanliness_engine_bay !== value){
+                isLiquidLeak(value);
+                if (selectedCar.liquid_leak !== value){
                     value ? (updateNotOkay(12,"gray"),  updateOkay(12,"red")) : (updateNotOkay(12,"red"),  updateOkay(12,"gray"));
                 } else {
                     updateNotOkay(12,"none"); updateOkay(12,"none");
                 }
                 break;
             case 'cb13':
-                isWasherFluid(value);
-                if (selectedCar.washer_fluid !== value){
+                isCleanlinessEngineBay(value);
+                if (selectedCar.cleanliness_engine_bay !== value){
                     value ? (updateNotOkay(13,"gray"),  updateOkay(13,"red")) : (updateNotOkay(13,"red"),  updateOkay(13,"gray"));
                 } else {
                     updateNotOkay(13,"none"); updateOkay(13,"none");
                 }
                 break;
             case 'cb14':
-                isCoolantLevel(value);
-                if (selectedCar.coolant_level !== value){
+                isWasherFluid(value);
+                if (selectedCar.washer_fluid !== value){
                     value ? (updateNotOkay(14,"gray"),  updateOkay(14,"red")) : (updateNotOkay(14,"red"),  updateOkay(14,"gray"));
                 } else {
                     updateNotOkay(14,"none"); updateOkay(14,"none");
                 }
                 break;
             case 'cb15':
-                isBrakeFluidLevel(value);
-                if (selectedCar.brake_fluid_level !== value){
+                isCoolantLevel(value);
+                if (selectedCar.coolant_level !== value){
                     value ? (updateNotOkay(15,"gray"),  updateOkay(15,"red")) : (updateNotOkay(15,"red"),  updateOkay(15,"gray"));
                 } else {
                     updateNotOkay(15,"none"); updateOkay(15,"none");
                 }
                 break;
             case 'cb16':
-                isPowerSteeringFluid(value);
-                if (selectedCar.power_steering_fluid !== value){
+                isBrakeFluidLevel(value);
+                if (selectedCar.brake_fluid_level !== value){
                     value ? (updateNotOkay(16,"gray"),  updateOkay(16,"red")) : (updateNotOkay(16,"red"),  updateOkay(16,"gray"));
                 } else {
                     updateNotOkay(16,"none"); updateOkay(16,"none");
                 }
                 break;
             case 'cb17':
-                isMainBeam(value);
-                if (selectedCar.main_beam !== value){
+                isPowerSteeringFluid(value);
+                if (selectedCar.power_steering_fluid !== value){
                     value ? (updateNotOkay(17,"gray"),  updateOkay(17,"red")) : (updateNotOkay(17,"red"),  updateOkay(17,"gray"));
                 } else {
                     updateNotOkay(17,"none"); updateOkay(17,"none");
                 }
                 break;
             case 'cb18':
-                isDippedBeam(value);
-                if (selectedCar.dipped_beam !== value){
+                isMainBeam(value);
+                if (selectedCar.main_beam !== value){
                     value ? (updateNotOkay(18,"gray"),  updateOkay(18,"red")) : (updateNotOkay(18,"red"),  updateOkay(18,"gray"));
                 } else {
                     updateNotOkay(18,"none"); updateOkay(18,"none");
                 }
                 break;
             case 'cb19':
-                isSideLights(value);
-                if (selectedCar.side_lights !== value){
+                isDippedBeam(value);
+                if (selectedCar.dipped_beam !== value){
                     value ? (updateNotOkay(19,"gray"),  updateOkay(19,"red")) : (updateNotOkay(19,"red"),  updateOkay(19,"gray"));
                 } else {
                     updateNotOkay(19,"none"); updateOkay(19,"none");
                 }
                 break;
             case 'cb20':
-                isTailLights(value);
-                if (selectedCar.tail_lights !== value){
+                isSideLights(value);
+                if (selectedCar.side_lights !== value){
                     value ? (updateNotOkay(20,"gray"),  updateOkay(20,"red")) : (updateNotOkay(20,"red"),  updateOkay(20,"gray"));
                 } else {
                     updateNotOkay(20,"none"); updateOkay(20,"none");
                 }
                 break;
             case 'cb21':
-                isIndicators(value);
-                if (selectedCar.indicators !== value){
+                isTailLights(value);
+                if (selectedCar.tail_lights !== value){
                     value ? (updateNotOkay(21,"gray"),  updateOkay(21,"red")) : (updateNotOkay(21,"red"),  updateOkay(21,"gray"));
                 } else {
                     updateNotOkay(21,"none"); updateOkay(21,"none");
                 }
                 break;
             case 'cb22':
-                isBreakLights(value);
-                if (selectedCar.break_lights !== value){
+                isIndicators(value);
+                if (selectedCar.indicators !== value){
                     value ? (updateNotOkay(22,"gray"),  updateOkay(22,"red")) : (updateNotOkay(22,"red"),  updateOkay(22,"gray"));
                 } else {
                     updateNotOkay(22,"none"); updateOkay(22,"none");
                 }
                 break;
             case 'cb23':
-                isReverseLights(value);
-                if (selectedCar.reverse_lights !== value){
+                isBreakLights(value);
+                if (selectedCar.break_lights !== value){
                     value ? (updateNotOkay(23,"gray"),  updateOkay(23,"red")) : (updateNotOkay(23,"red"),  updateOkay(23,"gray"));
                 } else {
                     updateNotOkay(23,"none"); updateOkay(23,"none");
                 }
                 break;
             case 'cb24':
-                isHazardLights(value);
-                if (selectedCar.hazard_light !== value){
+                isReverseLights(value);
+                if (selectedCar.reverse_lights !== value){
                     value ? (updateNotOkay(24,"gray"),  updateOkay(24,"red")) : (updateNotOkay(24,"red"),  updateOkay(24,"gray"));
                 } else {
                     updateNotOkay(24,"none"); updateOkay(24,"none");
                 }
                 break;
             case 'cb25':
-                isRearFogLights(value);
-                if (selectedCar.rear_fog_lights !== value){
+                isHazardLights(value);
+                if (selectedCar.hazard_light !== value){
                     value ? (updateNotOkay(25,"gray"),  updateOkay(25,"red")) : (updateNotOkay(25,"red"),  updateOkay(25,"gray"));
                 } else {
                     updateNotOkay(25,"none"); updateOkay(25,"none");
                 }
                 break;
             case 'cb26':
-                isInteriorLights(value);
-                if (selectedCar.interior_lights !== value){
+                isRearFogLights(value);
+                if (selectedCar.rear_fog_lights !== value){
                     value ? (updateNotOkay(26,"gray"),  updateOkay(26,"red")) : (updateNotOkay(26,"red"),  updateOkay(26,"gray"));
                 } else {
                     updateNotOkay(26,"none"); updateOkay(26,"none");
                 }
                 break;
             case 'cb27':
-                isScreenWashers(value);
-                if (selectedCar.screen_washer !== value){
+                isInteriorLights(value);
+                if (selectedCar.interior_lights !== value){
                     value ? (updateNotOkay(27,"gray"),  updateOkay(27,"red")) : (updateNotOkay(27,"red"),  updateOkay(27,"gray"));
                 } else {
                     updateNotOkay(27,"none"); updateOkay(27,"none");
                 }
                 break;
             case 'cb28':
-                isWiperBlades(value);
-                if (selectedCar.wiper_blades !== value){
+                isScreenWashers(value);
+                if (selectedCar.screen_washer !== value){
                     value ? (updateNotOkay(28,"gray"),  updateOkay(28,"red")) : (updateNotOkay(28,"red"),  updateOkay(28,"gray"));
                 } else {
                     updateNotOkay(28,"none"); updateOkay(28,"none");
                 }
                 break;
             case 'cb29':
-                isHorn(value);
-                if (selectedCar.horn !== value){
+                isWiperBlades(value);
+                if (selectedCar.wiper_blades !== value){
                     value ? (updateNotOkay(29,"gray"),  updateOkay(29,"red")) : (updateNotOkay(29,"red"),  updateOkay(29,"gray"));
                 } else {
                     updateNotOkay(29,"none"); updateOkay(29,"none");
                 }
                 break;
             case 'cb30':
-                isRadio(value);
-                if (selectedCar.radio !== value){
+                isHorn(value);
+                if (selectedCar.horn !== value){
                     value ? (updateNotOkay(30,"gray"),  updateOkay(30,"red")) : (updateNotOkay(30,"red"),  updateOkay(30,"gray"));
                 } else {
                     updateNotOkay(30,"none"); updateOkay(30,"none");
                 }
                 break;
             case 'cb31':
-                isFrontFogLights(value);
-                if (selectedCar.front_fog_lights !== value){
+                isRadio(value);
+                if (selectedCar.radio !== value){
                     value ? (updateNotOkay(31,"gray"),  updateOkay(31,"red")) : (updateNotOkay(31,"red"),  updateOkay(31,"gray"));
                 } else {
                     updateNotOkay(31,"none"); updateOkay(31,"none");
                 }
                 break;
             case 'cb32':
-                isAirConditioning(value);
-                if (selectedCar.air_conditioning !== value){
+                isFrontFogLights(value);
+                if (selectedCar.front_fog_lights !== value){
                     value ? (updateNotOkay(32,"gray"),  updateOkay(32,"red")) : (updateNotOkay(32,"red"),  updateOkay(32,"gray"));
                 } else {
                     updateNotOkay(32,"none"); updateOkay(32,"none");
@@ -1458,6 +1489,15 @@ export default function DriverRecordForms() {
                                     <center><Checkbox id="cb11" checked={vehicleDocuments} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
+                            <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Liquid Leak</h4></div>
+                                <div className={"p-col widCheck " + notOkay[12]}>
+                                    <center><Checkbox id="cb12" checked={!liquidLeak} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                </div>
+                                <div className={"p-col widCheck " + okay[12]}>
+                                    <center><Checkbox id="cb12" checked={liquidLeak} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1475,47 +1515,47 @@ export default function DriverRecordForms() {
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
-                                <div className={"p-col widCheck " + notOkay[12]}>
-                                    <center><Checkbox id="cb12" checked={!cleanlinessEngineBay} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[13]}>
+                                    <center><Checkbox id="cb13" checked={!cleanlinessEngineBay} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[12]}>
-                                    <center><Checkbox id="cb12" checked={cleanlinessEngineBay} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[13]}>
+                                    <center><Checkbox id="cb13" checked={cleanlinessEngineBay} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Washer Fluid</h4></div>
-                                <div className={"p-col widCheck " + notOkay[13]}>
-                                    <center><Checkbox id="cb13" checked={!washerFluid} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[14]}>
+                                    <center><Checkbox id="cb14" checked={!washerFluid} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[13]}>
-                                    <center><Checkbox id="cb13" checked={washerFluid} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[14]}>
+                                    <center><Checkbox id="cb14" checked={washerFluid} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Coolant Level</h4></div>
-                                <div className={"p-col widCheck " + notOkay[14]}>
-                                    <center><Checkbox id="cb14" checked={!coolantLevel} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[15]}>
+                                    <center><Checkbox id="cb15" checked={!coolantLevel} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[14]}>
-                                    <center><Checkbox id="cb14" checked={coolantLevel} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[15]}>
+                                    <center><Checkbox id="cb15" checked={coolantLevel} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Brake Fluid Level</h4></div>
-                                <div className={"p-col widCheck " + notOkay[15]}>
-                                    <center><Checkbox id="cb15" checked={!brakeFluidLevel} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[16]}>
+                                    <center><Checkbox id="cb16" checked={!brakeFluidLevel} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[15]}>
-                                    <center><Checkbox id="cb15" checked={brakeFluidLevel} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[16]}>
+                                    <center><Checkbox id="cb16" checked={brakeFluidLevel} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Power Steering Fluid</h4></div>
-                                <div className={"p-col widCheck " + notOkay[16]}>
-                                    <center><Checkbox id="cb16" checked={!powerSteeringFluid} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[17]}>
+                                    <center><Checkbox id="cb17" checked={!powerSteeringFluid} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[16]}>
-                                    <center><Checkbox id="cb16" checked={powerSteeringFluid} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[17]}>
+                                    <center><Checkbox id="cb17" checked={powerSteeringFluid} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                         </div>
@@ -1535,146 +1575,137 @@ export default function DriverRecordForms() {
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Main Beam</h4></div>
-                                <div className={"p-col widCheck " + notOkay[17]}>
-                                    <center><Checkbox id="cb17" checked={!mainBeam} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[18]}>
+                                    <center><Checkbox id="cb18" checked={!mainBeam} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[17]}>
-                                    <center><Checkbox id="cb17" checked={mainBeam} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[18]}>
+                                    <center><Checkbox id="cb18" checked={mainBeam} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Dipped Beam</h4></div>
-                                <div className={"p-col widCheck " + notOkay[18]}>
-                                    <center><Checkbox id="cb18" checked={!dippedBeam} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[19]}>
+                                    <center><Checkbox id="cb19" checked={!dippedBeam} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[18]}>
-                                    <center><Checkbox id="cb18" checked={dippedBeam} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[19]}>
+                                    <center><Checkbox id="cb19" checked={dippedBeam} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Side Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[19]}>
-                                    <center><Checkbox id="cb19" checked={!sideLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[20]}>
+                                    <center><Checkbox id="cb20" checked={!sideLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[19]}>
-                                    <center><Checkbox id="cb19" checked={sideLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[20]}>
+                                    <center><Checkbox id="cb20" checked={sideLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Tail Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[20]}>
-                                    <center><Checkbox id="cb20" checked={!tailLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[21]}>
+                                    <center><Checkbox id="cb21" checked={!tailLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[20]}>
-                                    <center><Checkbox id="cb20" checked={tailLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[21]}>
+                                    <center><Checkbox id="cb21" checked={tailLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Indicators</h4></div>
-                                <div className={"p-col widCheck " + notOkay[21]}>
-                                    <center><Checkbox id="cb21" checked={!indicators} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[22]}>
+                                    <center><Checkbox id="cb22" checked={!indicators} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[21]}>
-                                    <center><Checkbox id="cb21" checked={indicators} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[22]}>
+                                    <center><Checkbox id="cb22" checked={indicators} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{ height:'40px'}}><h4>Break Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[22]}>
-                                    <center><Checkbox id="cb22" checked={!breakLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[23]}>
+                                    <center><Checkbox id="cb23" checked={!breakLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[22]}>
-                                    <center><Checkbox id="cb22" checked={breakLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[23]}>
+                                    <center><Checkbox id="cb23" checked={breakLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Reverse Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[23]}>
-                                    <center><Checkbox id="cb23" checked={!reverseLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[24]}>
+                                    <center><Checkbox id="cb24" checked={!reverseLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[23]}>
-                                    <center><Checkbox id="cb23" checked={reverseLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[24]}>
+                                    <center><Checkbox id="cb24" checked={reverseLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Hazard Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[24]}>
-                                    <center><Checkbox id="cb24" checked={!hazardLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[25]}>
+                                    <center><Checkbox id="cb25" checked={!hazardLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[24]}>
-                                    <center><Checkbox id="cb24" checked={hazardLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[25]}>
+                                    <center><Checkbox id="cb25" checked={hazardLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Rear Fog Light</h4></div>
-                                <div className={"p-col widCheck " + notOkay[25]}>
-                                    <center><Checkbox id="cb25" checked={!rearFogLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[26]}>
+                                    <center><Checkbox id="cb26" checked={!rearFogLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[25]}>
-                                    <center><Checkbox id="cb25" checked={rearFogLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[26]}>
+                                    <center><Checkbox id="cb26" checked={rearFogLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Interior Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[26]}>
-                                    <center><Checkbox id="cb26" checked={!interiorLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[27]}>
+                                    <center><Checkbox id="cb27" checked={!interiorLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[26]}>
-                                    <center><Checkbox id="cb26" checked={interiorLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[27]}>
+                                    <center><Checkbox id="cb27" checked={interiorLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Screen Washer</h4></div>
-                                <div className={"p-col widCheck " + notOkay[27]}>
-                                    <center><Checkbox id="cb27" checked={!screenWasher} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[28]}>
+                                    <center><Checkbox id="cb28" checked={!screenWasher} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[27]}>
-                                    <center><Checkbox id="cb27" checked={screenWasher} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[28]}>
+                                    <center><Checkbox id="cb28" checked={screenWasher} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Wiper Blades</h4></div>
-                                <div className={"p-col widCheck " + notOkay[28]}>
-                                    <center><Checkbox id="cb28" checked={!wiperBlades} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[29]}>
+                                    <center><Checkbox id="cb29" checked={!wiperBlades} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[28]}>
-                                    <center><Checkbox id="cb28" checked={wiperBlades} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[29]}>
+                                    <center><Checkbox id="cb29" checked={wiperBlades} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Horn</h4></div>
-                                <div className={"p-col widCheck " + notOkay[29]}>
-                                    <center><Checkbox id="cb29" checked={!horn} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[30]}>
+                                    <center><Checkbox id="cb30" checked={!horn} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[29]}>
-                                    <center><Checkbox id="cb29" checked={horn} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[30]}>
+                                    <center><Checkbox id="cb30" checked={horn} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Radio/CD</h4></div>
-                                <div className={"p-col widCheck " + notOkay[30]}>
-                                    <center><Checkbox id="cb30" checked={!radio} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + notOkay[31]}>
+                                    <center><Checkbox id="cb31" checked={!radio} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
-                                <div className={"p-col widCheck " + okay[30]}>
-                                    <center><Checkbox id="cb30" checked={radio} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                <div className={"p-col widCheck " + okay[31]}>
+                                    <center><Checkbox id="cb31" checked={radio} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Front Fog Lights</h4></div>
-                                <div className={"p-col widCheck " + notOkay[31]}>
-                                    <center><Checkbox id="cb31" checked={!frontFogLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
-                                </div>
-                                <div className={"p-col widCheck " + okay[31]}>
-                                    <center><Checkbox id="cb31" checked={frontFogLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
-                                </div>
-                            </div>
-                            <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                                <div className="p-col widName" style={{height:'40px'}}><h4>Air Conditioning</h4></div>
                                 <div className={"p-col widCheck " + notOkay[32]}>
-                                    <center><Checkbox id="cb32" checked={!airConditioning} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
+                                    <center><Checkbox id="cb32" checked={!frontFogLights} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
                                 <div className={"p-col widCheck " + okay[32]}>
-                                    <center><Checkbox id="cb32" checked={airConditioning} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
+                                    <center><Checkbox id="cb32" checked={frontFogLights} onChange={event => onCheckboxChange(true, event.target.id)}/></center>
                                 </div>
                             </div>
                         </div>
@@ -1830,8 +1861,12 @@ export default function DriverRecordForms() {
                         <h1>Checklist Report</h1>
                             <div className="p-grid">
                                 <div className="p-col-12 p-md-8">
-                                    <label>Comments:</label>
-                                    <InputText id="n" className={editNotes} placeholder="Comments" value={notes} 
+                                    <label>Emergency Contact Number:</label>
+                                    <InputText value={emergency} disabled/>
+                                </div>
+                                <div className="p-col-12 p-md-8">
+                                    <label>Remarks:</label>
+                                    <InputText id="n" className={editNotes} placeholder="Add other remarks here" value={notes} 
                                     onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
                                     <small className="p-invalid p-d-block">{smallNotes}</small>
                                 </div>
@@ -2025,6 +2060,15 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col widCheck">
                                     <center><Checkbox checked={vehicleDocuments}/></center>
+                                </div>
+                            </div>
+                            <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
+                                <div className="p-col widName" style={{height:'40px'}}><h4>Liquid Leak</h4></div>
+                                <div className="p-col widCheck">
+                                    <center><Checkbox checked={!liquidLeak}/></center>
+                                </div>
+                                <div className="p-col widCheck">
+                                    <center><Checkbox checked={liquidLeak}/></center>
                                 </div>
                             </div>
                         </div>
@@ -2235,15 +2279,6 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col widCheck">
                                     <center><Checkbox checked={frontFogLights}/></center>
-                                </div>
-                            </div>
-                            <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
-                                <div className="p-col widName" style={{height:'40px'}}><h4>Air Conditioning</h4></div>
-                                <div className="p-col widCheck">
-                                    <center><Checkbox checked={!airConditioning}/></center>
-                                </div>
-                                <div className="p-col widCheck">
-                                    <center><Checkbox checked={airConditioning}/></center>
                                 </div>
                             </div>
                         </div>
