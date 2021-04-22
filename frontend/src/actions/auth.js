@@ -27,6 +27,7 @@ export const login = (username, password) => (dispatch) => {
             //console.log('login token: ' + res.data.access)
             localStorage.setItem('username', username);
             localStorage.setItem('token', res.data.access);
+            localStorage.setItem('refreshToken', res.data.refresh);
             try {
                 let token = localStorage.getItem("token");
                 let username = localStorage.getItem("username");

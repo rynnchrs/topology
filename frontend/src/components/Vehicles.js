@@ -15,6 +15,8 @@ import {Calendar} from 'primereact/calendar';
 import {SelectButton} from 'primereact/selectbutton';
 import {Toast} from 'primereact/toast'
 import { ListBox } from 'primereact/listbox';
+import { Carousel } from 'primereact/carousel';
+ 
 
 //import './TabViewDemo.css';
 import axios from "axios";
@@ -29,20 +31,21 @@ export class Vehicles extends Component {
         this.state = {
 
             //vehicle data object
-            vehicleData : {
-                car_id : 0, slug : '', vin_no : '', body_no : '', cs_no : '', plate_no : '', brand : '', release_year : 2020, make : '', series : '', 
-                body_type : '', color : '', dealer : '', dealer_phone : '', dealer_email : '', po_no : '', po_date : '', body_builder : '', fabricator : '',
-                sale_price : 0, vat_price : 0, engine_no : '', battery_no : '', fuel_type : '', transmission : '', denomination : '', piston : 0, cylinder : 0,
-                procuring_entity : '', capacity : 0, gross_weight : 0, net_weight : 0, shipping_weight : 0, net_capacity : 0, lto_cr : 0, cr_date : '', or_no : 0,
-                or_date : '', top_load : '', field_office : '', or_cr : '', permanent_loc : '', current_loc : '', vtf : '', permanent_status : '', delivery_location : '',
-                deliver_date : '', si_no : 0, dr_no : '', dr_codes : '', plate_date : '', decals_date : '', modified : '', ewd_date : '', tools_date : '',
-                userManual_date : '', warrantyBook_date : '', unitKey_date : '', bodyKey_date : '', cigarettePlug_date : '', keychain_date : '', fan_date : '',
-                remarks : '', operational : '', status : '', date_updated : '', date_created : '', fire_extinguisher:'',jack: '', wrench: '', c_client_name: '',
-                c_contract_no: '', c_start_date: '', c_end_date: '', c_bid_no: '', c_bid_name: '', c_bid_date: '', c_cost: 0, t_insurance_name: '', t_telephone_no: '',
-                t_email: '', t_po_no: '', t_date_issued: '', t_start_date: '', t_end_date: '', t_cost: 0, i1_insurance_company: '', i1_telephone_no: '', i1_email: '',
-                i1_po_no: '', i1_date_issued: '', i1_start_date: '', i1_end_date: '', i1_cost: 0, i2_insurance_company: '', i2_telephone_no: '', i2_email: '',
-                i2_po_no: '', i2_date_issued: '', i2_start_date: '', i2_end_date: '', i2_cost: 0,
-            },
+            // vehicleData : {
+            //     car_id : 0, slug : '', vin_no : '', body_no : '', cs_no : '', plate_no : '', brand : '', release_year : 2020, make : '', series : '', 
+            //     body_type : '', color : '', dealer : '', dealer_phone : '', dealer_email : '', po_no : '', po_date : '', body_builder : '', fabricator : '',
+            //     sale_price : 0, vat_price : 0, engine_no : '', battery_no : '', fuel_type : '', transmission : '', denomination : '', piston : 0, cylinder : 0,
+            //     procuring_entity : '', capacity : 0, gross_weight : 0, net_weight : 0, shipping_weight : 0, net_capacity : 0, lto_cr : 0, cr_date : '', or_no : 0,
+            //     or_date : '', top_load : '', field_office : '', or_cr : '', permanent_loc : '', current_loc : '', vtf : '', permanent_status : '', delivery_location : '',
+            //     deliver_date : '', si_no : 0, dr_no : '', dr_codes : '', plate_date : '', decals_date : '', modified : '', ewd_date : '', tools_date : '',
+            //     userManual_date : '', warrantyBook_date : '', unitKey_date : '', bodyKey_date : '', cigarettePlug_date : '', keychain_date : '', fan_date : '',
+            //     remarks : '', operational : '', status : '', date_updated : '', date_created : '', fire_extinguisher:'',jack: '', wrench: '', c_client_name: '',
+            //     c_contract_no: '', c_start_date: '', c_end_date: '', c_bid_no: '', c_bid_name: '', c_bid_date: '', c_cost: 0, t_insurance_name: '', t_telephone_no: '',
+            //     t_email: '', t_po_no: '', t_date_issued: '', t_start_date: '', t_end_date: '', t_cost: 0, i1_insurance_company: '', i1_telephone_no: '', i1_email: '',
+            //     i1_po_no: '', i1_date_issued: '', i1_start_date: '', i1_end_date: '', i1_cost: 0, i2_insurance_company: '', i2_telephone_no: '', i2_email: '',
+            //     i2_po_no: '', i2_date_issued: '', i2_start_date: '', i2_end_date: '', i2_cost: 0,
+            // },
+            vehicleData: "",
 
             //vehicle data object for CRUD
             newvehicleData : {
@@ -118,26 +121,115 @@ export class Vehicles extends Component {
             carValues: null,
 
             sampleValue: '',
+            bodyno: [],
+            filteredSuggestions: [],
+            searchBody: "",
+            images: [
+                {image: "samplecar.jpg", name: "samplecars"},
+                {image: "careta-logo.png", name: "careta"},
+            ],
+            //images: [],
         };
 
         this.toast = createRef(null)
         this.radioChange = this.radioChange.bind(this);
+        //this.productTemplate = this.productTemplate.bind(this);
 
     }
 
     componentDidMount() {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        Promise.all([
+            fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json())
+        ]).then(([res1]) => {
+            const bodyno = res1;
+            console.log("res1", res1);
+            if (res1.code === "token_not_valid"){
+                this.refreshToken();
+            }
+            this.setState({
+                bodyno: bodyno
+            });
+        })
 
     }
 
+    searchList = (event) => {
+        setTimeout(() => {
+            if (!event.query.trim().length) {
+
+            } else {
+                try {
+                    this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
+                    this.setState({
+                        filteredSuggestions: this.state.filteredSuggestions,
+                    });
+                } catch (err){
+                    console.log("autocomplete err:", err);
+                }
+            }
+        }, 100);
+    };
+
+    refreshToken() {
+        let token = localStorage.getItem("token");
+        let refreshToken = localStorage.getItem("token");
+        console.log("token: ", token);
+        console.log("refreshtoken: ", refreshToken);
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        const body = { "refresh": refreshToken }; 
+        console.log("body:", body);
+
+        axios
+            .post(process.env.REACT_APP_SERVER_NAME + 'careta/token/refresh/', body)
+            .then((res) => {  
+                console.log("res refresh:", res.data);
+            })
+            .catch((error) => {
+                console.log('error refresh: ');
+                console.log(error);
+            });
+    }
+
+    productTemplate(images) {
+        return (
+            <div>
+                {/* <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} */}
+                {/* <img src={`showcase/demo/images/product/${product.image}`}   alt={product.name} className="product-image" /> */}
+                <center><img src={`/assets/layout/images/${images.image}`} style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+            </div>
+        );
+    }
+
+    exportData() {
+        //console.log('export car-list');
+        let url = process.env.REACT_APP_SERVER_NAME + 'api/careta/export_list/';
+        window.open(url);
+    }
+
+    
     refreshList = () => {
         axios
-          .get("http://127.0.0.1:8000/api/careta/?search=")
+          //.get("http://127.0.0.1:8000/api/careta/?search=")
+          .get(process.env.REACT_APP_SERVER_NAME + "api/careta/?search=")
           .then(res => this.setState({ vehicleData: res.data[0] },this.logTest))
           .catch(err => console.log(err));
       };
 
     logTest = () =>{
-        console.log(this.state.vehicleData);
+        console.log("logtest: ",this.state.vehicleData);
         //this.forceUpdate();
     }
 
@@ -778,7 +870,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Status':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -1329,11 +1420,61 @@ export class Vehicles extends Component {
             onCalendarModalShow(clickSender);
 
         }
+
+        const onSearchBarOnKeyUp = (e) => {
+            if(e.keyCode===13)
+                {
+                    axios
+                    //.get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
+                    .get(process.env.REACT_APP_SERVER_NAME + 'api/careta/?search=' + e.target.value)
+                    .then(res =>  {
+                        console.log("vehicle: ", res.data);
+                        const isDataAvailable = res.data && res.data.length;
+
+                        if(isDataAvailable)
+                            this.setState({ vehicleData: res.data[0]},getContract);
+                        else
+                            showNoResult();
+
+                    })
+                    .catch(err => console.log(err));
+                }
+        }
+
+        const selectItem = event => {
+            console.log("select: ", event.value);
+            axios
+                //.get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
+                .get(process.env.REACT_APP_SERVER_NAME + 'api/careta/?search=' + event.value.body_no)
+                .then(res =>  {
+                    console.log("vehicle: ", res.data);
+                    const isDataAvailable = res.data && res.data.length;
+    
+                    if(isDataAvailable)
+                        this.setState({ vehicleData: res.data[0]},getContract);
+                    else
+                        showNoResult();
+    
+                })
+                .catch((error) => {
+                    console.log('error select: ');
+                    console.log(error);
+                });
+        }
         
         //GET VALUES OF CAR FROM DB
         const getContract = () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
             axios
-                .get("http://127.0.0.1:8000/api/careta-contract/" + this.state.vehicleData.car_id+"/")
+                //.get("http://127.0.0.1:8000/api/careta-contract/" + this.state.vehicleData.car_id+"/")
+                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-contract/" + this.state.vehicleData.car_id + "/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1351,7 +1492,8 @@ export class Vehicles extends Component {
 
         const getTPL= () =>{
             axios
-                .get("http://127.0.0.1:8000/api/careta-tpl/" + this.state.vehicleData.car_id+"/")
+                //.get("http://127.0.0.1:8000/api/careta-tpl/" + this.state.vehicleData.car_id+"/")
+                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-tpl/" + this.state.vehicleData.car_id + "/")
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1369,7 +1511,8 @@ export class Vehicles extends Component {
 
         const getInsurance1= () =>{
             axios
-                .get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-1/")
+                //.get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-1/")
+                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-insurance/" + this.state.vehicleData.car_id + "-1/")
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1387,7 +1530,8 @@ export class Vehicles extends Component {
 
         const getInsurance2= () =>{
             axios
-                .get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
+                //.get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
+                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1401,32 +1545,6 @@ export class Vehicles extends Component {
                         i2_cost: res.data.cost,        
                         }
                 },reProcessResult)})
-        }
-
-        
-        const onSearchBarOnKeyUp = (e) => {
-
-
-            if(e.keyCode===13)
-                {
-                    axios
-                    .get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
-                    .then(res =>  {
-                        console.log(res.data);
-                        const isDataAvailable = res.data && res.data.length;
-
-                        if(isDataAvailable)
-                            this.setState({ vehicleData: res.data[0]},getContract);
-                        else
-                            showNoResult();
-
-                    })
-                    .catch(err => console.log(err));
-
-
-                }
-
-
         }
 
         const reProcessResult = () => {
@@ -1659,7 +1777,7 @@ export class Vehicles extends Component {
 
         return (
             <div className="p-grid p-fluid">
-                <div className="p-col-12">
+                <div className="p-col-12 dialog-vehicle">
                     <Toast ref={this.toast} />
 
                     <Dialog header={"Delete Data"} visible={this.state.ddVisibility} onHide={() => ConfirmDeleteDialogHide()}>
@@ -1678,54 +1796,63 @@ export class Vehicles extends Component {
                         </div>
                     </Dialog>
 
-                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} style={{ width: '90vw' }} footer={renderFooter(this.state.vmModalMode)} onHide={() => onHide(this.state.vmModalMode)} closable={false} blockScroll={true}>
+                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} style={{width:'90vw'}} footer={renderFooter(this.state.vmModalMode)} onHide={() => onHide(this.state.vmModalMode)} closable={false} blockScroll={true}>
                         <div className="card">
-                            <Accordion activeAccordion={0}>
+                            <Accordion multiple activeAccordion={0}>
                                 <AccordionTab header={<label><span><b>Identification </b></span><i className="pi pi-user"></i></label>}>
                                     <div className="p-fluid">
                                         <div className="p-grid p-col-12">
-                                            <label htmlFor="vStatus" className="p-col-12 p-md-2">Status:</label>
+                                            <label htmlFor="vStatus" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Status:</label>
                                             {/* <div className="p-inputgroup p-col-12 p-md-10">
                                                 <InputText id="vStatus" type="text" value = {this.state.newvehicleData.status}/>
                                                 <SelectButton value={""} options={statusOptions} onChange={(e) => setOptionValue('Status',e)} className="p-col-4 p-md-6"></SelectButton>
                                             </div> */}
-                                            <div className="p-col-12 p-lg-5 p-md-5">
+                                            <div className="p-col-12 p-lg-5 p-md-12 p-sm-12">
                                                 <InputText id="vStatus" type="text" value = {this.state.newvehicleData.status}/>
                                             </div>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
-                                                <SelectButton value={""} options={statusOptions} onChange={(e) => setOptionValue('Status',e)} style={{wordBreak:'break-all'}}></SelectButton>
+                                            <div className="p-col-12 p-lg-5 p-md-12 p-sm-12">
+                                                {/* <SelectButton value={""} options={statusOptions} onChange={(e) => setOptionValue('Status',e)} style={{wordBreak:'break-all'}}></SelectButton> */}
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-4 p-md-4"><Button label="Active" onClick={() => setOptionValue('Status', {value: statusOptions[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-4 p-md-4"><Button label="Maintenance" onClick={() => setOptionValue('Status', {value: statusOptions[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-4 p-md-4"><Button label="Repair" onClick={() => setOptionValue('Status', {value: statusOptions[2].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="p-grid p-col-12">
-                                            <label htmlFor="vOperational" className="p-col-12 p-md-2">Operational:</label>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
+                                            <label htmlFor="vOperational" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Operational:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
                                                 <InputText id="vOperational" type="text" value = {this.state.newvehicleData.operational}/>
                                             </div>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
-                                                <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Operational',e)} style={{wordBreak:'break-all'}}></SelectButton>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                {/* <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Operational',e)} style={{wordBreak:'break-all'}}></SelectButton> */}
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Yes" onClick={() => setOptionValue('Operational', {value: operationalStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="No" onClick={() => setOptionValue('Operational', {value: operationalStatus[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vBodyNum" className="p-col-12 p-md-2">Body Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vBodyNum" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Body Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vBodyNum" name='body_no' type="text" value = {this.state.newvehicleData.body_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vCSNum" className="p-col-12 p-md-2">CS Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vCSNum" className="p-col-12 p-lg-2 p-md-12 p-sm-12">CS Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vCSNum" type="text" name='cs_no' value = {this.state.newvehicleData.cs_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vPlateNum" className="p-col-12 p-md-2">Plate Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPlateNum" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Plate Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vPlateNum" type="text" name='plate_no' value={this.state.newvehicleData.plate_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vRemarks" className="p-col-12 p-md-2">Remarks:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vRemarks" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Remarks:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vRemarks" type="text" name='remarks' value = {this.state.newvehicleData.remarks} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -1733,39 +1860,39 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>Vehicle Info </b></span><i className="pi pi-info-circle"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vBrand" className="p-col-12 p-md-2">Brand:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12"> {/* className="p-field p-grid" */}
+                                            <label htmlFor="vBrand" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Brand:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <Dropdown id="vBrand" name="brand" value={this.state.newvehicleData.brand} options={brandListItems} optionLabel="label" placeholder="Select a Brand" onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vYear" className="p-col-12 p-md-2">Year:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vYear" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Year:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputMask id="vYear" mask="9999" name='release_year' value={this.state.newvehicleData.release_year} onChange={(e) => onChangeHandler(e)}></InputMask>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vMake" className="p-col-12 p-md-2">Make:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vMake" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Make:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vMake" type="text" name='make' value={this.state.newvehicleData.make} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vSeries" className="p-col-12 p-md-2">Series:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vSeries" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Series:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vSeries" type="text" name='series' value={this.state.newvehicleData.series} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vBodyType" className="p-col-12 p-md-2">Body Type:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vBodyType" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Body Type:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vBodyType" type="text" name='body_type' value={this.state.newvehicleData.body_type} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vColor" className="p-col-12 p-md-2">Color:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vColor" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Color:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vColor" type="text" name='color'  value={this.state.newvehicleData.color} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -1773,33 +1900,33 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>Suppliers </b></span><i className="pi pi-briefcase"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDealer" className="p-col-12 p-md-2">Dealer:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vDealer" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Dealer:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <Dropdown id="vDealer" name="dealer" value={this.state.newvehicleData.dealer} options={dealerListItems} optionLabel="label" placeholder="Select a Dealer" onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vPONumber" className="p-col-12 p-md-2">PO Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPONumber" className="p-col-12 p-lg-2 p-md-12 p-sm-12">PO Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vPONumber" type="text" name='po_no'  value={this.state.newvehicleData.po_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vPODate" className="p-col-12 p-md-2">PO Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPODate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">PO Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vPODate" type="text" value={this.state.newvehicleData.po_date} onClick={()=>onInputTextClickHandler("PO Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vBodyBuilder" className="p-col-12 p-md-2">Body Builder:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vBodyBuilder" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Body Builder:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vBodyBuilder" type="text" name='body_builder' value={this.state.newvehicleData.body_builder} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vFabricator" className="p-col-12 p-md-2">Fabricator:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vFabricator" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Fabricator:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vFabricator" type="text" name='fabricator'  value={this.state.newvehicleData.fabricator} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -1807,93 +1934,99 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>Engine and Body Info </b></span><i className="pi pi-inbox"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vChassisN" className="p-col-12 p-md-2">Chassis Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vChassisN" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Chassis Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vChassisN" type="text" name='vin_no' value={this.state.newvehicleData.vin_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vEngineN" className="p-col-12 p-md-2">Engine Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vEngineN" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Engine Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vEngineN" type="text" name='engine_no' value={this.state.newvehicleData.engine_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vBatteryN" className="p-col-12 p-md-2">Battery Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vBatteryN" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Battery Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vBatteryN" type="text" name='battery_no' value={this.state.newvehicleData.battery_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
                                         <div className="p-grid p-col-12">
-                                            <label htmlFor="vFuelType" className="p-col-12 p-md-2">Fuel Type:</label>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
+                                            <label htmlFor="vFuelType" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Fuel Type:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
                                                 <InputText id="vFuelType" type="text" value = {this.state.newvehicleData.fuel_type}/>
                                             </div>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
-                                                <SelectButton value={""} options={fuelType} onChange={(e) => setOptionValue('Fuel Type',e)} style={{wordBreak:'break-all'}}></SelectButton>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Diesel" onClick={() => setOptionValue('Fuel Type', {value: fuelType[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Gas" onClick={() => setOptionValue('Fuel Type', {value: fuelType[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="p-grid p-col-12">
-                                            <label htmlFor="vTransmission" className="p-col-12 p-md-2">Transmission:</label>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
+                                            <label htmlFor="vTransmission" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Transmission:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
                                                 <InputText id="vTransmission" type="text" value = {this.state.newvehicleData.transmission}/>
                                             </div>
-                                            <div className="p-col-12 p-lg-5 p-md-5">
-                                                <SelectButton value={""} options={transmissionType} onChange={(e) => setOptionValue('Transmission Type',e)} style={{wordBreak:'break-all'}}></SelectButton>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Automatic" onClick={() => setOptionValue('Transmission Type', {value: transmissionType[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Manual" onClick={() => setOptionValue('Transmission Type', {value: transmissionType[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDenomination" className="p-col-12 p-md-2">Denomination:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vDenomination" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Denomination:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vDenomination" type="text" name='denomination' value={this.state.newvehicleData.denomination} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vPistonD" className="p-col-12 p-md-2">Piston Displacement:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPistonD" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Piston Displacement:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vPistonD" type="text" name='piston' value={this.state.newvehicleData.piston} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vNumCylinders" className="p-col-12 p-md-2">Number of Cylinders:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vNumCylinders" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Number of Cylinders:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vNumCylinders" type="text" name='cylinder' value={this.state.newvehicleData.cylinder} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vProcEntity" className="p-col-12 p-md-2">Procuring Entity:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vProcEntity" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Procuring Entity:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vProcEntity" type="text" name='procuring_entity' value={this.state.newvehicleData.procuring_entity} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vCapacity" className="p-col-12 p-md-2">Capacity:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vCapacity" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Capacity:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vCapacity" type="text" name='capacity' value={this.state.newvehicleData.capacity} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vGrossW" className="p-col-12 p-md-2">Gross Weight:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vGrossW" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Gross Weight:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vGrossW" type="text" name='gross_weight' value={this.state.newvehicleData.gross_weight} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vNetW" className="p-col-12 p-md-2">Net Weight:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vNetW" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Net Weight:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vNetW" type="text" name='net_weight' value={this.state.newvehicleData.net_weight} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vShippingW" className="p-col-12 p-md-2">Shipping Weight:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vShippingW" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Shipping Weight:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vShippingW" type="text" name='shipping_weight' value={this.state.newvehicleData.shipping_weight} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vNetCapacity" className="p-col-12 p-md-2">Net Capacity:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vNetCapacity" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Net Capacity:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vNetCapacity" type="text" name='net_capacity' value={this.state.newvehicleData.net_capacity} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -1901,46 +2034,51 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>LTO  </b></span><i className="pi pi-money-bill"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vLTOCR" className="p-col-12 p-md-2">LTO CR:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vLTOCR" className="p-col-12 p-lg-2 p-md-12 p-sm-12">LTO CR:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vLTOCR" type="text" name='lto_cr' value={this.state.newvehicleData.lto_cr} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vLTOCRDate" className="p-col-12 p-md-2">LTO CR Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vLTOCRDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">LTO CR Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vLTOCRDate" type="text" value={this.state.newvehicleData.cr_date} onClick={()=>onInputTextClickHandler("LTO Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vORNumber" className="p-col-12 p-md-2">OR Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vORNumber" className="p-col-12 p-lg-2 p-md-12 p-sm-12">OR Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vORNumber" type="text" name='or_no' value={this.state.newvehicleData.or_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vORDate" className="p-col-12 p-md-2">OR Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vORDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">OR Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vORDate" type="text" value={this.state.newvehicleData.or_date} onClick={()=>onInputTextClickHandler("OR Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vTopLoadReg" className="p-col-12 p-md-2">TopLoadReg:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vTopLoadReg" type="text" name='top_load' value={this.state.newvehicleData.top_load}/>
-                                                <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('TopLoad',e)} className="p-col-6 p-md-6"></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vTopLoadReg" className="p-col-12 p-lg-2 p-md-12 p-sm-12">TopLoadReg:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <InputText id="vTopLoadReg" type="text" name='top_load' value = {this.state.newvehicleData.top_load}/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Yes" onClick={() => setOptionValue('TopLoad', {value: operationalStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="No" onClick={() => setOptionValue('TopLoad', {value: operationalStatus[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vFieldOfc" className="p-col-12 p-md-2">Field office:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vFieldOfc" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Field office:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vFieldOfc" type="text" name='field_office' value={this.state.newvehicleData.field_office} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vORCRCopy" className="p-col-12 p-md-2">ORCR Copy:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vORCRCopy" className="p-col-12 p-lg-2 p-md-12 p-sm-12">ORCR Copy:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vORCRCopy" type="text" value={this.state.newvehicleData.or_cr} onClick={()=>onInputTextClickHandler("OR CR Copy Date")} readOnly/>
                                             </div>
                                         </div>
@@ -1948,63 +2086,73 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>Location </b></span><i className="pi pi-map-marker"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vPermanentLoc" className="p-col-12 p-md-2">Permanent:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPermanentLoc" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Permanent:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vPermanentLoc" type="text" name='permanent_loc' value={this.state.newvehicleData.permanent_loc} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vCurrentLoc" className="p-col-12 p-md-2">Current:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vCurrentLoc" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Current:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vCurrentLoc" type="text" name='current_loc' value={this.state.newvehicleData.current_loc} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vVTF" className="p-col-12 p-md-2">With VTF?:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vVTF" type="text" value={this.state.newvehicleData.vtf} readOnly/>
-                                                <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('VTF Type',e)} className="p-col-6 p-md-6"></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vVTF" className="p-col-12 p-lg-2 p-md-12 p-sm-12">With VTF?:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <InputText id="vVTF" type="text" value = {this.state.newvehicleData.vtf}/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Yes" onClick={() => setOptionValue('VTF Type', {value: operationalStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="No" onClick={() => setOptionValue('VTF Type', {value: operationalStatus[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vPLStatus" className="p-col-12 p-md-2">Permanent?:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vPLStatus" type="text" value={this.state.newvehicleData.permanent_status} readOnly/>
-                                                <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Permanent Type',e)} className="p-col-6 p-md-6"></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPLStatus" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Permanent?:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <InputText id="vPLStatus" type="text" value = {this.state.newvehicleData.permanent_status}/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Yes" onClick={() => setOptionValue('Permanent Type', {value: operationalStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="No" onClick={() => setOptionValue('Permanent Type', {value: operationalStatus[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>Delivery Info </b></span><i className="pi pi-directions"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDeliveryLoc" className="p-col-12 p-md-2">Delivery Location:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vDeliveryLoc" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Delivery Location:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vDeliveryLoc" type="text" name='delivery_location' value={this.state.newvehicleData.delivery_location} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDeliveryDate" className="p-col-12 p-md-2">Delivery Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vDeliveryDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Delivery Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vDeliveryDate" type="text" value={this.state.newvehicleData.deliver_date} onClick={()=>onInputTextClickHandler("Delivery Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vSINumber" className="p-col-12 p-md-2">SI Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vSINumber" className="p-col-12 p-lg-2 p-md-12 p-sm-12">SI Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vSINumber" type="text" name='si_no' value={this.state.newvehicleData.si_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDRNumber" className="p-col-12 p-md-2">DR Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vDRNumber" className="p-col-12 p-lg-2 p-md-12 p-sm-12">DR Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vDRNumber" type="text" name='dr_no' value={this.state.newvehicleData.dr_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDRCodes" className="p-col-12 p-md-2">DR Codes:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vDRCodes" className="p-col-12 p-lg-2 p-md-12 p-sm-12">DR Codes:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vDRCodes" type="text" name='dr_codes' value={this.state.newvehicleData.dr_codes} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -2013,167 +2161,283 @@ export class Vehicles extends Component {
                                 <AccordionTab header={<label><span><b>Received Items </b></span><i className="pi pi-download"></i></label>}>
                                     <div className="p-fluid">
                                         <div className="p-grid p-col-12">
-                                            <label htmlFor="vPlateNumDel" className="p-col-12 p-md-2">Plate Number Delivery:</label>
-                                            {/* <div className="p-inputgroup p-col-12 p-md-10">
+                                            <label htmlFor="vPlateNumDel" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Plate Number Delivery:</label>
+                                            {/* <div className="p-inputgroup p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="vPlateNumDel"  type="text" value={this.state.newvehicleData.plate_date} readOnly/>
                                                 <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Plate Number Delivery Date',e)}></SelectButton>
                                             </div> */}
-                                            <div className="p-col-12 p-lg-3 p-md-3">
-                                                <InputText id="vPlateNumDel"  type="text" value={this.state.newvehicleData.plate_date} readOnly/>
-                                            </div>
-                                            <div className="p-col-12 p-lg-7 p-md-7">
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Plate Number Delivery Date',e)} style={{wordBreak:'break-all'}}></SelectButton>
-                                            </div>
-                                        </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vDecals" className="p-col-12 p-md-2">Decals:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vDecals" type="text" value={this.state.newvehicleData.decals_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Decal Delivery Date',e)}></SelectButton>
-                                            </div>
-                                        </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vModified" className="p-col-12 p-md-2">Modified:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vModified" type="text" value={this.state.newvehicleData.modified} readOnly/>
-                                                <SelectButton value={""} options={operationalStatus} onChange={(e) => setOptionValue('Modified Date',e)} className="p-col-6 p-md-6"></SelectButton>
-                                            </div>
-
-
-                                        </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vEWD" className="p-col-12 p-md-2">Early Warning Device:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vEWD" type="text" value={this.state.newvehicleData.ewd_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('EWD Delivery Date',e)}></SelectButton>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                {/* <div className="p-grid">
+                                                    <InputText id="vPlateNumDel"  type="text" value={this.state.newvehicleData.plate_date} readOnly/>
+                                                </div> */}
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vPlateNumDel" type="text" value={this.state.newvehicleData.plate_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Recieving Copy" onClick={() => setOptionValue('Plate Number Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Plate Number Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Plate Number Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Recieve" onClick={() => setOptionValue('Plate Number Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Plate Number Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vTools" className="p-col-12 p-md-2">Tools:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vTools" type="text" value={this.state.newvehicleData.tools_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Tools Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vPlateNumDel" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Decals:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vPlateNumDel" type="text" value={this.state.newvehicleData.decals_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Recieving Copy" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Recieve" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vUsersManual" className="p-col-12 p-md-2">User's Manual:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vUsersManual" type="text" value={this.state.newvehicleData.userManual_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue("User's Manual Delivery Date",e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vModified" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Modified:</label>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <InputText id="vModified" type="text" value = {this.state.newvehicleData.modified}/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-5 p-md-6 p-sm-12">
+                                                <div className="p-grid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="Yes" onClick={() => setOptionValue('Modified Date', {value: operationalStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6"><Button label="No" onClick={() => setOptionValue('Modified Date', {value: operationalStatus[1].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vWarrantyBook" className="p-col-12 p-md-2">Warranty Book:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vWarrantyBook" type="text" value={this.state.newvehicleData.warrantyBook_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Warranty Book Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vEWD" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Early Warning Device:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vEWD" type="text" value={this.state.newvehicleData.ewd_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Recieving Copy" onClick={() => setOptionValue('EWD Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('EWD Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('EWD Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Recieve" onClick={() => setOptionValue('EWD Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('EWD Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vUnitKey" className="p-col-12 p-md-2">Unit Key:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vUnitKey" type="text" value={this.state.newvehicleData.unitKey_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Unit Key Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vTools" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Tools:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vTools" type="text" value={this.state.newvehicleData.tools_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Tools Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Tools Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Tools Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Tools Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Tools Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vBodyKey" className="p-col-12 p-md-2">Body Key:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vBodyKey" type="text" value={this.state.newvehicleData.bodyKey_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Body Key Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vUsersManual" className="p-col-12 p-lg-2 p-md-12 p-sm-12">User's Manual:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vUsersManual" type="text" value={this.state.newvehicleData.userManual_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue("User's Manual Delivery Date", {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue("User's Manual Delivery Date", {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue("User's Manual Delivery Date", {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue("User's Manual Delivery Date", {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue("User's Manual Delivery Date", {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vCigPlug" className="p-col-12 p-md-2">Cigarette Plug:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vCigPlug" type="text" value={this.state.newvehicleData.cigarettePlug_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Cigarette Plug Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vWarrantyBook" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Warranty Book:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vWarrantyBook" type="text" value={this.state.newvehicleData.warrantyBook_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Warranty Book Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Warranty Book Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Warranty Book Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Warranty Book Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Warranty Book Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vKeyChain" className="p-col-12 p-md-2">Key Chain:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vKeyChain" type="text" value={this.state.newvehicleData.keychain_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Key Chain Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vUnitKey" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Unit Key:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vUnitKey" type="text" value={this.state.newvehicleData.unitKey_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Unit Key Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Unit Key Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Unit Key Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Unit Key Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Unit Key Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vJack" className="p-col-12 p-md-2">Jack:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vJack" type="text" value={this.state.newvehicleData.jack} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Jack Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vBodyKey" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Body Key:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vBodyKey" type="text" value={this.state.newvehicleData.bodyKey_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Body Key Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Body Key Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Body Key Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Body Key Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Body Key Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vTireWrench" className="p-col-12 p-md-2">Tire Wrench:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vTireWrench" type="text" value={this.state.newvehicleData.wrench} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Tire Wrench Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vCigPlug" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Cigarette Plug:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vCigPlug" type="text" value={this.state.newvehicleData.cigarettePlug_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Cigarette Plug Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Cigarette Plug Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Cigarette Plug Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Cigarette Plug Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Cigarette Plug Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vFireExt" className="p-col-12 p-md-2">Fire Extinguisher:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vFireExt" type="text" value={this.state.newvehicleData.fire_extinguisher} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Fire Extinguisher Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vKeyChain" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Key Chain:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vKeyChain" type="text" value={this.state.newvehicleData.keychain_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Key Chain Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Key Chain Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Key Chain Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Key Chain Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Key Chain Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="vFan" className="p-col-12 p-md-2">Fan:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
-                                                <InputText id="vFan" type="text" value={this.state.newvehicleData.fan_date} readOnly/>
-                                                <SelectButton value={""} options={recievedItemStatus} onChange={(e) => setOptionValue('Fan Delivery Date',e)}></SelectButton>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vJack" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Jack:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vJack" type="text" value={this.state.newvehicleData.jack} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Jack Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Jack Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Jack Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Jack Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Jack Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vTireWrench" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Tire Wrench:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vTireWrench" type="text" value={this.state.newvehicleData.wrench} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Tire Wrench Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Tire Wrench Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Tire Wrench Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Tire Wrench Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Tire Wrench Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vFireExt" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Fire Extinguisher:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vFireExt" type="text" value={this.state.newvehicleData.fire_extinguisher} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Fire Extinguisher Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Fire Extinguisher Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Fire Extinguisher Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Fire Extinguisher Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Fire Extinguisher Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="vFan" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Fan:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
+                                                <div className="p-grid vehicle-dialog-rcvbtn">
+                                                    <div className="p-col-12 p-lg-12 p-md-12">
+                                                        <InputText id="vFan" type="text" value={this.state.newvehicleData.fan_date} readOnly/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Receiving Copy" onClick={() => setOptionValue('Fan Delivery Date', {value: recievedItemStatus[0].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Fan Delivery Date', {value: recievedItemStatus[1].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Applicable" onClick={() => setOptionValue('Fan Delivery Date', {value: recievedItemStatus[2].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Did Not Receive" onClick={() => setOptionValue('Fan Delivery Date', {value: recievedItemStatus[3].value})}/></div>
+                                                    <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Date" onClick={() => setOptionValue('Fan Delivery Date', {value: recievedItemStatus[4].value})}/></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>Bidding/Contract </b></span><i className="pi pi-clone"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dClientName" className="p-col-12 p-md-2">Client Name:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dClientName" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Client Name:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dClientName"  name = "c_client_name" type="text" value={this.state.newvehicleData.c_client_name} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dContractNumber" className="p-col-12 p-md-2">Contract Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dContractNumber" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Contract Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dContractNumber" name = "c_contract_no" type="text" value={this.state.newvehicleData.c_contract_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dCStartDate" className="p-col-12 p-md-2">Start Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dCStartDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Start Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dCStartDate" name = "c_start_date" type="text" value={this.state.newvehicleData.c_start_date} onClick={()=>onInputTextClickHandler("CStart Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dCEndDate" className="p-col-12 p-md-2">End Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dCEndDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">End Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dCEndDate" name="c_end_date" type="text" value={this.state.newvehicleData.c_end_date} onClick={()=>onInputTextClickHandler("CEnd Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dCBidNumber" className="p-col-12 p-md-2">Bid Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dCBidNumber" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Bid Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dCBidNumber" name="c_bid_no" type="text" value={this.state.newvehicleData.c_bid_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dCBidName" className="p-col-12 p-md-2">Bid Name:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dCBidName" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Bid Name:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dCBidName" name = "c_bid_name" type="text" value={this.state.newvehicleData.c_bid_name} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dCBidDate" className="p-col-12 p-md-2">Bid Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dCBidDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Bid Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dCBidDate" name= "c_bid_date" type="text" value={this.state.newvehicleData.c_bid_date} onClick={()=>onInputTextClickHandler("CBid Date")}readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dCCost" className="p-col-12 p-md-2">Cost:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dCCost" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Cost:</label>
+                                            <div className="p-inputgroup p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dCCost" name="c_cost" type="text" value={this.state.newvehicleData.c_cost} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -2181,51 +2445,51 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>TPL </b></span><i className="pi pi-id-card"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTInsuranceName" className="p-col-12 p-md-2">Insurance Name:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTInsuranceName" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Insurance Name:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTInsuranceName"  name = "t_insurance_name" type="text" value={this.state.newvehicleData.t_insurance_name} onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div> 
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTTelephone" className="p-col-12 p-md-2">Telephone Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTTelephone" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Telephone Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTTelephone" name = "t_telephone_no" type="text" value={this.state.newvehicleData.t_telephone_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTEmail" className="p-col-12 p-md-2">Email:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTEmail" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Email:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTEmail" name= "t_email" type="text" value={this.state.newvehicleData.t_email} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTPONo" className="p-col-12 p-md-2">PO Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTPONo" className="p-col-12 p-lg-2 p-md-12 p-sm-12">PO Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTPONo" name = "t_po_no" type="text" value={this.state.newvehicleData.t_po_no} onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTDateIssued" className="p-col-12 p-md-2">Date Issued:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTDateIssued" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Date Issued:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTDateIssued" name = "t_date_issued" type="text" value={this.state.newvehicleData.t_date_issued} onClick={()=>onInputTextClickHandler("TDate Issued")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTStartDate" className="p-col-12 p-md-2">Start Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTStartDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Start Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTStartDate" name = "t_start_date" type="text" value={this.state.newvehicleData.t_start_date} onClick={()=>onInputTextClickHandler("TStart Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTEndDate" className="p-col-12 p-md-2">End Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTEndDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">End Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTEndDate" name = "t_end_date" type="text" value={this.state.newvehicleData.t_end_date}  onClick={()=>onInputTextClickHandler("TEnd Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="dTCost" className="p-col-12 p-md-2">Cost:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="dTCost" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Cost:</label>
+                                            <div className="p-inputgroup p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="dTCost" name = "t_cost" type="text" value={this.state.newvehicleData.t_cost} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -2233,51 +2497,51 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>1st Insurance </b></span><i className="pi pi-list"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1InsuranceCompany" className="p-col-12 p-md-2">Insurance Company:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1InsuranceCompany" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Insurance Company:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1InsuranceCompany" name = "i1_insurance_company" type="text" value={this.state.newvehicleData.i1_insurance_company} onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1Telephone" className="p-col-12 p-md-2">Telephone Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1Telephone" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Telephone Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1Telephone" name = "i1_telephone_no" type="text" value={this.state.newvehicleData.i1_telephone_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1Email" className="p-col-12 p-md-2">Email:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1Email" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Email:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1Email" name = "i1_email" type="text" value={this.state.newvehicleData.i1_email} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1PONo" className="p-col-12 p-md-2">PO Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1PONo" className="p-col-12 p-lg-2 p-md-12 p-sm-12">PO Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1PONo" name = "i1_po_no" type="text" value={this.state.newvehicleData.i1_po_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1DateIssued" className="p-col-12 p-md-2">Date Issued:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1DateIssued" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Date Issued:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1DateIssued" name = "i1_date_issued" type="text" value={this.state.newvehicleData.i1_date_issued} onClick={()=>onInputTextClickHandler("I1Date Issued")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1StartDate" className="p-col-12 p-md-2">Start Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1StartDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Start Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1StartDate" name = "i1_start_date" type="text" value={this.state.newvehicleData.i1_start_date} onClick={()=>onInputTextClickHandler("I1Start Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1EndDate" className="p-col-12 p-md-2">End Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1EndDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">End Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1EndDate" name = "i1_end_date" type="text" value={this.state.newvehicleData.i1_end_date} onClick={()=>onInputTextClickHandler("I1End Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d1Cost" className="p-col-12 p-md-2">Cost:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d1Cost" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Cost:</label>
+                                            <div className="p-inputgroup p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d1Cost" name = "i1_cost" type="text" value={this.state.newvehicleData.i1_cost} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -2285,51 +2549,51 @@ export class Vehicles extends Component {
                                 </AccordionTab>
                                 <AccordionTab header={<label><span><b>2nd Insurance </b></span><i className="pi pi-list"></i></label>}>
                                     <div className="p-fluid">
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2InsuranceCompany" className="p-col-12 p-md-2">Insurance Company:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2InsuranceCompany" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Insurance Company:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2InsuranceCompany" name = "i2_insurance_company" type="text" value={this.state.newvehicleData.i2_insurance_company} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2Telephone" className="p-col-12 p-md-2">Telephone Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2Telephone" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Telephone Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2Telephone" name= "i2_telephone_no" type="text" value={this.state.newvehicleData.i2_telephone_no} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2Email" className="p-col-12 p-md-2">Email:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2Email" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Email:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2Email" name= "i2_email" type="text" value={this.state.newvehicleData.i2_email}onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2PONo" className="p-col-12 p-md-2">PO Number:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2PONo" className="p-col-12 p-lg-2 p-md-12 p-sm-12">PO Number:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2PONo" name = "i2_po_no" type="text" value={this.state.newvehicleData.i2_po_no} onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2DateIssued" className="p-col-12 p-md-2">Date Issued:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2DateIssued" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Date Issued:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2DateIssued" name = "i2_date_issued" type="text" value={this.state.newvehicleData.i2_date_issued} onClick={()=>onInputTextClickHandler("I2Date Issued")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2StartDate" className="p-col-12 p-md-2">Start Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2StartDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Start Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2StartDate" name = "i2_start_date" type="text" value={this.state.newvehicleData.i2_start_date} onClick={()=>onInputTextClickHandler("I2Start Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2EndDate" className="p-col-12 p-md-2">End Date:</label>
-                                            <div className="p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2EndDate" className="p-col-12 p-lg-2 p-md-12 p-sm-12">End Date:</label>
+                                            <div className="p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2EndDate" name = "i2_end_date" type="text" value={this.state.newvehicleData.i2_end_date}  onClick={()=>onInputTextClickHandler("I2End Date")} readOnly/>
                                             </div>
                                         </div>
-                                        <div className="p-field p-grid">
-                                            <label htmlFor="d2Cost" className="p-col-12 p-md-2">Cost:</label>
-                                            <div className="p-inputgroup p-col-12 p-md-10">
+                                        <div className="p-grid p-col-12">
+                                            <label htmlFor="d2Cost" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Cost:</label>
+                                            <div className="p-inputgroup p-col-12 p-lg-10 p-md-12">
                                                 <InputText id="d2Cost" name = "i2_cost" type="text" value={this.state.newvehicleData.i2_cost} onChange={(e) => onChangeHandler(e)}/>
                                             </div>
                                         </div>
@@ -2340,10 +2604,20 @@ export class Vehicles extends Component {
                     </Dialog>
 
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
-                        <div className="p-d-flex p-mb-2" name="searchbox">                           
-                            <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} />
+                        <div className="p-col-12" name="searchbox"> 
+                            <div className="p-grid p-fluid">
+                                <div className="p-col-12 p-lg-10 p-md-10 p-sm-12">                        
+                                    {/* <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} /> */}
+                                    <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
+                                    completeMethod={this.searchList} onSelect={selectItem}
+                                    onChange={event => this.setState({searchBody: event.target.value})}/>
+                                </div>
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12"> 
+                                    <Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => this.exportData()}/>
+                                </div>
+                            </div>
                         </div>
-                        <div className="p-grid p-mb-2">
+                        {/* <div className="p-grid p-mb-2">
                             <div className="p-col">
                                 <input type="radio"
                                     value="VIN"
@@ -2362,7 +2636,7 @@ export class Vehicles extends Component {
                                     checked={this.state.filterOption === "Plate"}
                                     onChange={this.radioChange} />Search By Plate No.
                             </div>
-                        </div>
+                        </div> */}
                     </Fieldset>
                 </div>
 
@@ -2370,7 +2644,7 @@ export class Vehicles extends Component {
                     <Fieldset legend="Vehicle Data">
                         <div className="p-grid">
                             <div className="p-col-12 p-lg-4 p-md-4"> </div>
-                            <div className="p-col-12 p-lg-8 p-md-8">
+                            <div className="p-col-12 p-lg-8 p-md-8" style={{paddingBottom: '1%'}}>
                                 <div className="p-grid">
                                     <div className="p-col-12 p-lg-4 p-md-4">
                                         { localStorage.getItem("addInventory") === "true" ?
@@ -2390,16 +2664,21 @@ export class Vehicles extends Component {
                                 </div>
                             </div>
                         </div>
+                        <div className="p-grid">
+                            {/* <div className="p-col-12 p-lg-4 p-md-4"> </div> */}
+                            <div className="p-col-12 p-shadow-1" style={{borderRadius: '90% 90% 90% 90%/5% 5% 5% 5%', boxShadow: '0px 1px 5px 1px rgba(175, 175, 175, 0.3)'}}> 
+                                <center><h5><b>Vehicle Image</b></h5></center>
+                                {/* <div class="p-d-flex p-jc-center"
+                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="100%" alt="car"></img>
+                                </div> */}
+                                <Carousel value={this.state.images} numVisible={1} numScroll={1} 
+                                itemTemplate={this.productTemplate}/>
+                            </div>
+                        </div>
 
                         <div className="p-grid">
-                            <div className="p-col-12 p-lg-4 p-md-4">
-                                <div class="p-d-flex p-jc-center">
-                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="100%" alt="car"></img>
-                                </div>
-                            </div>
-
-                            <div className="p-col-12 p-lg-8 p-md-8">
-                                <Accordion activeAccordion={0}>
+                            <div className="p-col-12 p-lg-10 p-md-10 p-sm-10" style={{paddingTop: '5%'}}>
+                                <Accordion multiple activeAccordion={0}>
                                     <AccordionTab header={<label><span><b>Identification </b></span><i className="pi pi-user"></i></label>}>
                                         <div className="p-fluid">
                                             <div className="p-field p-grid">

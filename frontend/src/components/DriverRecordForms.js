@@ -278,9 +278,7 @@ export default function DriverRecordForms() {
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                 setSelected(values);
                 onClick('displayBasic');
-                console.log("make1: ", res.data.body_no.make);
             })
-            
             .catch((error) => {
                 console.log('error: ');
                 console.log(error);
@@ -308,7 +306,6 @@ export default function DriverRecordForms() {
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                 setSelected(values);
                 onClick('displayBasic2');
-                console.log("make2", res.data.body_no.make);
             })
             .catch((error) => {
                 console.log('error: ');
@@ -1312,6 +1309,7 @@ export default function DriverRecordForms() {
             <div className="p-col-12">
                 <DataTable ref={dt} header={renderHeader()} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                     globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
+                    resizableColumns columnResizeMode="expand"
                     paginator rows={10} emptyMessage="No data found"
                     >
                     {/* <Column selectionMode="single" style={{width:'3em'}}/> */}

@@ -40,7 +40,6 @@ export const AppProfile = () => {
     
     const logout = () => {
         let token = localStorage.getItem("token");
-        const refresh_token = token;
 
         const config = {
             headers: {
@@ -49,7 +48,7 @@ export const AppProfile = () => {
             },
         };
 
-        const body = JSON.stringify({ refresh_token });
+        const body = JSON.stringify({ token });
         console.log('body: ' + body);
 
         axios
@@ -66,6 +65,7 @@ export const AppProfile = () => {
 
         localStorage.removeItem("token");
         localStorage.removeItem("username");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("myfirst");
 
         localStorage.removeItem("viewUsers"); localStorage.removeItem("addUsers");
