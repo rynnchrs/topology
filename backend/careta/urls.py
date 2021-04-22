@@ -4,8 +4,8 @@ from rest_framework_simplejwt import views as jwt_views  # add this
 
 from . import views
 from .views import (BlacklistTokenView, CarListView, ExpiryView,  # add this
-                    MyTokenObtainPairView, Populate,
-                    RegisterView, SearchInventoryView, UserListView)
+                    MyTokenObtainPairView, RegisterView, SearchInventoryView,
+                    UserListView)
 
 router = routers.DefaultRouter()  
 router.register(r'users', views.UserView, 'users') # users api
@@ -21,5 +21,4 @@ urlpatterns = [
     path('user-list/', UserListView.as_view(), name='user-list'), # 
     path('car-list/', CarListView.as_view(), name='car-list'), # 
     path('expiry/', ExpiryView.as_view(), name='expiry'),
-    path('populate/', Populate.as_view(), name='populate') 
 ]
