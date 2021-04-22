@@ -18,7 +18,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import (TPL, Car, Contract, Insurance, JobOrder,  # add this
                      Permission)
-from .populate import user_data
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
                           ContractSerializer, InsuranceSerializer,
                           JobOrderSerializer, MyTokenObtainPairSerializer,
@@ -37,14 +36,7 @@ from .utils import (check_Com_date, check_cr_date, check_or_date,
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
     
-class Populate(generics.GenericAPIView):  # for register user
-
-    def post(self, request):
-        user_data()
-        return Response("Successfully Created", status=status.HTTP_201_CREATED)
-
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this

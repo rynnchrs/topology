@@ -1,7 +1,9 @@
 from datetime import datetime
-from django.conf import settings
 
+from django.conf import settings
 from openpyxl import Workbook
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+
 
 def export(inspection):
     datas = inspection
@@ -12,6 +14,24 @@ def export(inspection):
     worksheet.title = '{date}-Inspection-Report.xlsx'.format(
         date=datetime.now().strftime('%Y-%m-%d'))
 
+    cell_1 = ["B1","H1","P1","T1","Z1","AO1","AQ1","BA1"]
+    cell_2 = ["G1","O1","S1","Y1","AN1","AP1","AZ1","BE1"]
+    header = ["VEHICLE INFOMATION","EXTERIOR","INTERIOR","ENGINE BAY","ELECTRICS",
+            "WHEELS AND TIRES","GAS AND OIL","CHECKLIST REPORT"]
+    color = ["00FFFF00","003366FF","00FFCC99","00C0C0C0","0000FF00","00FF0000","00800080","00FFFFFF"]
+
+    for i in range(8):
+        worksheet.merge_cells(cell_1[i] +":"+cell_2[i])
+
+        cell = worksheet[cell_1[i]] 
+        cell.value = header[i]
+        
+        cell.fill = PatternFill("solid", fgColor=color[i])
+        cell.alignment = Alignment(horizontal='center')
+        cell.font = Font(bold=True)
+        thin = Side(border_style="thin", color="000000")
+        cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+
     # Define the titles for columns
     columns = [
         'ID',
@@ -21,6 +41,7 @@ def export(inspection):
         'Make',
         'Current Location',
         "Mileage",
+
         "Cleanliness",
         "Condition Rust",
         "Decals/Livery Intact",
@@ -33,6 +54,14 @@ def export(inspection):
         "Seat Belts",
         "General Condition",
         "Vehicle Documents",
+        
+        "Engine Bay Cleanliness ",
+        "Washer Fluids",
+        "Coolant Level",
+        "Brake Fluid Level",
+        "Power Steering Fluid",
+        "Liquid Leak Under Vehicle",
+
         "Main Beam",
         "Dipped Beam",
         "Side Lights",
@@ -48,14 +77,10 @@ def export(inspection):
         "Horn",
         "Radio/CD",
         "Front Fog Lights",
-        "Air Conditioning",
-        "Engine Bay Cleanliness ",
-        "Washer Fluids",
-        "Coolant Level",
-        "Brake Fluid Level",
-        "Power Steering Fluid",
+
         "Gas Level",
         "Oil Level",
+
         "Tyres",
         "Front (Visual)",
         "Rear (Visual)",
@@ -66,245 +91,182 @@ def export(inspection):
         "Left Front",
         "Right Rear",
         "Left Rear",
+
         "Driver",
         "Edited By",
         "Notes",
         "Date Updated",
         "Date Created"
     ]
-    row_num = 1
+    row_num = 2
 
     # Assign the titles for each cell of the header
     for col_num, column_title in enumerate(columns, 1):
         cell = worksheet.cell(row=row_num, column=col_num)
         cell.value = column_title
+        cell.fill = PatternFill("solid", fgColor=color[i])
+        cell.alignment = Alignment(horizontal='center')
+        cell.font = Font(bold=True)
+        thin = Side(border_style="thin", color="000000")
+        cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+
+        if col_num >= 2:
+            cell.fill = PatternFill("solid", fgColor=color[0])
+        if col_num >= 8:
+            cell.fill = PatternFill("solid", fgColor=color[1])
+        if col_num >= 16:
+            cell.fill = PatternFill("solid", fgColor=color[2])
+        if col_num >= 20:
+            cell.fill = PatternFill("solid", fgColor=color[3])
+        if col_num >= 26:
+            cell.fill = PatternFill("solid", fgColor=color[4])
+        if col_num >= 41:
+            cell.fill = PatternFill("solid", fgColor=color[5])
+        if col_num >= 43:
+            cell.fill = PatternFill("solid", fgColor=color[6])
+        if col_num >= 53:
+            cell.fill = PatternFill("solid", fgColor=color[7])
 
     # Iterate through all movies
     for data in datas:
         row_num += 1
-        if data.body_no.make == "L30":
-            data.body_no.make = 'L300 Exceed 2.5D MT'
-        elif data.body_no.make == "SUV":
-            data.body_no.make = 'Super Carry UV'
-        elif data.body_no.make == "G15":
-            data.body_no.make = 'Gratour midi truck 1.5L'
-        elif data.body_no.make == "G12":
-            data.body_no.make = 'Gratour midi truck 1.2L'
+           
+        choices = ["L30","SUV","G15","G12",True,False,None]
+        real_value = ["L300 Exceed 2.5D MT","Super Carry UV","Gratour midi truck 1.5L",
+            "Gratour midi truck 1.2L","Okay","Not Okay",None
+            ]
+
+        index = choices.index(data.body_no.make) 
+        data.body_no.make = real_value[index]
+
+        index = choices.index(data.cleanliness_exterior) 
+        data.cleanliness_exterior = real_value[index]
+
+        index = choices.index(data.condition_rust) 
+        data.condition_rust = real_value[index]
+
+        index = choices.index(data.decals) 
+        data.decals = real_value[index]
             
-        if data.cleanliness_exterior is True:
-            data.cleanliness_exterior = "Okay"
-        else:
-            data.cleanliness_exterior = "Not Okay"
-            
-        if data.condition_rust is True:
-            data.condition_rust = "Okay"
-        else:
-            data.condition_rust = "Not Okay"
+        index = choices.index(data.windows) 
+        data.windows = real_value[index]
 
-        if data.decals is True:
-            data.decals = "Okay"
-        else:
-            data.decals = "Not Okay"
+        index = choices.index(data.rear_door) 
+        data.rear_door = real_value[index]
 
-        if data.windows is True:
-            data.windows = "Okay"
-        else:
-            data.windows = "Not Okay"
+        index = choices.index(data.mirror) 
+        data.mirror = real_value[index]
 
-        if data.rear_door is True:
-            data.rear_door = "Okay"
-        else:
-            data.rear_door = "Not Okay"
+        index = choices.index(data.roof_rack) 
+        data.roof_rack = real_value[index]
 
-        if data.mirror is True:
-            data.mirror = "Okay"
-        else:
-            data.mirror = "Not Okay"
+        index = choices.index(data.rear_step) 
+        data.rear_step = real_value[index]
 
-        if data.roof_rack is True:
-            data.roof_rack = "Okay"
-        else:
-            data.roof_rack = "Not Okay"
+        index = choices.index(data.seats) 
+        data.seats = real_value[index]
 
-        if data.rear_step is True:
-            data.rear_step = "Okay"
-        else:
-            data.rear_step = "Not Okay"
+        index = choices.index(data.seat_belts) 
+        data.seat_belts = real_value[index]
 
-        if data.seats is True:
-            data.seats = "Okay"
-        else:
-            data.seats = "Not Okay"
+        index = choices.index(data.general_condition) 
+        data.general_condition = real_value[index]
 
-        if data.seat_belts is True:
-            data.seat_belts = "Okay"
-        else:
-            data.seat_belts = "Not Okay"
+        index = choices.index(data.vehicle_documents) 
+        data.vehicle_documents = real_value[index]
 
-        if data.general_condition is True:
-            data.general_condition = "Okay"
-        else:
-            data.general_condition = "Not Okay"
+        index = choices.index(data.main_beam) 
+        data.main_beam = real_value[index]
 
-        if data.vehicle_documents is True:
-            data.vehicle_documents = "Okay"
-        else:
-            data.vehicle_documents = "Not Okay"
+        index = choices.index(data.dipped_beam) 
+        data.dipped_beam = real_value[index]
 
-        if data.main_beam is True:
-            data.main_beam = "Okay"
-        else:
-            data.main_beam = "Not Okay"
+        index = choices.index(data.side_lights) 
+        data.side_lights = real_value[index]
 
-        if data.dipped_beam is True:
-            data.dipped_beam = "Okay"
-        else:
-            data.dipped_beam = "Not Okay"
+        index = choices.index(data.tail_lights) 
+        data.tail_lights = real_value[index]
 
-        if data.side_lights is True:
-            data.side_lights = "Okay"
-        else:
-            data.side_lights = "Not Okay"
+        index = choices.index(data.indicators) 
+        data.indicators = real_value[index]
 
-        if data.tail_lights is True:
-            data.tail_lights = "Okay"
-        else:
-            data.tail_lights = "Not Okay"
+        index = choices.index(data.break_lights) 
+        data.break_lights = real_value[index]
 
-        if data.indicators is True:
-            data.indicators = "Okay"
-        else:
-            data.indicators = "Not Okay"
+        index = choices.index(data.reverse_lights) 
+        data.reverse_lights = real_value[index]
 
-        if data.break_lights is True:
-            data.break_lights = "Okay"
-        else:
-            data.break_lights = "Not Okay"
+        index = choices.index(data.hazard_light) 
+        data.hazard_light = real_value[index]
 
-        if data.reverse_lights is True:
-            data.reverse_lights = "Okay"
-        else:
-            data.reverse_lights = "Not Okay"
+        index = choices.index(data.rear_fog_lights) 
+        data.rear_fog_lights = real_value[index]
 
-        if data.hazard_light is True:
-            data.hazard_light = "Okay"
-        else:
-            data.hazard_light = "Not Okay"
+        index = choices.index(data.interior_lights) 
+        data.interior_lights = real_value[index]
 
-        if data.rear_fog_lights is True:
-            data.rear_fog_lights = "Okay"
-        else:
-            data.rear_fog_lights = "Not Okay"
+        index = choices.index(data.screen_washer) 
+        data.screen_washer = real_value[index]
 
-        if data.interior_lights is True:
-            data.interior_lights = "Okay"
-        else:
-            data.interior_lights = "Not Okay"
+        index = choices.index(data.wiper_blades) 
+        data.wiper_blades = real_value[index]
 
-        if data.screen_washer is True:
-            data.screen_washer = "Okay"
-        else:
-            data.screen_washer = "Not Okay"
+        index = choices.index(data.horn) 
+        data.horn = real_value[index]
 
-        if data.wiper_blades is True:
-            data.wiper_blades = "Okay"
-        else:
-            data.wiper_blades = "Not Okay"
+        index = choices.index(data.radio) 
+        data.radio = real_value[index]
 
-        if data.horn is True:
-            data.horn = "Okay"
-        else:
-            data.horn = "Not Okay"
+        index = choices.index(data.front_fog_lights) 
+        data.front_fog_lights = real_value[index]
 
-        if data.radio is True:
-            data.radio = "Okay"
-        else:
-            data.radio = "Not Okay"
+        index = choices.index(data.liquid_leak) 
+        data.liquid_leak = real_value[index]
 
-        if data.front_fog_lights is True:
-            data.front_fog_lights = "Okay"
-        else:
-            data.front_fog_lights = "Not Okay"
+        index = choices.index(data.cleanliness_engine_bay) 
+        data.cleanliness_engine_bay = real_value[index]
 
-        if data.liquid_leak is True:
-            data.liquid_leak = "Okay"
-        else:
-            data.liquid_leak = "Not Okay"
+        index = choices.index(data.washer_fluid) 
+        data.washer_fluid = real_value[index]
 
-        if data.cleanliness_engine_bay is True:
-            data.cleanliness_engine_bay = "Okay"
-        else:
-            data.cleanliness_engine_bay = "Not Okay"
+        index = choices.index(data.coolant_level) 
+        data.coolant_level = real_value[index]
 
-        if data.washer_fluid is True:
-            data.washer_fluid = "Okay"
-        else:
-            data.washer_fluid = "Not Okay"
+        index = choices.index(data.brake_fluid_level) 
+        data.brake_fluid_level = real_value[index]
 
-        if data.coolant_level is True:
-            data.coolant_level = "Okay"
-        else:
-            data.coolant_level = "Not Okay"
+        index = choices.index(data.power_steering_fluid) 
+        data.power_steering_fluid = real_value[index]
 
-        if data.brake_fluid_level is True:
-            data.brake_fluid_level = "Okay"
-        else:
-            data.brake_fluid_level = "Not Okay"
+        index = choices.index(data.tyres) 
+        data.tyres = real_value[index]
 
-        if data.power_steering_fluid is True:
-            data.power_steering_fluid = "Okay"
-        else:
-            data.power_steering_fluid = "Not Okay"
+        index = choices.index(data.front_visual) 
+        data.front_visual = real_value[index]
 
-        if data.tyres is True:
-            data.tyres = "Okay"
-        else:
-            data.tyres = "Not Okay"
+        index = choices.index(data.rear_visual) 
+        data.rear_visual = real_value[index]
 
-        if data.front_visual is True:
-            data.front_visual = "Okay"
-        else:
-            data.front_visual = "Not Okay"
+        index = choices.index(data.spare_visual) 
+        data.spare_visual = real_value[index]
 
-        if data.rear_visual is True:
-            data.rear_visual = "Okay"
-        else:
-            data.rear_visual = "Not Okay"
+        index = choices.index(data.wheel_brace) 
+        data.wheel_brace = real_value[index]
 
-        if data.spare_visual is True:
-            data.spare_visual = "Okay"
-        else:
-            data.spare_visual = "Not Okay"
+        index = choices.index(data.jack) 
+        data.jack = real_value[index]
 
-        if data.wheel_brace is True:
-            data.wheel_brace = "Okay"
-        else:
-            data.wheel_brace = "Not Okay"
+        index = choices.index(data.front_right_wheel) 
+        data.front_right_wheel = real_value[index]
 
-        if data.jack is True:
-            data.jack = "Okay"
-        else:
-            data.jack = "Not Okay"
+        index = choices.index(data.front_left_wheel) 
+        data.front_left_wheel = real_value[index]
 
-        if data.front_right_wheel is True:
-            data.front_right_wheel = "Okay"
-        else:
-            data.front_right_wheel = "Not Okay"
+        index = choices.index(data.rear_right_wheel) 
+        data.rear_right_wheel = real_value[index]
 
-        if data.front_left_wheel is True:
-            data.front_left_wheel = "Okay"
-        else:
-            data.front_left_wheel = "Not Okay"
-
-        if data.rear_right_wheel is True:
-            data.rear_right_wheel = "Okay"
-        else:
-            data.rear_right_wheel = "Not Okay"
-
-        if data.rear_left_wheel is True:
-            data.rear_left_wheel = "Okay"
-        else:
-            data.rear_left_wheel = "Not Okay"
+        index = choices.index(data.rear_left_wheel) 
+        data.rear_left_wheel = real_value[index]
 
         if data.edited_by != None:
             edited_by = data.edited_by.user_info.full_name
@@ -319,6 +281,7 @@ def export(inspection):
             data.body_no.make,
             data.body_no.current_loc,
             data.mileage,
+
             data.cleanliness_exterior,
             data.condition_rust,
             data.decals,
@@ -331,6 +294,14 @@ def export(inspection):
             data.seat_belts,
             data.general_condition,
             data.vehicle_documents,
+            
+            data.cleanliness_engine_bay,
+            data.washer_fluid,
+            data.coolant_level,
+            data.brake_fluid_level,
+            data.power_steering_fluid,
+            data.liquid_leak,
+
             data.main_beam,
             data.dipped_beam,
             data.side_lights,
@@ -346,14 +317,10 @@ def export(inspection):
             data.horn,
             data.radio,
             data.front_fog_lights,
-            data.cleanliness_engine_bay,
-            data.washer_fluid,
-            data.coolant_level,
-            data.brake_fluid_level,
-            data.power_steering_fluid,
-            data.liquid_leak,
+
             data.gas_level,
             data.oil_level,
+
             data.tyres,
             data.front_visual,
             data.rear_visual,
@@ -364,6 +331,7 @@ def export(inspection):
             data.front_left_wheel,
             data.rear_right_wheel,
             data.rear_left_wheel,
+
             data.driver.user_info.full_name,
             edited_by,
             data.notes,
@@ -374,6 +342,9 @@ def export(inspection):
         for col_num, cell_value in enumerate(row, 1):
             cell = worksheet.cell(row=row_num, column=col_num)
             cell.value = cell_value
+            cell.alignment = Alignment(horizontal='center')
+            thin = Side(border_style="thin", color="000000")
+            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
     try:
         workbook.save('.'+settings.MEDIA_URL+worksheet.title)
         return True

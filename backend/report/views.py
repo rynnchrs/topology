@@ -1,5 +1,6 @@
 import datetime
 from datetime import datetime as date
+from os import remove
 from wsgiref.util import FileWrapper
 
 from careta.models import Car
@@ -96,7 +97,8 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
     def export_post(self, request, pk=None):
         # print(request.data)
         inspection_id = []
-        print(request.data['inspection_id'])
+        if len(request.data['inspection_id']) == 0:
+            return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)            
         for data in (request.data['inspection_id']):
             inspection_id.append(data)
             try:
@@ -121,7 +123,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
          content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         response['Content-Disposition'] = 'attachment; filename=' + filename
-
+        file = remove(file_path)
         return response
 
 
