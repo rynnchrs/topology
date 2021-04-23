@@ -16,12 +16,10 @@ import {SelectButton} from 'primereact/selectbutton';
 import {Toast} from 'primereact/toast'
 import { ListBox } from 'primereact/listbox';
 import { Carousel } from 'primereact/carousel';
- 
 
 //import './TabViewDemo.css';
 import axios from "axios";
 import { isThisISOWeek } from 'date-fns';
-
 
 export class Vehicles extends Component {
     
@@ -149,15 +147,11 @@ export class Vehicles extends Component {
             fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json())
         ]).then(([res1]) => {
             const bodyno = res1;
-            console.log("res1", res1);
-            if (res1.code === "token_not_valid"){
-                this.refreshToken();
-            }
+            //console.log("res1", res1);
             this.setState({
                 bodyno: bodyno
             });
         })
-
     }
 
     searchList = (event) => {
@@ -176,32 +170,6 @@ export class Vehicles extends Component {
             }
         }, 100);
     };
-
-    refreshToken() {
-        let token = localStorage.getItem("token");
-        let refreshToken = localStorage.getItem("token");
-        console.log("token: ", token);
-        console.log("refreshtoken: ", refreshToken);
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
-
-        const body = { "refresh": refreshToken }; 
-        console.log("body:", body);
-
-        axios
-            .post(process.env.REACT_APP_SERVER_NAME + 'careta/token/refresh/', body)
-            .then((res) => {  
-                console.log("res refresh:", res.data);
-            })
-            .catch((error) => {
-                console.log('error refresh: ');
-                console.log(error);
-            });
-    }
 
     productTemplate(images) {
         return (
@@ -1442,19 +1410,15 @@ export class Vehicles extends Component {
         }
 
         const selectItem = event => {
-            console.log("select: ", event.value);
             axios
                 //.get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
                 .get(process.env.REACT_APP_SERVER_NAME + 'api/careta/?search=' + event.value.body_no)
                 .then(res =>  {
-                    console.log("vehicle: ", res.data);
                     const isDataAvailable = res.data && res.data.length;
-    
                     if(isDataAvailable)
                         this.setState({ vehicleData: res.data[0]},getContract);
                     else
                         showNoResult();
-    
                 })
                 .catch((error) => {
                     console.log('error select: ');
@@ -1474,7 +1438,7 @@ export class Vehicles extends Component {
 
             axios
                 //.get("http://127.0.0.1:8000/api/careta-contract/" + this.state.vehicleData.car_id+"/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-contract/" + this.state.vehicleData.car_id + "/", config)
+                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-contract/Car object(" + this.state.vehicleData.car_id + ")/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1493,7 +1457,7 @@ export class Vehicles extends Component {
         const getTPL= () =>{
             axios
                 //.get("http://127.0.0.1:8000/api/careta-tpl/" + this.state.vehicleData.car_id+"/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-tpl/" + this.state.vehicleData.car_id + "/")
+                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-tpl/Car object(" + this.state.vehicleData.car_id + ")/")
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -2183,11 +2147,11 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                         <div className="p-grid p-col-12">
-                                            <label htmlFor="vPlateNumDel" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Decals:</label>
+                                            <label htmlFor="vDecals" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Decals:</label>
                                             <div className="p-col-12 p-lg-10 p-md-12 p-sm-12">
                                                 <div className="p-grid vehicle-dialog-rcvbtn">
                                                     <div className="p-col-12 p-lg-12 p-md-12">
-                                                        <InputText id="vPlateNumDel" type="text" value={this.state.newvehicleData.decals_date} readOnly/>
+                                                        <InputText id="vDecals" type="text" value={this.state.newvehicleData.decals_date} readOnly/>
                                                     </div>
                                                     <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="No Recieving Copy" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[0].value})}/></div>
                                                     <div className="p-col-12 p-lg-2 p-md-2 btns"><Button className="p-button-outlined p-button-secondary" label="Not Yet Released" onClick={() => setOptionValue('Decal Delivery Date', {value: recievedItemStatus[1].value})}/></div>
