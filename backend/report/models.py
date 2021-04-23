@@ -9,6 +9,7 @@ class Inspection(models.Model):
     inspection_id = models.AutoField(primary_key=True)
     body_no =  models.ForeignKey(Car, related_name='inspection', on_delete=models.CASCADE, default=None)
     mileage = models.IntegerField(default=0)
+    gps = models.CharField(max_length=255, blank=True, null=True)
     # Exterior
     cleanliness_exterior = models.BooleanField(default=False)
     condition_rust = models.BooleanField(default=False)
