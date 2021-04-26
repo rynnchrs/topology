@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reversion',
     'careta',
     'report',
+    'notifications',
 ]
 
 REST_FRAMEWORK = {

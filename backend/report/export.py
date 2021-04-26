@@ -14,8 +14,8 @@ def export(inspection):
     worksheet.title = '{date}-Inspection-Report.xlsx'.format(
         date=datetime.now().strftime('%Y-%m-%d'))
 
-    cell_1 = ["B1","H1","P1","T1","Z1","AO1","AQ1","BA1"]
-    cell_2 = ["G1","O1","S1","Y1","AN1","AP1","AZ1","BE1"]
+    cell_1 = ["B1","I1","P1","T1","Z1","AO1","AQ1","BA1"]
+    cell_2 = ["H1","O1","S1","Y1","AN1","AP1","AZ1","BE1"]
     header = ["VEHICLE INFOMATION","EXTERIOR","INTERIOR","ENGINE BAY","ELECTRICS",
             "WHEELS AND TIRES","GAS AND OIL","CHECKLIST REPORT"]
     color = ["00FFFF00","003366FF","00FFCC99","00C0C0C0","0000FF00","00FF0000","00800080","00FFFFFF"]
@@ -41,6 +41,7 @@ def export(inspection):
         'Make',
         'Current Location',
         "Mileage",
+        "GPS",
 
         "Cleanliness",
         "Condition Rust",
@@ -112,7 +113,7 @@ def export(inspection):
 
         if col_num >= 2:
             cell.fill = PatternFill("solid", fgColor=color[0])
-        if col_num >= 8:
+        if col_num >= 9:
             cell.fill = PatternFill("solid", fgColor=color[1])
         if col_num >= 16:
             cell.fill = PatternFill("solid", fgColor=color[2])
@@ -281,6 +282,7 @@ def export(inspection):
             data.body_no.make,
             data.body_no.current_loc,
             data.mileage,
+            data.gps,
 
             data.cleanliness_exterior,
             data.condition_rust,

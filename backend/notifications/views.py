@@ -1,15 +1,12 @@
-from .serializer import InspectionNotifySerializer
 import datetime
+import json
 from datetime import datetime as date
 
-from django.http import response
-import json
-
 from careta.models import Car
+from django.http import response
 from django.shortcuts import render
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from report.models import Inspection
-from report.serializers import InspectionListSerializer
 from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -17,16 +14,14 @@ from rest_framework.response import Response
 
 
 class InspectionNotifyView(viewsets.ViewSet):
-    serializer_class = InspectionListSerializer
-    
-    @action(detail=False)
-    def car_notification(str, request):
+
+    def list(str, request):
         context = []
         start_date = date.strptime(request.GET['start_date'], '%Y-%m-%d')
         end_date = date.strptime(request.GET['end_date'], '%Y-%m-%d')
         day = datetime.timedelta(days=1)
         
-        dates =[]
+        dates = []
         #apped all the dates in the given range of dates
         while start_date <= end_date:
             dates.append(start_date)
