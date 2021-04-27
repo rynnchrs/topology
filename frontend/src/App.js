@@ -29,6 +29,8 @@ import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
 
 import  DriverRecordForms from './components/DriverRecordForms';
+import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 const App = () => {
 
@@ -42,6 +44,8 @@ const App = () => {
     const sidebar = useRef();
     let menuClick = false;
 
+    const [counter, setCounter] = useState(0);
+
     useEffect(() => {
         if (mobileMenuActive) {
             addClass(document.body, 'body-overflow-hidden');
@@ -50,6 +54,62 @@ const App = () => {
             removeClass(document.body, 'body-overflow-hidden');
         }
     }, [mobileMenuActive]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setCounter(counter + 1);
+            console.log("cntr: ",counter);
+            let token = localStorage.getItem("token");
+            let refreshToken = localStorage.getItem("refreshToken");
+            // console.log("token: ", token);
+            // console.log("refreshtoken: ", refreshToken);
+            
+            const body = { "refresh": refreshToken }; 
+            //console.log("body:", body);
+
+            let decoded = jwt_decode(token);
+            //console.log("dcd: ", decoded);
+            const dNow = new Date();
+            const d = new Date(0);
+            d.setUTCSeconds(decoded.exp);
+            // console.log("dateNow: ", dNow);
+            // console.log("dcdexp: ", d);
+            // console.log("remaining: ",getDifferenceInMinutes(dNow, d));
+            const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
+            // console.log("remaining: ", remainingMinutes);
+            if (remainingMinutes <= 1){
+                console.log("1 minute left");
+                console.log("diff: ", remainingMinutes);
+                console.log("old a: ", token);
+                axios
+                    .post(process.env.REACT_APP_SERVER_NAME + 'careta/token/refresh/', body)
+                    .then((res) => {  
+                        console.log("res refresh:", res.data);
+                        localStorage.setItem('token', res.data.access);
+                        console.log("new a: ", localStorage.getItem("token"));
+                        setCounter(0);
+                    })
+                    .catch((error) => {
+                        console.log('error refresh: ');
+                        console.log(error);
+                    });
+            } else {
+                console.log("remaining: ", remainingMinutes);
+            }
+          }, 5000)
+        
+          return () => clearInterval(intervalId);
+    }, [counter]);
+
+    const getDifferenceInMinutes = (date1, date2) => {
+        const diffInMs = Math.round(date2 - date1);
+        return diffInMs / (1000 * 60);
+    }
+
+    window.onunload = () => {
+        // Clear the local storage
+        localStorage.clear();
+    }
 
     const sidebarMenu = [];
     const sidebarSubMenu1 = [];
