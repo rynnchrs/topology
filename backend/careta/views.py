@@ -1,9 +1,11 @@
-from .export import export
 import datetime
 from abc import abstractmethod
+from wsgiref.util import FileWrapper
 
+from django.conf import settings
 from django.contrib.auth.models import User  # add this
 from django.db.models import query
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend  # filter
 from report.models import Maintenance
@@ -16,6 +18,7 @@ from rest_framework.views import APIView  # add this
 from rest_framework_simplejwt.tokens import RefreshToken  # add this
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from .export import export
 from .models import (TPL, Car, Contract, Insurance, JobOrder,  # add this
                      Permission)
 from .serializers import (CarInfoSerializer, CarSerializer,  # add this
@@ -374,11 +377,33 @@ class CarView(viewsets.ModelViewSet):  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
     filter_backends = [filters.SearchFilter]
     lookup_field = 'slug'
+    
+    def create(self, request):
+        serializer = CarSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            export()  
+        return Response(status=status.HTTP_201_CREATED)      
 
+    def update(self, request, slug=None):
+        queryset = Car.objects.all()
+        car = get_object_or_404(queryset, slug=slug) 
+        serializer = CarSerializer(instance=car, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            export() 
+        return Response(serializer.data, status=status.HTTP_200_OK)   
+    
     @action(detail=False)
     def export_list(self, request):
-        return export()  
-
+        filename = 'Car-Inventory.xlsx'
+        file_path = '.'+settings.MEDIA_URL+filename
+        file = open(file_path,"rb")
+        response = HttpResponse(FileWrapper(file),
+         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+        return response
 
 class CarListView(generics.ListAPIView):  #list of all car with filtering
     permission_classes = [IsAuthenticated]

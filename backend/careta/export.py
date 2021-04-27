@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
-from django.http import HttpResponse
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
@@ -9,18 +10,12 @@ from .models import TPL, Car, Contract, Insurance
 
 def export():
     datas = Car.objects.all()
-    
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    )
-    response['Content-Disposition'] = 'attachment; filename={date}-Car-List.xlsx'.format(
-        date=datetime.now().strftime('%Y-%m-%d'),
-    )
     workbook = Workbook()
     
     # Get active worksheet/tab
     worksheet = workbook.active
-    worksheet.title = 'Car Report'
+    worksheet.title = 'Car-Inventory.xlsx'
+
     cell_1 = ["B1","F1","L1","S1","AH1","AO1","AS1","AX1","BM1","BU1","CC1","CL1"]
     cell_2 = ["E1","K1","R1","AG1","AN1","AR1","AW1","BL1","BT1","CB1","CK1","CT1"]
     header = ["IDENTIFICATION","VEHICLE INFOMATION","SUPPLIERS","ENGINE AND BODY INFORMATION","LTO",
@@ -144,7 +139,7 @@ def export():
         "From",
         "To",
         "Cost",
-
+        
         "Remarks",
         "Operational",
         "Status",
@@ -193,11 +188,52 @@ def export():
     # Iterate through all movies
     for data in datas:
         row_num += 1
-
-        contract = Contract.objects.get(car=data.car_id)
-        tpl = TPL.objects.get(car=data.car_id)
-        ins19 = Insurance.objects.get(car=data.car_id, date_issued__lte = datetime.strptime("2019-12-31", '%Y-%m-%d'))
-        ins20 = Insurance.objects.get(car=data.car_id, date_issued__lte = datetime.strptime("2020-12-31", '%Y-%m-%d') , date_issued__gt = datetime.strptime("2019-12-31", '%Y-%m-%d'))
+        try:
+            contract = Contract.objects.get(car=data.car_id)
+        except ObjectDoesNotExist:
+            contract.client_name = ""
+            contract.contract_no = ""
+            contract.start_date = ""
+            contract.end_date = ""
+            contract.bid_no = ""
+            contract.bid_name = ""
+            contract.bid_date = ""
+            contract.cost = ""
+        try:
+            tpl = TPL.objects.get(car=data.car_id)
+        except ObjectDoesNotExist:
+            tpl.insurance_name = ""
+            tpl.telephone = ""
+            tpl.email = ""
+            tpl.po_no = ""
+            tpl.date_issued = ""
+            tpl.start_date = ""
+            tpl.end_date = ""
+            tpl.cost = ""
+        try:
+            ins19 = Insurance.objects.get(car=data.car_id, insurance_no = 1)
+        except ObjectDoesNotExist:
+            ins19.company = ""
+            ins19.telephone = ""
+            ins19.email = ""
+            ins19.po_no = ""
+            ins19.reference_no = ""
+            ins19.date_issued = ""
+            ins19.start_date = ""
+            ins19.end_date = ""
+            ins19.cost = ""
+        try:
+            ins20 = Insurance.objects.get(car=data.car_id, insurance_no = 2)
+        except ObjectDoesNotExist:
+            ins20.company = ""
+            ins20.telephone = ""
+            ins20.email = ""
+            ins20.po_no = ""
+            ins20.reference_no = ""
+            ins20.date_issued = ""
+            ins20.start_date = ""
+            ins20.end_date = ""
+            ins20.cost = ""
 
         choices = ["M","S","F","L30","SUV","G15","G12","L3","SC","GR","DMC","GCM","CAC","CAI","D","G","A","M","R","NRC","NYR","NA","DNR"]
 
@@ -410,7 +446,7 @@ def export():
             ins19.telephone,
             ins19.email,
             ins19.po_no,
-            ins19.insurance_no,
+            ins19.reference_no,
             ins19.date_issued,
             ins19.start_date,
             ins19.end_date,
@@ -420,7 +456,7 @@ def export():
             ins20.telephone,
             ins20.email,
             ins20.po_no,
-            ins20.insurance_no,
+            ins20.reference_no,
             ins20.date_issued,
             ins20.start_date,
             ins20.end_date,
@@ -439,5 +475,9 @@ def export():
             cell.alignment = Alignment(horizontal='center')
             thin = Side(border_style="thin", color="000000")
             cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-    workbook.save(response)
-    return response
+    try:
+        workbook.save('.'+settings.MEDIA_URL+worksheet.title)
+        return True
+    except:
+        return False
+

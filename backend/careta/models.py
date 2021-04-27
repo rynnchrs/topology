@@ -407,6 +407,7 @@ class Insurance(models.Model):
     telephone = PhoneField(help_text='Contact phone number', null=True, blank=True)
     email = models.EmailField(max_length=50, null=True, blank=True)
     po_no = models.CharField(max_length=30, null=True, blank=True)
+    reference_no = models.CharField(max_length=30, null=True, blank=True)
     date_issued = models.CharField(max_length=20, null=True, blank=True)
     start_date = models.CharField(max_length=20, null=True, blank=True)
     end_date = models.CharField(max_length=20, null=True, blank=True)
