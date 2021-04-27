@@ -29,6 +29,7 @@ import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
 
 import  DriverRecordForms from './components/DriverRecordForms';
+import  VehiclesGPS from './components/VehiclesGPS';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
@@ -110,10 +111,11 @@ const App = () => {
         // Clear the local storage
         localStorage.clear();
     }
-
+    
     const sidebarMenu = [];
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
+    const sidebarSubMenu3 = [];
     
     sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
     //users permission
@@ -124,34 +126,36 @@ const App = () => {
         sidebarSubMenu1.push({ label: 'Edit-Delete user', icon: 'pi pi-user-edit', to: '/editdeleteuser'});
     }
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
-        sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user',items: sidebarSubMenu1});
+        sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user', items: sidebarSubMenu1});
     } else {
         //console.log("permission data none");
     }
 
     //inventory permission
-    // if (localStorage.getItem("addInspectionReport") === "true") {
+    // if (localStorage.getItem("viewInventory") === "true") {
     //     sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     // }
-    // if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    // if (localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
     //     sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
     // }
+    sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
+    sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
-        sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
+        sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', items: sidebarSubMenu2});
     } else {
         //console.log("permission data none");
     }
 
     //inspection permission
     if (localStorage.getItem("addInspectionReport") === "true") {
-        sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
+        sidebarSubMenu3.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     }
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
-        sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
+        sidebarSubMenu3.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
     }
     
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
-        sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file',items: sidebarSubMenu2});
+        sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file', items: sidebarSubMenu3});
     } else {
         //console.log("permission data none");
     }
@@ -287,6 +291,7 @@ const App = () => {
                 <Route path="/register" exact component={Register} />
                 <Route path="/editdeleteuser" exact component={EditDeleteUser} />
                 <Route path="/vehicles" exact component={Vehicles} />
+                <Route path="/vehiclesgps" exact component={VehiclesGPS} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
             </div>

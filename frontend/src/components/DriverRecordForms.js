@@ -115,6 +115,7 @@ export default function DriverRecordForms() {
     const [emergency, setEmergency] = useState("09465657944");
     const [notes, isNotes] = useState("");
     const [editor, setEditor] = useState("");
+    const [dateUpdated, setDateUpdated] = useState("");
 
     const [notOkay, setNotOkay] = useState(Array(46).fill(""));
     const [okay, setOkay] = useState(Array(46).fill(""));
@@ -278,6 +279,7 @@ export default function DriverRecordForms() {
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                 setSelected(values);
                 onClick('displayBasic');
+                console.log(res.data);
             })
             .catch((error) => {
                 console.log('error: ');
@@ -371,9 +373,7 @@ export default function DriverRecordForms() {
         isOilLevel(selectedCar.oil_level);
 
         isNotes(selectedCar.notes);
-        //console.log("revised")
-        //console.log("editor", selectedCar.editor)
-        //console.log("driver", selectedCar.driver)
+        setDateUpdated(selectedCar.date_updated);
         if (typeof(selectedCar.editor) === 'undefined') {setEditor("None");}
         selectedCar.revised.mileage ? (setMileage(selectedCar.revised.mileage), onCheckboxChange(selectedCar.revised.mileage, "mil")) : '';
         if (typeof(selectedCar.revised.cleanliness_exterior) !== 'undefined' && selectedCar.revised.cleanliness_exterior !== selectedCar.cleanliness_exterior) {  isCleanlinessExterior(selectedCar.revised.cleanliness_exterior); onCheckboxChange(selectedCar.revised.cleanliness_exterior, "cb0"); } 
@@ -428,6 +428,7 @@ export default function DriverRecordForms() {
         selectedCar.revised.oil_level ? (isOilLevel(selectedCar.revised.oil_level), onCheckboxChange(selectedCar.revised.oil_level, "o"+selectedCar.revised.oil_level)) : '';
         selectedCar.revised.notes ? (isNotes(selectedCar.revised.notes), onCheckboxChange(selectedCar.revised.notes, "n")) : '';
         selectedCar.revised.edited_by ? setEditor(selectedCar.revised.edited_by) : '';
+        selectedCar.revised.date_updated ? setDateUpdated(selectedCar.date_updated) : '';
         
     }
 
@@ -1863,6 +1864,10 @@ export default function DriverRecordForms() {
                                     <InputText value={emergency} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
+                                    <label>GPS:</label>
+                                    <InputText value="gps data" disabled/>
+                                </div>
+                                <div className="p-col-12 p-md-8">
                                     <label>Remarks:</label>
                                     <InputText id="n" className={editNotes} placeholder="Add other remarks here" value={notes} 
                                     onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
@@ -1877,8 +1882,12 @@ export default function DriverRecordForms() {
                                     <InputText placeholder="Inspected by" value={selectedCar.driver} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
-                                    <label>Date:</label>
+                                    <label>Date Created:</label>
                                     <InputText placeholder="Inspected Date" value={selectedCar.date_created} disabled/>
+                                </div>
+                                <div className="p-col-12 p-md-8">
+                                    <label>Date Updated:</label>
+                                    <InputText placeholder="Inspected Date" value={dateUpdated} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-5"> </div>
                                 <div className="p-col-12 p-md-3">
