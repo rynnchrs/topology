@@ -353,7 +353,7 @@ for data in datas():
 
     Contract.objects.create(
         car = car,
-        slug = car,
+        slug = car.body_no,
         contract_no = data[47],
         bid_no = data[46],
         bid_name = data[45],
@@ -362,7 +362,7 @@ for data in datas():
 
     TPL.objects.create(
         car = car,
-        slug = car,
+        slug = car.body_no,
         insurance_name = data[64],
         po_no = data[65],
         date_issued = di1,
@@ -372,9 +372,10 @@ for data in datas():
 
     Insurance.objects.create(
         car = car,
-        slug = car,
+        slug = str(car.body_no)+"-1",
         company = data[69],
         po_no = data[70],
+        insurance_no = 1,
         date_issued = di2,
         start_date = sd2,
         end_date = ed2,
@@ -382,10 +383,11 @@ for data in datas():
 
     Insurance.objects.create(
         car = car,
-        slug = car,
+        slug = str(car.body_no)+"-2",
         company = data[74],
         po_no = data[75],
-        insurance_no = data[76],
+        reference_no = data[76],
+        insurance_no = 2,
         date_issued = di3,
         start_date = sd3,
         end_date = ed3,
