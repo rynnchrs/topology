@@ -297,7 +297,7 @@ for data in datas():
 
 
     Car.objects.create( # initializing car data
-            slug = data[14],
+            slug = data[0],
             body_no = data[0],
             cs_no = data[1],
             plate_no = plate,

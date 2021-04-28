@@ -21,7 +21,7 @@ from .utils import check_Com_date, check_cr_date, check_or_date, check_TPL_date
 
 
 class CarView(viewsets.ModelViewSet):  # add this
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Car.objects.all()  # add this
     serializer_class = CarSerializer  # add this
     search_fields = ['body_no', 'plate_no', 'vin_no']
@@ -120,7 +120,7 @@ class TPLView(viewsets.ModelViewSet):  # add this
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
 class InsuranceView(viewsets.ModelViewSet):  # add this
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Insurance.objects.all()  # add this
     serializer_class = InsuranceSerializer  # add this
     lookup_field = 'slug'
