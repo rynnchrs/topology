@@ -1,4 +1,5 @@
-from careta.models import Car
+from car.models import Car
+from car.serializers import CarInfoSerializer
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -8,11 +9,6 @@ from .models import Cost, Inspection, Maintenance, Repair
 #    class Meta:
 #        model = InspectionImage
 #        fields = ['id','images']
- 
-class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
-    class Meta:
-        model = Car
-        fields = ['vin_no','body_no','plate_no','make','current_loc']
 
 
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
@@ -22,7 +18,7 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
     edited_by = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model = Inspection
-        fields = ['inspection_id','body_no','mileage','cleanliness_exterior','condition_rust','decals','windows',
+        fields = ['inspection_id','body_no','mileage','gps','cleanliness_exterior','condition_rust','decals','windows',
                     'rear_door','mirror','roof_rack','rear_step','seats','seat_belts','general_condition',
                     'vehicle_documents','main_beam','dipped_beam','side_lights','tail_lights','indicators',
                     'break_lights','reverse_lights','hazard_light','rear_fog_lights','interior_lights',

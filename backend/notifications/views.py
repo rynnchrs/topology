@@ -1,15 +1,9 @@
 import datetime
-import json
 from datetime import datetime as date
 
-from careta.models import Car
-from django.http import response
-from django.shortcuts import render
-from django_filters.rest_framework.backends import DjangoFilterBackend
+from car.models import Car
 from report.models import Inspection
-from rest_framework import filters, generics, serializers, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 

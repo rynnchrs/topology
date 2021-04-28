@@ -3,14 +3,14 @@ from datetime import datetime as date
 from os import remove
 from wsgiref.util import FileWrapper
 
-from careta.models import Car
+from car.models import Car
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
-from rest_framework import filters, generics, serializers, status, viewsets
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from reversion.models import Version
 
@@ -24,7 +24,7 @@ from .utils import maintenance_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = InspectionSerializer
     search_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
     filter_backends = [filters.SearchFilter]
@@ -93,7 +93,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def export_post(self, request, pk=None):
         # print(request.data)
         inspection_id = []
@@ -111,7 +111,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         else:
             return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False)
+    @action(detail=False,permission_classes=[AllowAny])
     def export_get(self, request):
         # print(request.data)
         filename = '{date}-Inspection-Report.xlsx'.format(

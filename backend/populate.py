@@ -11,8 +11,8 @@ from datetime import datetime
 
 from django.contrib.auth.models import User  # add this
 
-from careta.models import (TPL, Car, Contract, Insurance,  # add this
-                           Permission, UserInfo)
+from car.models import TPL, Car, Contract, Insurance
+from careta.models import Permission, UserInfo
 
 
 def datas():
@@ -25,9 +25,19 @@ def datas():
 superuser = User.objects.create_superuser( #creating super user "admin"
         username = 'admin',
         password = 'password',
-        first_name = 'admin'
+        email = 'admin@test.com',
+        first_name = 'Admin',
+        last_name = 'Test',
     )
-UserInfo.objects.create(user=superuser)
+UserInfo.objects.create(
+        user=superuser,
+        company = "Careta",
+        position = "Admin",
+        gender = "M",
+        birthday = "2000-01-01",
+        phone = "09123456789",
+        address = "Makati"
+        )
 Permission.objects.create(user=superuser,  #create permission for admin only
     can_view_users = True,
     can_add_users = True,

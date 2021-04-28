@@ -1,5 +1,7 @@
 import datetime
-from careta.models import Car, JobOrder
+
+from car.models import Car
+from careta.models import JobOrder
 from django.contrib.auth.models import User
 from django.db import models
 

@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from openpyxl import Workbook
@@ -191,49 +189,92 @@ def export():
         try:
             contract = Contract.objects.get(car=data.car_id)
         except ObjectDoesNotExist:
-            contract.client_name = ""
-            contract.contract_no = ""
-            contract.start_date = ""
-            contract.end_date = ""
-            contract.bid_no = ""
-            contract.bid_name = ""
-            contract.bid_date = ""
-            contract.cost = ""
+            contract = None
+            contract_client_name = ""
+            contract_contract_no = ""
+            contract_start_date = ""
+            contract_end_date = ""
+            contract_bid_no = ""
+            contract_bid_name = ""
+            contract_bid_date = ""
+            contract_cost = ""
+        if contract is not None:
+            contract_client_name = contract.client_name
+            contract_contract_no = contract.contract_no
+            contract_start_date = contract.start_date
+            contract_end_date = contract.end_date
+            contract_bid_no = contract.bid_no
+            contract_bid_name = contract.bid_name
+            contract_bid_date = contract.bid_name
+            contract_cost = contract.cost
         try:
             tpl = TPL.objects.get(car=data.car_id)
         except ObjectDoesNotExist:
-            tpl.insurance_name = ""
-            tpl.telephone = ""
-            tpl.email = ""
-            tpl.po_no = ""
-            tpl.date_issued = ""
-            tpl.start_date = ""
-            tpl.end_date = ""
-            tpl.cost = ""
+            tpl = None
+            tpl_insurance_name = ""
+            tpl_telephone = ""
+            tpl_email = ""
+            tpl_po_no = ""
+            tpl_date_issued = ""
+            tpl_start_date = ""
+            tpl_end_date = ""
+            tpl_cost = ""
+        if tpl is not None:
+            tpl_insurance_name = tpl.insurance_name
+            tpl_telephone = tpl.telephone
+            tpl_email = tpl.email
+            tpl_po_no = tpl.po_no
+            tpl_date_issued = tpl.date_issued
+            tpl_start_date = tpl.start_date
+            tpl_end_date = tpl.end_date
+            tpl_cost = tpl.cost
+
         try:
             ins19 = Insurance.objects.get(car=data.car_id, insurance_no = 1)
         except ObjectDoesNotExist:
-            ins19.company = ""
-            ins19.telephone = ""
-            ins19.email = ""
-            ins19.po_no = ""
-            ins19.reference_no = ""
-            ins19.date_issued = ""
-            ins19.start_date = ""
-            ins19.end_date = ""
-            ins19.cost = ""
+            ins19 = None
+            ins19_company = ""
+            ins19_telephone = ""
+            ins19_email = ""
+            ins19_po_no = ""
+            ins19_reference_no = ""
+            ins19_date_issued = ""
+            ins19_start_date = ""
+            ins19_end_date = ""
+            ins19_cost = ""
+        if ins19 is not None:
+            ins19_company = ins19.company
+            ins19_telephone = ins19.telephone
+            ins19_email = ins19.email
+            ins19_po_no = ins19.po_no
+            ins19_reference_no = ins19.reference_no
+            ins19_date_issued = ins19.date_issued
+            ins19_start_date = ins19.start_date
+            ins19_end_date = ins19.end_date
+            ins19_cost = ins19.cost
         try:
             ins20 = Insurance.objects.get(car=data.car_id, insurance_no = 2)
         except ObjectDoesNotExist:
-            ins20.company = ""
-            ins20.telephone = ""
-            ins20.email = ""
-            ins20.po_no = ""
-            ins20.reference_no = ""
-            ins20.date_issued = ""
-            ins20.start_date = ""
-            ins20.end_date = ""
-            ins20.cost = ""
+            ins20 = None
+            ins20_company = ""
+            ins20_telephone = ""
+            ins20_email = ""
+            ins20_po_no = ""
+            ins20_reference_no = ""
+            ins20_date_issued = ""
+            ins20_start_date = ""
+            ins20_end_date = ""
+            ins20_cost = ""
+        if ins20 is not None:
+            ins20_company = ins20.company
+            ins20_telephone = ins20.telephone
+            ins20_email = ins20.email 
+            ins20_po_no = ins20.po_no
+            ins20_reference_no = ins20.reference_no
+            ins20_date_issued = ins20.date_issued
+            ins20_start_date = ins20.start_date
+            ins20_end_date = ins20.end_date
+            ins20_cost = ins20.cost
 
         choices = ["M","S","F","L30","SUV","G15","G12","L3","SC","GR","DMC","GCM","CAC","CAI","D","G","A","M","R","NRC","NYR","NA","DNR"]
 
@@ -424,43 +465,43 @@ def export():
             data.wrench,
             data.fire_extinguisher,
 
-            contract.client_name,
-            contract.contract_no,
-            contract.start_date,
-            contract.end_date,
-            contract.bid_no,
-            contract.bid_name,
-            contract.bid_date,
-            contract.cost,
+            contract_client_name,
+            contract_contract_no,
+            contract_start_date,
+            contract_end_date,
+            contract_bid_no,
+            contract_bid_name,
+            contract_bid_date,
+            contract_cost,
             
-            tpl.insurance_name,
-            tpl.telephone,
-            tpl.email,
-            tpl.po_no,
-            tpl.date_issued,
-            tpl.start_date,
-            tpl.end_date,
-            tpl.cost,
+            tpl_insurance_name,
+            tpl_telephone,
+            tpl_email,
+            tpl_po_no,
+            tpl_date_issued,
+            tpl_start_date,
+            tpl_end_date,
+            tpl_cost,
 
-            ins19.company,
-            ins19.telephone,
-            ins19.email,
-            ins19.po_no,
-            ins19.reference_no,
-            ins19.date_issued,
-            ins19.start_date,
-            ins19.end_date,
-            ins19.cost,
+            ins19_company,
+            ins19_telephone,
+            ins19_email,
+            ins19_po_no,
+            ins19_reference_no,
+            ins19_date_issued,
+            ins19_start_date,
+            ins19_end_date,
+            ins19_cost,
             
-            ins20.company,
-            ins20.telephone,
-            ins20.email,
-            ins20.po_no,
-            ins20.reference_no,
-            ins20.date_issued,
-            ins20.start_date,
-            ins20.end_date,
-            ins20.cost,
+            ins20_company,
+            ins20_telephone,
+            ins20_email,
+            ins20_po_no,
+            ins20_reference_no,
+            ins20_date_issued,
+            ins20_start_date,
+            ins20_end_date,
+            ins20_cost,
 
             data.remarks,
             data.operational,
