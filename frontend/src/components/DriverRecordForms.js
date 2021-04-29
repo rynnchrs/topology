@@ -113,6 +113,7 @@ export default function DriverRecordForms() {
     const [gasLevel, isGasLevel] = useState("");
     const [oilLevel, isOilLevel] = useState("");
     const [emergency, setEmergency] = useState("09465657944");
+    const [GPSData, setGPSData] = useState("");
     const [notes, isNotes] = useState("");
     const [editor, setEditor] = useState("");
     const [dateUpdated, setDateUpdated] = useState("");
@@ -218,8 +219,10 @@ export default function DriverRecordForms() {
             setOil([]);
             setSmallMileage("");
             setEditMileage("");
+            setGPSData("");
             setSmallNotes("");
             setEditNotes("");
+            setEditor("");
             setIconBtnSave("");
             setLabelBtnSave("SAVE CHANGES");
             setIsBtnSave(false); 
@@ -250,13 +253,13 @@ export default function DriverRecordForms() {
     }
 
     const lbl = () => {
-        return( <span><i className="pi pi-pencil"></i> Edit <big>/</big> <i className="pi pi-search"></i> Show</span>);
+        return( <span><i className="pi pi-pencil"></i> Edit<big> / </big><i className="pi pi-search"></i> Show</span>);
     }
 
     const actionBody = (rowData) => {
         return (
             localStorage.getItem("editInspectionReport") === "true" ? <center>
-            <Button label={lbl()} className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
+            <Button label={lbl()} className="p-mr-2" onClick={() => getInspectionData(rowData)} style={{minWidth: '130px', padding: '7px 3px'}}/></center>
             : <center>
             <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2(rowData)}/></center>
         );
@@ -372,6 +375,7 @@ export default function DriverRecordForms() {
         isGasLevel(selectedCar.gas_level);
         isOilLevel(selectedCar.oil_level);
 
+        setGPSData(selectedCar.gps);
         isNotes(selectedCar.notes);
         setDateUpdated(selectedCar.date_updated);
         if (typeof(selectedCar.editor) === 'undefined') {setEditor("None");}
@@ -426,9 +430,10 @@ export default function DriverRecordForms() {
         
         selectedCar.revised.gas_level ? (isOilLevel(selectedCar.revised.gas_level), onCheckboxChange(selectedCar.revised.gas_level, "g"+selectedCar.revised.gas_level)) : '';
         selectedCar.revised.oil_level ? (isOilLevel(selectedCar.revised.oil_level), onCheckboxChange(selectedCar.revised.oil_level, "o"+selectedCar.revised.oil_level)) : '';
+        selectedCar.revised.gps ? setGPSData(selectedCar.revised.gps) : '';
         selectedCar.revised.notes ? (isNotes(selectedCar.revised.notes), onCheckboxChange(selectedCar.revised.notes, "n")) : '';
         selectedCar.revised.edited_by ? setEditor(selectedCar.revised.edited_by) : '';
-        selectedCar.revised.date_updated ? setDateUpdated(selectedCar.date_updated) : '';
+        selectedCar.revised.date_updated ? setDateUpdated(selectedCar.revised.date_updated) : '';
         
     }
 
@@ -1865,7 +1870,7 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>GPS:</label>
-                                    <InputText value="gps data" disabled/>
+                                    <InputText value={GPSData} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Remarks:</label>
@@ -1883,11 +1888,11 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Date Created:</label>
-                                    <InputText placeholder="Inspected Date" value={selectedCar.date_created} disabled/>
+                                    <InputText placeholder="Date Created" value={selectedCar.date_created} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Date Updated:</label>
-                                    <InputText placeholder="Inspected Date" value={dateUpdated} disabled/>
+                                    <InputText placeholder="Date Updated" value={dateUpdated} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-5"> </div>
                                 <div className="p-col-12 p-md-3">
@@ -2441,6 +2446,14 @@ export default function DriverRecordForms() {
                         <h1>Checklist Report</h1>
                             <div className="p-grid">
                                 <div className="p-col-12 p-md-8">
+                                    <label>Emergency Contact Number:</label>
+                                    <InputText value={emergency} disabled/>
+                                </div>
+                                <div className="p-col-12 p-md-8">
+                                    <label>GPS:</label>
+                                    <InputText value={GPSData}/>
+                                </div>
+                                <div className="p-col-12 p-md-8">
                                     <label>Comments:</label>
                                     <InputText placeholder="Comments" value={notes}/>
                                 </div>
@@ -2453,8 +2466,12 @@ export default function DriverRecordForms() {
                                     <InputText placeholder="Inspected by" value={selectedCar.driver}/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
-                                    <label>Date:</label>
-                                    <InputText placeholder="Inspected by" value={selectedCar.date_created}/>
+                                    <label>Date Created:</label>
+                                    <InputText placeholder="Date Created" value={selectedCar.date_created}/>
+                                </div>
+                                <div className="p-col-12 p-md-8">
+                                    <label>Date Updated:</label>
+                                    <InputText placeholder="Date Updated" value={dateUpdated}/>
                                 </div>
                             </div>
                         </div>

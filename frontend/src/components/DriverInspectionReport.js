@@ -372,7 +372,7 @@ export class DriverInspectionReport extends Component {
             front_left_wheel: this.state.radioValue40,
             rear_right_wheel: this.state.radioValue43,
             rear_left_wheel: this.state.radioValue42,
-            gpsData: this.state.gpsData,
+            gps: "wews",
             notes: this.state.com,
             driver: this.state.driver,
             edited_by: this.state.editor,

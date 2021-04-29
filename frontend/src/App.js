@@ -33,6 +33,9 @@ import  VehiclesGPS from './components/VehiclesGPS';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
+import { Toast } from 'primereact/toast';
+
+
 const App = () => {
 
     const [layoutMode, setLayoutMode] = useState('static');
@@ -46,6 +49,7 @@ const App = () => {
     let menuClick = false;
 
     const [counter, setCounter] = useState(0);
+    const toast = useRef(null);
 
     useEffect(() => {
         if (mobileMenuActive) {
@@ -55,6 +59,21 @@ const App = () => {
             removeClass(document.body, 'body-overflow-hidden');
         }
     }, [mobileMenuActive]);
+
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+        let decoded = jwt_decode(token);
+        const dNow = new Date();
+        const d = new Date(0);
+        d.setUTCSeconds(decoded.exp);
+        const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
+        if (remainingMinutes <= 0) {
+            localStorage.clear();
+            window.location.reload();
+        } else {
+            //console.log("remain: ", remainingMinutes);
+        }
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -78,7 +97,7 @@ const App = () => {
             // console.log("remaining: ",getDifferenceInMinutes(dNow, d));
             const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
             // console.log("remaining: ", remainingMinutes);
-            if (remainingMinutes <= 1){
+            if (remainingMinutes === 1){
                 console.log("1 minute left");
                 console.log("diff: ", remainingMinutes);
                 console.log("old a: ", token);
@@ -107,11 +126,6 @@ const App = () => {
         return diffInMs / (1000 * 60);
     }
 
-    window.onunload = () => {
-        // Clear the local storage
-        localStorage.clear();
-    }
-    
     const sidebarMenu = [];
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
@@ -132,14 +146,14 @@ const App = () => {
     }
 
     //inventory permission
-    // if (localStorage.getItem("viewInventory") === "true") {
-    //     sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
-    // }
-    // if (localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
-    //     sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
-    // }
-    sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
-    sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
+    if (localStorage.getItem("viewInventory") === "true") {
+        sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
+    }
+    if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
+        sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
+    }
+    // sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
+    // sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', items: sidebarSubMenu2});
     } else {
@@ -270,6 +284,7 @@ const App = () => {
     return (
         
         <div className={wrapperClass} onClick={onWrapperClick}>
+            <Toast ref={toast} />
             <AppTopbar onToggleMenu={onToggleMenu} />
 
             <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
