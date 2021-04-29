@@ -73,6 +73,7 @@ export class DriverInspectionReport extends Component {
             mil: "",
             locc: "",
             emergency: "09465657944",
+            gpsData: "",
             com: "",
             driver: "",
             drivername: "",
@@ -371,6 +372,7 @@ export class DriverInspectionReport extends Component {
             front_left_wheel: this.state.radioValue40,
             rear_right_wheel: this.state.radioValue43,
             rear_left_wheel: this.state.radioValue42,
+            gps: "wews",
             notes: this.state.com,
             driver: this.state.driver,
             edited_by: this.state.editor,
@@ -432,6 +434,7 @@ export class DriverInspectionReport extends Component {
                 make: "",
                 mil: "",
                 locc: "",
+                gpsData: "",
                 com: "",
                 labelBtnSubmit:"SUBMIT",
                 isBtnSubmit: false,
@@ -1161,12 +1164,20 @@ export class DriverInspectionReport extends Component {
                                 <InputText value={this.state.emergency} disabled/>
                             </div>
                             <div className="p-col-12 p-md-12">
+                                <label>GPS:</label>
+                                <InputText placeholder="Input GPS" value={this.state.gpsData} onChange={event => this.setState({ gpsData: event.target.value })}/>
+                            </div>
+                            <div className="p-col-12 p-md-12">
                                 <label>Remarks:</label>
                                 <InputText placeholder="Add other remarks here" value={this.state.com} onChange={event => this.setState({ com: event.target.value })}/>
                             </div>
                             <div className="p-col-12 p-md-12">
                                 <label>Driver/ Operator:</label>
                                 <InputText placeholder="Driver" value={localStorage.getItem("myfirst")} onChange={event => this.setState({ drivername: event.target.value })} disabled/>
+                            </div>
+                            <div className="p-col-12 p-md-12">
+                                <label>Date Updated:</label>
+                                <InputText placeholder="None" value="None" disabled/>
                             </div>
                             <div className="p-col-12 p-md-9"> </div>
                             <div className="p-col-12 p-md-3">
