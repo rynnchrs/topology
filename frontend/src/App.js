@@ -29,8 +29,12 @@ import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
 
 import  DriverRecordForms from './components/DriverRecordForms';
+import  VehiclesGPS from './components/VehiclesGPS';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+
+import { Toast } from 'primereact/toast';
+
 
 const App = () => {
 
@@ -45,6 +49,7 @@ const App = () => {
     let menuClick = false;
 
     const [counter, setCounter] = useState(0);
+    const toast = useRef(null);
 
     useEffect(() => {
         if (mobileMenuActive) {
@@ -54,6 +59,21 @@ const App = () => {
             removeClass(document.body, 'body-overflow-hidden');
         }
     }, [mobileMenuActive]);
+
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+        let decoded = jwt_decode(token);
+        const dNow = new Date();
+        const d = new Date(0);
+        d.setUTCSeconds(decoded.exp);
+        const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
+        if (remainingMinutes <= 0) {
+            localStorage.clear();
+            window.location.reload();
+        } else {
+            //console.log("remain: ", remainingMinutes);
+        }
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -77,7 +97,7 @@ const App = () => {
             // console.log("remaining: ",getDifferenceInMinutes(dNow, d));
             const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
             // console.log("remaining: ", remainingMinutes);
-            if (remainingMinutes <= 1){
+            if (remainingMinutes === 1){
                 console.log("1 minute left");
                 console.log("diff: ", remainingMinutes);
                 console.log("old a: ", token);
@@ -106,14 +126,10 @@ const App = () => {
         return diffInMs / (1000 * 60);
     }
 
-    window.onunload = () => {
-        // Clear the local storage
-        localStorage.clear();
-    }
-
     const sidebarMenu = [];
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
+    const sidebarSubMenu3 = [];
     
     sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
     //users permission
@@ -124,34 +140,36 @@ const App = () => {
         sidebarSubMenu1.push({ label: 'Edit-Delete user', icon: 'pi pi-user-edit', to: '/editdeleteuser'});
     }
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
-        sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user',items: sidebarSubMenu1});
+        sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user', items: sidebarSubMenu1});
     } else {
         //console.log("permission data none");
     }
 
     //inventory permission
-    // if (localStorage.getItem("addInspectionReport") === "true") {
-    //     sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
-    // }
-    // if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
-    //     sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
-    // }
+    if (localStorage.getItem("viewInventory") === "true") {
+        sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
+    }
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
-        sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
+        sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
+    }
+    // sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
+    // sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
+    if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
+        sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', items: sidebarSubMenu2});
     } else {
         //console.log("permission data none");
     }
 
     //inspection permission
     if (localStorage.getItem("addInspectionReport") === "true") {
-        sidebarSubMenu2.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
+        sidebarSubMenu3.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     }
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
-        sidebarSubMenu2.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
+        sidebarSubMenu3.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
     }
     
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
-        sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file',items: sidebarSubMenu2});
+        sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file', items: sidebarSubMenu3});
     } else {
         //console.log("permission data none");
     }
@@ -266,6 +284,7 @@ const App = () => {
     return (
         
         <div className={wrapperClass} onClick={onWrapperClick}>
+            <Toast ref={toast} />
             <AppTopbar onToggleMenu={onToggleMenu} />
 
             <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
@@ -287,6 +306,7 @@ const App = () => {
                 <Route path="/register" exact component={Register} />
                 <Route path="/editdeleteuser" exact component={EditDeleteUser} />
                 <Route path="/vehicles" exact component={Vehicles} />
+                <Route path="/vehiclesgps" exact component={VehiclesGPS} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
             </div>
