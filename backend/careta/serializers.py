@@ -22,8 +22,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         user_obj = username or email or phone 
         if user_obj:
             credentials['username'] = user_obj.username
-
-        return super().validate(credentials)
+        token = super().validate(credentials) 
+        token['username'] = credentials['username']
+        
+        return token
 
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
