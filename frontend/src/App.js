@@ -113,10 +113,13 @@ const App = () => {
                         console.log('error refresh: ');
                         console.log(error);
                     });
+            } else if (remainingMinutes <= 0) {
+                localStorage.clear();
+                window.location.reload();
             } else {
                 console.log("remaining: ", remainingMinutes);
             }
-          }, 5000)
+          }, 1000);
         
           return () => clearInterval(intervalId);
     }, [counter]);

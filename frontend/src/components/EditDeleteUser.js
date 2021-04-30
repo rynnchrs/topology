@@ -60,6 +60,7 @@ export const EditDeleteUser = () => {
     const [check22, isCheck22] = useState(false);
     const [check23, isCheck23] = useState(false);
     const [check24, isCheck24] = useState(false);
+    const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
 
     const [globalFilter, setGlobalFilter] = useState(null);
@@ -789,16 +790,16 @@ export const EditDeleteUser = () => {
                         </div>
                     </div>
 
-                    <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
+                    {/* <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
                         <Panel header="PERMISSION" className="p-col-12 p-md-12">
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="User Data">
+                                    <Fieldset legend="User Data"> */}
                                         {/*<div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check1} onChange={event => isCheck1(check1 ? false : true)}> </Checkbox>
                                             <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
                                         </div>*/}
-                                        <div className="p-col">
+                                        {/* <div className="p-col">
                                             <Checkbox classname="p-checkbox-lg" checked={check2} onChange={event => isCheck2(check2 ? false : true)}> </Checkbox>
                                             <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
                                         </div>
@@ -922,6 +923,29 @@ export const EditDeleteUser = () => {
                                 </div>
                             </div>
 
+                        </Panel>
+                    </div> */}
+
+                    <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>
+                        <Panel header="PERMISSION" className="p-col-12 p-md-12"><center>
+                            <div className="p-grid p-fluid">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center', margin: 'auto'}}>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "manager"} onChange={event => setUserLevel("manager")}> </Checkbox>
+                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> MANAGER</label>
+                                </div>
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "fieldman"} onChange={event => setUserLevel("fieldman")}> </Checkbox>
+                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> FIELDMAN</label>
+                                </div>
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setUserLevel("driver")}> </Checkbox>
+                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DRIVER</label>
+                                </div>
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "viewer"} onChange={event => setUserLevel("viewer")}> </Checkbox>
+                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEWER</label>
+                                </div>
+                            </div></center>
                         </Panel>
                     </div>
 

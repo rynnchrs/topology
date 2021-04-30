@@ -1189,7 +1189,7 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-                <Dialog header="SUBMIT FAILURE" visible={this.state.displayError} style={{ width: '310px' }} footer={this.renderFooter('displayError')} onHide={() => this.onHide('displayError')}>
+                <Dialog header="SUBMIT FAILURE" visible={this.state.displayError} style={{ width: '310px' }} footer={this.renderFooter('displayError')} onHide={() => this.onHide('displayError')} closable={false}>
                     <div className="p-grid">
                         <div className="p-col-2">
                             <i className="pi pi-exclamation-triangle" style={{fontSize: '30px', color: 'red'}}/>
@@ -1201,7 +1201,7 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </Dialog>
 
-                <Dialog header="SUBMIT SUCCESS" visible={this.state.displaySuccess} style={{ width: '310px' }} footer={this.renderFooter('displaySuccess')} onHide={() => this.onHide('displaySuccess')}>
+                <Dialog header="SUBMIT SUCCESS" visible={this.state.displaySuccess} style={{ width: '310px' }} footer={this.renderFooter('displaySuccess')} onHide={() => this.onHide('displaySuccess')} closable={false}>
                     <div className="p-grid">
                         <div className="p-col-2">
                             <i className="pi pi-check-circle" style={{fontSize: '30px', color: 'green'}}/>
