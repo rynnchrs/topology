@@ -3,18 +3,19 @@ from datetime import datetime as date
 from os import remove
 from wsgiref.util import FileWrapper
 
-from careta.models import Car
+from car.models import Car
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework.backends import DjangoFilterBackend
-from rest_framework import filters, generics, serializers, status, viewsets
+from django_filters import rest_framework as filter
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from reversion.models import Version
 
 from .export import export
+from .filters import InspectionFilter
 from .models import Inspection, Maintenance, Repair
 from .serializers import (InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
@@ -24,10 +25,8 @@ from .utils import maintenance_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = InspectionSerializer
-    search_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
-    filter_backends = [filters.SearchFilter]
 
     def list(self, request):        
         user = self.request.user
@@ -93,7 +92,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def export_post(self, request, pk=None):
         # print(request.data)
         inspection_id = []
@@ -111,7 +110,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         else:
             return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False)
+    @action(detail=False,permission_classes=[AllowAny])
     def export_get(self, request):
         # print(request.data)
         filename = '{date}-Inspection-Report.xlsx'.format(
@@ -131,8 +130,8 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
     permission_classes = [IsAuthenticated]
     # queryset = Inspection.objects.all().order_by('inpsection_id')
     serializer_class = InspectionListSerializer
-    filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
-    filterset_fields = ['inspection_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
+    filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = InspectionFilter
     ordering_fields = ['body_no__body_no', 'date_created', 'inspection_id']
 
     def get_queryset(self):
@@ -188,7 +187,7 @@ class MaintenanceListView(generics.ListAPIView): #list of inspection with filter
     permission_classes = [IsAuthenticated]
     queryset = Maintenance.objects.all().order_by('maintenance_id')
     serializer_class = MaintenanceListSerializer       
-    filter_backends = [DjangoFilterBackend,filters.OrderingFilter]
+    filter_backends = [filter.DjangoFilterBackend,filters.OrderingFilter]
     filterset_fields = ['maintenance_id','body_no__body_no', 'body_no__vin_no', 'date_created', 'body_no__current_loc']
     ordering_fields = ['body_no__body_no', 'date_created', 'maintenance_id']
 
