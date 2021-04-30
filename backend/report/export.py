@@ -14,8 +14,8 @@ def export(inspection):
     worksheet.title = '{date}-Inspection-Report.xlsx'.format(
         date=datetime.now().strftime('%Y-%m-%d'))
 
-    cell_1 = ["B1","I1","P1","T1","Z1","AO1","AQ1","BA1"]
-    cell_2 = ["H1","O1","S1","Y1","AN1","AP1","AZ1","BE1"]
+    cell_1 = ["B1","I1","Q1","U1","AA1","AP1","AR1","BB1"]
+    cell_2 = ["H1","P1","T1","Z1","AO1","AQ1","BA1","BF1"]
     header = ["VEHICLE INFOMATION","EXTERIOR","INTERIOR","ENGINE BAY","ELECTRICS",
             "WHEELS AND TIRES","GAS AND OIL","CHECKLIST REPORT"]
     color = ["00FFFF00","003366FF","00FFCC99","00C0C0C0","0000FF00","00FF0000","00800080","00FFFFFF"]
@@ -115,17 +115,17 @@ def export(inspection):
             cell.fill = PatternFill("solid", fgColor=color[0])
         if col_num >= 9:
             cell.fill = PatternFill("solid", fgColor=color[1])
-        if col_num >= 16:
+        if col_num >= 17:
             cell.fill = PatternFill("solid", fgColor=color[2])
-        if col_num >= 20:
+        if col_num >= 21:
             cell.fill = PatternFill("solid", fgColor=color[3])
-        if col_num >= 26:
+        if col_num >= 27:
             cell.fill = PatternFill("solid", fgColor=color[4])
-        if col_num >= 41:
+        if col_num >= 42:
             cell.fill = PatternFill("solid", fgColor=color[5])
-        if col_num >= 43:
+        if col_num >= 44:
             cell.fill = PatternFill("solid", fgColor=color[6])
-        if col_num >= 53:
+        if col_num >= 54:
             cell.fill = PatternFill("solid", fgColor=color[7])
 
     # Iterate through all movies

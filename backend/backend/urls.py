@@ -22,19 +22,13 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 router = routers.DefaultRouter()                      # add this
-router.register(r'careta', views.CarView, 'careta')     # add this
-router.register(r'careta-contract', views.ContractView, 'careta-contract')     # add this
-router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
-router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance') # add this
-router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
-router.register(r'total', views.TotalView, 'total') # total list api
 router.register(r'job-order', views.JobOrderView, 'job-order') # job-order list api
 
 urlpatterns = [
-    path('admin/', admin.site.urls),         path('api/', include(router.urls)),                # add this
-    re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
-    path('careta/',  include('careta.urls')), # add this
-    path('report/',  include('report.urls')), # add this
-    path('notifications/',  include('notifications.urls')), # add this
+    path('admin/', admin.site.urls),                        # add this
+    path('car/',  include('car.urls')), 
+    path('careta/',  include('careta.urls')), 
+    path('report/',  include('report.urls')), 
+    path('notifications/',  include('notifications.urls')), 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

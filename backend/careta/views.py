@@ -1,40 +1,28 @@
 import datetime
 from abc import abstractmethod
-from wsgiref.util import FileWrapper
 
-from django.conf import settings
-from django.contrib.auth.models import User  # add this
-from django.db.models import query
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
-from django_filters.rest_framework import DjangoFilterBackend  # filter
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from report.models import Maintenance
-from rest_framework import viewsets  # add this; filter; add this
-from rest_framework import filters, generics, serializers, status
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response  # add this
-from rest_framework.views import APIView  # add this
-from rest_framework_simplejwt.tokens import RefreshToken  # add this
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .export import export
-from .models import (TPL, Car, Contract, Insurance, JobOrder,  # add this
-                     Permission)
-from .serializers import (CarInfoSerializer, CarSerializer,  # add this
-                          ContractSerializer, InsuranceSerializer,
-                          JobOrderSerializer, MyTokenObtainPairSerializer,
+from .models import JobOrder, Permission
+from .serializers import (JobOrderSerializer, MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
                           PermissionMaintenanceReportSerializer,
                           PermissionRepairReportSerializer,
                           PermissionSerializer, PermissionTaskSerializer,
-                          PermissionUserSerializer, SearchInventorySerializer,
-                          TotalCarSerializer, TPLSerializer,
-                          UpdateUserSerializer, UserListSerializer,
-                          UserSerializer)
-from .utils import (check_Com_date, check_cr_date, check_or_date,
-                    check_TPL_date, user_permission)
+                          PermissionUserSerializer, UpdateUserSerializer,
+                          UserListSerializer, UserSerializer)
+from .utils import user_permission
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -370,105 +358,4 @@ class JobOrderView(viewsets.ViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class CarView(viewsets.ModelViewSet):  # add this
-    # permission_classes = [IsAuthenticated]
-    queryset = Car.objects.all()  # add this
-    serializer_class = CarSerializer  # add this
-    search_fields = ['body_no', 'plate_no', 'vin_no']
-    filter_backends = [filters.SearchFilter]
-    lookup_field = 'slug'
-    
-    def create(self, request):
-        serializer = CarSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            export()  
-        return Response(status=status.HTTP_201_CREATED)      
 
-    def update(self, request, slug=None):
-        queryset = Car.objects.all()
-        car = get_object_or_404(queryset, slug=slug) 
-        serializer = CarSerializer(instance=car, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            export() 
-        return Response(serializer.data, status=status.HTTP_200_OK)   
-    
-    @action(detail=False)
-    def export_list(self, request):
-        filename = 'Car-Inventory.xlsx'
-        file_path = '.'+settings.MEDIA_URL+filename
-        file = open(file_path,"rb")
-        response = HttpResponse(FileWrapper(file),
-         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = 'attachment; filename=' + filename
-        return response
-
-class CarListView(generics.ListAPIView):  #list of all car with filtering
-    permission_classes = [IsAuthenticated]
-    queryset = Car.objects.all().order_by('car_id')  # add this
-    serializer_class = CarInfoSerializer  # add this
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['body_no', 'plate_no', 'vin_no','make','current_loc']
-    pagination_class=None
-
-
-class SearchInventoryView(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
-
-    def list(self, request):
-        value = request.query_params.get('search_field', None)
-        queryset = Car.objects.only(value)
-        serializer = SearchInventorySerializer(queryset, many=True, fields=[str(value)])
-        return Response(serializer.data)
-
-
-class ContractView(viewsets.ModelViewSet):  # add this
-    permission_classes = [IsAuthenticated]
-    queryset = Contract.objects.all()  # add this
-    serializer_class = ContractSerializer  # add this
-    lookup_field = 'slug'
-
-
-class TPLView(viewsets.ModelViewSet):  # add this
-    permission_classes = [IsAuthenticated]
-    queryset = TPL.objects.all()  # add this
-    serializer_class = TPLSerializer  # add this
-    lookup_field = 'slug'
-
-
-class InsuranceView(viewsets.ModelViewSet):  # add this
-    permission_classes = [IsAuthenticated]
-    queryset = Insurance.objects.all()  # add this
-    serializer_class = InsuranceSerializer  # add this
-    lookup_field = 'slug'
-    
-
-class InsuranceList(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = InsuranceSerializer
-
-    def get_queryset(self):
-        username = self.kwargs['username']
-        return Insurance.objects.filter(car=username)
-
-
-
-class TotalView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = TotalCarSerializer
-    queryset = Car.objects.all().order_by('date_created')[:1]
-
-
-class ExpiryView(APIView): # expiry 
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        year = request.data.get('year')
-        print(year)
-        return Response({
-            'OR':check_or_date(year), # OR
-            'CR':check_cr_date(year), # CR
-            'TPL':check_TPL_date(year), # TPL Insurance
-            'Com':check_Com_date(year), # Comprehensive Insurance
-            })
