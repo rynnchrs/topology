@@ -1,11 +1,10 @@
 # todo/serializers.py
 import django.contrib.auth.password_validation as validators
-from car.serializers import CarInfoSerializer
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import JobOrder, Permission, Task, UserInfo
+from .models import Permission, UserInfo
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -29,11 +28,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):  # user info serializer
-    id = serializers.CharField(read_only=True, source='user.id')
-    username = serializers.CharField(read_only=True, source='user.username')
-    full_name = serializers.CharField(read_only=True, source='user.user_info.full_name')
+    full_name = serializers.CharField(read_only=True, source='user_info.full_name')
     class Meta:
-        model = Permission
+        model = User
         fields = ['id','username','full_name']
 
 
@@ -170,21 +167,6 @@ class PermissionTaskSerializer(serializers.ModelSerializer):    # task permissio
         extra_kwargs = {'slug': {'read_only': True},}
 
 
-class TaskSerializer(serializers.ModelSerializer):
-    body_no = serializers.CharField()
-    class Meta:
-        model= Task
-        fields = ['body_no']
-
-    def to_representation(self, instance): # instance of vin_no
-        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
-        return super(TaskSerializer, self).to_representation(instance)
-
-class JobOrderSerializer(serializers.ModelSerializer): # list of all Maintenance
-    task = TaskSerializer()
-    class Meta:
-        model = JobOrder
-        fields = ['job_id','job_no','task']
 
 
 

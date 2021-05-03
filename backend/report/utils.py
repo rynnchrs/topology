@@ -1,6 +1,7 @@
 import json
 
-from careta.models import Car, Permission
+from careta.models import Permission
+from car.models import Car
 from django.contrib.auth.models import User
 from jsondiff import diff
 from reversion.models import Version

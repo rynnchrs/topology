@@ -14,15 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
-from django.urls import path, include, re_path                 # add this
-from rest_framework import routers                    # add this
-from careta import views                            # add this
-from django.conf.urls.static import static
 from django.conf import settings
-
-router = routers.DefaultRouter()                      # add this
-router.register(r'job-order', views.JobOrderView, 'job-order') # job-order list api
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path  # add this
 
 urlpatterns = [
     path('admin/', admin.site.urls),                        # add this
@@ -30,5 +25,6 @@ urlpatterns = [
     path('careta/',  include('careta.urls')), 
     path('report/',  include('report.urls')), 
     path('notifications/',  include('notifications.urls')), 
+    path('task/',  include('task.urls')), 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
