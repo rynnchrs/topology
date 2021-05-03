@@ -33,9 +33,6 @@ import  VehiclesGPS from './components/VehiclesGPS';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
-import { Toast } from 'primereact/toast';
-
-
 const App = () => {
 
     const [layoutMode, setLayoutMode] = useState('static');
@@ -49,7 +46,6 @@ const App = () => {
     let menuClick = false;
 
     const [counter, setCounter] = useState(0);
-    const toast = useRef(null);
 
     useEffect(() => {
         if (mobileMenuActive) {
@@ -78,29 +74,17 @@ const App = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCounter(counter + 1);
-            console.log("cntr: ",counter);
             let token = localStorage.getItem("token");
             let refreshToken = localStorage.getItem("refreshToken");
-            // console.log("token: ", token);
-            // console.log("refreshtoken: ", refreshToken);
             
-            const body = { "refresh": refreshToken }; 
-            //console.log("body:", body);
+            const body = { "refresh": refreshToken };
 
             let decoded = jwt_decode(token);
-            //console.log("dcd: ", decoded);
             const dNow = new Date();
             const d = new Date(0);
             d.setUTCSeconds(decoded.exp);
-            // console.log("dateNow: ", dNow);
-            // console.log("dcdexp: ", d);
-            // console.log("remaining: ",getDifferenceInMinutes(dNow, d));
             const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
-            // console.log("remaining: ", remainingMinutes);
             if (remainingMinutes === 1){
-                console.log("1 minute left");
-                console.log("diff: ", remainingMinutes);
-                console.log("old a: ", token);
                 axios
                     .post(process.env.REACT_APP_SERVER_NAME + 'careta/token/refresh/', body)
                     .then((res) => {  
@@ -117,9 +101,9 @@ const App = () => {
                 localStorage.clear();
                 window.location.reload();
             } else {
-                console.log("remaining: ", remainingMinutes);
+                //console.log("remaining: ", remainingMinutes);
             }
-          }, 1000);
+          }, 5000);
         
           return () => clearInterval(intervalId);
     }, [counter]);
@@ -155,8 +139,6 @@ const App = () => {
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
     }
-    // sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
-    // sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', items: sidebarSubMenu2});
     } else {
@@ -287,7 +269,6 @@ const App = () => {
     return (
         
         <div className={wrapperClass} onClick={onWrapperClick}>
-            <Toast ref={toast} />
             <AppTopbar onToggleMenu={onToggleMenu} />
 
             <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>

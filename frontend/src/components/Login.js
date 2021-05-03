@@ -48,7 +48,7 @@ export const Login = (props) => {
                         <div className="p-col"></div>
                         <div className="p-col">
                             <center>
-                                <div><img src='/assets/layout/images/careta-logo.png' /></div>
+                                <div><img src='/assets/layout/images/careta-logo.png' alt="" /></div>
                                 <div><label style={{ fontSize: '25px', fontWeight: 'bold' }}>Sign in</label></div>
                             </center>
                         </div>

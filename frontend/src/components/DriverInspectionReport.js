@@ -1,6 +1,5 @@
-import React, { Component, createRef} from 'react';
+import React, { Component} from 'react';
 import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
@@ -150,16 +149,11 @@ export class DriverInspectionReport extends Component {
         };
 
         Promise.all([
-            fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json()),
-            //fetch(process.env.REACT_APP_SERVER_NAME + 'careta/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/careta/', config).then(res => res.json()),
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
-            //console.log("res", res1)
-            // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
-            //             : item.make === 'SUV' ? 'Super Carry UV'
-            //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
-            //             : 'Gratour midi truck 1.2L' }));
+            //console.log("res", res1);
             this.setState({
                 bodyno: bodyno,
                 carValues: res2
@@ -170,7 +164,7 @@ export class DriverInspectionReport extends Component {
     showBodyNumberTags () {
         if (this.state.carValues.length <= 0) {
             //console.log("recent null");
-        } else if (this.state.carValues.length == 1) { //1
+        } else if (this.state.carValues.length === 1) { //1
             return <div> 
             <ul>
                 <li>
@@ -180,7 +174,7 @@ export class DriverInspectionReport extends Component {
                 </li>
             </ul>
             </div>
-        } else if (this.state.carValues.length == 2) { //2
+        } else if (this.state.carValues.length === 2) { //2
             return <div> 
             <ul>
                 <li>
@@ -195,7 +189,7 @@ export class DriverInspectionReport extends Component {
                 </li>
             </ul>
             </div>
-        } else if (this.state.carValues.length == 3) { //3
+        } else if (this.state.carValues.length === 3) { //3
             return <div> 
             <ul>
                 <li>
@@ -215,7 +209,7 @@ export class DriverInspectionReport extends Component {
                 </li>
             </ul>
             </div>
-        } else if (this.state.carValues.length == 4) { //4
+        } else if (this.state.carValues.length === 4) { //4
             return <div> 
             <ul>
                 <li>
@@ -372,7 +366,7 @@ export class DriverInspectionReport extends Component {
             front_left_wheel: this.state.radioValue40,
             rear_right_wheel: this.state.radioValue43,
             rear_left_wheel: this.state.radioValue42,
-            gps: "wews",
+            gps: this.state.gpsData,
             notes: this.state.com,
             driver: this.state.driver,
             edited_by: this.state.editor,

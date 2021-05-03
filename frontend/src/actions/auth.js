@@ -25,7 +25,7 @@ export const login = (username, password) => (dispatch) => {
         //.post(SERVER_NAME + 'api/login/', body, config)
         .then((res) => {
             //console.log('login token: ' + res.data.access)
-            localStorage.setItem('username', username);
+            localStorage.setItem('username', res.data.username);
             localStorage.setItem('token', res.data.access);
             localStorage.setItem('refreshToken', res.data.refresh);
             try {

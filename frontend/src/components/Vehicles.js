@@ -1,7 +1,4 @@
 import React, {Component, createRef} from 'react';
-import { TabView,TabPanel } from 'primereact/tabview';
-import {DataTable} from 'primereact/datatable';
-import {Column} from 'primereact/column'
 import {InputText} from 'primereact/inputtext';
 import { AutoComplete } from 'primereact/autocomplete';
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -12,12 +9,8 @@ import {Dialog} from 'primereact/dialog';
 import {Dropdown} from 'primereact/dropdown';
 import {InputMask} from 'primereact/inputmask';
 import {Calendar} from 'primereact/calendar';
-import {SelectButton} from 'primereact/selectbutton';
 import {Toast} from 'primereact/toast'
-import { ListBox } from 'primereact/listbox';
 import { Carousel } from 'primereact/carousel';
-
-//import './TabViewDemo.css';
 import axios from "axios";
 import { isThisISOWeek } from 'date-fns';
 
@@ -144,7 +137,7 @@ export class Vehicles extends Component {
             },
         };
         Promise.all([
-            fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/careta/', config).then(res => res.json())
         ]).then(([res1]) => {
             const bodyno = res1;
             //console.log("res1", res1);
@@ -176,14 +169,14 @@ export class Vehicles extends Component {
             <div>
                 {/* <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} */}
                 {/* <img src={`showcase/demo/images/product/${product.image}`}   alt={product.name} className="product-image" /> */}
-                <center><img src={`/assets/layout/images/${images.image}`} style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+                <center><img src={`/assets/layout/images/${images.image}`} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
             </div>
         );
     }
 
     exportData() {
         //console.log('export car-list');
-        let url = process.env.REACT_APP_SERVER_NAME + 'api/careta/export_list/';
+        let url = process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/';
         window.open(url);
     }
 
@@ -210,6 +203,13 @@ export class Vehicles extends Component {
 
     //ADD VEHICLE ALGORITHM
     addVehicle = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data = {
             slug: this.state.APIvehicleData.slug,
             vin_no: this.state.APIvehicleData.vin_no,
@@ -278,9 +278,29 @@ export class Vehicles extends Component {
             status: this.state.APIvehicleData.status,
         };
         axios
-                .post("http://localhost:8000/api/careta/",data)
-                .then(res => this.setState({ todoList: res.data },this.addTPL))
-                .catch(this.showErrorSave);
+            //.post("http://localhost:8000/api/careta/",data)
+            .post(process.env.REACT_APP_SERVER_NAME + "car/careta/", data, config)
+            .then(res => this.setState({ todoList: res.data },this.addContract))
+            .catch(this.showErrorSave);
+    }
+
+    addContract = () => {
+        const data_contract ={
+            slug : this.state.todoList.car_id,
+            client_name: this.state.APIvehicleData.c_client_name,
+            contract_no:this.state.APIvehicleData.c_contract_no,
+            start_date:this.state.APIvehicleData.c_start_date,
+            end_date: this.state.APIvehicleData.c_end_date,
+            bid_no: this.state.APIvehicleData.c_bid_no,
+            bid_name: this.state.APIvehicleData.c_bid_name,
+            bid_date: this.state.APIvehicleData.c_bid_date,
+            cost: this.state.APIvehicleData.c_cost,
+            car: this.state.todoList.car_id,
+        }
+        axios
+            .post("http://localhost:8000/api/careta-contract/",data_contract)
+            .then(res => this.setState({ todoList_contract: res.data },this.addTPL))
+            .catch(err => console.log(err));
     }
 
     addTPL = () =>{
@@ -299,29 +319,9 @@ export class Vehicles extends Component {
         }
         axios
             .post("http://localhost:8000/api/careta-tpl/",data_tpl)
-            .then(res => this.setState({ todoList_tpl: res.data },this.addContract))
+            .then(res => this.setState({ todoList_tpl: res.data },this.addInsurance1))
             .catch(err => console.log(err));
 
-    }
-
-    addContract = () => {
-        const data_contract ={
-            slug : this.state.todoList.car_id,
-            client_name: this.state.APIvehicleData.c_client_name,
-            contract_no:this.state.APIvehicleData.c_contract_no,
-            start_date:this.state.APIvehicleData.c_start_date,
-            end_date: this.state.APIvehicleData.c_end_date,
-            bid_no: this.state.APIvehicleData.c_bid_no,
-            bid_name: this.state.APIvehicleData.c_bid_name,
-            bid_date: this.state.APIvehicleData.c_bid_date,
-            cost: this.state.APIvehicleData.c_cost,
-            car: this.state.todoList.car_id,
-
-        }
-        axios
-                .post("http://localhost:8000/api/careta-contract/",data_contract)
-                .then(res => this.setState({ todoList_contract: res.data },this.addInsurance1))
-                .catch(err => console.log(err));
     }
 
     addInsurance1 = () => {
@@ -434,9 +434,9 @@ export class Vehicles extends Component {
             status: this.state.APIvehicleData.status,
         };
         axios
-                .put("http://localhost:8000/api/careta/" + this.state.newvehicleData.slug+"/",data)
-                .then(res => this.setState({ todoList: res.data },this.editTPL))
-                .catch(this.showErrorSave);
+            .put("http://localhost:8000/api/careta/" + this.state.newvehicleData.slug+"/",data)
+            .then(res => this.setState({ todoList: res.data },this.editTPL))
+            .catch(this.showErrorSave);
 
     }
 
@@ -455,9 +455,9 @@ export class Vehicles extends Component {
 
         }
         axios
-                .put("http://localhost:8000/api/careta-tpl/" + this.state.newvehicleData.car_id+"/",data_tpl)
-                .then(res => this.setState({ todoList_tpl: res.data },this.editContract))
-                .catch(this.showErrorSave);
+            .put("http://localhost:8000/api/careta-tpl/" + this.state.newvehicleData.car_id+"/",data_tpl)
+            .then(res => this.setState({ todoList_tpl: res.data },this.editContract))
+            .catch(this.showErrorSave);
 
     }
 
@@ -1410,19 +1410,28 @@ export class Vehicles extends Component {
         }
 
         const selectItem = event => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
                 //.get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
-                .get(process.env.REACT_APP_SERVER_NAME + 'api/careta/?search=' + event.value.body_no)
+                .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + event.value.body_no + '/', config)
                 .then(res =>  {
-                    const isDataAvailable = res.data && res.data.length;
-                    if(isDataAvailable)
-                        this.setState({ vehicleData: res.data[0]},getContract);
-                    else
-                        showNoResult();
+                    this.setState({ vehicleData: res.data},getContract);
+                    // const isDataAvailable = res.data && res.data.length;
+                    // if(isDataAvailable)
+                    //     this.setState({ vehicleData: res.data[0]},getContract);
+                    // else
+                    //     showNoResult();
                 })
                 .catch((error) => {
                     console.log('error select: ');
                     console.log(error);
+                    showNoResult();
                 });
         }
         
@@ -1435,10 +1444,9 @@ export class Vehicles extends Component {
                     'Authorization': 'Bearer ' + token,
                 },
             };
-
             axios
                 //.get("http://127.0.0.1:8000/api/careta-contract/" + this.state.vehicleData.car_id+"/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-contract/Car object(" + this.state.vehicleData.car_id + ")/", config)
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/" + this.state.vehicleData.slug + "/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1455,9 +1463,16 @@ export class Vehicles extends Component {
         }
 
         const getTPL= () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
                 //.get("http://127.0.0.1:8000/api/careta-tpl/" + this.state.vehicleData.car_id+"/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-tpl/Car object(" + this.state.vehicleData.car_id + ")/")
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-tpl/" + this.state.vehicleData.slug + "/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1474,9 +1489,16 @@ export class Vehicles extends Component {
         }
 
         const getInsurance1= () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
                 //.get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-1/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-insurance/" + this.state.vehicleData.car_id + "-1/")
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.vehicleData.slug + "-1/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1493,9 +1515,16 @@ export class Vehicles extends Component {
         }
 
         const getInsurance2= () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
                 //.get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.vehicleData.slug + "-2/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1512,8 +1541,6 @@ export class Vehicles extends Component {
         }
 
         const reProcessResult = () => {
-
-
             console.log(this.state.vehicleData);
             var vBrand = this.state.vehicleData.brand === "M" ? "Mitsubishi"
                 : this.state.vehicleData.brand === "S" ? "Suzuki" : "Foton";
@@ -1598,6 +1625,15 @@ export class Vehicles extends Component {
                 : this.state.vehicleData.fan_date ===  'NA' ? 'Not Applicable'
                 : this.state.vehicleData.fan_date ===  'DNR'? 'Did Not Recieve'
                 : this.state.vehicleData.fan_date;
+            var vMake = this.state.vehicleData.make === 'L30' ? 'L300 Exceed 2.5D MT'
+                : this.state.vehicleData.make === 'SUV' ? 'Super Carry UV'
+                : this.state.vehicleData.make ===  'G15' ? 'Gratour midi truck 1.5L'
+                : this.state.vehicleData.make ===  'G12'? 'Gratour midi truck 1.2L'
+                : this.state.vehicleData.make;
+            var vSeries = this.state.vehicleData.series === 'L3' ? 'L300 Exceed C/C'
+                : this.state.vehicleData.series === 'SC' ? 'Suzuki CAB CHAS'
+                : this.state.vehicleData.series ===  'GR' ? 'Gratour midi'
+                : this.state.vehicleData.series;
 
 
 
@@ -1631,7 +1667,9 @@ export class Vehicles extends Component {
                     fire_extinguisher: vFireExtinguisher,
                     fan_date: vFan,
                     date_created: vPlateNumberDelivery,
-                    date_updated: vPlateNumberDelivery
+                    date_updated: vPlateNumberDelivery,
+                    make: vMake,
+                    series: vSeries
 
                 }
             });

@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useRef } from 'react';
-import { ListBox } from 'primereact/listbox';
 import { InputText } from 'primereact/inputtext';
 import axios from "axios";
 import { Button } from 'primereact/button';
@@ -678,6 +677,7 @@ export default function DriverRecordForms() {
     
     const onCheckboxChange = (value, id) => {
         /* eslint-disable no-unused-expressions */
+        var i;
         switch (id) {
             case 'cb0':
                 //console.log("id: cb0");
@@ -1030,7 +1030,7 @@ export default function DriverRecordForms() {
                 isGasLevel(value);
                 if (selectedCar.gas_level !== value){
                     const copy = gas.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 4) {
                             copy[i] = "red";
                         } else if (i === selectedCar.gas_level) {
@@ -1048,7 +1048,7 @@ export default function DriverRecordForms() {
                 isGasLevel(value);
                 if (selectedCar.gas_level !== value){
                     const copy = gas.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 3) {
                             copy[i] = "red";
                         } else if (i === selectedCar.gas_level) {
@@ -1066,7 +1066,7 @@ export default function DriverRecordForms() {
                 isGasLevel(value);
                 if (selectedCar.gas_level !== value){
                     const copy = gas.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 2) {
                             copy[i] = "red";
                         } else if (i === selectedCar.gas_level) {
@@ -1084,7 +1084,7 @@ export default function DriverRecordForms() {
                 isGasLevel(value);
                 if (selectedCar.gas_level !== value){
                     const copy = gas.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 1) {
                             copy[i] = "red";
                         } else if (i === selectedCar.gas_level) {
@@ -1102,7 +1102,7 @@ export default function DriverRecordForms() {
                 isOilLevel(value);
                 if (selectedCar.oil_level !== value){
                     const copy = oil.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 4) {
                             copy[i] = "red";
                         } else if (i === selectedCar.oil_level) {
@@ -1120,7 +1120,7 @@ export default function DriverRecordForms() {
                 isOilLevel(value);
                 if (selectedCar.oil_level !== value){
                     const copy = oil.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 3) {
                             copy[i] = "red";
                         } else if (i === selectedCar.oil_level) {
@@ -1138,7 +1138,7 @@ export default function DriverRecordForms() {
                 isOilLevel(value);
                 if (selectedCar.oil_level !== value){
                     const copy = oil.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 2) {
                             copy[i] = "red";
                         } else if (i === selectedCar.oil_level) {
@@ -1156,7 +1156,7 @@ export default function DriverRecordForms() {
                 isOilLevel(value);
                 if (selectedCar.oil_level !== value){
                     const copy = oil.slice(); //copy the array
-                    for (var i = 0; i < 5; i++) {
+                    for (i = 0; i < 5; i++) {
                         if (i === 1) {
                             copy[i] = "red";
                         } else if (i === selectedCar.oil_level) {
@@ -1315,7 +1315,6 @@ export default function DriverRecordForms() {
             <div className="p-col-12">
                 <DataTable ref={dt} header={renderHeader()} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                     globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
-                    resizableColumns columnResizeMode="expand"
                     paginator rows={10} emptyMessage="No data found"
                     >
                     {/* <Column selectionMode="single" style={{width:'3em'}}/> */}
