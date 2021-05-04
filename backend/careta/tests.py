@@ -10,7 +10,7 @@ from rest_framework import serializers, status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Car, Permission, UserInfo  # add this
+from .models import Permission, UserInfo  # add this
 
 
 class RegistrationTestCase(APITestCase):

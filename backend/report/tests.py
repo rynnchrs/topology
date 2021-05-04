@@ -1,11 +1,13 @@
 import json
 
 import reversion
-from careta.models import Car, Permission, UserInfo, JobOrder
+from car.models import Car
+from careta.models import Permission, UserInfo
 from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
+from task.models import JobOrder
 
 from .models import Inspection, Maintenance
 
