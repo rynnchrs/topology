@@ -149,7 +149,7 @@ export class DriverInspectionReport extends Component {
         };
 
         Promise.all([
-            fetch(process.env.REACT_APP_SERVER_NAME + 'car/careta/', config).then(res => res.json()),
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/', config).then(res => res.json()),
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;

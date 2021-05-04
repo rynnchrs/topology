@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback } from 'react';
 import { InputText } from 'primereact/inputtext';
 import axios from "axios";
 import { Button } from 'primereact/button';
@@ -30,6 +30,7 @@ export default function DriverRecordForms() {
     const [iconBtnSave, setIconBtnSave] = useState("");
     const [labelBtnSave, setLabelBtnSave] = useState("SAVE CHANGES");
     const [isBtnSave, setIsBtnSave] = useState(false);
+    const [bodyNo, setBodyNo] = useState(null);
     const [date2, setDate2] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const cities = [
@@ -144,8 +145,8 @@ export default function DriverRecordForms() {
             .then(data => {
                 //console.log("fr reactuseeffect")
                 //console.log(data)
-                //setTotalCount(data.count);
-                setcarValues(data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
             });
     }, []);
 
@@ -159,35 +160,35 @@ export default function DriverRecordForms() {
         }
     }, [selectedCar]);
 
-    //for paginator
-    // useEffect(() => {
-    //     try {
-    //         console.log("test flagPages: ", flagPages);
-    //         console.log("firstVariable: ", first);
+    //for pagination
+    useEffect(() => {
+        try {
+            console.log("test flagPages: ", flagPages);
+            console.log("firstVariable: ", first);
 
-    //         const sentPage = (first / rows) + 1;
-    //         console.log("sentPage: ",sentPage);
+            const sentPage = (first / rows) + 1;
+            console.log("sentPage: ",sentPage);
 
-    //         let token = localStorage.getItem("token");
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': 'Bearer ' + token,
-    //             },
-    //         };
-    //         fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 console.log("from pages");
-    //                 console.log(data);
-    //                 setTotalCount(data.count);
-    //                 setcarValues(data.results);
-    //         });
-    //     } catch(err) {
-    //         console.log("pages error")
-    //         console.log(err)
-    //     }
-    // }, [flagPages]);
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("from pages");
+                    console.log(data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+            });
+        } catch(err) {
+            console.log("pages error")
+            console.log(err)
+        }
+    }, [flagPages]);
 
     const dialogFuncMap = {
         'displayBasic': setDisplayBasic,
@@ -251,14 +252,14 @@ export default function DriverRecordForms() {
         }
     }
 
-    const lbl = () => {
-        return( <span><i className="pi pi-pencil"></i> Edit<big> / </big><i className="pi pi-search"></i> Show</span>);
-    }
+    // const lbl = () => {
+    //     return( <span><i className="pi pi-pencil"></i> Edit<big> / </big><i className="pi pi-search"></i> Show</span>);
+    // }
 
     const actionBody = (rowData) => {
         return (
             localStorage.getItem("editInspectionReport") === "true" ? <center>
-            <Button label={lbl()} className="p-mr-2" onClick={() => getInspectionData(rowData)} style={{minWidth: '130px', padding: '7px 3px'}}/></center>
+            <Button label="Edit / Show" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
             : <center>
             <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2(rowData)}/></center>
         );
@@ -632,35 +633,15 @@ export default function DriverRecordForms() {
         carValues.map((iddata, index) => {
             ids.push(iddata.inspection_id);
         });
-        console.log("ids:", ids)
+        //console.log("ids:", ids)
 
         //const body = { "inspection_id": [9,8] }; //carValues
-        const body = { "inspection_id": ids }; 
-        console.log("body:", body);
+        const body = { "inspection_id": ids };
 
         axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
         .then((res) => {
-            //console.log('post',res.data);
-            console.log('post success');
             let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
             window.open(url);
-            //const w = window.open(url);
-            //w.focus();
-            // let token = localStorage.getItem("token");
-            // const config = {
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': 'Bearer ' + token,
-            //     },
-            // };
-            // axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/', config)
-            // .then((res) => {
-            //     //console.log('get',res.data);
-            // })
-            // .catch((error) => {
-            //     console.log('error export get: ');
-            //     console.log(error);
-            // });
         })
         .catch((error) => {
             console.log('error export: ');
@@ -1195,54 +1176,131 @@ export default function DriverRecordForms() {
         }
     }
 
-    const submitSearch = () => {
-        console.log(selectedLocation);
+    const [timeOutId, setTimeOutId] = useState(null);
+    const bodySearch = (event) => {
+        setBodyNo(event.target.value);
+        clearTimeout(timeOutId);
+        setTimeOutId(setTimeout(() => {
+            submitSearch(event.target.value);
+        }, 1000));
+    }
+
+    const submitSearch = (bodyValue) => {
+        // try {
+        //     console.log('val: ', bodyValue);
+        //     console.log('loc: ', selectedLocation);
+        //     console.log('locC: ', selectedLocation.code);
+        //     console.log('dateF: ', format(date2, 'yyyy-MM-dd'));
+        // } catch(err){
+        //     //console.log("err: ", err)
+        // }
+
         let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-        if(date2 === null && selectedLocation === null){
-            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/', config)
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        //report/inspection-list/?ordering=-inspection_id
+        if((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log(data)
-                setcarValues(data);
+                console.log("all null: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
             })
             .catch((err) => {
                 console.log('err search: ');
                 console.log(err.response)
             });
         }
-        else if (date2 !== null && selectedLocation === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd'), config)
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                setcarValues(data);
+                console.log("body locnull datenull: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
             })
             .catch((err) => {
                 console.log('err search: ');
                 console.log(err.response)
             });
         }
-        else if (date2 === null && selectedLocation !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no__current_loc=' + selectedLocation.code, config)
+        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                setcarValues(data);
+                console.log("bodynull loc datenull: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
             })
             .catch((err) => {
                 console.log('err search: ');
                 console.log(err.response)
             });
         }
-        else if (date2 !== null && selectedLocation !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd')+'&body_no__current_loc=' + selectedLocation.code, config)
+        else if ((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                setcarValues(data);
+                console.log("bodynull locnull date: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log('err search: ');
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                console.log("body loc datenull: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log('err search: ');
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                console.log("body locnull date: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log('err search: ');
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                console.log("bodynull loc date: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log('err search: ');
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 !== null){ //last
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                console.log("body loc date: ", data.results);
+                setTotalCount(data.count);
+                setcarValues(data.results);
             })
             .catch((err) => {
                 console.log('err search: ');
@@ -1281,7 +1339,8 @@ export default function DriverRecordForms() {
                             {/* <label>Body No.:</label> */}
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Body No." />
+                                {/* <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Body No." /> */}
+                                <InputText placeholder="Search Body No." value={bodyNo} onChange={(event) => bodySearch(event)}/>
                             </span>
                         </div>
                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
@@ -1294,7 +1353,7 @@ export default function DriverRecordForms() {
                         </div>
                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                             <div className="p-d-flex">
-                                <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                                <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch(bodyNo)}/></div>
                                 <div className="p-mr-2"><Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => exportData()}/></div>
                             </div>
                         </div>
@@ -1315,13 +1374,12 @@ export default function DriverRecordForms() {
             <div className="p-col-12">
                 <DataTable ref={dt} header={renderHeader()} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                     globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
-                    paginator rows={10} emptyMessage="No data found"
+                    emptyMessage="No data found"
                     >
-                    {/* <Column selectionMode="single" style={{width:'3em'}}/> */}
                     <Column field="body_no" header="Body No." style={{ paddingLeft: '3%' }}></Column>
                     <Column body={actionBody}></Column>
                 </DataTable>
-                {/* <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator> */}
+                <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
             </div>
             
             <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>

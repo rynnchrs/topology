@@ -87,10 +87,8 @@ const App = () => {
             if (remainingMinutes === 1){
                 axios
                     .post(process.env.REACT_APP_SERVER_NAME + 'careta/token/refresh/', body)
-                    .then((res) => {  
-                        console.log("res refresh:", res.data);
+                    .then((res) => { 
                         localStorage.setItem('token', res.data.access);
-                        console.log("new a: ", localStorage.getItem("token"));
                         setCounter(0);
                     })
                     .catch((error) => {
