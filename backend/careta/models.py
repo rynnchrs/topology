@@ -1,7 +1,6 @@
 import datetime
 from datetime import date
 
-from car.models import Car
 from django.contrib.auth.models import User  # authenticate User
 from django.db import models
 from phone_field import PhoneField
@@ -69,29 +68,3 @@ class Permission(models.Model):         # permission Model
     def __str__(self):
         return self.user.username
 
-
-class JobOrder(models.Model):
-    job_id = models.AutoField(primary_key=True)
-    job_no = models.IntegerField(default=0)
-    type = models.BooleanField(default=True)
-
-    def __str__(self):
-        return str(self.job_id)
-
-
-class Task(models.Model):
-    task_id = models.AutoField(primary_key=True)
-    job_order = models.OneToOneField(JobOrder, related_name='task', on_delete=models.CASCADE)
-    body_no = models.ForeignKey(Car, related_name='task', on_delete=models.CASCADE, default="")
-
-    def __str__(self):
-        return str(self.task_id)
-
-
-class Fieldman(models.Model):
-    fieldman_id = models.AutoField(primary_key=True)
-    task = models.ForeignKey(Task, related_name='fieldman', on_delete=models.CASCADE)
-    field_man = models.ForeignKey(User, related_name='fieldman', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(self.fieldman_id)

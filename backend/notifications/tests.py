@@ -1,16 +1,15 @@
-
-import json
 from datetime import datetime
 
-import reversion
-from careta.models import Car, JobOrder, Permission, UserInfo
+from car.models import Car
+from careta.models import Permission, UserInfo
 from django.contrib.auth.models import User
 from django.test import TestCase
+from report.models import Inspection
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from report.models import Inspection
 from .models import *
+
 
 class InspectionNotifyTestCase(APITestCase):
     TEST_REPORT1 = {  
