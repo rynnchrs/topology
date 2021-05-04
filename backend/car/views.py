@@ -34,7 +34,7 @@ class CarView(viewsets.ModelViewSet):  # add this
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             subprocess.Popen(["python","car-export.py"], shell=True)
-        return Response(status=status.HTTP_201_CREATED)      
+        return Response(serializer.data, status=status.HTTP_201_CREATED)      
 
     def update(self, request, slug=None):
         queryset = Car.objects.all()

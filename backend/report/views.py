@@ -33,18 +33,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         queryset = Inspection.objects.all().filter(driver=user.id).order_by('-inspection_id')[:4]
         serializer = InspectionLastFourListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)    
-
-    @action(detail=False)
-    def can_view_list(self, request): 
-        user = self.request.user
-        if user_permission(user, 'can_view_inspection_reports'):
-            queryset = Inspection.objects.all().order_by('inspection_id')
-            serializer = InspectionListSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)    
-        else:
-            queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
-            serializer = InspectionListSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)    
+   
 
     def create(self, request): # create report 
         user = self.request.user
@@ -142,6 +131,21 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
             queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
         return queryset
 
+class CanViewListView(generics.ListAPIView): #list of inspection with filtering
+    permission_classes = [IsAuthenticated]
+    # queryset = Inspection.objects.all().order_by('inpsection_id')
+    serializer_class = InspectionListSerializer
+    filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = InspectionFilter
+    ordering_fields = ['body_no__body_no', 'date_created', 'inspection_id']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user_permission(user, 'can_view_inspection_reports'):
+            queryset = Inspection.objects.all().order_by('inspection_id')
+        else:
+            queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
+        return queryset
 
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]

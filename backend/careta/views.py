@@ -108,7 +108,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
 
 class UserListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = User.objects.all().order_by('id')
+    queryset = User.objects.all().exclude(username='admin').order_by('id')
     serializer_class = UserListSerializer   
     filter_backends = [filters.SearchFilter]  
     search_fields = ['id','^username','^first_name','^last_name']  
