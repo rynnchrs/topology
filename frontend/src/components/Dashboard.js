@@ -37,9 +37,9 @@ export const Dashboard = () => {
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'car/total/', config)
             .then(res => {
-                //console.log("total table:");
-                //console.log(res.data);
-                const reply = res.data[0];
+                // console.log("total table:");
+                // console.log(res.data);
+                const reply = res.data.results[0];
                 setTotalTable([
                     {name: "Body Key", "wd": reply.bodyKey_with_date, "nrc": reply.bodyKey_with_nrc, "nyr": reply.bodyKey_with_nyr, "na": reply.bodyKey_with_na, "dnr": reply.bodyKey_with_dnr},
                     {name: "Cigarette Plug", "wd": reply.cigarettePlug_with_date, "nrc": reply.cigarettePlug_with_nrc, "nyr": reply.cigarettePlug_with_nyr, "na": reply.cigarettePlug_with_na, "dnr": reply.cigarettePlug_with_dnr},

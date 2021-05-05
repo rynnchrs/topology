@@ -120,6 +120,7 @@ export class Vehicles extends Component {
                 {image: "careta-logo.png", name: "careta"},
             ],
             //images: [],
+            counter: 0,
         };
 
         this.toast = createRef(null)
@@ -129,6 +130,10 @@ export class Vehicles extends Component {
     }
 
     componentDidMount() {
+        this.getCarList();
+    }
+
+    getCarList = () => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -140,13 +145,52 @@ export class Vehicles extends Component {
             fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/', config).then(res => res.json())
         ]).then(([res1]) => {
             const bodyno = res1;
-            //console.log("res1", res1);
             this.setState({
-                bodyno: bodyno
+                bodyno: bodyno.results
             });
+        
+            if (bodyno.next === null){
+
+            } else {
+                this.setState({
+                    counter: 2
+                });
+                this.nextPage();
+            }
         })
     }
 
+    nextPage = () => {
+        // setTimeout(() => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    bodyno: this.state.bodyno.concat(data.results)
+                });
+                if (data.next === null){
+
+                } else {
+                    this.setState({
+                        counter: this.state.counter + 1
+                    });
+                    this.nextPage();
+                }
+            })
+            .catch((err) => {
+                console.log('err nxt: ');
+                console.log(err)
+            });
+        // }, 500);
+    }
+    
     searchList = (event) => {
         setTimeout(() => {
             if (!event.query.trim().length) {
@@ -158,7 +202,7 @@ export class Vehicles extends Component {
                         filteredSuggestions: this.state.filteredSuggestions,
                     });
                 } catch (err){
-                    console.log("autocomplete err:", err);
+                    //console.log("autocomplete err:", err);
                 }
             }
         }, 100);
@@ -176,24 +220,8 @@ export class Vehicles extends Component {
 
     exportData() {
         //console.log('export car-list');
-        // let url = process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/';
-        // window.open(url);
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/', config)
-            .then((res) => {
-                
-            })
-            .catch((err) => {
-                console.log('err: ');
-                console.log(err.response)
-            });
+        let url = process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/';
+        window.open(url);
     }
 
     
@@ -402,7 +430,7 @@ export class Vehicles extends Component {
         }
         axios
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/", data_insurance2, config)
-            .then(res => this.setState({ todoList_insurance2: res.data },this.toast.current.show({severity:'success', summary: 'Add Successfully', detail:'New vehicle added.', life: 3000})))
+            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Add Successfully', detail:'New vehicle added.', life: 3000}), this.getCarList()))
             .catch(err => console.log("ins2: ",err));
     }
 
@@ -598,7 +626,7 @@ export class Vehicles extends Component {
         axios
             //.put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-2/",data_insurance2)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.newvehicleData.body_no +"-2/", data_insurance2, config)
-            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Modify Successfully', detail:'All changes applied.', life: 3000})))
+            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Modify Successfully', detail:'All changes applied.', life: 3000}), this.getCarList()))
             .catch(this.showErrorSave);
     }
 
@@ -775,7 +803,12 @@ export class Vehicles extends Component {
             axios
                 //.delete("http://localhost:8000/api/careta/" + this.state.vehicleData.slug + '/')
                 .delete(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.vehicleData.body_no + "/", config)
-                .then(res => this.setState({ todoList: res.data }, this.toast.current.show({severity:'success', summary: 'Remove Successfully', detail:'Vehicle removed.', life: 3000})))
+                .then(res => this.setState({ todoList: res.data }, this.toast.current.show({severity:'success', summary: 'Remove Successfully', detail:'Vehicle removed.', life: 3000}), this.getCarList(), 
+                    this.setState({
+                        vehicleData: this.state.emptyvehicleData,
+                        searchBody: ""
+                    })
+                ))
                 .catch(err => console.log(err));
         }
     }
@@ -1311,16 +1344,6 @@ export class Vehicles extends Component {
                         });
                         break;
                     
-                    case 'Fan Delivery Date':
-
-                            this.setState({
-                                newvehicleData: {
-                                    ...this.state.newvehicleData,
-                                    fan_date: formattedValue
-                                }
-                            });
-                            break;
-                    
                     case 'TDate Issued':
 
                             this.setState({
@@ -1493,6 +1516,7 @@ export class Vehicles extends Component {
                     'Authorization': 'Bearer ' + token,
                 },
             };
+
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/" + this.state.vehicleData.slug + "/", config)
                 .then(res=>{this.setState({
@@ -1718,7 +1742,7 @@ export class Vehicles extends Component {
                 }
             });
 
-            }
+        }
 
         const onChangeHandler = (e) => {
 
@@ -2658,26 +2682,6 @@ export class Vehicles extends Component {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className="p-grid p-mb-2">
-                            <div className="p-col">
-                                <input type="radio"
-                                    value="VIN"
-                                    checked={this.state.filterOption === "VIN"}
-                                    onChange={this.radioChange} />Search By VIN No.
-                            </div>
-                            <div className="p-col">
-                                <input type="radio"
-                                    value="Body"
-                                    checked={this.state.filterOption === "Body"}
-                                    onChange={this.radioChange} />Search By Body No.
-                            </div>
-                            <div className="p-col">
-                                <input type="radio"
-                                    value="Plate"
-                                    checked={this.state.filterOption === "Plate"}
-                                    onChange={this.radioChange} />Search By Plate No.
-                            </div>
-                        </div> */}
                     </Fieldset>
                 </div>
 
@@ -2718,7 +2722,7 @@ export class Vehicles extends Component {
                         </div>
 
                         <div className="p-grid">
-                            <div className="p-col-12 p-lg-10 p-md-10 p-sm-10" style={{paddingTop: '5%'}}>
+                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12" style={{paddingTop: '5%'}}>
                                 <Accordion multiple activeAccordion={0}>
                                     <AccordionTab header={<label><span><b>Identification </b></span><i className="pi pi-user"></i></label>}>
                                         <div className="p-fluid">

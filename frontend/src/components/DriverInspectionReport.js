@@ -89,6 +89,7 @@ export class DriverInspectionReport extends Component {
             labelBtnSubmit: "SUBMIT",
             iconBtnSubmit: "",
             isLoading: false,
+            counter: 0,
         };
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
         this.onTagBodyNo = this.onTagBodyNo.bind(this);
@@ -106,33 +107,6 @@ export class DriverInspectionReport extends Component {
             selected.splice(selected.indexOf(event.value), 1);
         this.setState({ checkboxValue: selected });
     }
-
-    // //fetch data of car list from db on page load
-    // componentDidMount() {
-    //     let user = localStorage.getItem("myfirst");
-    //     this.setState({drivername:user})
-    //     let username = localStorage.getItem("username");
-    //     this.setState({driver:username})
-    //     let token = localStorage.getItem("token");
-    //     const config = {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': 'Bearer ' + token,
-    //         },
-    //     };
-    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config)
-    //         .then(res => {
-    //             const bodyno = res.data;
-    //             bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
-    //                     : item.make === 'SUV' ? 'Super Carry UV'
-    //                     : item.make ===  'G15'? 'Gratour midi truck 1.5L'
-    //                     : 'Gratour midi truck 1.2L' }));
-    //             this.setState({
-    //                 bodyno: bodyno,
-    //             });
-    //             //console.log(bodyno);
-    //         })
-    // }
 
     //fetch data of car list from db on page load
     componentDidMount() {
@@ -155,10 +129,50 @@ export class DriverInspectionReport extends Component {
             const bodyno = res1;
             //console.log("res", res1);
             this.setState({
-                bodyno: bodyno,
+                bodyno: bodyno.results,
                 carValues: res2
             });
+
+            if (bodyno.next === null){
+                
+            } else {
+                this.setState({
+                    counter: 2
+                });
+                this.nextPage();
+            }
         })
+    }
+
+    nextPage = () => {
+        // setTimeout(() => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    bodyno: this.state.bodyno.concat(data.results)
+                });
+                if (data.next === null){
+
+                } else {
+                    this.setState({
+                        counter: this.state.counter + 1
+                    });
+                    this.nextPage();
+                }
+            })
+            .catch((err) => {
+                console.log('err nxt: ');
+                console.log(err)
+            });
+        // }, 500);
     }
 
     showBodyNumberTags () {
@@ -263,12 +277,14 @@ export class DriverInspectionReport extends Component {
             if (!event.query.trim().length) {
 
             } else {
-                //error when i use item.car_id.includes(event.query), uncomment to try
-                //this.state.filteredSuggestions = this.state.bodyno.filter(item => item.car_id.includes(event.query));
-                this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
-                this.setState({
-                    filteredSuggestions: this.state.filteredSuggestions,
-                });
+                try {
+                    this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
+                    this.setState({
+                        filteredSuggestions: this.state.filteredSuggestions,
+                    });
+                } catch (err){
+                    //console.log("autocomplete err:", err);
+                }
             }
         }, 100);
     };

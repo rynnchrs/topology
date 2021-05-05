@@ -131,10 +131,11 @@ const App = () => {
     }
 
     //inventory permission
-    if (localStorage.getItem("viewInventory") === "true") {
-        sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
-    }
+    // if (localStorage.getItem("viewInventory") === "true") {
+    //     sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
+    // }
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
+        sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
         sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
     }
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
@@ -147,15 +148,15 @@ const App = () => {
     if (localStorage.getItem("addInspectionReport") === "true") {
         sidebarSubMenu3.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     }
-    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    //if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
         sidebarSubMenu3.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
-    }
+    //}
     
-    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    //if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
         sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file', items: sidebarSubMenu3});
-    } else {
+    //} else {
         //console.log("permission data none");
-    }
+    //}
 
     if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
         sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});

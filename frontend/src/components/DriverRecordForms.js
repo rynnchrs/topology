@@ -131,24 +131,27 @@ export default function DriverRecordForms() {
     const [rows, setRows] = useState(10);
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
+    const [counter, setCounter] = useState(1);
+    const [ids, setIds] = useState([]);
+    const [trigger, setTrigger] = useState("");
 
-    React.useEffect(function effectFunction() {
-        let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-        fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id',config)
-            .then(response => response.json())
-            .then(data => {
-                //console.log("fr reactuseeffect")
-                //console.log(data)
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            });
-    }, []);
+    // React.useEffect(function effectFunction() {
+    //     let token = localStorage.getItem("token");
+    //         const config = {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': 'Bearer ' + token,
+    //             },
+    //         };
+    //     fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id',config)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             //console.log("fr reactuseeffect")
+    //             //console.log(data)
+    //             setTotalCount(data.count);
+    //             setcarValues(data.results);
+    //         });
+    // }, []);
 
     useEffect(() => {
         try {
@@ -163,11 +166,11 @@ export default function DriverRecordForms() {
     //for pagination
     useEffect(() => {
         try {
-            console.log("test flagPages: ", flagPages);
-            console.log("firstVariable: ", first);
-
+            // console.log("test flagPages: ", flagPages);
+            // console.log("firstVariable: ", first);
             const sentPage = (first / rows) + 1;
-            console.log("sentPage: ",sentPage);
+            // console.log("sentPage: ",sentPage);
+            // console.log("bn: ",bodyNo);
 
             let token = localStorage.getItem("token");
             const config = {
@@ -176,19 +179,238 @@ export default function DriverRecordForms() {
                     'Authorization': 'Bearer ' + token,
                 },
             };
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
+
+            if((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("from pages");
-                    console.log(data);
+                    //console.log("all nullU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
-            });
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body locnull datenullU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("bodynull loc datenullU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("bodynull locnull dateU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body loc datenullU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body locnull dateU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("bodynull loc dateU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body loc dateU: ", data);
+                    setTotalCount(data.count);
+                    setcarValues(data.results);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
         } catch(err) {
             console.log("pages error")
             console.log(err)
         }
     }, [flagPages]);
+
+    //for pagination
+    const onPageChange = (event) =>  {
+        setFirst(event.first);
+        if (event.first > first) {
+            //console.log("greater add page");
+            setFlagPages(flagPages + 1);
+        } else if (event.first < first) {
+            //console.log("less than minus page");
+            setFlagPages(flagPages - 1);
+        } else {
+            //console.log("same first")
+        }          
+    }
+
+    const [timeOutId, setTimeOutId] = useState(null);
+    const bodySearch = (event) => {
+        setBodyNo(event.target.value);
+        clearTimeout(timeOutId);
+        setTimeOutId(setTimeout(() => {
+            submitSearch(event.target.value);
+        }, 1000));
+    }
+
+    const submitSearch = (bodyValue) => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        if((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("all null: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body locnull datenull: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("bodynull loc datenull: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("bodynull locnull date: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body loc datenull: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body locnull date: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("bodynull loc date: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 !== null){ //last
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body loc date: ", data);
+                setTotalCount(data.count);
+                setcarValues(data.results);
+            })
+            .catch((err) => {
+                console.log(err.response)
+            });
+        }
+    }
 
     const dialogFuncMap = {
         'displayBasic': setDisplayBasic,
@@ -258,7 +480,7 @@ export default function DriverRecordForms() {
 
     const actionBody = (rowData) => {
         return (
-            localStorage.getItem("editInspectionReport") === "true" ? <center>
+            localStorage.getItem("editInspectionReport") === "true" || (localStorage.getItem("editInspectionReport") === "false" && localStorage.getItem("addInspectionReport") === "true")? <center>
             <Button label="Edit / Show" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
             : <center>
             <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2(rowData)}/></center>
@@ -621,6 +843,150 @@ export default function DriverRecordForms() {
     }
 
     const exportData = () => {
+        setIds([]);
+        // let ii = counter + 1;
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        
+        if((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("all nullE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body locnull datenullE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("bodynull loc datenullE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("bodynull locnull dateE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body loc datenullE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body locnull dateE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("bodynull loc dateE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+            .then(response => response.json())
+            .then(data => {
+                //console.log("body loc dateE: ", data);
+                analyzeNext(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }
+        
+        // let ids = [];
+        // carValues.map((iddata, index) => {
+        //     ids.push(iddata.inspection_id);
+        // });
+        // console.log("ids:", ids)
+
+        //const body = { "inspection_id": [9,8] }; //carValues
+        // const body = { "inspection_id": ids };
+
+        // axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
+        // .then((res) => {
+        //     let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
+        //     window.open(url);
+        // })
+        // .catch((error) => {
+        //     console.log('error export: ');
+        //     console.log(error);
+        // });
+    }
+
+    const analyzeNext = (value) => {
+        value.results.map((iddata, index) => {
+            setIds(ids => [...ids, iddata.inspection_id]);
+        });
+
+        if (value.next === null){
+            setCounter(0);
+        } else {
+            setCounter(counter + 1);
+        }
+    }
+
+    useEffect(() => {
+        //console.log("tryCOUNTER: ", counter);
+        //console.log("tryids: ", ids);
+        if (counter === 0) {
+            finalize();
+        } else if (counter >= 2) {
+            exportDataNextPage();
+        }
+    }, [counter]); 
+
+    const finalize = (value) => {
+        setCounter(1);
+        setTrigger("");
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -629,24 +995,124 @@ export default function DriverRecordForms() {
             },
         };
 
-        let ids = [];
-        carValues.map((iddata, index) => {
-            ids.push(iddata.inspection_id);
-        });
-        //console.log("ids:", ids)
-
-        //const body = { "inspection_id": [9,8] }; //carValues
+        //console.log("ids: ", ids.length)
         const body = { "inspection_id": ids };
 
-        axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
-        .then((res) => {
-            let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
-            window.open(url);
-        })
-        .catch((error) => {
-            console.log('error export: ');
-            console.log(error);
-        });
+        if (ids.length <= 0){
+            //console.log("no export")
+        } else {
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
+            .then((res) => {
+                setIds([]);
+                let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
+                window.open(url);
+            })
+            .catch((error) => {
+                console.log('error export: ');
+                console.log(error);
+            });
+        }
+    }
+
+    const exportDataNextPage = () => {
+        // setTimeout(() => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            if((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("all nullEN: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body locnull datenullE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("bodynull loc datenullE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("bodynull locnull dateE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body loc datenullE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body locnull dateE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("bodynull loc dateE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
+                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
+                .then(response => response.json())
+                .then(data => {
+                    //console.log("body loc dateE: ", data);
+                    analyzeNext(data);
+                })
+                .catch((err) => {
+                    console.log(err.response)
+                });
+            }
+            
+        // }, 2000);
     }
 
     const updateNotOkay = (index, value) => {
@@ -1174,159 +1640,6 @@ export default function DriverRecordForms() {
             default:
                 break;
         }
-    }
-
-    const [timeOutId, setTimeOutId] = useState(null);
-    const bodySearch = (event) => {
-        setBodyNo(event.target.value);
-        clearTimeout(timeOutId);
-        setTimeOutId(setTimeout(() => {
-            submitSearch(event.target.value);
-        }, 1000));
-    }
-
-    const submitSearch = (bodyValue) => {
-        // try {
-        //     console.log('val: ', bodyValue);
-        //     console.log('loc: ', selectedLocation);
-        //     console.log('locC: ', selectedLocation.code);
-        //     console.log('dateF: ', format(date2, 'yyyy-MM-dd'));
-        // } catch(err){
-        //     //console.log("err: ", err)
-        // }
-
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
-        //report/inspection-list/?ordering=-inspection_id
-        if((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("all null: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("body locnull datenull: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("bodynull loc datenull: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("bodynull locnull date: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("body loc datenull: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("body locnull date: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("bodynull loc date: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 !== null){ //last
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                console.log("body loc date: ", data.results);
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                console.log('err search: ');
-                console.log(err.response)
-            });
-        }
-    }
-
-    // const onChangeHandler = (e) => {
-    //     console.log(e.target.value);
-    //     setSelectedCar(e.target.value);
-    // }
-    
-    //for paginator
-    const onPageChange = (event) =>  {
-        setFirst(event.first);
-        if (event.first > first) {
-            console.log("greater add page");
-            setFlagPages(flagPages + 1);
-        } else if (event.first < first) {
-            console.log("less than minus page");
-            setFlagPages(flagPages - 1);
-        } else {
-            console.log("same first")
-        } 
-        // now look at useEffect at top          
     }
 
     return(

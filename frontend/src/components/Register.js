@@ -4,7 +4,6 @@ import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
 import { Checkbox } from 'primereact/checkbox';
-import { Fieldset } from 'primereact/fieldset';
 import { Panel } from 'primereact/panel';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
@@ -24,30 +23,30 @@ export const Register = () => {
     const [phone, setPhone] = useState('');
     const [birthday, setBirthday] = useState('');
     const [passwordShown, setPasswordShown] = useState(true);
-    const [check1, isCheck1] = useState(false);
-    const [check2, isCheck2] = useState(false);
-    const [check3, isCheck3] = useState(false);
-    const [check4, isCheck4] = useState(false);
-    const [check5, isCheck5] = useState(false);
-    const [check6, isCheck6] = useState(false);
-    const [check7, isCheck7] = useState(false);
-    const [check8, isCheck8] = useState(false);
-    const [check9, isCheck9] = useState(false);
-    const [check10, isCheck10] = useState(false);
-    const [check11, isCheck11] = useState(false);
-    const [check12, isCheck12] = useState(false);
-    const [check13, isCheck13] = useState(false);
-    const [check14, isCheck14] = useState(false);
-    const [check15, isCheck15] = useState(false);
-    const [check16, isCheck16] = useState(false);
-    const [check17, isCheck17] = useState(false);
-    const [check18, isCheck18] = useState(false);
-    const [check19, isCheck19] = useState(false);
-    const [check20, isCheck20] = useState(false);
-    const [check21, isCheck21] = useState(false);
-    const [check22, isCheck22] = useState(false);
-    const [check23, isCheck23] = useState(false);
-    const [check24, isCheck24] = useState(false);
+    const [viewUsers, setViewUsers] = useState(false);
+    const [addUsers, setAddUsers] = useState(false);
+    const [editUsers, setEditUsers] = useState(false);
+    const [delUsers, setDelUsers] = useState(false);
+    const [viewInventory, setViewInventory] = useState(false);
+    const [addInventory, setAddInventory] = useState(false);
+    const [editInventory, setEditInventory] = useState(false);
+    const [delInventory, setDelInventory] = useState(false);
+    const [viewInspectionReport, setViewInspectionReport] = useState(false);
+    const [addInspectionReport, setAddInspectionReport] = useState(false);
+    const [editInspectionReport, setEditInspectionReport] = useState(false);
+    const [delInspectionReport, setDelInspectionReport] = useState(false);
+    const [viewMaintenanceReport, setViewMaintenanceReport] = useState(false);
+    const [addMaintenanceReport, setAddMaintenanceReport] = useState(false);
+    const [editMaintenanceReport, setEditMaintenanceReport] = useState(false);
+    const [delMaintenanceReport, setDelMaintenanceReport] = useState(false);
+    const [viewRepairReport, setViewRepairReport] = useState(false);
+    const [addRepairReport, setAddRepairReport] = useState(false);
+    const [editRepairReport, setEditRepairReport] = useState(false);
+    const [delRepairReport, setDelRepairReport] = useState(false);
+    const [viewTask, setViewTask] = useState(false);
+    const [addTask, setAddTask] = useState(false);
+    const [editTask, setEditTask] = useState(false);
+    const [delTask, setDelTask] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
 
@@ -112,6 +111,129 @@ export const Register = () => {
         }
     }
 
+    const setPermissionLevel = (value) => {
+        if (value === "manager") {
+            //console.log("manager");
+            setUserLevel("manager");
+            setViewUsers(true);
+            setAddUsers(true);
+            setEditUsers(true);
+            setDelUsers(true);
+            setViewInventory(true);
+            setAddInventory(true);
+            setEditInventory(true);
+            setDelInventory(true);
+            setViewInspectionReport(true);
+            setAddInspectionReport(true);
+            setEditInspectionReport(true);
+            setDelInspectionReport(true);
+            setViewMaintenanceReport(true);
+            setAddMaintenanceReport(true);
+            setEditMaintenanceReport(true);
+            setDelMaintenanceReport(true);
+            setViewRepairReport(true);
+            setAddRepairReport(true);
+            setEditRepairReport(true);
+            setDelRepairReport(true);
+            setViewTask(true);
+            setAddTask(true);
+            setEditTask(true);
+            setDelTask(true);
+        } else if (value === "fieldman") {
+            //console.log("fieldman");
+            setUserLevel("fieldman");
+            setViewUsers(false);
+            setAddUsers(false);
+            setEditUsers(false);
+            setDelUsers(false);
+
+            setViewInventory(true);
+            setAddInventory(true);
+            setEditInventory(true);
+            setDelInventory(true);
+
+            setViewInspectionReport(true);
+            setAddInspectionReport(true);
+            setEditInspectionReport(true);
+            setDelInspectionReport(true);
+
+            setViewMaintenanceReport(true);
+            setAddMaintenanceReport(true);
+            setEditMaintenanceReport(true);
+            setDelMaintenanceReport(true);
+            setViewRepairReport(true);
+            setAddRepairReport(true);
+            setEditRepairReport(true);
+            setDelRepairReport(true);
+            setViewTask(true);
+            setAddTask(true);
+            setEditTask(true);
+            setDelTask(true);
+            
+        } else if (value === "driver") {
+            //console.log("driver");
+            setUserLevel("driver");
+            setViewUsers(false);
+            setAddUsers(false);
+            setEditUsers(false);
+            setDelUsers(false);
+            
+            setViewInventory(false);
+            setAddInventory(false);
+            setEditInventory(false);
+            setDelInventory(false);
+
+            setViewInspectionReport(true);
+            setAddInspectionReport(true);
+            setEditInspectionReport(false);
+            setDelInspectionReport(true);
+
+            setViewMaintenanceReport(true);
+            setAddMaintenanceReport(true);
+            setEditMaintenanceReport(true);
+            setDelMaintenanceReport(true);
+            setViewRepairReport(true);
+            setAddRepairReport(true);
+            setEditRepairReport(true);
+            setDelRepairReport(true);
+            setViewTask(true);
+            setAddTask(true);
+            setEditTask(true);
+            setDelTask(true);
+           
+        } else if (value === "viewer") {
+            //console.log("viewer");
+            setUserLevel("viewer");
+            setViewUsers(false);
+            setAddUsers(false);
+            setEditUsers(false);
+            setDelUsers(false);
+            
+            setViewInventory(false);
+            setAddInventory(false);
+            setEditInventory(false);
+            setDelInventory(false);
+
+            setViewInspectionReport(true);
+            setAddInspectionReport(false);
+            setEditInspectionReport(false);
+            setDelInspectionReport(true);
+
+            setViewMaintenanceReport(true);
+            setAddMaintenanceReport(true);
+            setEditMaintenanceReport(true);
+            setDelMaintenanceReport(true);
+            setViewRepairReport(true);
+            setAddRepairReport(true);
+            setEditRepairReport(true);
+            setDelRepairReport(true);
+            setViewTask(true);
+            setAddTask(true);
+            setEditTask(true);
+            setDelTask(true);
+        }
+    }
+
     const submitPermission = event => {
         let token = localStorage.getItem("token");
         
@@ -125,30 +247,30 @@ export const Register = () => {
         // Request Body
         const body = JSON.stringify({
             "user": username,
-            "can_view_users": check1,
-            "can_add_users": check2,
-            "can_edit_users": check3,
-            "can_delete_users": check4,
-            "can_view_inventory": check5,
-            "can_add_inventory": check6,
-            "can_edit_inventory": check7,
-            "can_delete_inventory": check8,
-            "can_view_inspection_reports": check9,
-            "can_add_inspection_reports": check10,
-            "can_edit_inspection_reports": check11,
-            "can_delete_inspection_reports": check12,
-            "can_view_maintenance_reports": check13,
-            "can_add_maintenance_reports": check14,
-            "can_edit_maintenance_reports": check15,
-            "can_delete_maintenance_reports": check16,
-            "can_view_repair_reports": check17,
-            "can_add_repair_reports": check18,
-            "can_edit_repair_reports": check19,
-            "can_delete_repair_reports": check20,
-            "can_view_task": check21,
-            "can_add_task": check22,
-            "can_edit_task": check23,
-            "can_delete_task": check24
+            "can_view_users": viewUsers,
+            "can_add_users": addUsers,
+            "can_edit_users": editUsers,
+            "can_delete_users": delUsers,
+            "can_view_inventory": viewInventory,
+            "can_add_inventory": addInventory,
+            "can_edit_inventory": editInventory,
+            "can_delete_inventory": delInventory,
+            "can_view_inspection_reports": viewInspectionReport,
+            "can_add_inspection_reports": addInspectionReport,
+            "can_edit_inspection_reports": editInspectionReport,
+            "can_delete_inspection_reports": delInspectionReport,
+            "can_view_maintenance_reports": viewMaintenanceReport,
+            "can_add_maintenance_reports": addMaintenanceReport,
+            "can_edit_maintenance_reports": editMaintenanceReport,
+            "can_delete_maintenance_reports": delMaintenanceReport,
+            "can_view_repair_reports": viewRepairReport,
+            "can_add_repair_reports": addRepairReport,
+            "can_edit_repair_reports": editRepairReport,
+            "can_delete_repair_reports": delRepairReport,
+            "can_view_task": viewTask,
+            "can_add_task": addTask,
+            "can_edit_task": editTask,
+            "can_delete_task": delTask
         });
 
         axios
@@ -250,158 +372,23 @@ export const Register = () => {
                         </div>
                     </div>
 
-                    {/* <div className="p-grid p-fluid" style={{ paddingLeft: '2%', paddingRight: '2%', marginTop: '2%' }}>
-                        <Panel header="PERMISSION" className="p-col-12 p-md-12">
-                            <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="User Data"> */}
-                                        {/*<div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check1} onChange={event => isCheck1(check1 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '5%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>*/}
-                                        {/* <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check2} onChange={event => isCheck2(check2 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check3} onChange={event => isCheck3(check3 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check4} onChange={event => isCheck4(check4 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                        </div>
-                                        <div className="p-col" style={{ height:'45px'}}></div>
-                                    </Fieldset>
-                                </div>
-
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="Inventory">
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check5} onChange={event => isCheck5(check5 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check6} onChange={event => isCheck6(check6 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check7} onChange={event => isCheck7(check7 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check8} onChange={event => isCheck8(check8 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                        </div>
-                                    </Fieldset>
-                                </div>
-
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="Inspection Report">
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check9} onChange={event => isCheck9(check9 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check10} onChange={event => isCheck10(check10 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check11} onChange={event => isCheck11(check11 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check12} onChange={event => isCheck12(check12 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                        </div>
-                                    </Fieldset>
-                                </div>
-                            </div>
-
-                            <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="Maintenance Report">
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check13} onChange={event => isCheck13(check13 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check14} onChange={event => isCheck14(check14 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check15} onChange={event => isCheck15(check15 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check16} onChange={event => isCheck16(check16 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                        </div>
-                                    </Fieldset>
-                                </div>
-
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="Repair Reports">
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check17} onChange={event => isCheck17(check17 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check18} onChange={event => isCheck18(check18 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check19} onChange={event => isCheck19(check19 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check20} onChange={event => isCheck20(check20 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                        </div>
-                                    </Fieldset>
-                                </div>
-
-                                <div className="p-col-12 p-md-4" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-                                    <Fieldset legend="Task">
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check21} onChange={event => isCheck21(check21 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEW</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check22} onChange={event => isCheck22(check22 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> ADD </label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check23} onChange={event => isCheck23(check23 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> EDIT</label>
-                                        </div>
-                                        <div className="p-col">
-                                            <Checkbox classname="p-checkbox-lg" checked={check24} onChange={event => isCheck24(check24 ? false : true)}> </Checkbox>
-                                            <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DELETE</label>
-                                        </div>
-                                    </Fieldset>
-                                </div>
-                            </div>
-                        </Panel>
-                    </div> */}
-
                     <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>
                         <Panel header="PERMISSION" className="p-col-12 p-md-12"><center>
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center', margin: 'auto'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "manager"} onChange={event => setUserLevel("manager")}> </Checkbox>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "manager"} onChange={event => setPermissionLevel("manager")}> </Checkbox>
                                     <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> MANAGER</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "fieldman"} onChange={event => setUserLevel("fieldman")}> </Checkbox>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "fieldman"} onChange={event => setPermissionLevel("fieldman")}> </Checkbox>
                                     <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> FIELDMAN</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setUserLevel("driver")}> </Checkbox>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setPermissionLevel("driver")}> </Checkbox>
                                     <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DRIVER</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "viewer"} onChange={event => setUserLevel("viewer")}> </Checkbox>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "viewer"} onChange={event => setPermissionLevel("viewer")}> </Checkbox>
                                     <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEWER</label>
                                 </div>
                             </div></center>
