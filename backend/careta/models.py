@@ -46,7 +46,7 @@ class Permission(models.Model):         # permission Model
     can_view_inspection_reports = models.BooleanField(default=False)
     can_add_inspection_reports = models.BooleanField(default=False)
     can_edit_inspection_reports = models.BooleanField(default=False)
-    can_delete_inspection_reports = models.BooleanField(default=False)
+    can_show_all_inspection_reports = models.BooleanField(default=False)
 
     can_view_maintenance_reports = models.BooleanField(default=False)
     can_add_maintenance_reports = models.BooleanField(default=False)

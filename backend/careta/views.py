@@ -53,7 +53,7 @@ class BlacklistTokenView(APIView):      # for Logout
 class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, update, delete
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all().order_by('id')
-    serializers_class = UserSerializer
+    serializer_class = UserSerializer
     def list(self, request):        # User List
         user = self.request.user    # get users
         if user_permission(user, 'can_view_users'):    # permission
