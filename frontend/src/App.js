@@ -148,15 +148,14 @@ const App = () => {
     if (localStorage.getItem("addInspectionReport") === "true") {
         sidebarSubMenu3.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     }
-    //if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    if (localStorage.getItem("viewInspectionReport") === "true") {
         sidebarSubMenu3.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
-    //}
-    
-    //if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    }
+    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("viewAllInspectionReport") === "true") {
         sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file', items: sidebarSubMenu3});
-    //} else {
-        //console.log("permission data none");
-    //}
+    } else {
+        console.log("permission data none");
+    }
 
     if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
         sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});

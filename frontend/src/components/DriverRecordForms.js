@@ -480,7 +480,7 @@ export default function DriverRecordForms() {
 
     const actionBody = (rowData) => {
         return (
-            localStorage.getItem("editInspectionReport") === "true" || (localStorage.getItem("editInspectionReport") === "false" && localStorage.getItem("addInspectionReport") === "true")? <center>
+            localStorage.getItem("editInspectionReport") === "true" ? <center>
             <Button label="Edit / Show" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
             : <center>
             <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2(rowData)}/></center>

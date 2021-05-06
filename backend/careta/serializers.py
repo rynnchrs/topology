@@ -112,7 +112,7 @@ class PermissionSerializer(serializers.ModelSerializer):    # permission seriali
         model = Permission
         fields = ['id','user','slug','can_view_users','can_add_users','can_edit_users','can_delete_users',
                   'can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory',
-                  'can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports',
+                  'can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_show_all_inspection_reports',
                   'can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports',
                   'can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports',
                   'can_view_task','can_add_task','can_edit_task','can_delete_task']
@@ -142,7 +142,7 @@ class PermissionInventorySerializer(serializers.ModelSerializer):    # inventory
 class PermissionInspectionReportSerializer(serializers.ModelSerializer):    # inspection report permission serializer
     class Meta:
         model = Permission
-        fields = ['id','slug','can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports']
+        fields = ['id','slug','can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_show_all_inspection_reports']
         extra_kwargs = {'slug': {'read_only': True},}
 
 

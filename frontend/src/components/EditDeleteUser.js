@@ -46,7 +46,7 @@ export const EditDeleteUser = () => {
     const [viewInspectionReport, setViewInspectionReport] = useState(false);
     const [addInspectionReport, setAddInspectionReport] = useState(false);
     const [editInspectionReport, setEditInspectionReport] = useState(false);
-    const [delInspectionReport, setDelInspectionReport] = useState(false);
+    const [viewAllInspectionReport, setViewAllInspectionReport] = useState(false);
     const [viewMaintenanceReport, setViewMaintenanceReport] = useState(false);
     const [addMaintenanceReport, setAddMaintenanceReport] = useState(false);
     const [editMaintenanceReport, setEditMaintenanceReport] = useState(false);
@@ -263,43 +263,39 @@ export const EditDeleteUser = () => {
 
     const getUserData = () => {
         if (selectedUser != null) {
-            if (selectedUser.username === "admin") {
+            let token = localStorage.getItem("token");
+            let username = selectedUser.username;
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
 
-            } else {
-                let token = localStorage.getItem("token");
-                let username = selectedUser.username;
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token,
-                    },
-                };
-
-                axios
-                    .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
-                    .then((res) => {
-                        //console.log(res.data);
-                        setFirst_Name(res.data.first_name);
-                        setLast_Name(res.data.last_name);
-                        setEmail(res.data.email);
-                        setUsername(res.data.username);
-                        try{
-                            setGender(genderOptions.find(x => x.val === res.data.user_info.gender));
-                        } catch(err){
-                            console.log("err gender: ", err)
-                        }
-                        setCompany(res.data.user_info.company);
-                        setPosition(res.data.user_info.position);
-                        setAddress(res.data.user_info.address);
-                        setPhone(res.data.user_info.phone);
-                        setBirthday(res.data.user_info.birthday);
-                        getPermission();
-                    })
-                    .catch((err) => {
-                        console.log("userdata err:");
-                        console.log(err.response);
-                    });
-            }
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
+                .then((res) => {
+                    //console.log(res.data);
+                    setFirst_Name(res.data.first_name);
+                    setLast_Name(res.data.last_name);
+                    setEmail(res.data.email);
+                    setUsername(res.data.username);
+                    try{
+                        setGender(genderOptions.find(x => x.val === res.data.user_info.gender));
+                    } catch(err){
+                        console.log("err gender: ", err)
+                    }
+                    setCompany(res.data.user_info.company);
+                    setPosition(res.data.user_info.position);
+                    setAddress(res.data.user_info.address);
+                    setPhone(res.data.user_info.phone);
+                    setBirthday(res.data.user_info.birthday);
+                    getPermission();
+                })
+                .catch((err) => {
+                    console.log("userdata err:");
+                    console.log(err.response);
+                });
         } else {
             //console.log("no selected");
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
@@ -330,7 +326,7 @@ export const EditDeleteUser = () => {
                 setViewInspectionReport(res.data.can_view_inspection_reports);
                 setAddInspectionReport(res.data.can_add_inspection_reports);
                 setEditInspectionReport(res.data.can_edit_inspection_reports);
-                setDelInspectionReport(res.data.can_delete_inspection_reports);
+                setViewAllInspectionReport(res.data.can_show_all_inspection_reports);
                 setViewMaintenanceReport(res.data.can_view_maintenance_reports);
                 setAddMaintenanceReport(res.data.can_add_maintenance_reports);
                 setEditMaintenanceReport(res.data.can_edit_maintenance_reports);
@@ -345,22 +341,22 @@ export const EditDeleteUser = () => {
                 setDelTask(res.data.can_delete_task);
                 if (res.data.can_view_users === true && res.data.can_view_inventory === true  && res.data.can_view_inspection_reports === true 
                     && res.data.can_add_inspection_reports === true
-                    && res.data.can_edit_inspection_reports === true && res.data.can_delete_inspection_reports === true){
+                    && res.data.can_edit_inspection_reports === true && res.data.can_show_all_inspection_reports === true){
                         setPermissionLevel("manager");
                     }
                 else if (res.data.can_view_users === false && res.data.can_view_inventory === true && res.data.can_view_inspection_reports === true 
                     && res.data.can_add_inspection_reports === true
-                    && res.data.can_edit_inspection_reports === true && res.data.can_delete_inspection_reports === true){
-                        setPermissionLevel("fieldman");
+                    && res.data.can_edit_inspection_reports === true && res.data.can_show_all_inspection_reports === true){
+                        setPermissionLevel("technician");
                     }
                 else if (res.data.can_view_users === false && res.data.can_view_inventory === false && res.data.can_view_inspection_reports === true 
                     && res.data.can_add_inspection_reports === true
-                    && res.data.can_edit_inspection_reports === false && res.data.can_delete_inspection_reports === true){
+                    && res.data.can_edit_inspection_reports === false && res.data.can_show_all_inspection_reports === false){
                         setPermissionLevel("driver");
                     }
                 else if (res.data.can_view_users === false && res.data.can_view_inventory === false && res.data.can_view_inspection_reports === true 
                     && res.data.can_add_inspection_reports === false
-                    && res.data.can_edit_inspection_reports === false && res.data.can_delete_inspection_reports === true){
+                    && res.data.can_edit_inspection_reports === false && res.data.can_show_all_inspection_reports === true){
                         setPermissionLevel("viewer");
                     }
                 onClick('displayBasic')
@@ -386,7 +382,7 @@ export const EditDeleteUser = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(true);
             setEditInspectionReport(true);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(true);
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
             setEditMaintenanceReport(true);
@@ -399,9 +395,9 @@ export const EditDeleteUser = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
-        } else if (value === "fieldman") {
-            //console.log("fieldman");
-            setUserLevel("fieldman");
+        } else if (value === "technician") {
+            //console.log("technician");
+            setUserLevel("technician");
             setViewUsers(false);
             setAddUsers(false);
             setEditUsers(false);
@@ -415,7 +411,7 @@ export const EditDeleteUser = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(true);
             setEditInspectionReport(true);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(true);
 
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
@@ -446,7 +442,7 @@ export const EditDeleteUser = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(true);
             setEditInspectionReport(false);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(false);
 
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
@@ -477,7 +473,7 @@ export const EditDeleteUser = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(false);
             setEditInspectionReport(false);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(true);
 
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
@@ -524,7 +520,7 @@ export const EditDeleteUser = () => {
                     res.data.can_view_inspection_reports ? localStorage.setItem('viewInspectionReport', "true") : localStorage.setItem('viewInspectionReport', "false")
                     res.data.can_add_inspection_reports ? localStorage.setItem('addInspectionReport', "true") : localStorage.setItem('addInspectionReport', "false")
                     res.data.can_edit_inspection_reports ? localStorage.setItem('editInspectionReport', "true") : localStorage.setItem('editInspectionReport', "false")
-                    res.data.can_delete_inspection_reports ? localStorage.setItem('deleteInspectionReport', "true") : localStorage.setItem('deleteInspectionReport', "false")
+                    res.data.can_show_all_inspection_reports ? localStorage.setItem('viewAllInspectionReport', "true") : localStorage.setItem('viewAllInspectionReport', "false")
                     
                     res.data.can_view_maintenance_reports ? localStorage.setItem('viewMaintenanceReport', "true") : localStorage.setItem('viewMaintenanceReport', "false")
                     res.data.can_add_maintenance_reports ? localStorage.setItem('addMaintenanceReport', "true") : localStorage.setItem('addMaintenanceReport', "false")
@@ -628,7 +624,7 @@ export const EditDeleteUser = () => {
             "can_view_inspection_reports": viewInspectionReport,
             "can_add_inspection_reports": addInspectionReport,
             "can_edit_inspection_reports": editInspectionReport,
-            "can_delete_inspection_reports": delInspectionReport
+            "can_show_all_inspection_reports": viewAllInspectionReport
         });
         
         axios
@@ -759,12 +755,8 @@ export const EditDeleteUser = () => {
     const confirmDelete = (name, values) => {
         setSelectedUser(values);
         if (values != null) {
-            if (values.full_name === "Admin Test") {
-
-            } else {
-                setWord(values.full_name);
-                dialogFuncMap[`${name}`](true);
-            }
+            setWord(values.full_name);
+            dialogFuncMap[`${name}`](true);
         } else {
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to delete.', life: 5000 });
         }
@@ -797,32 +789,6 @@ export const EditDeleteUser = () => {
                 toast.current.show({ severity: 'error', summary: 'Delete User Error', detail: 'Something went wrong.', life: 5000 });
             });
     }
-
-    // const deletePermission = event => {
-    //     let token = localStorage.getItem("token");
-    //     let username = selectedUser.username;
-
-    //     const config = {
-    //         headers: {
-    //             'Authorization': 'Bearer ' + token,
-    //             'Content-Type': 'application/json',
-    //         },
-    //     };
-
-    //     axios
-    //         .delete('http://127.0.0.1:8000/careta/permission/' + username + '/', config)
-    //         .then((res) => {
-    //             console.log('succ delete permission: ');
-    //             console.log(res.data)
-    //             toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
-    //             getUsers();
-    //         })
-    //         .catch((err) => {
-    //             console.log('err delete permission: ');
-    //             console.log(err.response)
-    //             toast.current.show({ severity: 'error', summary: 'Delete Permission Error', detail: 'Something went wrong.', life: 5000 });
-    //         });
-    // }
 
     const renderHeader = () => {
         return (
@@ -985,8 +951,8 @@ export const EditDeleteUser = () => {
                                     <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> MANAGER</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "fieldman"} onChange={event => setPermissionLevel("fieldman")}> </Checkbox>
-                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> FIELDMAN</label>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "technician"} onChange={event => setPermissionLevel("technician")}> </Checkbox>
+                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> TECHNICIAN</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
                                     <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setPermissionLevel("driver")}> </Checkbox>

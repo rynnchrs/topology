@@ -34,7 +34,7 @@ export const Register = () => {
     const [viewInspectionReport, setViewInspectionReport] = useState(false);
     const [addInspectionReport, setAddInspectionReport] = useState(false);
     const [editInspectionReport, setEditInspectionReport] = useState(false);
-    const [delInspectionReport, setDelInspectionReport] = useState(false);
+    const [viewAllInspectionReport, setViewAllInspectionReport] = useState(false);
     const [viewMaintenanceReport, setViewMaintenanceReport] = useState(false);
     const [addMaintenanceReport, setAddMaintenanceReport] = useState(false);
     const [editMaintenanceReport, setEditMaintenanceReport] = useState(false);
@@ -126,7 +126,7 @@ export const Register = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(true);
             setEditInspectionReport(true);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(true);
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
             setEditMaintenanceReport(true);
@@ -139,9 +139,9 @@ export const Register = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
-        } else if (value === "fieldman") {
-            //console.log("fieldman");
-            setUserLevel("fieldman");
+        } else if (value === "technician") {
+            //console.log("technician");
+            setUserLevel("technician");
             setViewUsers(false);
             setAddUsers(false);
             setEditUsers(false);
@@ -155,7 +155,7 @@ export const Register = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(true);
             setEditInspectionReport(true);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(true);
 
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
@@ -186,7 +186,7 @@ export const Register = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(true);
             setEditInspectionReport(false);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(false);
 
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
@@ -217,7 +217,7 @@ export const Register = () => {
             setViewInspectionReport(true);
             setAddInspectionReport(false);
             setEditInspectionReport(false);
-            setDelInspectionReport(true);
+            setViewAllInspectionReport(true);
 
             setViewMaintenanceReport(true);
             setAddMaintenanceReport(true);
@@ -258,7 +258,7 @@ export const Register = () => {
             "can_view_inspection_reports": viewInspectionReport,
             "can_add_inspection_reports": addInspectionReport,
             "can_edit_inspection_reports": editInspectionReport,
-            "can_delete_inspection_reports": delInspectionReport,
+            "can_show_all_inspection_reports": viewAllInspectionReport,
             "can_view_maintenance_reports": viewMaintenanceReport,
             "can_add_maintenance_reports": addMaintenanceReport,
             "can_edit_maintenance_reports": editMaintenanceReport,
@@ -380,8 +380,8 @@ export const Register = () => {
                                     <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> MANAGER</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "fieldman"} onChange={event => setPermissionLevel("fieldman")}> </Checkbox>
-                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> FIELDMAN</label>
+                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "technician"} onChange={event => setPermissionLevel("technician")}> </Checkbox>
+                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> TECHNICIAN</label>
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
                                     <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setPermissionLevel("driver")}> </Checkbox>
