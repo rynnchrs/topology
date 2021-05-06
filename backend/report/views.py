@@ -61,14 +61,18 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
         user = self.request.user
         queryset =  Inspection.objects.all()
         inspection = get_object_or_404(queryset, pk=pk)
-        if user_permission(user, 'can_view_inspection_reports'):
-            return Response(reversion(inspection), status=status.HTTP_200_OK)
-        else:
+        if not user_permission(user, 'can_edit_inspection_reports'):
             if str(inspection.driver) == user.username:       # if current user is equal to pk
+                return Response(reversion(inspection), status=status.HTTP_200_OK)
+            elif user_permission(user, 'can_show_all_inspection_reports'):
                 return Response(reversion(inspection), status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
+        elif user_permission(user, 'can_view_inspection_reports'):
+            return Response(reversion(inspection), status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            
     def update(self, request, pk=None): # update inspection
         user = self.request.user
         if user_permission(user, 'can_edit_inspection_reports'):
@@ -125,7 +129,7 @@ class InspectionListView(generics.ListAPIView): #list of inspection with filteri
 
     def get_queryset(self):
         user = self.request.user
-        if user_permission(user, 'can_edit_inspection_reports'):
+        if user_permission(user, 'can_show_all_inspection_reports'):
             queryset = Inspection.objects.all().order_by('inspection_id')
         else:
             queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')
@@ -141,7 +145,7 @@ class CanViewListView(generics.ListAPIView): #list of inspection with filtering
 
     def get_queryset(self):
         user = self.request.user
-        if user_permission(user, 'can_view_inspection_reports'):
+        if user_permission(user, 'can_show_all_inspection_reports'):
             queryset = Inspection.objects.all().order_by('inspection_id')
         else:
             queryset = Inspection.objects.filter(driver=user.id).order_by('inspection_id')

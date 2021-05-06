@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('position', models.CharField(blank=True, max_length=20, null=True)),
                 ('gender', models.CharField(choices=[('M', 'Male'), ('F', 'Female')], max_length=1, null=True)),
                 ('birthday', models.DateField(null=True)),
-                ('phone', phone_field.models.PhoneField(blank=True, help_text='Contact phone number', max_length=31, unique=True)),
+                ('phone', phone_field.models.PhoneField(blank=True, help_text='Contact phone number', max_length=31)),
                 ('address', models.CharField(blank=True, max_length=100, null=True)),
                 ('date_created', models.DateField(auto_now_add=True)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='user_info', to=settings.AUTH_USER_MODEL)),
