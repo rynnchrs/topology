@@ -22,14 +22,15 @@ class Task(models.Model):
     job_order = models.OneToOneField(JobOrder, related_name='task', on_delete=models.CASCADE)
     desc = models.TextField(blank=True, null=True)
     remarks =  models.TextField(blank=True, null=True)
-    startdate = models.DateTimeField(default=datetime.date.today)
-    enddate = models.DateTimeField(default=datetime.date.today)
-    startdate_actual = models.DateTimeField(default=datetime.date.today)
-    enddate_actual = models.DateTimeField(default=datetime.date.today)
-    actual_days = models.DateTimeField(default=datetime.date.today)
+    start_date = models.DateField(default=datetime.date.today)
+    end_date = models.DateField(default=datetime.date.today)
+    start_date_actual = models.DateField(default=datetime.date.today)
+    end_date_actual = models.DateField(default=datetime.date.today)
+    actual_days = models.IntegerField(default=0)
     task_status_fm = models.BooleanField(default=False)
     task_status_mn = models.BooleanField(default=False)
-
+    date_updated = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now_add=True)
     def __str__(self):
         return str(self.task_id)
 
