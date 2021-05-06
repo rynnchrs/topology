@@ -103,6 +103,8 @@ export const Register = () => {
                         toast.current.show({ severity: 'error', summary: 'Email', detail: `${err.response.data.email.join()}`, life: 5000 });
                     } else if (err.response.data.password) {
                         toast.current.show({ severity: 'error', summary: 'Password', detail: `${err.response.data.password.join()}`, life: 5000 });
+                    } else if (err.response.data.phone) {
+                        toast.current.show({ severity: 'error', summary: 'Phone', detail: `${err.response.data.phone.join()}`, life: 5000 });
                     } else if (err.response.data.user_info.birthday) {
                         //toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
                         toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 5000 });
