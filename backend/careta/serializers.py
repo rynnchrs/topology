@@ -38,7 +38,8 @@ class UserInfoSerializer(serializers.ModelSerializer):  # user info serializer
     class Meta:
         model = UserInfo
         fields = ['id','company','position','gender','birthday','phone','address','full_name']
-        
+    
+
 class UserSerializer(serializers.ModelSerializer):  # user serializer
     user_info = UserInfoSerializer()
 
@@ -54,6 +55,17 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
     def validate_password(self, data):  # validate password
         validators.validate_password(password=data, user=User)
         return data
+
+    def validate(self, attrs):
+        validated_attrs = super().validate(attrs)
+        errors = {}
+        if User.objects.filter(email=validated_attrs['email']).exists():
+            errors['email'] = 'user with this email already exists.'
+        if UserInfo.objects.filter(phone=validated_attrs['user_info']['phone']).exists():
+            errors['phone'] = 'user with this phone already exists.'
+        if errors:
+            raise serializers.ValidationError(errors)
+        return validated_attrs
 
     def create(self, validated_data):       # Creating User
         user_data = validated_data.pop('user_info')
@@ -76,10 +88,22 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializ
             'password': {'write_only': True}
         }
         lookup_field = 'username'
-        
+
     def validate_password(self, data):      # validate password
         validators.validate_password(password=data, user=User)
         return data
+
+    def validate(self, attrs):
+        validated_attrs = super().validate(attrs)
+        errors = {}
+        if User.objects.filter(email=validated_attrs['email']).exclude(id=self.instance.id).exists():
+            errors['email'] = 'user with this email already exists.'
+        if UserInfo.objects.filter(phone=validated_attrs['user_info']['phone']).exclude(id=self.instance.id).exists():
+            errors['phone'] = 'user with this phone already exists.'
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return validated_attrs
 
     def update(self, instance, validated_data):     # Updating User Info
         user_data = validated_data.pop("user_info")
@@ -112,7 +136,7 @@ class PermissionSerializer(serializers.ModelSerializer):    # permission seriali
         model = Permission
         fields = ['id','user','slug','can_view_users','can_add_users','can_edit_users','can_delete_users',
                   'can_view_inventory','can_add_inventory','can_edit_inventory','can_delete_inventory',
-                  'can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports',
+                  'can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_show_all_inspection_reports',
                   'can_view_maintenance_reports','can_add_maintenance_reports','can_edit_maintenance_reports','can_delete_maintenance_reports',
                   'can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports',
                   'can_view_task','can_add_task','can_edit_task','can_delete_task']
@@ -142,7 +166,7 @@ class PermissionInventorySerializer(serializers.ModelSerializer):    # inventory
 class PermissionInspectionReportSerializer(serializers.ModelSerializer):    # inspection report permission serializer
     class Meta:
         model = Permission
-        fields = ['id','slug','can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_delete_inspection_reports']
+        fields = ['id','slug','can_view_inspection_reports','can_add_inspection_reports','can_edit_inspection_reports','can_show_all_inspection_reports']
         extra_kwargs = {'slug': {'read_only': True},}
 
 
