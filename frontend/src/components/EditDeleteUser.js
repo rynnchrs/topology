@@ -467,7 +467,7 @@ export const EditDeleteUser = () => {
             setEditUsers(false);
             setDelUsers(false);
             
-            setViewInventory(false);
+            setViewInventory(true);
             setAddInventory(false);
             setEditInventory(false);
             setDelInventory(false);

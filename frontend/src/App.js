@@ -116,7 +116,9 @@ const App = () => {
     const sidebarSubMenu2 = [];
     const sidebarSubMenu3 = [];
     
-    sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
+    if (localStorage.getItem("viewInventory") === "true") {
+        sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
+    }
     //users permission
     if (localStorage.getItem("addUsers") === "true") {
         sidebarSubMenu1.push({ label: 'Register User', icon: 'pi pi-user-plus', to: '/register'});
@@ -157,11 +159,11 @@ const App = () => {
         console.log("permission data none");
     }
 
-    if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
-        sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
-    } else {
-        //console.log("permission data none");
-    }
+    // if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
+    //     sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
+    // } else {
+    //     //console.log("permission data none");
+    // }
 
     //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
     const onInputStyleChange = (inputStyle) => {

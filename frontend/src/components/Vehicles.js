@@ -324,7 +324,11 @@ export class Vehicles extends Component {
         axios
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta/", data, config)
             .then(res => this.setState({ todoList: res.data },this.addContract))
-            .catch(this.showErrorSave);
+            .catch((err) => {
+                console.log(err.response)
+                this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                    
+            });
     }
 
     addContract = () => {
@@ -514,7 +518,17 @@ export class Vehicles extends Component {
             //.put("http://localhost:8000/api/careta/" + this.state.newvehicleData.slug+"/",data)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.newvehicleData.body_no + "/", data, config)
             .then(res => this.setState({ todoList: res.data },this.editContract))
-            .catch(this.showErrorSave);
+            .catch((err) => {
+                console.log(err.response)
+                if (err.response.data.vin_no.join() === "car with this vin no already exists.") {
+                    // this.toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.vin_no.join()}`, life: 3000 });
+                    this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: "Chassis No./Vin No. already exist.", life: 3000 });
+                } else if (err.response.data.vin_no.join() === "This field may not be blank.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                }
+               
+                    
+            });
 
     }
 
