@@ -33,9 +33,6 @@ import  VehiclesGPS from './components/VehiclesGPS';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
-import { Toast } from 'primereact/toast';
-
-
 const App = () => {
 
     const [layoutMode, setLayoutMode] = useState('static');
@@ -49,7 +46,6 @@ const App = () => {
     let menuClick = false;
 
     const [counter, setCounter] = useState(0);
-    const toast = useRef(null);
 
     useEffect(() => {
         if (mobileMenuActive) {
@@ -78,45 +74,34 @@ const App = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCounter(counter + 1);
-            console.log("cntr: ",counter);
             let token = localStorage.getItem("token");
             let refreshToken = localStorage.getItem("refreshToken");
-            // console.log("token: ", token);
-            // console.log("refreshtoken: ", refreshToken);
             
-            const body = { "refresh": refreshToken }; 
-            //console.log("body:", body);
+            const body = { "refresh": refreshToken };
 
             let decoded = jwt_decode(token);
-            //console.log("dcd: ", decoded);
             const dNow = new Date();
             const d = new Date(0);
             d.setUTCSeconds(decoded.exp);
-            // console.log("dateNow: ", dNow);
-            // console.log("dcdexp: ", d);
-            // console.log("remaining: ",getDifferenceInMinutes(dNow, d));
             const remainingMinutes = Math.round(getDifferenceInMinutes(dNow, d));
-            // console.log("remaining: ", remainingMinutes);
             if (remainingMinutes === 1){
-                console.log("1 minute left");
-                console.log("diff: ", remainingMinutes);
-                console.log("old a: ", token);
                 axios
                     .post(process.env.REACT_APP_SERVER_NAME + 'careta/token/refresh/', body)
-                    .then((res) => {  
-                        console.log("res refresh:", res.data);
+                    .then((res) => { 
                         localStorage.setItem('token', res.data.access);
-                        console.log("new a: ", localStorage.getItem("token"));
                         setCounter(0);
                     })
                     .catch((error) => {
                         console.log('error refresh: ');
                         console.log(error);
                     });
+            } else if (remainingMinutes <= 0) {
+                localStorage.clear();
+                window.location.reload();
             } else {
-                console.log("remaining: ", remainingMinutes);
+                //console.log("remaining: ", remainingMinutes);
             }
-          }, 5000)
+          }, 5000);
         
           return () => clearInterval(intervalId);
     }, [counter]);
@@ -131,7 +116,9 @@ const App = () => {
     const sidebarSubMenu2 = [];
     const sidebarSubMenu3 = [];
     
-    sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
+    if (localStorage.getItem("viewInventory") === "true") {
+        sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
+    }
     //users permission
     if (localStorage.getItem("addUsers") === "true") {
         sidebarSubMenu1.push({ label: 'Register User', icon: 'pi pi-user-plus', to: '/register'});
@@ -146,14 +133,13 @@ const App = () => {
     }
 
     //inventory permission
-    if (localStorage.getItem("viewInventory") === "true") {
-        sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
-    }
+    // if (localStorage.getItem("viewInventory") === "true") {
+    //     sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
+    // }
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
+        sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
         sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
     }
-    // sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
-    // sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', items: sidebarSubMenu2});
     } else {
@@ -164,21 +150,20 @@ const App = () => {
     if (localStorage.getItem("addInspectionReport") === "true") {
         sidebarSubMenu3.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     }
-    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    if (localStorage.getItem("viewInspectionReport") === "true") {
         sidebarSubMenu3.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
     }
-    
-    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("deleteInspectionReport") === "true") {
+    if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("viewAllInspectionReport") === "true") {
         sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file', items: sidebarSubMenu3});
     } else {
-        //console.log("permission data none");
+        console.log("permission data none");
     }
 
-    if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
-        sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
-    } else {
-        //console.log("permission data none");
-    }
+    // if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
+    //     sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
+    // } else {
+    //     //console.log("permission data none");
+    // }
 
     //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
     const onInputStyleChange = (inputStyle) => {
@@ -284,7 +269,6 @@ const App = () => {
     return (
         
         <div className={wrapperClass} onClick={onWrapperClick}>
-            <Toast ref={toast} />
             <AppTopbar onToggleMenu={onToggleMenu} />
 
             <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>

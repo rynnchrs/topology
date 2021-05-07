@@ -40,6 +40,7 @@ export const AppProfile = () => {
     
     const logout = () => {
         let token = localStorage.getItem("token");
+        let refreshToken = localStorage.getItem("refreshToken");
 
         const config = {
             headers: {
@@ -48,19 +49,38 @@ export const AppProfile = () => {
             },
         };
 
-        const body = JSON.stringify({ token });
-        console.log('body: ' + body);
+        const body = { "refresh": refreshToken }; 
+        //console.log('body: ' + body);
 
         axios
             .post(process.env.REACT_APP_SERVER_NAME + 'careta/logout/blacklist/', body, config)
             .then((res) => {
                 console.log('logout success');
-                console.log(res.data)
+                localStorage.removeItem("token");
+                localStorage.removeItem("username");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("myfirst");
+
+                localStorage.removeItem("viewUsers"); localStorage.removeItem("addUsers");
+                localStorage.removeItem("editUsers"); localStorage.removeItem("deleteUsers");
+                localStorage.removeItem("viewInventory"); localStorage.removeItem("addInventory");
+                localStorage.removeItem("editInventory"); localStorage.removeItem("deleteInventory");
+                localStorage.removeItem("viewInspectionReport"); localStorage.removeItem("addInspectionReport");
+                localStorage.removeItem("editInspectionReport"); localStorage.removeItem("viewAllInspectionReport");
+                localStorage.removeItem("viewMaintenanceReport"); localStorage.removeItem("addMaintenanceReport");
+                localStorage.removeItem("editMaintenanceReport"); localStorage.removeItem("deleteMaintenanceReport");
+                localStorage.removeItem("viewRepairReport"); localStorage.removeItem("addRepairReport");
+                localStorage.removeItem("editRepairReport"); localStorage.removeItem("deleteRepairReport");
+                localStorage.removeItem("viewTask"); localStorage.removeItem("addTask");
+                localStorage.removeItem("editTask"); localStorage.removeItem("deleteTask");
+                toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500)
             })
             .catch((err) => {
                 console.log('logout error');
-                console.log(err.response)
-
+                console.log(err.response);
             });
 
         localStorage.removeItem("token");
@@ -73,14 +93,14 @@ export const AppProfile = () => {
         localStorage.removeItem("viewInventory"); localStorage.removeItem("addInventory");
         localStorage.removeItem("editInventory"); localStorage.removeItem("deleteInventory");
         localStorage.removeItem("viewInspectionReport"); localStorage.removeItem("addInspectionReport");
-        localStorage.removeItem("editInspectionReport"); localStorage.removeItem("deleteInspectionReport");
+        localStorage.removeItem("editInspectionReport"); localStorage.removeItem("viewAllInspectionReport");
         localStorage.removeItem("viewMaintenanceReport"); localStorage.removeItem("addMaintenanceReport");
         localStorage.removeItem("editMaintenanceReport"); localStorage.removeItem("deleteMaintenanceReport");
         localStorage.removeItem("viewRepairReport"); localStorage.removeItem("addRepairReport");
         localStorage.removeItem("editRepairReport"); localStorage.removeItem("deleteRepairReport");
         localStorage.removeItem("viewTask"); localStorage.removeItem("addTask");
         localStorage.removeItem("editTask"); localStorage.removeItem("deleteTask");
-        toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
+        // toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
         setTimeout(() => {
             window.location.href = '/';
         }, 1500)
