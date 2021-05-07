@@ -25,7 +25,7 @@ export const login = (username, password) => (dispatch) => {
         //.post(SERVER_NAME + 'api/login/', body, config)
         .then((res) => {
             //console.log('login token: ' + res.data.access)
-            localStorage.setItem('username', username);
+            localStorage.setItem('username', res.data.username);
             localStorage.setItem('token', res.data.access);
             localStorage.setItem('refreshToken', res.data.refresh);
             try {
@@ -56,7 +56,7 @@ export const login = (username, password) => (dispatch) => {
                     res.data.can_view_inspection_reports ? localStorage.setItem('viewInspectionReport', "true") : localStorage.setItem('viewInspectionReport', "false")
                     res.data.can_add_inspection_reports ? localStorage.setItem('addInspectionReport', "true") : localStorage.setItem('addInspectionReport', "false")
                     res.data.can_edit_inspection_reports ? localStorage.setItem('editInspectionReport', "true") : localStorage.setItem('editInspectionReport', "false")
-                    res.data.can_delete_inspection_reports ? localStorage.setItem('deleteInspectionReport', "true") : localStorage.setItem('deleteInspectionReport', "false")
+                    res.data.can_show_all_inspection_reports ? localStorage.setItem('viewAllInspectionReport', "true") : localStorage.setItem('viewAllInspectionReport', "false")
                     
                     res.data.can_view_maintenance_reports ? localStorage.setItem('viewMaintenanceReport', "true") : localStorage.setItem('viewMaintenanceReport', "false")
                     res.data.can_add_maintenance_reports ? localStorage.setItem('addMaintenanceReport', "true") : localStorage.setItem('addMaintenanceReport', "false")

@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { TabView, TabPanel } from 'primereact/tabview';
@@ -10,22 +9,6 @@ export const Dashboard = () => {
 
     const [totalTable, setTotalTable] = useState([]);
 
-    const [datas, setDatas] = useState([{ name: 'Plate Delivery No.', wd: '184', nyr: '99', nrc: '33' }, 
-    { name: 'Modified Decals', wd: '102', nyr: '120', nrc: '45' },
-    { name: 'EWD', wd: '102', nyr: '120', nrc: '45' },
-    { name: 'Fan', wd: '102', nyr: '120', nrc: '45' },
-    { name: 'Tools', wd: '102', nyr: '120', nrc: '45' },
-    { name: "User's Manual", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Warranty Booklet", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Unit Key", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Body Key", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Cigarrtte Plug", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Keychain", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Jack", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Tire Wrench", wd: '102', nyr: '120', nrc: '45' },
-    { name: "Fire Extinguisher", wd: '102', nyr: '120', nrc: '45' }
-    ]);
-
     const [expiry1, setExpiry1] = useState([
         { month: 'January', or: '184', cr: '99', tpl: '33', compre: '33' }, 
         { month: 'February', or: '184', cr: '99', tpl: '33', compre: '33' },
@@ -35,14 +18,6 @@ export const Dashboard = () => {
         { month: "June", or: '102', cr: '120', tpl: '45', compre: '33' }
     ]);
     
-    const items = [
-        {label: '2019', icon: 'pi pi-fw pi-calendar'},
-        {label: '2020', icon: 'pi pi-fw pi-calendar'},
-        {label: '2021', icon: 'pi pi-fw pi-calendar'}
-    ];
-
-    const [activeIndex, setActiveIndex] = useState(1);
-
     const dt = useRef(null);
 
     useEffect(() => {
@@ -60,11 +35,11 @@ export const Dashboard = () => {
         };
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'api/total/', config)
+            .get(process.env.REACT_APP_SERVER_NAME + 'car/total/', config)
             .then(res => {
-                //console.log("total table:");
-                //console.log(res.data);
-                const reply = res.data[0];
+                // console.log("total table:");
+                // console.log(res.data);
+                const reply = res.data.results[0];
                 setTotalTable([
                     {name: "Body Key", "wd": reply.bodyKey_with_date, "nrc": reply.bodyKey_with_nrc, "nyr": reply.bodyKey_with_nyr, "na": reply.bodyKey_with_na, "dnr": reply.bodyKey_with_dnr},
                     {name: "Cigarette Plug", "wd": reply.cigarettePlug_with_date, "nrc": reply.cigarettePlug_with_nrc, "nyr": reply.cigarettePlug_with_nyr, "na": reply.cigarettePlug_with_na, "dnr": reply.cigarettePlug_with_dnr},

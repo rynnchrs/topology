@@ -1,6 +1,5 @@
-import React, { Component, createRef} from 'react';
+import React, { Component} from 'react';
 import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
@@ -90,6 +89,7 @@ export class DriverInspectionReport extends Component {
             labelBtnSubmit: "SUBMIT",
             iconBtnSubmit: "",
             isLoading: false,
+            counter: 0,
         };
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
         this.onTagBodyNo = this.onTagBodyNo.bind(this);
@@ -108,33 +108,6 @@ export class DriverInspectionReport extends Component {
         this.setState({ checkboxValue: selected });
     }
 
-    // //fetch data of car list from db on page load
-    // componentDidMount() {
-    //     let user = localStorage.getItem("myfirst");
-    //     this.setState({drivername:user})
-    //     let username = localStorage.getItem("username");
-    //     this.setState({driver:username})
-    //     let token = localStorage.getItem("token");
-    //     const config = {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': 'Bearer ' + token,
-    //         },
-    //     };
-    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config)
-    //         .then(res => {
-    //             const bodyno = res.data;
-    //             bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
-    //                     : item.make === 'SUV' ? 'Super Carry UV'
-    //                     : item.make ===  'G15'? 'Gratour midi truck 1.5L'
-    //                     : 'Gratour midi truck 1.2L' }));
-    //             this.setState({
-    //                 bodyno: bodyno,
-    //             });
-    //             //console.log(bodyno);
-    //         })
-    // }
-
     //fetch data of car list from db on page load
     componentDidMount() {
         let user = localStorage.getItem("myfirst");
@@ -150,27 +123,62 @@ export class DriverInspectionReport extends Component {
         };
 
         Promise.all([
-            fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json()),
-            //fetch(process.env.REACT_APP_SERVER_NAME + 'careta/inspection-list/?ordering=-inspection_id',config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/', config).then(res => res.json()),
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
-            //console.log("res", res1)
-            // bodyno.map((item) => ({ make: item.make = item.make === 'L30' ? 'L300 Exceed 2.5D MT'
-            //             : item.make === 'SUV' ? 'Super Carry UV'
-            //             : item.make ===  'G15'? 'Gratour midi truck 1.5L'
-            //             : 'Gratour midi truck 1.2L' }));
+            //console.log("res", res1);
             this.setState({
-                bodyno: bodyno,
+                bodyno: bodyno.results,
                 carValues: res2
             });
+
+            if (bodyno.next === null){
+                
+            } else {
+                this.setState({
+                    counter: 2
+                });
+                this.nextPage();
+            }
         })
+    }
+
+    nextPage = () => {
+        // setTimeout(() => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    bodyno: this.state.bodyno.concat(data.results)
+                });
+                if (data.next === null){
+
+                } else {
+                    this.setState({
+                        counter: this.state.counter + 1
+                    });
+                    this.nextPage();
+                }
+            })
+            .catch((err) => {
+                console.log('err nxt: ');
+                console.log(err)
+            });
+        // }, 500);
     }
 
     showBodyNumberTags () {
         if (this.state.carValues.length <= 0) {
             //console.log("recent null");
-        } else if (this.state.carValues.length == 1) { //1
+        } else if (this.state.carValues.length === 1) { //1
             return <div> 
             <ul>
                 <li>
@@ -180,7 +188,7 @@ export class DriverInspectionReport extends Component {
                 </li>
             </ul>
             </div>
-        } else if (this.state.carValues.length == 2) { //2
+        } else if (this.state.carValues.length === 2) { //2
             return <div> 
             <ul>
                 <li>
@@ -195,7 +203,7 @@ export class DriverInspectionReport extends Component {
                 </li>
             </ul>
             </div>
-        } else if (this.state.carValues.length == 3) { //3
+        } else if (this.state.carValues.length === 3) { //3
             return <div> 
             <ul>
                 <li>
@@ -215,7 +223,7 @@ export class DriverInspectionReport extends Component {
                 </li>
             </ul>
             </div>
-        } else if (this.state.carValues.length == 4) { //4
+        } else if (this.state.carValues.length === 4) { //4
             return <div> 
             <ul>
                 <li>
@@ -269,12 +277,14 @@ export class DriverInspectionReport extends Component {
             if (!event.query.trim().length) {
 
             } else {
-                //error when i use item.car_id.includes(event.query), uncomment to try
-                //this.state.filteredSuggestions = this.state.bodyno.filter(item => item.car_id.includes(event.query));
-                this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
-                this.setState({
-                    filteredSuggestions: this.state.filteredSuggestions,
-                });
+                try {
+                    this.setState({filteredSuggestions: this.state.bodyno.filter(item => item.body_no.startsWith(event.query))});
+                    this.setState({
+                        filteredSuggestions: this.state.filteredSuggestions,
+                    });
+                } catch (err){
+                    //console.log("autocomplete err:", err);
+                }
             }
         }, 100);
     };
@@ -372,7 +382,7 @@ export class DriverInspectionReport extends Component {
             front_left_wheel: this.state.radioValue40,
             rear_right_wheel: this.state.radioValue43,
             rear_left_wheel: this.state.radioValue42,
-            gps: "wews",
+            gps: this.state.gpsData,
             notes: this.state.com,
             driver: this.state.driver,
             edited_by: this.state.editor,
@@ -1189,7 +1199,7 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </div>
 
-                <Dialog header="SUBMIT FAILURE" visible={this.state.displayError} style={{ width: '310px' }} footer={this.renderFooter('displayError')} onHide={() => this.onHide('displayError')}>
+                <Dialog header="SUBMIT FAILURE" visible={this.state.displayError} style={{ width: '310px' }} footer={this.renderFooter('displayError')} onHide={() => this.onHide('displayError')} closable={false}>
                     <div className="p-grid">
                         <div className="p-col-2">
                             <i className="pi pi-exclamation-triangle" style={{fontSize: '30px', color: 'red'}}/>
@@ -1201,7 +1211,7 @@ export class DriverInspectionReport extends Component {
                     </div>
                 </Dialog>
 
-                <Dialog header="SUBMIT SUCCESS" visible={this.state.displaySuccess} style={{ width: '310px' }} footer={this.renderFooter('displaySuccess')} onHide={() => this.onHide('displaySuccess')}>
+                <Dialog header="SUBMIT SUCCESS" visible={this.state.displaySuccess} style={{ width: '310px' }} footer={this.renderFooter('displaySuccess')} onHide={() => this.onHide('displaySuccess')} closable={false}>
                     <div className="p-grid">
                         <div className="p-col-2">
                             <i className="pi pi-check-circle" style={{fontSize: '30px', color: 'green'}}/>

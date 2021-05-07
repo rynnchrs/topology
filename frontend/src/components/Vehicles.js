@@ -1,7 +1,4 @@
 import React, {Component, createRef} from 'react';
-import { TabView,TabPanel } from 'primereact/tabview';
-import {DataTable} from 'primereact/datatable';
-import {Column} from 'primereact/column'
 import {InputText} from 'primereact/inputtext';
 import { AutoComplete } from 'primereact/autocomplete';
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -12,12 +9,8 @@ import {Dialog} from 'primereact/dialog';
 import {Dropdown} from 'primereact/dropdown';
 import {InputMask} from 'primereact/inputmask';
 import {Calendar} from 'primereact/calendar';
-import {SelectButton} from 'primereact/selectbutton';
 import {Toast} from 'primereact/toast'
-import { ListBox } from 'primereact/listbox';
 import { Carousel } from 'primereact/carousel';
-
-//import './TabViewDemo.css';
 import axios from "axios";
 import { isThisISOWeek } from 'date-fns';
 
@@ -127,6 +120,7 @@ export class Vehicles extends Component {
                 {image: "careta-logo.png", name: "careta"},
             ],
             //images: [],
+            counter: 0,
         };
 
         this.toast = createRef(null)
@@ -136,6 +130,10 @@ export class Vehicles extends Component {
     }
 
     componentDidMount() {
+        this.getCarList();
+    }
+
+    getCarList = () => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -144,16 +142,55 @@ export class Vehicles extends Component {
             },
         };
         Promise.all([
-            fetch(process.env.REACT_APP_SERVER_NAME + 'careta/car-list/', config).then(res => res.json())
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/', config).then(res => res.json())
         ]).then(([res1]) => {
             const bodyno = res1;
-            //console.log("res1", res1);
             this.setState({
-                bodyno: bodyno
+                bodyno: bodyno.results
             });
+        
+            if (bodyno.next === null){
+
+            } else {
+                this.setState({
+                    counter: 2
+                });
+                this.nextPage();
+            }
         })
     }
 
+    nextPage = () => {
+        // setTimeout(() => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    bodyno: this.state.bodyno.concat(data.results)
+                });
+                if (data.next === null){
+
+                } else {
+                    this.setState({
+                        counter: this.state.counter + 1
+                    });
+                    this.nextPage();
+                }
+            })
+            .catch((err) => {
+                console.log('err nxt: ');
+                console.log(err)
+            });
+        // }, 500);
+    }
+    
     searchList = (event) => {
         setTimeout(() => {
             if (!event.query.trim().length) {
@@ -165,7 +202,7 @@ export class Vehicles extends Component {
                         filteredSuggestions: this.state.filteredSuggestions,
                     });
                 } catch (err){
-                    console.log("autocomplete err:", err);
+                    //console.log("autocomplete err:", err);
                 }
             }
         }, 100);
@@ -176,14 +213,14 @@ export class Vehicles extends Component {
             <div>
                 {/* <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} */}
                 {/* <img src={`showcase/demo/images/product/${product.image}`}   alt={product.name} className="product-image" /> */}
-                <center><img src={`/assets/layout/images/${images.image}`} style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+                <center><img src={`/assets/layout/images/${images.image}`} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
             </div>
         );
     }
 
     exportData() {
         //console.log('export car-list');
-        let url = process.env.REACT_APP_SERVER_NAME + 'api/careta/export_list/';
+        let url = process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/';
         window.open(url);
     }
 
@@ -194,7 +231,7 @@ export class Vehicles extends Component {
           .get(process.env.REACT_APP_SERVER_NAME + "api/careta/?search=")
           .then(res => this.setState({ vehicleData: res.data[0] },this.logTest))
           .catch(err => console.log(err));
-      };
+        };
 
     logTest = () =>{
         console.log("logtest: ",this.state.vehicleData);
@@ -210,6 +247,13 @@ export class Vehicles extends Component {
 
     //ADD VEHICLE ALGORITHM
     addVehicle = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data = {
             slug: this.state.APIvehicleData.slug,
             vin_no: this.state.APIvehicleData.vin_no,
@@ -278,14 +322,51 @@ export class Vehicles extends Component {
             status: this.state.APIvehicleData.status,
         };
         axios
-                .post("http://localhost:8000/api/careta/",data)
-                .then(res => this.setState({ todoList: res.data },this.addTPL))
-                .catch(this.showErrorSave);
+            .post(process.env.REACT_APP_SERVER_NAME + "car/careta/", data, config)
+            .then(res => this.setState({ todoList: res.data },this.addContract))
+            .catch((err) => {
+                console.log(err.response)
+                this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                    
+            });
+    }
+
+    addContract = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        const data_contract ={
+            slug : this.state.todoList.body_no,
+            client_name: this.state.APIvehicleData.c_client_name,
+            contract_no:this.state.APIvehicleData.c_contract_no,
+            start_date:this.state.APIvehicleData.c_start_date,
+            end_date: this.state.APIvehicleData.c_end_date,
+            bid_no: this.state.APIvehicleData.c_bid_no,
+            bid_name: this.state.APIvehicleData.c_bid_name,
+            bid_date: this.state.APIvehicleData.c_bid_date,
+            cost: this.state.APIvehicleData.c_cost,
+            car: this.state.todoList.car_id,
+        }
+        axios
+            .post(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/", data_contract, config)
+            .then(res => this.setState({ todoList_contract: res.data },this.addTPL))
+            .catch(err => console.log("cont", err));
     }
 
     addTPL = () =>{
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data_tpl ={
-            slug : this.state.todoList.car_id,
+            slug : this.state.todoList.body_no,
             insurance_name: this.state.APIvehicleData.t_insurance_name,
             telephone:this.state.APIvehicleData.t_telephone_no,
             email:this.state.APIvehicleData.t_email,
@@ -298,35 +379,21 @@ export class Vehicles extends Component {
 
         }
         axios
-            .post("http://localhost:8000/api/careta-tpl/",data_tpl)
-            .then(res => this.setState({ todoList_tpl: res.data },this.addContract))
-            .catch(err => console.log(err));
-
-    }
-
-    addContract = () => {
-        const data_contract ={
-            slug : this.state.todoList.car_id,
-            client_name: this.state.APIvehicleData.c_client_name,
-            contract_no:this.state.APIvehicleData.c_contract_no,
-            start_date:this.state.APIvehicleData.c_start_date,
-            end_date: this.state.APIvehicleData.c_end_date,
-            bid_no: this.state.APIvehicleData.c_bid_no,
-            bid_name: this.state.APIvehicleData.c_bid_name,
-            bid_date: this.state.APIvehicleData.c_bid_date,
-            cost: this.state.APIvehicleData.c_cost,
-            car: this.state.todoList.car_id,
-
-        }
-        axios
-                .post("http://localhost:8000/api/careta-contract/",data_contract)
-                .then(res => this.setState({ todoList_contract: res.data },this.addInsurance1))
-                .catch(err => console.log(err));
+            .post(process.env.REACT_APP_SERVER_NAME + "car/careta-tpl/", data_tpl, config)
+            .then(res => this.setState({ todoList_tpl: res.data },this.addInsurance1))
+            .catch(err => console.log("tpl: ", err));
     }
 
     addInsurance1 = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data_insurance1 ={
-            slug : this.state.todoList.car_id + "-1",
+            slug : this.state.todoList.body_no + "-1",
             company: this.state.APIvehicleData.i1_insurance_company,
             telephone:this.state.APIvehicleData.i1_telephone_no,
             email:this.state.APIvehicleData.i1_email,
@@ -339,14 +406,21 @@ export class Vehicles extends Component {
             car: this.state.todoList.car_id,
         }
         axios
-                .post("http://localhost:8000/api/careta-insurance/",data_insurance1)
-                .then(res => this.setState({ todoList_insurance1: res.data },this.addInsurance2))
-                .catch(err => console.log(err));
+            .post(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/", data_insurance1, config)
+            .then(res => this.setState({ todoList_insurance1: res.data },this.addInsurance2))
+            .catch(err => console.log("ins1: ", err));
     }
 
     addInsurance2 = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data_insurance2 ={
-            slug : this.state.todoList.car_id + "-2",
+            slug : this.state.todoList.body_no + "-2",
             company: this.state.APIvehicleData.i2_insurance_company,
             telephone:this.state.APIvehicleData.i2_telephone_no,
             email:this.state.APIvehicleData.i2_email,
@@ -359,13 +433,20 @@ export class Vehicles extends Component {
             car: this.state.todoList.car_id,
         }
         axios
-                .post("http://localhost:8000/api/careta-insurance/",data_insurance2)
-                .then(res => this.setState({ todoList_insurance2: res.data }))
-                .catch(err => console.log(err));
+            .post(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/", data_insurance2, config)
+            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Add Successfully', detail:'New vehicle added.', life: 3000}), this.getCarList()))
+            .catch(err => console.log("ins2: ",err));
     }
 
     //MODIFY VEHICLE INFO ALGORITHM
     editVehicle = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data = {
             slug: this.state.APIvehicleData.slug,
             vin_no: this.state.APIvehicleData.vin_no,
@@ -434,15 +515,61 @@ export class Vehicles extends Component {
             status: this.state.APIvehicleData.status,
         };
         axios
-                .put("http://localhost:8000/api/careta/" + this.state.newvehicleData.slug+"/",data)
-                .then(res => this.setState({ todoList: res.data },this.editTPL))
-                .catch(this.showErrorSave);
+            //.put("http://localhost:8000/api/careta/" + this.state.newvehicleData.slug+"/",data)
+            .put(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.newvehicleData.body_no + "/", data, config)
+            .then(res => this.setState({ todoList: res.data },this.editContract))
+            .catch((err) => {
+                console.log(err.response)
+                if (err.response.data.vin_no.join() === "car with this vin no already exists.") {
+                    // this.toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.vin_no.join()}`, life: 3000 });
+                    this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: "Chassis No./Vin No. already exist.", life: 3000 });
+                } else if (err.response.data.vin_no.join() === "This field may not be blank.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                }
+               
+                    
+            });
 
     }
 
+    editContract = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        const data_contract ={
+            slug : this.state.APIvehicleData.body_no,
+            client_name: this.state.APIvehicleData.c_client_name,
+            contract_no:this.state.APIvehicleData.c_contract_no,
+            start_date:this.state.APIvehicleData.c_start_date,
+            end_date: this.state.APIvehicleData.c_end_date,
+            bid_no: this.state.APIvehicleData.c_bid_no,
+            bid_name: this.state.APIvehicleData.c_bid_name,
+            bid_date: this.state.APIvehicleData.c_bid_date,
+            cost: this.state.APIvehicleData.c_cost,
+            car: this.state.todoList.car_id,
+
+        }
+        axios
+            //.put("http://localhost:8000/api/careta-contract/"+this.state.newvehicleData.car_id + "/",data_contract)
+            .put(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/" + this.state.newvehicleData.body_no + "/", data_contract, config)
+            .then(res => this.setState({ todoList_contract: res.data },this.editTPL))
+            .catch(this.showErrorSave);
+    }
+
     editTPL = () =>{
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data_tpl ={
-            slug : this.state.APIvehicleData.car_id,
+            slug : this.state.APIvehicleData.body_no,
             insurance_name: this.state.APIvehicleData.t_insurance_name,
             telephone:this.state.APIvehicleData.t_telephone_no,
             email:this.state.APIvehicleData.t_email,
@@ -455,35 +582,22 @@ export class Vehicles extends Component {
 
         }
         axios
-                .put("http://localhost:8000/api/careta-tpl/" + this.state.newvehicleData.car_id+"/",data_tpl)
-                .then(res => this.setState({ todoList_tpl: res.data },this.editContract))
-                .catch(this.showErrorSave);
-
-    }
-
-    editContract = () => {
-        const data_contract ={
-            slug : this.state.APIvehicleData.car_id,
-            client_name: this.state.APIvehicleData.c_client_name,
-            contract_no:this.state.APIvehicleData.c_contract_no,
-            start_date:this.state.APIvehicleData.c_start_date,
-            end_date: this.state.APIvehicleData.c_end_date,
-            bid_no: this.state.APIvehicleData.c_bid_no,
-            bid_name: this.state.APIvehicleData.c_bid_name,
-            bid_date: this.state.APIvehicleData.c_bid_date,
-            cost: this.state.APIvehicleData.c_cost,
-            car: this.state.todoList.car_id,
-
-        }
-        axios
-                .put("http://localhost:8000/api/careta-contract/"+this.state.newvehicleData.car_id + "/",data_contract)
-                .then(res => this.setState({ todoList_contract: res.data },this.editInsurance1))
-                .catch(this.showErrorSave);
+            //.put("http://localhost:8000/api/careta-tpl/" + this.state.newvehicleData.car_id+"/",data_tpl)
+            .put(process.env.REACT_APP_SERVER_NAME + "car/careta-tpl/" + this.state.newvehicleData.body_no + "/", data_tpl, config)
+            .then(res => this.setState({ todoList_tpl: res.data },this.editInsurance1))
+            .catch(this.showErrorSave);
     }
 
     editInsurance1 = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data_insurance1 ={
-            slug : this.state.APIvehicleData.car_id + "-1",
+            slug : this.state.APIvehicleData.body_no + "-1",
             company: this.state.APIvehicleData.i1_insurance_company,
             telephone:this.state.APIvehicleData.i1_telephone_no,
             email:this.state.APIvehicleData.i1_email,
@@ -496,14 +610,22 @@ export class Vehicles extends Component {
             car: this.state.todoList.car_id,
         }
         axios
-                .put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-1/",data_insurance1)
-                .then(res => this.setState({ todoList_insurance1: res.data },this.editInsurance2))
-                .catch(this.showErrorSave);
+            //.put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-1/",data_insurance1)
+            .put(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.newvehicleData.body_no +"-1/", data_insurance1, config)
+            .then(res => this.setState({ todoList_insurance1: res.data },this.editInsurance2))
+            .catch(this.showErrorSave);
     }
 
     editInsurance2 = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
         const data_insurance2 ={
-            slug : this.state.APIvehicleData.car_id + "-2",
+            slug : this.state.APIvehicleData.body_no + "-2",
             company: this.state.APIvehicleData.i2_insurance_company,
             telephone:this.state.APIvehicleData.i2_telephone_no,
             email:this.state.APIvehicleData.i2_email,
@@ -516,18 +638,23 @@ export class Vehicles extends Component {
             car: this.state.todoList.car_id,
         }
         axios
-                .put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-2/",data_insurance2)
-                .then(res => this.setState({ todoList_insurance2: res.data }))
-                .catch(this.showErrorSave);
+            //.put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-2/",data_insurance2)
+            .put(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.newvehicleData.body_no +"-2/", data_insurance2, config)
+            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Modify Successfully', detail:'All changes applied.', life: 3000}), this.getCarList()))
+            .catch(this.showErrorSave);
     }
 
     modifyCarDB = (mode) => {
-        
         var vBrand = this.state.newvehicleData.brand === "Mitsubishi" ? "M"
             : this.state.newvehicleData.brand === "Suzuki" ? "S" : "F";
-        var vDealer = this.state.newvehicleData.dealer === "Diamond Motor Corporation" ? "DM"
-            : this.state.newvehicleData.dealer === "Grand Canyon Multi Holdings, INC." ? "GC"
-            : this.state.newvehicleData.dealer === "Cebu Autocentrale Corporation" ? "CAC": "CA";
+        var vMake = this.state.newvehicleData.make === "L300 Exceed 2.5D MT" ? "L30"
+            : this.state.newvehicleData.make === "Super Carry UV" ? "SUV"
+            : this.state.newvehicleData.make === "Gratour midi truck 1.5L" ? "G15": "G12";
+        var vSeries = this.state.newvehicleData.series === "L300 Exceed C/C" ? "L3"
+            : this.state.newvehicleData.series === "Suzuki CAB CHAS" ? "SC" : "GR";
+        var vDealer = this.state.newvehicleData.dealer === "Diamond Motor Corporation" ? "DMC"
+            : this.state.newvehicleData.dealer === "Grand Canyon Multi Holdings, INC." ? "GCM"
+            : this.state.newvehicleData.dealer === "Cebu Autocentrale Corporation" ? "CAC": "CAI";
         var vFuelType = this.state.newvehicleData.fuel_type === "Diesel" ? "D" : "G";
         var vTransmissionType = this.state.newvehicleData.transmission === "Automatic" ? "A" : "M";
         var vTopLoading = this.state.newvehicleData.top_load ==="Yes" ? true : false;
@@ -607,13 +734,11 @@ export class Vehicles extends Component {
             : this.state.newvehicleData.fan_date ===  'Did Not Recieve'? 'DNR'
             : this.state.newvehicleData.fan_date;
 
-        console.log(vBrand);
-
         //apply
         this.setState({
             APIvehicleData: {
                 car_id : this.state.newvehicleData.car_id,
-                slug: this.state.newvehicleData.vin_no,
+                slug: this.state.newvehicleData.body_no,
                 vin_no : this.state.newvehicleData.vin_no,
                 body_no : this.state.newvehicleData.body_no,
                 brand: vBrand,
@@ -643,7 +768,7 @@ export class Vehicles extends Component {
                 date_created: vPlateNumberDelivery,
                 date_updated: vPlateNumberDelivery,
                 cs_no : this.state.newvehicleData.cs_no, plate_no : this.state.newvehicleData.plate_no, release_year :this.state.newvehicleData.release_year, 
-                make : this.state.newvehicleData.make, series : this.state.newvehicleData.series, 
+                make : vMake, series : vSeries, 
                 body_type : this.state.newvehicleData.body_type, color : this.state.newvehicleData.color, dealer_phone : this.state.newvehicleData.dealer_phone, 
                 dealer_email : this.state.newvehicleData.dealer_email, po_no : this.state.newvehicleData.po_no, po_date : this.state.newvehicleData.po_date, 
                 body_builder : this.state.newvehicleData.body_builder, fabricator : this.state.newvehicleData.fabricator,
@@ -672,27 +797,34 @@ export class Vehicles extends Component {
                 i2_start_date: this.state.newvehicleData.i2_start_date, i2_end_date: this.state.newvehicleData.i2_end_date, i2_cost: this.state.newvehicleData.i2_cost,
             }
         }, this.runModify);
-
-
     }
 
     runModify = () => {
-
-        if(this.state.vmModalMode==='Add'){
-            console.log(this.state.APIvehicleData)
+        if (this.state.vmModalMode==='Add'){
             this.addVehicle()
         }
-
-        else if(this.state.vmModalMode==='Modify'){
+        else if (this.state.vmModalMode==='Modify'){
             this.editVehicle()
-            }
-        else
-            {
-                axios
-                    .delete("http://localhost:8000/api/careta/" + this.state.vehicleData.slug + '/')
-                    .then(res => this.setState({ todoList: res.data }))
-                    .catch(err => console.log(err));
-            }
+        }
+        else {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            axios
+                //.delete("http://localhost:8000/api/careta/" + this.state.vehicleData.slug + '/')
+                .delete(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.vehicleData.body_no + "/", config)
+                .then(res => this.setState({ todoList: res.data }, this.toast.current.show({severity:'success', summary: 'Remove Successfully', detail:'Vehicle removed.', life: 3000}), this.getCarList(), 
+                    this.setState({
+                        vehicleData: this.state.emptyvehicleData,
+                        searchBody: ""
+                    })
+                ))
+                .catch(err => console.log(err));
+        }
     }
 
     showErrorSave = () => {
@@ -704,7 +836,20 @@ export class Vehicles extends Component {
         const brandListItems = [
             {label: 'Mitsubishi', value: 'Mitsubishi'},
             {label: 'Suzuki', value: 'Suzuki'},
-            {label: 'Foton', value: 'Foton'},
+            {label: 'Foton', value: 'Foton'}
+        ];
+
+        const makeListItems = [
+            {label: 'L300 Exceed 2.5D MT', value: 'L300 Exceed 2.5D MT'},
+            {label: 'Super Carry UV', value: 'Super Carry UV'},
+            {label: 'Gratour midi truck 1.5L', value: 'Gratour midi truck 1.5L'},
+            {label: 'Gratour midi truck 1.2L', value: 'Gratour midi truck 1.2L'}
+        ];
+
+        const seriesListItems = [
+            {label: 'L300 Exceed C/C', value: 'L300 Exceed C/C'},
+            {label: 'Suzuki CAB CHAS', value: 'Suzuki CAB CHAS'},
+            {label: 'Gratour midi', value: 'Gratour midi'}
         ];
 
         const dealerListItems = [
@@ -743,12 +888,9 @@ export class Vehicles extends Component {
             {label: 'Manual', value: 'Manual'}
         ];
 
-
-
         const onHide = (name) => {
 
-
-            }
+        }
 
         const onShow = (vm) => {
             if (vm === 'Add'){
@@ -765,7 +907,7 @@ export class Vehicles extends Component {
                     newvehicleData:this.state.vehicleData
                 });
             }
-            }
+        }
 
         const renderFooter = (name) => {
             return (
@@ -784,11 +926,8 @@ export class Vehicles extends Component {
 
                 switch(name)
                     {
-
-                        //others
-
+                    //others
                     case 'TopLoad':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -798,7 +937,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Permanent Type':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -808,7 +946,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'VTF Type':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -818,7 +955,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Fuel Type':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -828,7 +964,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Transmission Type':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -847,7 +982,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Operational':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -860,7 +994,6 @@ export class Vehicles extends Component {
                         //recieved items
 
                     case 'Plate Number Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -870,7 +1003,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Decal Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -880,7 +1012,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Modified Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -890,7 +1021,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'EWD Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -900,7 +1030,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Tools Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -910,7 +1039,6 @@ export class Vehicles extends Component {
                         break;
 
                     case "User's Manual Delivery Date":
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -920,7 +1048,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Warranty Book Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -930,7 +1057,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Unit Key Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -940,7 +1066,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Body Key Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -950,7 +1075,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Cigarette Plug Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -960,7 +1084,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Key Chain Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -970,7 +1093,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Jack Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -980,7 +1102,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Tire Wrench Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -990,7 +1111,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Fire Extinguisher Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -1000,7 +1120,6 @@ export class Vehicles extends Component {
                         break;
 
                     case 'Fan Delivery Date':
-
                         this.setState({
                             newvehicleData: {
                                 ...this.state.newvehicleData,
@@ -1008,7 +1127,8 @@ export class Vehicles extends Component {
                             }
                         });
                         break;
-                        default:
+
+                    default:
                     }
 
             }
@@ -1017,9 +1137,6 @@ export class Vehicles extends Component {
             {
                 onCalendarModalShow(name);
             }
-
-
-
         }
 
         //custom modal calendar behavior
@@ -1241,16 +1358,6 @@ export class Vehicles extends Component {
                         });
                         break;
                     
-                    case 'Fan Delivery Date':
-
-                            this.setState({
-                                newvehicleData: {
-                                    ...this.state.newvehicleData,
-                                    fan_date: formattedValue
-                                }
-                            });
-                            break;
-                    
                     case 'TDate Issued':
 
                             this.setState({
@@ -1389,44 +1496,32 @@ export class Vehicles extends Component {
 
         }
 
-        const onSearchBarOnKeyUp = (e) => {
-            if(e.keyCode===13)
-                {
-                    axios
-                    //.get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
-                    .get(process.env.REACT_APP_SERVER_NAME + 'api/careta/?search=' + e.target.value)
-                    .then(res =>  {
-                        console.log("vehicle: ", res.data);
-                        const isDataAvailable = res.data && res.data.length;
-
-                        if(isDataAvailable)
-                            this.setState({ vehicleData: res.data[0]},getContract);
-                        else
-                            showNoResult();
-
-                    })
-                    .catch(err => console.log(err));
-                }
-        }
-
+        //GET VALUES OF CAR FROM DB
         const selectItem = event => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
-                //.get("http://127.0.0.1:8000/api/careta/?search=" + e.target.value)
-                .get(process.env.REACT_APP_SERVER_NAME + 'api/careta/?search=' + event.value.body_no)
+                .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + event.value.body_no + '/', config)
                 .then(res =>  {
-                    const isDataAvailable = res.data && res.data.length;
-                    if(isDataAvailable)
-                        this.setState({ vehicleData: res.data[0]},getContract);
-                    else
-                        showNoResult();
+                    this.setState({ vehicleData: res.data},getContract);
+                    // const isDataAvailable = res.data && res.data.length;
+                    // if(isDataAvailable)
+                    //     this.setState({ vehicleData: res.data[0]},getContract);
+                    // else
+                    //     showNoResult();
                 })
                 .catch((error) => {
                     console.log('error select: ');
                     console.log(error);
+                    showNoResult();
                 });
         }
-        
-        //GET VALUES OF CAR FROM DB
+
         const getContract = () =>{
             let token = localStorage.getItem("token");
             const config = {
@@ -1437,8 +1532,7 @@ export class Vehicles extends Component {
             };
 
             axios
-                //.get("http://127.0.0.1:8000/api/careta-contract/" + this.state.vehicleData.car_id+"/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-contract/Car object(" + this.state.vehicleData.car_id + ")/", config)
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/" + this.state.vehicleData.slug + "/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1455,9 +1549,15 @@ export class Vehicles extends Component {
         }
 
         const getTPL= () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
-                //.get("http://127.0.0.1:8000/api/careta-tpl/" + this.state.vehicleData.car_id+"/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-tpl/Car object(" + this.state.vehicleData.car_id + ")/")
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-tpl/" + this.state.vehicleData.slug + "/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1474,9 +1574,15 @@ export class Vehicles extends Component {
         }
 
         const getInsurance1= () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
-                //.get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-1/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-insurance/" + this.state.vehicleData.car_id + "-1/")
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.vehicleData.slug + "-1/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1493,9 +1599,15 @@ export class Vehicles extends Component {
         }
 
         const getInsurance2= () =>{
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
             axios
-                //.get("http://127.0.0.1:8000/api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
-                .get(process.env.REACT_APP_SERVER_NAME + "api/careta-insurance/" + this.state.vehicleData.car_id+"-2/")
+                .get(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.vehicleData.slug + "-2/", config)
                 .then(res=>{this.setState({
                         vehicleData: {
                             ...this.state.vehicleData,
@@ -1512,14 +1624,11 @@ export class Vehicles extends Component {
         }
 
         const reProcessResult = () => {
-
-
-            console.log(this.state.vehicleData);
             var vBrand = this.state.vehicleData.brand === "M" ? "Mitsubishi"
                 : this.state.vehicleData.brand === "S" ? "Suzuki" : "Foton";
-            var vDealer = this.state.vehicleData.dealer === "DM" ? "Diamond Motor Corporation"
-                : this.state.vehicleData.dealer === "GC" ? "Grand Canyon Multi Holdings, INC."
-                : this.state.vehicleData.dealer === "CAC" ? "Cebu Autocentrale Corporation" : "Cherub Autodealer Inc."; 
+            var vDealer = this.state.vehicleData.dealer === "DMC" ? "Diamond Motor Corporation"
+                : this.state.vehicleData.dealer === "GCM" ? "Grand Canyon Multi Holdings, INC."
+                : this.state.vehicleData.dealer === "CAC" ? "Cebu Autocentrale Corporation" : "Cherub Autodealer Inc.";
             var vFuelType = this.state.vehicleData.fuel_type === "D" ? "Diesel" : "Gas";
             var vTransmissionType = this.state.vehicleData.transmission === "A" ? "Automatic" : "Manual";
             var vTopLoading = this.state.vehicleData.top_load === true ? "Yes" : "No";
@@ -1598,6 +1707,15 @@ export class Vehicles extends Component {
                 : this.state.vehicleData.fan_date ===  'NA' ? 'Not Applicable'
                 : this.state.vehicleData.fan_date ===  'DNR'? 'Did Not Recieve'
                 : this.state.vehicleData.fan_date;
+            var vMake = this.state.vehicleData.make === 'L30' ? 'L300 Exceed 2.5D MT'
+                : this.state.vehicleData.make === 'SUV' ? 'Super Carry UV'
+                : this.state.vehicleData.make ===  'G15' ? 'Gratour midi truck 1.5L'
+                : this.state.vehicleData.make ===  'G12'? 'Gratour midi truck 1.2L'
+                : this.state.vehicleData.make;
+            var vSeries = this.state.vehicleData.series === 'L3' ? 'L300 Exceed C/C'
+                : this.state.vehicleData.series === 'SC' ? 'Suzuki CAB CHAS'
+                : this.state.vehicleData.series ===  'GR' ? 'Gratour midi'
+                : this.state.vehicleData.series;
 
 
 
@@ -1631,12 +1749,14 @@ export class Vehicles extends Component {
                     fire_extinguisher: vFireExtinguisher,
                     fan_date: vFan,
                     date_created: vPlateNumberDelivery,
-                    date_updated: vPlateNumberDelivery
+                    date_updated: vPlateNumberDelivery,
+                    make: vMake,
+                    series: vSeries
 
                 }
             });
 
-            }
+        }
 
         const onChangeHandler = (e) => {
 
@@ -1698,37 +1818,30 @@ export class Vehicles extends Component {
         }
 
         const ConfirmDeleteProceedHandler = () => {
-
             if(this.state.ddVisibility)
             {
                 this.setState({
                     ddVisibility: false
                 },this.runModify());
-
-                
-
             }
-
-
         }
 
         const ConfirmDeleteCancelHandler = () => {
+
         }
 
         const RemoveButtonHandler = () => {
-
-             if(this.state.vehicleData.car_id===0)
-                {
-                    showError();
-                }
-              else
-                {
-                    this.setState({
-                        ddVisibility: true,
-                        vmModalMode: "Remove"
-                    });
-                }
-
+            if(this.state.vehicleData.car_id===0)
+            {
+                showError();
+            }
+            else
+            {
+                this.setState({
+                    ddVisibility: true,
+                    vmModalMode: "Remove"
+                });
+            }
         }
 
         const showError = () => {
@@ -1741,12 +1854,12 @@ export class Vehicles extends Component {
 
         return (
             <div className="p-grid p-fluid">
+                <Toast ref={this.toast} />
                 <div className="p-col-12 dialog-vehicle">
-                    <Toast ref={this.toast} />
-
                     <Dialog header={"Delete Data"} visible={this.state.ddVisibility} onHide={() => ConfirmDeleteDialogHide()}>
                         <div className="card">
                             <p>Are you sure you want to delete this vehicle?</p>
+                            <p><center>Body No.: <b>{this.state.vehicleData.body_no ? this.state.vehicleData.body_no : 'None Selected'}</b></center></p>
                         <div>
                         </div>
                             <Button label="Yes" icon="pi pi-check" onClick={() => ConfirmDeleteProceedHandler()} autoFocus />
@@ -1760,7 +1873,7 @@ export class Vehicles extends Component {
                         </div>
                     </Dialog>
 
-                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} style={{width:'90vw'}} footer={renderFooter(this.state.vmModalMode)} onHide={() => onHide(this.state.vmModalMode)} closable={false} blockScroll={true}>
+                    <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} style={{width:'90vw'}} footer={renderFooter(this.state.vmModalMode)} onHide={() => onHide(this.state.vmModalMode)} closable={false}>
                         <div className="card">
                             <Accordion multiple activeAccordion={0}>
                                 <AccordionTab header={<label><span><b>Identification </b></span><i className="pi pi-user"></i></label>}>
@@ -1839,13 +1952,15 @@ export class Vehicles extends Component {
                                         <div className="p-grid p-col-12">
                                             <label htmlFor="vMake" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Make:</label>
                                             <div className="p-col-12 p-lg-10 p-md-12">
-                                                <InputText id="vMake" type="text" name='make' value={this.state.newvehicleData.make} onChange={(e) => onChangeHandler(e)}/>
+                                                {/* <InputText id="vMake" type="text" name='make' value={this.state.newvehicleData.make} onChange={(e) => onChangeHandler(e)}/> */}
+                                                <Dropdown id="vMake" name="make" value={this.state.newvehicleData.make} options={makeListItems} optionLabel="label" placeholder="Select a Make" onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
                                         <div className="p-grid p-col-12">
                                             <label htmlFor="vSeries" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Series:</label>
                                             <div className="p-col-12 p-lg-10 p-md-12">
-                                                <InputText id="vSeries" type="text" name='series' value={this.state.newvehicleData.series} onChange={(e) => onChangeHandler(e)}/>
+                                                {/* <InputText id="vSeries" type="text" name='series' value={this.state.newvehicleData.series} onChange={(e) => onChangeHandler(e)}/> */}
+                                                <Dropdown id="vSeries" name="series" value={this.state.newvehicleData.series} options={seriesListItems} optionLabel="label" placeholder="Select a Series" onChange={(e) => onChangeHandler(e)} />
                                             </div>
                                         </div>
                                         <div className="p-grid p-col-12">
@@ -2581,26 +2696,6 @@ export class Vehicles extends Component {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className="p-grid p-mb-2">
-                            <div className="p-col">
-                                <input type="radio"
-                                    value="VIN"
-                                    checked={this.state.filterOption === "VIN"}
-                                    onChange={this.radioChange} />Search By VIN No.
-                            </div>
-                            <div className="p-col">
-                                <input type="radio"
-                                    value="Body"
-                                    checked={this.state.filterOption === "Body"}
-                                    onChange={this.radioChange} />Search By Body No.
-                            </div>
-                            <div className="p-col">
-                                <input type="radio"
-                                    value="Plate"
-                                    checked={this.state.filterOption === "Plate"}
-                                    onChange={this.radioChange} />Search By Plate No.
-                            </div>
-                        </div> */}
                     </Fieldset>
                 </div>
 
@@ -2641,7 +2736,7 @@ export class Vehicles extends Component {
                         </div>
 
                         <div className="p-grid">
-                            <div className="p-col-12 p-lg-10 p-md-10 p-sm-10" style={{paddingTop: '5%'}}>
+                            <div className="p-col-12 p-lg-10 p-md-12 p-sm-12" style={{paddingTop: '5%'}}>
                                 <Accordion multiple activeAccordion={0}>
                                     <AccordionTab header={<label><span><b>Identification </b></span><i className="pi pi-user"></i></label>}>
                                         <div className="p-fluid">
