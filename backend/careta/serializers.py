@@ -61,7 +61,7 @@ class UserSerializer(serializers.ModelSerializer):  # user serializer
         errors = {}
         if User.objects.filter(email=validated_attrs['email']).exists():
             errors['email'] = 'user with this email already exists.'
-        if UserInfo.objects.filter(phone=validated_attrs['user_info']['phone']).exists():
+        if User.objects.filter(user_info__phone=validated_attrs['user_info']['phone']).exists():
             errors['phone'] = 'user with this phone already exists.'
         if errors:
             raise serializers.ValidationError(errors)
@@ -98,7 +98,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializ
         errors = {}
         if User.objects.filter(email=validated_attrs['email']).exclude(id=self.instance.id).exists():
             errors['email'] = 'user with this email already exists.'
-        if UserInfo.objects.filter(phone=validated_attrs['user_info']['phone']).exclude(id=self.instance.id).exists():
+        if User.objects.filter(user_info__phone=validated_attrs['user_info']['phone']).exclude(id=self.instance.id).exists():
             errors['phone'] = 'user with this phone already exists.'
         if errors:
             raise serializers.ValidationError(errors)
