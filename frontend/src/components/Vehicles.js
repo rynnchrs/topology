@@ -12,7 +12,6 @@ import {Calendar} from 'primereact/calendar';
 import {Toast} from 'primereact/toast'
 import { Carousel } from 'primereact/carousel';
 import axios from "axios";
-import { isThisISOWeek } from 'date-fns';
 
 export class Vehicles extends Component {
     
@@ -161,34 +160,32 @@ export class Vehicles extends Component {
     }
 
     nextPage = () => {
-        // setTimeout(() => {
-            let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    bodyno: this.state.bodyno.concat(data.results)
-                });
-                if (data.next === null){
-
-                } else {
-                    this.setState({
-                        counter: this.state.counter + 1
-                    });
-                    this.nextPage();
-                }
-            })
-            .catch((err) => {
-                console.log('err nxt: ');
-                console.log(err)
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
+        .then(response => response.json())
+        .then(data => {
+            this.setState({
+                bodyno: this.state.bodyno.concat(data.results)
             });
-        // }, 500);
+            if (data.next === null){
+
+            } else {
+                this.setState({
+                    counter: this.state.counter + 1
+                });
+                this.nextPage();
+            }
+        })
+        .catch((err) => {
+            console.log('err nxt: ');
+            console.log(err)
+        });
     }
     
     searchList = (event) => {
@@ -202,7 +199,7 @@ export class Vehicles extends Component {
                         filteredSuggestions: this.state.filteredSuggestions,
                     });
                 } catch (err){
-                    //console.log("autocomplete err:", err);
+
                 }
             }
         }, 100);
@@ -211,23 +208,25 @@ export class Vehicles extends Component {
     productTemplate(images) {
         return (
             <div>
-                {/* <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} */}
-                {/* <img src={`showcase/demo/images/product/${product.image}`}   alt={product.name} className="product-image" /> */}
                 <center><img src={`/assets/layout/images/${images.image}`} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
             </div>
         );
     }
 
     exportData() {
-        //console.log('export car-list');
         let url = process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/';
+        window.open(url);
+    }
+
+    newTab() {
+        //console.log(this.state.vehicleData)
+        let url = "http://128.199.92.107:59535/?map=" + this.state.vehicleData.body_no;
         window.open(url);
     }
 
     
     refreshList = () => {
         axios
-          //.get("http://127.0.0.1:8000/api/careta/?search=")
           .get(process.env.REACT_APP_SERVER_NAME + "api/careta/?search=")
           .then(res => this.setState({ vehicleData: res.data[0] },this.logTest))
           .catch(err => console.log(err));
@@ -325,9 +324,19 @@ export class Vehicles extends Component {
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta/", data, config)
             .then(res => this.setState({ todoList: res.data },this.addContract))
             .catch((err) => {
-                console.log(err.response)
-                this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
-                    
+                console.log(err.response);
+                let error = err.response.data;
+                if (error.slug && error.slug.join() === "This field may not be blank.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: "Body No. is required.", life: 3000 });
+                } else if (error.vin_no && error.vin_no.join() === "This field may not be blank.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                } else if (error.body_no && error.body_no.join() === "car with this body no already exists.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Body No. already exist.', life: 3000 });
+                } else if (error.vin_no && error.vin_no.join() === "car with this vin no already exists.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. already exist.', life: 3000 });
+                } else if (error.cs_no && error.cs_no.join() === "car with this cs no already exists.") {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'CS Number already exist.', life: 3000 });
+                }
             });
     }
 
@@ -434,7 +443,15 @@ export class Vehicles extends Component {
         }
         axios
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/", data_insurance2, config)
-            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Add Successfully', detail:'New vehicle added.', life: 3000}), this.getCarList()))
+            .then(res =>  
+                this.setState({
+                    todoList_insurance2: res.data,
+                    vmVisibility: false,
+                    vehicleData: this.state.emptyvehicleData,
+                    searchBody: ""
+                }),
+                this.toast.current.show({severity:'success', summary: 'Add Successfully', detail:'New vehicle added.', life: 3000}),
+                this.getCarList())
             .catch(err => console.log("ins2: ",err));
     }
 
@@ -515,19 +532,15 @@ export class Vehicles extends Component {
             status: this.state.APIvehicleData.status,
         };
         axios
-            //.put("http://localhost:8000/api/careta/" + this.state.newvehicleData.slug+"/",data)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.newvehicleData.body_no + "/", data, config)
             .then(res => this.setState({ todoList: res.data },this.editContract))
             .catch((err) => {
                 console.log(err.response)
                 if (err.response.data.vin_no.join() === "car with this vin no already exists.") {
-                    // this.toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.vin_no.join()}`, life: 3000 });
                     this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: "Chassis No./Vin No. already exist.", life: 3000 });
                 } else if (err.response.data.vin_no.join() === "This field may not be blank.") {
                     this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
-                }
-               
-                    
+                }   
             });
 
     }
@@ -554,7 +567,6 @@ export class Vehicles extends Component {
 
         }
         axios
-            //.put("http://localhost:8000/api/careta-contract/"+this.state.newvehicleData.car_id + "/",data_contract)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/" + this.state.newvehicleData.body_no + "/", data_contract, config)
             .then(res => this.setState({ todoList_contract: res.data },this.editTPL))
             .catch(this.showErrorSave);
@@ -582,7 +594,6 @@ export class Vehicles extends Component {
 
         }
         axios
-            //.put("http://localhost:8000/api/careta-tpl/" + this.state.newvehicleData.car_id+"/",data_tpl)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta-tpl/" + this.state.newvehicleData.body_no + "/", data_tpl, config)
             .then(res => this.setState({ todoList_tpl: res.data },this.editInsurance1))
             .catch(this.showErrorSave);
@@ -610,7 +621,6 @@ export class Vehicles extends Component {
             car: this.state.todoList.car_id,
         }
         axios
-            //.put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-1/",data_insurance1)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.newvehicleData.body_no +"-1/", data_insurance1, config)
             .then(res => this.setState({ todoList_insurance1: res.data },this.editInsurance2))
             .catch(this.showErrorSave);
@@ -638,9 +648,16 @@ export class Vehicles extends Component {
             car: this.state.todoList.car_id,
         }
         axios
-            //.put("http://localhost:8000/api/careta-insurance/" + this.state.newvehicleData.car_id +"-2/",data_insurance2)
             .put(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/" + this.state.newvehicleData.body_no +"-2/", data_insurance2, config)
-            .then(res => this.setState({ todoList_insurance2: res.data }, this.toast.current.show({severity:'success', summary: 'Modify Successfully', detail:'All changes applied.', life: 3000}), this.getCarList()))
+            .then(res =>  
+                this.setState({
+                    todoList_insurance2: res.data,
+                    vmVisibility: false,
+                    vehicleData: this.state.emptyvehicleData,
+                    searchBody: ""
+                }),
+                this.toast.current.show({severity:'success', summary: 'Modify Successfully', detail:'All changes applied.', life: 3000}),
+                this.getCarList())
             .catch(this.showErrorSave);
     }
 
@@ -815,7 +832,6 @@ export class Vehicles extends Component {
                 },
             };
             axios
-                //.delete("http://localhost:8000/api/careta/" + this.state.vehicleData.slug + '/')
                 .delete(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.vehicleData.body_no + "/", config)
                 .then(res => this.setState({ todoList: res.data }, this.toast.current.show({severity:'success', summary: 'Remove Successfully', detail:'Vehicle removed.', life: 3000}), this.getCarList(), 
                     this.setState({
@@ -828,7 +844,7 @@ export class Vehicles extends Component {
     }
 
     showErrorSave = () => {
-        this.toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 5000});
+        this.toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 3000});
     }
 
     render() {
@@ -1766,14 +1782,9 @@ export class Vehicles extends Component {
                     [e.target.name]: e.target.value
                 }
             });
-
-
         }
 
-
-
         const mainModalDialogSaveButtonhandler = (name) => {
-            
             if(this.state.vmVisibility)
             {
                 //this.setState({
@@ -1781,23 +1792,17 @@ export class Vehicles extends Component {
                 //});
                 this.modifyCarDB(name)
             }
-
         }
 
 
         const mainModalDialogCancelButtonhandler = () => {
-
             if(this.state.vmVisibility)
             {
                 this.setState({
                     vmVisibility: false
                 });
-
                 //this.modifyCarDB(name);
-
             }
-
-
         }
 
 
@@ -2685,7 +2690,7 @@ export class Vehicles extends Component {
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
                         <div className="p-col-12" name="searchbox"> 
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-lg-10 p-md-10 p-sm-12">                        
+                                <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">                        
                                     {/* <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} /> */}
                                     <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
                                     completeMethod={this.searchList} onSelect={selectItem}
@@ -2693,6 +2698,9 @@ export class Vehicles extends Component {
                                 </div>
                                 <div className="p-col-12 p-lg-2 p-md-2 p-sm-12"> 
                                     <Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => this.exportData()}/>
+                                </div>
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12"> 
+                                    <Button label="MAP" icon="pi pi-map-marker" onClick={() => this.newTab()}/>
                                 </div>
                             </div>
                         </div>

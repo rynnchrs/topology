@@ -1,11 +1,11 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import Toasts from './Toasts';
 
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { login } from '../actions/auth';
 
 export const Login = (props) => {
@@ -14,10 +14,10 @@ export const Login = (props) => {
     const [password, setPassword] = useState('');
     const [passwordShown, setPasswordShown] = useState(true);
     
-    const propTypes = {
-        login: PropTypes.func.isRequired,
-        isAuthenticated: PropTypes.bool,
-    };
+    // const propTypes = {
+    //     login: PropTypes.func.isRequired,
+    //     isAuthenticated: PropTypes.bool,
+    // };
 
     const submitData = event => {
         //alert("U: " + this.state.username + "\nP: " + this.state.password)

@@ -6,13 +6,12 @@ import {
 } from '../actions/types';
 
 const initialState = {
-    token: localStorage.getItem('token'), 
-    //isAuthenticated: null,
+    token: localStorage.getItem('token'),
     isAuthenticated: localStorage.getItem('token') ? true : false,
-    //isLoading: false,
-    //user: null,
+    
 };
 
+/* eslint import/no-anonymous-default-export: [2, {"allowAnonymousFunction": true}] */
 export default function (state = initialState, action) {
     switch (action.type) {
         case LOGIN_SUCCESS:
@@ -28,13 +27,10 @@ export default function (state = initialState, action) {
         case AUTH_ERROR:
         case LOGIN_FAIL:
             localStorage.removeItem('token');
-            //console.log("LOGIN FAIL TRY")
             return {
                 ...state,
                 token: null,
-                //user: null,
                 isAuthenticated: false,
-                //isLoading: false,
             };
         
         default:
