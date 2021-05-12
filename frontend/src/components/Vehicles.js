@@ -2690,16 +2690,16 @@ export class Vehicles extends Component {
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
                         <div className="p-col-12" name="searchbox"> 
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">                        
+                                <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">
                                     {/* <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} /> */}
                                     <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
                                     completeMethod={this.searchList} onSelect={selectItem}
                                     onChange={event => this.setState({searchBody: event.target.value})}/>
                                 </div>
-                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12"> 
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                     <Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => this.exportData()}/>
                                 </div>
-                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12"> 
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                     <Button label="MAP" icon="pi pi-map-marker" onClick={() => this.newTab()}/>
                                 </div>
                             </div>
