@@ -4,12 +4,13 @@ from datetime import datetime as date
 from car.models import Car
 from report.models import Inspection
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 
 class InspectionNotifyView(viewsets.ViewSet):
 
-    def list(str, request):
+    def list(self, request):
         context = []
         start_date = date.strptime(request.GET['start_date'], '%Y-%m-%d')
         end_date = date.strptime(request.GET['end_date'], '%Y-%m-%d')
@@ -40,4 +41,13 @@ class InspectionNotifyView(viewsets.ViewSet):
                     'date': dates[i].strftime('%Y-%m-%d')
                 })
         return Response(context, status=status.HTTP_200_OK)
+    
+    @action(detail=False)
+    def last_three_driver(self, request):
+        context = []
+        queryset = Inspection.objects.all().order_by('-inspection_id')[:3]
+        # print(queryset)
+        for inspection in queryset:
+            context.append(str(inspection.driver))
+        return Response({"driver":context}, status=status.HTTP_200_OK)
 
