@@ -68,7 +68,7 @@ class InspectionReportTestCase(APITestCase):
                 "can_view_inspection_reports": True,
                 "can_add_inspection_reports": True,
                 "can_edit_inspection_reports": True,
-                "can_delete_inspection_reports": True,
+                "can_show_all_inspection_reports": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",
@@ -233,7 +233,7 @@ class MaintenanceReportTestCase(APITestCase):
                 "can_view_maintenance_reports": True,
                 "can_add_maintenance_reports": True,
                 "can_edit_maintenance_reports": True,
-                "can_delete_maintenance_reports": True,
+                "can_show_all_maintenance_reports": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",

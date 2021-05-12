@@ -57,10 +57,20 @@ class TaskSerializer(serializers.ModelSerializer):
 
         if job_order['type'] == False:  # maintenance job order
             count = JobOrder.objects.filter(type=False).count()
-            job_order = JobOrder.objects.create(**job_order, job_no=count+1)
+            if count == 0:
+                job_order = JobOrder.objects.create(**job_order, job_no=count+1)
+            else:
+                count = JobOrder.objects.filter(type=False).latest('job_id')
+                count = int(count.job_no)+1
+                job_order = JobOrder.objects.create(**job_order, job_no=count)
         elif job_order['type'] == True: # repair job order
             count = JobOrder.objects.filter(type=True).count()
-            job_order = JobOrder.objects.create(**job_order, job_no=count+1)
+            if count == 0:
+                job_order = JobOrder.objects.create(**job_order, job_no=count+1)
+            else:
+                count = JobOrder.objects.filter(type=True).latest('job_id')
+                count = int(count.job_no)+1
+                job_order = JobOrder.objects.create(**job_order, job_no=count)
 
         fieldmans_data = validated_data.pop('fieldman')
         task = Task.objects.create(**validated_data, job_order=job_order)
@@ -69,6 +79,32 @@ class TaskSerializer(serializers.ModelSerializer):
             Fieldman.objects.create(task=task, **fieldman_data)
         return task
 
+    def update(self, instance, validated_data):     # Updating User Info
+        fieldmans_data = validated_data.pop("fieldman")
+        fieldmans = (instance.fieldman).all()
+
+        for fieldman in fieldmans:
+            fieldman.delete()
+
+        instance.job_order = validated_data.get('job_order__type', instance.job_order)
+        instance.desc = validated_data.get('desc', instance.desc)
+        instance.remarks = validated_data.get('remarks', instance.remarks)
+        instance.start_date = validated_data.get('start_date', instance.start_date)
+        instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.start_date_actual = validated_data.get('start_date_actual', instance.start_date_actual)
+        instance.end_date_actual = validated_data.get('end_date_actual', instance.end_date_actual)
+        instance.actual_days = validated_data.get('actual_days', instance.actual_days)
+        instance.task_status_fm = validated_data.get('task_status_fm', instance.task_status_fm)
+        instance.task_status_mn = validated_data.get('task_status_mn', instance.task_status_mn)
+        instance.manager = validated_data.get('manager', instance.manager)
+        instance.body_no = validated_data.get('body_no', instance.body_no)
+        instance.save()
+
+        for fieldman_data in fieldmans_data:
+            Fieldman.objects.create(task=instance, **fieldman_data)
+
+        return instance
+        
     def to_representation(self, instance): # instance of vin_no
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         return super(TaskSerializer, self).to_representation(instance)

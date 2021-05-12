@@ -27,12 +27,16 @@ class InspectionNotifyView(viewsets.ViewSet):
             inspection = Inspection.objects.filter(date_created = dates[i]) 
             # get all cars that is not used in specified date
             car = Car.objects.exclude(body_no__in = inspection.values_list('body_no__body_no', flat=True))
-
+            
             for x in range(len(car)):
                 # get the driver of the car
                 try:
-                    inspection = Inspection.objects.filter(body_no = car[x]).latest('inspection_id')
-                    driver = inspection.driver.username
+                    inspections = Inspection.objects.filter(body_no = car[x]).order_by('-inspection_id')[:3]
+                    driver = []
+                    for inspection in inspections:
+                        print(inspection)
+                        driver.append(str(inspection.driver))
+                    driver = list(dict.fromkeys(driver))
                 except:
                     driver = ""
                 context.append({
