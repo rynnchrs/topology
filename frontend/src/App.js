@@ -27,6 +27,7 @@ import { DriverInspectionReport } from './components/DriverInspectionReport';
 
 import { Register } from './components/Register';
 import { EditDeleteUser } from './components/EditDeleteUser';
+import { JobScheduling } from './components/JobScheduling';
 
 import  DriverRecordForms from './components/DriverRecordForms';
 import  VehiclesGPS from './components/VehiclesGPS';
@@ -159,11 +160,11 @@ const App = () => {
         console.log("permission data none");
     }
 
-    // if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
-    //     sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar'});
-    // } else {
-    //     //console.log("permission data none");
-    // }
+    if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
+        sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar', to: '/jobscheduling'});
+    } else {
+        //console.log("permission data none");
+    }
 
     //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
     const onInputStyleChange = (inputStyle) => {
@@ -293,6 +294,7 @@ const App = () => {
                 <Route path="/vehiclesgps" exact component={VehiclesGPS} />
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
+                <Route path="/jobscheduling" exact component={JobScheduling} />
             </div>
 
             <AppFooter />

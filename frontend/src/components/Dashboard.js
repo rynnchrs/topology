@@ -9,7 +9,7 @@ export const Dashboard = () => {
 
     const [totalTable, setTotalTable] = useState([]);
 
-    const [expiry1, setExpiry1] = useState([
+    const expiry1 = ([
         { month: 'January', or: '184', cr: '99', tpl: '33', compre: '33' }, 
         { month: 'February', or: '184', cr: '99', tpl: '33', compre: '33' },
         { month: 'March', or: '102', cr: '120', tpl: '45', compre: '33' },

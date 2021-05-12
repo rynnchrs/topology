@@ -6,7 +6,6 @@ import { AutoComplete } from 'primereact/autocomplete';
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import axios from "axios";
-import { isThisISOWeek } from 'date-fns';
 
 export class DriverInspectionReport extends Component {
     
@@ -282,6 +281,7 @@ export class DriverInspectionReport extends Component {
                     this.setState({
                         filteredSuggestions: this.state.filteredSuggestions,
                     });
+                    
                 } catch (err){
                     //console.log("autocomplete err:", err);
                 }
@@ -290,7 +290,6 @@ export class DriverInspectionReport extends Component {
     };
 
     onChangeAutoCompelete = (event) => {
-        //console.log("auto", event.target.value);
         this.setState({
             bn: event.target.value,
         });
@@ -300,6 +299,15 @@ export class DriverInspectionReport extends Component {
         } else {
             //console.log("bn is no null");
         }
+    }
+
+    convertData = (event) => {
+        let m = event.value.make === "L30" ? 'L300 Exceed 2.5D MT': event.value.make === "SUV" ? 'Super Carry UV': event.value.make ===  'G15'? 'Gratour midi truck 1.5L': event.value.make ===  'G12'? 'Gratour midi truck 1.2L' : ''; 
+        let l = event.value.current_loc ? event.value.current_loc : '';
+        this.setState({
+            make: m,
+            locc: l
+        })
     }
 
     //This will get the filename/filepath that can be use in post request*
@@ -617,12 +625,10 @@ export class DriverInspectionReport extends Component {
                         <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>
                         <div className="p-grid">
                             <div className="p-col-12 p-md-6">
-                                <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onChange={event => this.onChangeAutoCompelete(event)}/>
-                                {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onChange={event => this.setState({ bn: event.target.value })}  /> */}
+                                <AutoComplete forceSelection field="body_no" placeholder="Body No." value={this.state.bn} suggestions={this.state.filteredSuggestions} completeMethod={this.searchList} onSelect={event => this.convertData(event)} onChange={event => this.onChangeAutoCompelete(event)}/>
                             </div>
                             <div className="p-col-12 p-md-6">
-                                <InputText placeholder="Make/Model" value={this.state.make = this.state.bn.make === "L30" ? 'L300 Exceed 2.5D MT': this.state.bn.make === "SUV" ? 'Super Carry UV': this.state.bn.make ===  'G15'? 'Gratour midi truck 1.5L': this.state.bn.make ===  'G12'? 'Gratour midi truck 1.2L' : '' }/>
-                                {/* <InputText placeholder="Make/Model" value={this.state.bn.make}/> */}
+                                <InputText placeholder="Make/Model" value={this.state.make}/>
                             </div>
                         </div>
                         <div className="p-grid">
@@ -631,7 +637,7 @@ export class DriverInspectionReport extends Component {
                                 <span className="p-inputgroup-addon">KM.</span>
                             </div>
                             <div className="p-col-12 p-md-6">
-                                <InputText placeholder="Location" value={this.state.locc = this.state.bn.current_loc ? this.state.bn.current_loc:''}/>
+                                <InputText placeholder="Location" value={this.state.locc}/>
                             </div>
                         </div>
                         <div className="p-grid">

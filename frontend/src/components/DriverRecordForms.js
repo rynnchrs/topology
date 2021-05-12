@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback } from 'react';
+import React, {useState, useEffect, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import axios from "axios";
 import { Button } from 'primereact/button';
@@ -10,21 +10,18 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import { Fieldset } from 'primereact/fieldset';
 import { Paginator } from 'primereact/paginator';
-import { format, isToday } from 'date-fns';
+import { format } from 'date-fns';
 
 export default function DriverRecordForms() {
 
     const [selectedCar, setSelectedCar] = useState(['']);
-    //const [selectedBody, setSelectedBody] = useState(['']);
     const [selectedBody, setSelectedBody] = useState(['']);
     const [carValues, setcarValues] = useState([]);
     const [displayBasic, setDisplayBasic] = useState(false);
     const [displayBasic2, setDisplayBasic2] = useState(false);
     const [displayError, setDisplayError] = useState(false);
     const [displaySuccess, setDisplaySuccess] = useState(false);
-    const [position, setPosition] = useState('center');
     const [errorMessage, setErrorMessage] = useState({title:"", content:""});
     const [isLoading, setIsLoading] = useState(false);
     const [iconBtnSave, setIconBtnSave] = useState("");
@@ -55,11 +52,9 @@ export default function DriverRecordForms() {
     const [makes, setMakes] = useState("");
 
     const [selected, setSelected] = useState(null);
-    const [globalFilter, setGlobalFilter] = useState(null);
     const dt = useRef(null);
     const toast = useRef(null);
 
-    //const [cloneSelectedCar, setCloneSelectedCar] = useState([]);
     const [mil, setMileage] = useState("");
 
     const [cleanlinessExterior, isCleanlinessExterior] = useState(false);
@@ -112,7 +107,7 @@ export default function DriverRecordForms() {
 
     const [gasLevel, isGasLevel] = useState("");
     const [oilLevel, isOilLevel] = useState("");
-    const [emergency, setEmergency] = useState("09465657944");
+    const emergency = "09465657944";
     const [GPSData, setGPSData] = useState("");
     const [notes, isNotes] = useState("");
     const [editor, setEditor] = useState("");
@@ -128,49 +123,24 @@ export default function DriverRecordForms() {
     const [smallNotes, setSmallNotes] = useState("");
 
     const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(10);
+    const rows = 10;
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
     const [counter, setCounter] = useState(1);
     const [ids, setIds] = useState([]);
-    const [trigger, setTrigger] = useState("");
-
-    // React.useEffect(function effectFunction() {
-    //     let token = localStorage.getItem("token");
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': 'Bearer ' + token,
-    //             },
-    //         };
-    //     fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id',config)
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             //console.log("fr reactuseeffect")
-    //             //console.log(data)
-    //             setTotalCount(data.count);
-    //             setcarValues(data.results);
-    //         });
-    // }, []);
 
     useEffect(() => {
         try {
-            //console.log("test: ",selectedCar )
             revised();
         } catch(err) {
-            //console.log("revised error")
-            //console.log(err)
+
         }
-    }, [selectedCar]);
+    }, [selectedCar]); // eslint-disable-line react-hooks/exhaustive-deps
 
     //for pagination
     useEffect(() => {
         try {
-            // console.log("test flagPages: ", flagPages);
-            // console.log("firstVariable: ", first);
             const sentPage = (first / rows) + 1;
-            // console.log("sentPage: ",sentPage);
-            // console.log("bn: ",bodyNo);
 
             let token = localStorage.getItem("token");
             const config = {
@@ -184,7 +154,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("all nullU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -196,7 +165,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body locnull datenullU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -208,7 +176,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("bodynull loc datenullU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -220,7 +187,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("bodynull locnull dateU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -232,7 +198,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body loc datenullU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -244,7 +209,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body locnull dateU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -256,7 +220,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("bodynull loc dateU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -268,7 +231,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body loc dateU: ", data);
                     setTotalCount(data.count);
                     setcarValues(data.results);
                 })
@@ -280,19 +242,17 @@ export default function DriverRecordForms() {
             console.log("pages error")
             console.log(err)
         }
-    }, [flagPages]);
+    }, [flagPages]); // eslint-disable-line react-hooks/exhaustive-deps
 
     //for pagination
     const onPageChange = (event) =>  {
         setFirst(event.first);
         if (event.first > first) {
-            //console.log("greater add page");
             setFlagPages(flagPages + 1);
         } else if (event.first < first) {
-            //console.log("less than minus page");
             setFlagPages(flagPages - 1);
         } else {
-            //console.log("same first")
+
         }          
     }
 
@@ -318,7 +278,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("all null: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -330,7 +289,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body locnull datenull: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -342,7 +300,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("bodynull loc datenull: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -354,7 +311,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("bodynull locnull date: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -366,7 +322,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body loc datenull: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -378,7 +333,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body locnull date: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -390,7 +344,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("bodynull loc date: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -402,7 +355,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body loc date: ", data);
                 setTotalCount(data.count);
                 setcarValues(data.results);
             })
@@ -419,11 +371,8 @@ export default function DriverRecordForms() {
         'displaySuccess': setDisplaySuccess,
     }
 
-    const onClick = (name, position) => {
+    const onClick = (name) => {
         dialogFuncMap[`${name}`](true);
-        if (position) {
-            setPosition(position);
-        }
     }
 
     const onHide = (name) => {
@@ -474,10 +423,6 @@ export default function DriverRecordForms() {
         }
     }
 
-    // const lbl = () => {
-    //     return( <span><i className="pi pi-pencil"></i> Edit<big> / </big><i className="pi pi-search"></i> Show</span>);
-    // }
-
     const actionBody = (rowData) => {
         return (
             localStorage.getItem("editInspectionReport") === "true" ? <center>
@@ -504,14 +449,12 @@ export default function DriverRecordForms() {
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
                 setSelected(values);
                 onClick('displayBasic');
-                console.log(res.data);
             })
             .catch((error) => {
                 console.log('error: ');
                 console.log(error);
             });
         } else {
-            console.log("no selected");
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
         }
     }
@@ -726,7 +669,6 @@ export default function DriverRecordForms() {
                 rear_right_wheel: rearRightWheel,
                 rear_left_wheel: rearLeftWheel,
                 notes: notes,
-            // driver: selectedCar.driver,
                 driver: "",
                 edited_by: accfullname,
             }, config)
@@ -844,7 +786,6 @@ export default function DriverRecordForms() {
 
     const exportData = () => {
         setIds([]);
-        // let ii = counter + 1;
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -857,7 +798,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("all nullE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -868,7 +808,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body locnull datenullE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -879,7 +818,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("bodynull loc datenullE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -890,7 +828,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("bodynull locnull dateE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -901,7 +838,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body loc datenullE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -912,7 +848,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body locnull dateE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -923,7 +858,6 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("bodynull loc dateE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
@@ -934,37 +868,17 @@ export default function DriverRecordForms() {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
             .then(response => response.json())
             .then(data => {
-                //console.log("body loc dateE: ", data);
                 analyzeNext(data);
             })
             .catch((err) => {
                 console.log(err)
             });
         }
-        
-        // let ids = [];
-        // carValues.map((iddata, index) => {
-        //     ids.push(iddata.inspection_id);
-        // });
-        // console.log("ids:", ids)
-
-        //const body = { "inspection_id": [9,8] }; //carValues
-        // const body = { "inspection_id": ids };
-
-        // axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
-        // .then((res) => {
-        //     let url = process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_get/';
-        //     window.open(url);
-        // })
-        // .catch((error) => {
-        //     console.log('error export: ');
-        //     console.log(error);
-        // });
     }
 
     const analyzeNext = (value) => {
-        value.results.map((iddata, index) => {
-            setIds(ids => [...ids, iddata.inspection_id]);
+        value.results.map((iddata) => {
+            return setIds(ids => [...ids, iddata.inspection_id]);
         });
 
         if (value.next === null){
@@ -975,18 +889,15 @@ export default function DriverRecordForms() {
     }
 
     useEffect(() => {
-        //console.log("tryCOUNTER: ", counter);
-        //console.log("tryids: ", ids);
         if (counter === 0) {
             finalize();
         } else if (counter >= 2) {
             exportDataNextPage();
         }
-    }, [counter]); 
+    }, [counter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const finalize = (value) => {
         setCounter(1);
-        setTrigger("");
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -995,11 +906,10 @@ export default function DriverRecordForms() {
             },
         };
 
-        //console.log("ids: ", ids.length)
         const body = { "inspection_id": ids };
 
         if (ids.length <= 0){
-            //console.log("no export")
+
         } else {
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/export_post/', body, config)
             .then((res) => {
@@ -1015,7 +925,6 @@ export default function DriverRecordForms() {
     }
 
     const exportDataNextPage = () => {
-        // setTimeout(() => {
             let token = localStorage.getItem("token");
             const config = {
                 headers: {
@@ -1027,7 +936,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("all nullEN: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1038,7 +946,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body locnull datenullE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1049,7 +956,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("bodynull loc datenullE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1060,7 +966,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("bodynull locnull dateE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1071,7 +976,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body loc datenullE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1082,7 +986,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body locnull dateE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1093,7 +996,6 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("bodynull loc dateE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
@@ -1104,15 +1006,12 @@ export default function DriverRecordForms() {
                 fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + counter, config)
                 .then(response => response.json())
                 .then(data => {
-                    //console.log("body loc dateE: ", data);
                     analyzeNext(data);
                 })
                 .catch((err) => {
                     console.log(err.response)
                 });
             }
-            
-        // }, 2000);
     }
 
     const updateNotOkay = (index, value) => {
@@ -1127,13 +1026,10 @@ export default function DriverRecordForms() {
         var i;
         switch (id) {
             case 'cb0':
-                //console.log("id: cb0");
                 isCleanlinessExterior(value);
                 if (selectedCar.cleanliness_exterior !== value){
-                    //console.log("edit0");
                     value ? (updateNotOkay(0,"gray"),  updateOkay(0,"red")) : (updateNotOkay(0,"red"),  updateOkay(0,"gray"));
                 } else {
-                    //console.log("same0");
                     updateNotOkay(0,"none"); updateOkay(0,"none");
                 }
                 break;
@@ -1649,10 +1545,8 @@ export default function DriverRecordForms() {
                 <div className="card card-w-title">
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
-                            {/* <label>Body No.:</label> */}
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
-                                {/* <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Body No." /> */}
                                 <InputText placeholder="Search Body No." value={bodyNo} onChange={(event) => bodySearch(event)}/>
                             </span>
                         </div>
@@ -1660,8 +1554,6 @@ export default function DriverRecordForms() {
                             <Dropdown value={selectedLocation} options={cities} onChange={(e) => setSelectedLocation(e.value)} optionLabel="name" placeholder="Select a Location" />
                         </div>
                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
-                            {/* <Button label="Search" icon="pi pi-external-link" onClick={() => submitSearch()} />
-                            <Calendar id="icon" value={date2} onChange={(e) => setDate2(e.value)} showIcon /> */}
                             <Calendar id="icon" placeholder="Select a Date" value={date2} onChange={(e) => setDate2(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
@@ -1686,9 +1578,8 @@ export default function DriverRecordForms() {
 
             <div className="p-col-12">
                 <DataTable ref={dt} header={renderHeader()} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
-                    globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
-                    emptyMessage="No data found"
-                    >
+                    selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
+                    emptyMessage="No data found">
                     <Column field="body_no" header="Body No." style={{ paddingLeft: '3%' }}></Column>
                     <Column body={actionBody}></Column>
                 </DataTable>
@@ -1742,7 +1633,6 @@ export default function DriverRecordForms() {
                             <div className="p-fluid p-grid p-col-12 p-lg-11 p-md-12 p-sm-12" style={{borderBottom: '1px solid #dedede'}}> 
                                 <div className="p-col widName" style={{height:'40px'}}><h4>Cleanliness</h4></div>
                                 <div className={"p-col widCheck " + notOkay[0]}>
-                                    {/* <center><Checkbox  type="checkbox" id="rb1" checked={!cleanlinessExterior} onChange={event => onCheckboxChange(false, event.target.id)} /></center> */}
                                     <center><Checkbox id="cb0" checked={!cleanlinessExterior} onChange={event => onCheckboxChange(false, event.target.id)}/></center>
                                 </div>
                                 <div className={"p-col widCheck " + okay[0]}>
@@ -2296,7 +2186,6 @@ export default function DriverRecordForms() {
                                 <div className="p-col-12 p-md-6">
                                     <label htmlFor="mileage">Mileage:</label>
                                     <div className="p-inputgroup">
-                                        {/* <InputText id="mileage" value={selectedCar.mileage} /> */}
                                         <InputText id="mileage" value={mil} />
                                         <span className="p-inputgroup-addon">KM.</span>
                                     </div>

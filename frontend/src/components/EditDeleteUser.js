@@ -65,22 +65,15 @@ export const EditDeleteUser = () => {
     const dt = useRef(null);
 
     const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(10);
+    const rows = 10;
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(15);
     const [seacrhUser, setSearchUser] = useState("");
 
-    // useEffect(() => {
-    //     getUsers();
-    // }, []); 
-
     //for pagination
     useEffect(() => {
         try {
-            // console.log("test flagPages: ", flagPages);
-            // console.log("firstVariable: ", first);
             const sentPage = (first / rows) + 1;
-            // console.log("sentPage: ", sentPage);
 
             let token = localStorage.getItem("token");
             const config = {
@@ -93,31 +86,26 @@ export const EditDeleteUser = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'careta/user-list/?search=' + seacrhUser + '&page=' + sentPage, config)
                 .then((res) => {
-                    //console.log("paginU:", res.data);
                     setTotalCount(res.data.count);
                     setUsers(res.data.results);
                 })
                 .catch((err) => {
-                    console.log("getusersflag err:");
-                    console.log(err.response);
+                    
                 });
         } catch(err) {
-            console.log("pages error")
-            console.log(err)
+
         }
-    }, [flagPages]);
+    }, [flagPages]); // eslint-disable-line react-hooks/exhaustive-deps
 
     //for pagination
     const onPageChange = (event) =>  {
         setFirst(event.first);
         if (event.first > first) {
-            //console.log("greater add page");
             setFlagPages(flagPages + 1);
         } else if (event.first < first) {
-            //console.log("less than minus page");
             setFlagPages(flagPages - 1);
         } else {
-            //console.log("same first")
+
         }          
     }
 
@@ -277,7 +265,6 @@ export const EditDeleteUser = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
                 .then((res) => {
-                    //console.log(res.data);
                     setFirst_Name(res.data.first_name);
                     setLast_Name(res.data.last_name);
                     setEmail(res.data.email);
@@ -299,7 +286,6 @@ export const EditDeleteUser = () => {
                     console.log(err.response);
                 });
         } else {
-            //console.log("no selected");
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
         }
     }
@@ -371,7 +357,6 @@ export const EditDeleteUser = () => {
 
     const setPermissionLevel = (value) => {
         if (value === "manager") {
-            //console.log("manager");
             setUserLevel("manager");
             setViewUsers(true);
             setAddUsers(true);
@@ -398,7 +383,6 @@ export const EditDeleteUser = () => {
             setEditTask(true);
             setDelTask(true);
         } else if (value === "technician") {
-            //console.log("technician");
             setUserLevel("technician");
             setViewUsers(false);
             setAddUsers(false);
@@ -427,9 +411,7 @@ export const EditDeleteUser = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
-            
         } else if (value === "driver") {
-            //console.log("driver");
             setUserLevel("driver");
             setViewUsers(false);
             setAddUsers(false);
@@ -458,9 +440,7 @@ export const EditDeleteUser = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
-           
         } else if (value === "viewer") {
-            //console.log("viewer");
             setUserLevel("viewer");
             setViewUsers(false);
             setAddUsers(false);
@@ -497,7 +477,7 @@ export const EditDeleteUser = () => {
         let user = localStorage.getItem("username");
         let username = selectedUser.username;
         if(user !== username){
-            //console.log("not username")
+
         } else {
             const config = {
                 headers: {
@@ -730,6 +710,7 @@ export const EditDeleteUser = () => {
             .then((res) => {
                 //console.log('succ permission task: ');
                 //console.log(res.data)
+                onHide('displayBasic')
                 toast.current.show({ severity: 'success', summary: 'Update Successfully', detail: 'User details updated.', life: 3000 });
                 getUsers();
                 updateLocalPermission();
@@ -783,7 +764,6 @@ export const EditDeleteUser = () => {
                 toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
                 getUsers();
                 setSelectedUser(null);
-                //deletePermission();
             })
             .catch((err) => {
                 console.log('err delete user: ');
@@ -822,7 +802,7 @@ export const EditDeleteUser = () => {
             refreshPage();
             setIsChanged(false);
         } else {
-            //console.log("nothing change")
+            
         }
     }
 
@@ -848,7 +828,6 @@ export const EditDeleteUser = () => {
                     <div className="p-col-12 p-lg-4 p-md-4 p-sm-4">
                         <span className="p-input-icon-left">
                             <i className="pi pi-search" />
-                            {/* <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search Users" /> */}
                             <InputText type="search" placeholder="Search User" value={seacrhUser} onChange={(event) => filterUser(event)}/>
                         </span>
                     </div>
@@ -856,17 +835,13 @@ export const EditDeleteUser = () => {
             </div>
 
             <div className="p-col-12">
-                {/* <Panel header="USER MANAGEMENT" > */}
-                    <DataTable ref={dt} header={renderHeader()} value={users} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
-                        selectionMode="single" selection={selectedUser} onSelectionChange={e => setSelectedUser(e.value)}
-                        // paginator rows={10} 
-                        emptyMessage="No data found"
-                        >
-                        <Column field="full_name" header="Name" style={{ paddingLeft: '2%' }}></Column>
-                        <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column>
-                    </DataTable>
-                    <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
-                {/* </Panel> */}
+                <DataTable ref={dt} header={renderHeader()} value={users} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
+                    selectionMode="single" selection={selectedUser} onSelectionChange={e => setSelectedUser(e.value)}
+                    emptyMessage="No data found">
+                    <Column field="full_name" header="Name" style={{ paddingLeft: '2%' }}></Column>
+                    <Column body={actionBody} header="Action (Delete)" style={{ textAlign: 'center' }}></Column>
+                </DataTable>
+                <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
             </div>
 
             <Dialog header="Edit Form" visible={displayBasic} style={{  width: '85vw' }} onHide={() => onHide('displayBasic')}>
@@ -971,7 +946,6 @@ export const EditDeleteUser = () => {
                     <div className="p-grid">
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '2%' }}>
-                        {/* <div className="p-field p-col" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}> */}
                         <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={saveChanges} />
                         </div>
                     </div>
@@ -983,7 +957,6 @@ export const EditDeleteUser = () => {
             </Dialog>
             
         </div>
-
     )
 
 }
