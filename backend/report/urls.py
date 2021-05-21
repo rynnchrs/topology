@@ -5,8 +5,9 @@ from . import views
 from .views import CanViewListView, InspectionListView, MaintenanceListView
 
 router = routers.DefaultRouter() 
-router.register(r'inspection', views.InspectionView, 'inspection'), # report creation api
+router.register(r'inspection', views.InspectionView, 'inspection'), # inspection report creation api
 router.register(r'maintenance', views.MaintenanceView, 'maintenance'), #maintenance report form api
+router.register(r'repair', views.RepairView, 'repair'), #repair report form api
 
 urlpatterns = [
     path('', include(router.urls)),

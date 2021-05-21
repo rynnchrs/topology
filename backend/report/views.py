@@ -106,7 +106,7 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
     @action(detail=False,permission_classes=[AllowAny])
     def export_get(self, request):
         # print(request.data)
-        filename = '{date}-Inspection-Report.xlsx'.format(
+        filename = '{date}-Inspections.xlsx'.format(
         date=date.now().strftime('%Y-%m-%d'))
 
         file_path = '.'+settings.MEDIA_URL+filename
@@ -154,6 +154,15 @@ class CanViewListView(generics.ListAPIView): #list of inspection with filtering
 class MaintenanceView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]
     serializer_class = MaintenanceSerializer
+
+    def list(self, request): 
+        user = self.request.user   
+        if user_permission(user, 'can_view_maintenance_reports'): 
+            queryset = Maintenance.objects.all()
+            serializer = MaintenanceSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)            
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def create(self, request): # create report 
         user = self.request.user
@@ -204,10 +213,61 @@ class RepairView(viewsets.ModelViewSet):  # add this
     permission_classes = [IsAuthenticated]
     queryset = Repair.objects.all()  # add this
     serializer_class = RepairSerializer  # add this
-    search_fields = ['vin_no__vin_no','date_created']
-    filter_backends = [filters.SearchFilter]
+    # search_fields = ['vin_no__vin_no','date_created']
+    # filter_backends = [filters.SearchFilter]
 
-    def list(self, request): # list of all repair
-        queryset =  Repair.objects.all()
-        serializer = RepairListSerializer(queryset, many=True)
-        return Response(serializer.data)
+    
+    def list(self, request): 
+        user = self.request.user   
+        if user_permission(user, 'can_view_repair_reports'): 
+            queryset = Repair.objects.all()
+            serializer = RepairSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)            
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def create(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_repair_reports'):
+            serializer = RepairSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(status=status.HTTP_201_CREATED)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)    
+
+    def retrieve(self, request, pk=None):  
+        user = self.request.user
+        if user_permission(user,'can_view_repair_reports'): 
+            queryset = Repair.objects.all()
+            repair = get_object_or_404(queryset, pk=pk) 
+            serializer = RepairSerializer(repair,  many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)          
+        else:
+            if pk == user.username:  
+                serializer = RepairSerializer(user,  many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:    
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def update(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_edit_repair_reports'): 
+            queryset = Repair.objects.all()
+            repair = get_object_or_404(queryset, pk=pk)   
+            serializer = RepairSerializer(instance=repair, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)       
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            
+    def destroy(self, request, pk=None):      
+        user = self.request.user
+        if user_permission(user, 'can_delete_repair_reports'): 
+            queryset = Repair.objects.all()
+            repair = get_object_or_404(queryset, pk=pk)
+            repair.delete()
+            return Response(status=status.HTTP_200_OK)        
+        else: 
+            return Response(status=status.HTTP_401_UNAUTHORIZED)

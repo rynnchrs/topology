@@ -34,7 +34,6 @@ class InspectionNotifyView(viewsets.ViewSet):
                     inspections = Inspection.objects.filter(body_no = car[x]).order_by('-inspection_id')[:3]
                     driver = []
                     for inspection in inspections:
-                        print(inspection)
                         driver.append(str(inspection.driver))
                     driver = list(dict.fromkeys(driver))
                 except:

@@ -89,6 +89,7 @@ class TaskSerializer(serializers.ModelSerializer):
         instance.job_order = validated_data.get('job_order__type', instance.job_order)
         instance.desc = validated_data.get('desc', instance.desc)
         instance.remarks = validated_data.get('remarks', instance.remarks)
+        instance.schedule_date = validated_data.get('schedule_date', instance.schedule_date)
         instance.start_date = validated_data.get('start_date', instance.start_date)
         instance.end_date = validated_data.get('end_date', instance.end_date)
         instance.start_date_actual = validated_data.get('start_date_actual', instance.start_date_actual)
@@ -119,3 +120,30 @@ class WarningTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model= Task
         fields =  ['task_id','fieldman','manager','body_no','job_order','start_date','end_date']
+
+
+
+class RepairCarInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = ['vin_no','body_no','plate_no','make','current_loc','status','operational']
+
+
+class RepairTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ['task_id','schedule_date','body_no']
+
+    def to_representation(self, instance): 
+        self.fields['body_no'] = RepairCarInfoSerializer(read_only=True)
+        return super(RepairTaskSerializer, self).to_representation(instance)
+ 
+ 
+class RepairJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobOrder
+        fields = '__all__'
+
+    def to_representation(self, instance): 
+        self.fields['task'] = RepairTaskSerializer(read_only=True)
+        return super(RepairJobSerializer, self).to_representation(instance)   

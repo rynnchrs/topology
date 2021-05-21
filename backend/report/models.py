@@ -170,33 +170,38 @@ class Maintenance(models.Model): #Maintenance model
 
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
-    vin_no = models.ForeignKey(Car, related_name='repair', on_delete=models.CASCADE)
-    ro_no = models.CharField(unique=True, max_length=10)
-    current_status = models.CharField(max_length=30)
+    job_order = models.OneToOneField(JobOrder, related_name='repair', on_delete=models.CASCADE)
+    
+    ir_no = models.CharField(max_length=30)
+    incident_date = models.DateField(default=datetime.date.today)
+    date_receive = models.DateField(default=datetime.date.today)
+    site_poc = models.CharField(max_length=30)  
+    contact_no = models.IntegerField(default=0)
     incident_details = models.TextField(max_length=200, null=True, blank=True)
-    vms = models.ForeignKey(User, related_name='vms', on_delete=models.CASCADE)
-    dealer = models.CharField(max_length=30)
-    schedule_date = models.DateField(auto_now=False, auto_now_add=False)
-    perform_by = models.ForeignKey(User, related_name='actual', on_delete=models.CASCADE)
-    perform_date = models.DateField(auto_now=False, auto_now_add=False)
+    #actual findings    
+    diagnosed_by = models.ForeignKey(User, related_name='diagnosed', on_delete=models.CASCADE)
+    perform_date = models.DateField(default=datetime.date.today)
     actual_findings = models.TextField(max_length=200, null=True, blank=True)
     actual_remarks = models.TextField(max_length=200, null=True, blank=True)
+    generated_by = models.ForeignKey(User, related_name='generated', on_delete=models.CASCADE)
+    noted_by = models.ForeignKey(User, related_name='noted', on_delete=models.CASCADE, null=True, blank=True)
+    #action taken
     repair_by = models.ForeignKey(User, related_name='repair', on_delete=models.CASCADE)
-    repair_date = models.DateField(auto_now=False, auto_now_add=False)
+    repair_date = models.DateField(default=datetime.date.today)
     action_taken = models.TextField(max_length=200, null=True, blank=True)
-    date_done = models.DateField(auto_now=False, auto_now_add=False)
+    date_done = models.DateField(default=datetime.date.today)
     status_repair = models.CharField(max_length=20)
     remarks = models.TextField(max_length=200, null=True, blank=True)
+
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.ro_no
+        return self.job_order
         
     @property
     def total_parts_cost(self):  # total cost of particular
-        ro_no = Repair.objects.get(ro_no=self.ro_no)
-        repair_list = Cost.objects.filter(ro_no=ro_no,cost_type="P")
+        repair_list = Cost.objects.filter(ro_no=self.repair_id,cost_type="P")
         total = 0
         for cost in repair_list:
             total += cost.total_cost
@@ -204,8 +209,8 @@ class Repair(models.Model):
     
     @property
     def total_labor_cost(self): # total cost of labor
-        ro_no = Repair.objects.get(ro_no=self.ro_no)
-        repair_list = Cost.objects.filter(ro_no=ro_no, cost_type="L")
+        ro_no = Repair.objects.get(repair_id=self.repair_id)
+        repair_list = Cost.objects.filter(ro_no=self.repair_id, cost_type="L")
         total = 0
         for cost in repair_list:
             total += cost.cost
@@ -235,3 +240,5 @@ class Cost(models.Model):
     @property
     def total_cost(self): # total cost of an item per quantity
         return self.cost * self.quantity
+
+    

@@ -94,18 +94,18 @@ class InspectionReportTestCase(APITestCase):
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_inspection_report_list(self):
-        response1 = self.client.post('/report/inspection/', self.TEST_REPORT1, format='json')
-        response = self.client.get('/report/inspection/can_view_list/') # list of inspection report
+        response1 = self.client.post('/report/inspection-list/', self.TEST_REPORT1, format='json')
+        response = self.client.get('/report/inspection-list/can_view_list/') # list of inspection report
         self.assertEqual( response.status_code , status.HTTP_200_OK)
-        response = self.client.get('/report/inspection/can_view_list/?search=18-1654') # filter with body no
+        response = self.client.get('/report/inspection-list/can_view_list/?search=18-1654') # filter with body no
         self.assertNotEquals( response.content , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=NCT4511') # filter with plate no
+        response = self.client.get('/report/inspection-list/can_view_list/?search=NCT4511') # filter with plate no
         self.assertNotEquals( response.status_code , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=Marikina') # lfilter with location
+        response = self.client.get('/report/inspection-list/can_view_list/?search=Marikina') # lfilter with location
         self.assertNotEquals( response.status_code , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=PAEL65NYHJB005043') # filter with vin no
+        response = self.client.get('/report/inspection-list/can_view_list/?search=PAEL65NYHJB005043') # filter with vin no
         self.assertNotEquals( response.status_code , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=L30') # filter with make
+        response = self.client.get('/report/inspection-list/can_view_list/?search=L30') # filter with make
         self.assertNotEquals( response.status_code , response1.content)
 
     def test_inspection_report_retrieve(self): # retrieve inspection report
@@ -233,7 +233,7 @@ class MaintenanceReportTestCase(APITestCase):
                 "can_view_maintenance_reports": True,
                 "can_add_maintenance_reports": True,
                 "can_edit_maintenance_reports": True,
-                "can_show_all_maintenance_reports": True,
+                "can_delete_maintenance_reports": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",

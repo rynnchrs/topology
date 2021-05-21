@@ -21,6 +21,7 @@ class Task(models.Model):
     body_no = models.ForeignKey(Car, related_name='task', on_delete=models.CASCADE)
     job_order = models.OneToOneField(JobOrder, related_name='task', on_delete=models.CASCADE)
     desc = models.TextField(blank=True, null=True)
+    schedule_date = models.DateField(default=datetime.date.today)
     remarks =  models.TextField(blank=True, null=True)
     start_date = models.DateField(default=datetime.date.today)
     end_date = models.DateField(default=datetime.date.today)
