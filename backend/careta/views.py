@@ -16,7 +16,6 @@ from .models import Permission
 from .serializers import (MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
-                          PermissionMaintenanceReportSerializer,
                           PermissionRepairReportSerializer,
                           PermissionSerializer, PermissionTaskSerializer,
                           PermissionUserSerializer, UpdateUserSerializer,
@@ -202,19 +201,6 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=True, methods=['put'])
-    def maintenance(self, request, pk=None):     # update report permission
-        user = self.request.user
-        if user_permission(user, 'can_edit_users'): # permission
-            queryset = Permission.objects.all()
-            users = get_object_or_404(queryset, user__username=pk) # get user
-            serializer = PermissionMaintenanceReportSerializer(instance=users, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)       
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-    @action(detail=True, methods=['put'])
     def repair(self, request, pk=None):     # update report permission
         user = self.request.user
         if user_permission(user, 'can_edit_users'): # permission
@@ -237,16 +223,6 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)       
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-    @action(detail=False)
-    def add_maintenance_list(self, request):        # User List
-        user = self.request.user
-        if user_permission(user, 'can_view_users'): # permission
-            queryset = User.objects.all().filter(permission__can_add_maintenance_reports=True)
-            serializer = UserSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)            
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 

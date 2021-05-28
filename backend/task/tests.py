@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 from car.models import Car
 from careta.models import Permission, UserInfo
@@ -6,8 +7,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Task, JobOrder, Fieldman
 
+from .models import Fieldman, JobOrder, Task
 
 # Create your tests here.
 
@@ -21,13 +22,8 @@ class TaskTestCase(APITestCase):
             ],
             "desc": "",
             "remarks": "",
-            "start_date": "2021-05-10",
-            "end_date": "2021-05-10",
-            "start_date_actual": "2021-05-10",
-            "end_date_actual": "2021-05-10",
-            "actual_days": 1,
-            "task_status_fm": False,
-            "task_status_mn": False,
+            "start_date": str(date.today()),
+            "end_date": str(date.today()),
             "manager": "sample",
             "body_no": "18-1654"
         } 
@@ -40,13 +36,8 @@ class TaskTestCase(APITestCase):
             ],
             "desc": "",
             "remarks": "",
-            "start_date": "2021-05-10",
-            "end_date": "2021-05-10",
-            "start_date_actual": "2021-05-10",
-            "end_date_actual": "2021-05-10",
-            "actual_days": 1,
-            "task_status_fm": False,
-            "task_status_mn": False,
+            "start_date": str(date.today()),
+            "end_date": str(date.today()),
             "manager": "sample",
             "body_no": "18-1655"  #invalid body_no
         } 
@@ -118,3 +109,35 @@ class TaskTestCase(APITestCase):
             content_type = 'application/json'
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_warning_list(self):
+        response = self.client.get('/task/task-scheduling/warning_list/?start_date='+str(date.today())+
+                                    '&end_date='+str(date.today())+'&fieldman='+self.user.username)
+        self.assertEqual(response.status_code , status.HTTP_200_OK)
+
+    def test_date_update(self): # update inspection report 
+        self.TEST_DATE = {
+            "start_date_actual": str(date.today()),
+            "end_date_actual": str(date.today())
+            }
+        response = self.client.put('/task/task-scheduling/1/date_update/',
+            json.dumps(self.TEST_DATE),
+            content_type = 'application/json'
+            )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_status_fm(self): # update inspection report 
+        response = self.client.put('/task/task-scheduling/1/status_fm/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_status_mn(self): # update inspection report 
+        response = self.client.put('/task/task-scheduling/1/status_mn/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_status_approval(self):
+        response = self.client.get('/task/task-scheduling/status_approval/')
+        self.assertEqual(response.status_code , status.HTTP_200_OK)
+
+    def test_status_approved(self):
+        response = self.client.get('/task/task-scheduling/status_approval/')
+        self.assertEqual(response.status_code , status.HTTP_200_OK)

@@ -2,13 +2,9 @@ import datetime
 import json
 from datetime import date
 
-import reversion
 from django.contrib.auth.models import User
-from django.urls import reverse
-from report.models import Inspection, Maintenance
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Permission, UserInfo  # add this
 
@@ -95,10 +91,6 @@ class UserTestCase(APITestCase):
 
     def test_permission_retrieve_detail(self):
         response = self.client.get('/careta/permission/sample/')
-        self.assertEqual( response.status_code , status.HTTP_200_OK)
-
-    def test_permission_maintenance_list(self):
-        response = self.client.get('/careta/permission/add_maintenance_list/')
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_permission_inspection_list(self):

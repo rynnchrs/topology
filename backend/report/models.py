@@ -88,95 +88,16 @@ class InspectiontImage(models.Model):
    report = models.ForeignKey(Inspection, default=None, on_delete=models.CASCADE, related_name='images')
    images = models.ImageField(upload_to = 'images/')
 
-class Maintenance(models.Model): #Maintenance model
-    maintenance_id = models.AutoField(primary_key=True)
-    body_no = models.ForeignKey(Car, related_name='maintenance', on_delete=models.CASCADE)
-    supplier_name = models.CharField(max_length=50, null=True, blank=True)
-    mileage = models.IntegerField(default=0, null=True, blank=True)
-    job_order = models.ForeignKey(JobOrder, related_name='maintenance', on_delete=models.CASCADE)
-    Level_List = [
-        (1, "CHECK AND OK"),
-        (2, "MAY REQUIRE ATTENTION"),
-        (3, "REQUIRES IMMEDIATE ATTENTION")
-    ]
-    #interior/exterior
-    exterior_body = models.IntegerField(default=1, choices=Level_List)
-    windshield = models.IntegerField(default=1, choices=Level_List)
-    wipers = models.IntegerField(default=1, choices=Level_List)
-    lights = models.IntegerField(default=1, choices=Level_List)
-    interior_lights = models.IntegerField(default=1, choices=Level_List)
-    ac_operation = models.IntegerField(default=1, choices=Level_List)
-    heating = models.IntegerField(default=1, choices=Level_List)
-    interior_other = models.CharField(max_length=30, null=True, blank=True)
-    #underhood
-    engine_oil = models.IntegerField(default=1, choices=Level_List)
-    brake_fluid = models.IntegerField(default=1, choices=Level_List)
-    power_stearing = models.IntegerField(default=1, choices=Level_List)
-    washer = models.IntegerField(default=1, choices=Level_List)
-    belts_hoses = models.IntegerField(default=1, choices=Level_List)
-    coolant = models.IntegerField(default=1, choices=Level_List)
-    air_filter = models.IntegerField(default=1, choices=Level_List)
-    cabin_filter = models.IntegerField(default=1, choices=Level_List)
-    fuel_filter = models.IntegerField(default=1, choices=Level_List)
-    spark_plug = models.IntegerField(default=1, choices=Level_List)
-    underhood_other = models.CharField(max_length=30, null=True, blank=True)
-    battery_charge = models.IntegerField(default=1, choices=Level_List)
-    battery_condition = models.IntegerField(default=1, choices=Level_List)
-    cables = models.IntegerField(default=1, choices=Level_List)
-    #under vehicle
-    brakes = models.IntegerField(default=1, choices=Level_List)
-    brake_lines = models.IntegerField(default=1, choices=Level_List)
-    steering = models.IntegerField(default=1, choices=Level_List)
-    shocks = models.IntegerField(default=1, choices=Level_List)
-    driveline = models.IntegerField(default=1, choices=Level_List)
-    exhaust = models.IntegerField(default=1, choices=Level_List)
-    fuel_lines = models.IntegerField(default=1, choices=Level_List)
-    under_vehicle_other = models.CharField(max_length=30, null=True, blank=True)
-    #tires
-    Tread_List = [
-        (1, "7/32\" or greater"),
-        (2, "3/32\" to 6/32\""),
-        (3, "2/32\" or less")
-    ]
-    tread_depth = models.IntegerField(default=1, choices=Tread_List)
-    tread_lf = models.IntegerField(default=1, choices=Level_List)
-    tread_lr = models.IntegerField(default=1, choices=Level_List)
-    tread_rf = models.IntegerField(default=1, choices=Level_List)
-    tread_rr = models.IntegerField(default=1, choices=Level_List)
-    wear_lf = models.IntegerField(default=1, choices=Level_List)
-    wear_lr = models.IntegerField(default=1, choices=Level_List)
-    wear_rf = models.IntegerField(default=1, choices=Level_List)
-    wear_rr = models.IntegerField(default=1, choices=Level_List)
-    tpms = models.BooleanField(default=False)
-    air_lf = models.IntegerField(default=0, null=True, blank=True)
-    air_lr = models.IntegerField(default=0, null=True, blank=True)
-    air_rf = models.IntegerField(default=0, null=True, blank=True)
-    air_rr = models.IntegerField(default=0, null=True, blank=True)
-    alignment = models.BooleanField(default=False)
-    balance = models.BooleanField(default=False)
-    rotation = models.BooleanField(default=False)
-    new_tire = models.BooleanField(default=False)
-    repair_desc = models.TextField(null=True, blank=True)
-    comments = models.TextField(null=True, blank=True)
-    inspected_by = models.ForeignKey(User, related_name='inspected', on_delete=models.CASCADE)
-    edited_by = models.ForeignKey(User, related_name='edited', on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.date.today)
-    date_updated = models.DateField(auto_now=True)
-    date_created = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return self.body_no.body_no
-
 
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
     job_order = models.OneToOneField(JobOrder, related_name='repair', on_delete=models.CASCADE)
     
-    ir_no = models.CharField(max_length=30)
+    ir_no = models.CharField(max_length=30, null=True, blank=True)
     incident_date = models.DateField(default=datetime.date.today)
     date_receive = models.DateField(default=datetime.date.today)
-    site_poc = models.CharField(max_length=30)  
-    contact_no = models.IntegerField(default=0)
+    site_poc = models.CharField(max_length=30, null=True, blank=True)  
+    contact_no = models.IntegerField(default=0, null=True, blank=True)
     incident_details = models.TextField(max_length=200, null=True, blank=True)
     #actual findings    
     diagnosed_by = models.ForeignKey(User, related_name='diagnosed', on_delete=models.CASCADE)
@@ -190,7 +111,7 @@ class Repair(models.Model):
     repair_date = models.DateField(default=datetime.date.today)
     action_taken = models.TextField(max_length=200, null=True, blank=True)
     date_done = models.DateField(default=datetime.date.today)
-    status_repair = models.CharField(max_length=20)
+    status_repair = models.CharField(max_length=20, null=True, blank=True)
     remarks = models.TextField(max_length=200, null=True, blank=True)
 
     date_updated = models.DateField(auto_now=True)
