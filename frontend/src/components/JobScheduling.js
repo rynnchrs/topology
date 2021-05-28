@@ -58,6 +58,8 @@ export const JobScheduling = () => {
         "date_created": ""
     });
 
+    const [counterFieldman, setCounterFieldman] = useState([0]);
+
     const [makeData, setMakeData] = useState('');
 
     const [fieldman, setFieldman] = useState('');
@@ -68,6 +70,7 @@ export const JobScheduling = () => {
     const [remarks, setRemarks] = useState('none');
 
     //edit task form
+    const [editCounterFieldman, setEditCounterFieldman] = useState([0]);
     const [editJobNo, setEditJobNo] = useState('');
     const [editFieldman, setEditFieldman] = useState('');
     const [editManager, setEditManager] = useState('');
@@ -85,6 +88,8 @@ export const JobScheduling = () => {
     const [displayJobDetails, setDisplayJobDetails] = useState(false);
     const [displayJobCreate, setDisplayJobCreate] = useState(false);
     const [displayJobEdit, setDisplayJobEdit] = useState(false);
+
+    
     
 
     useEffect(() => {
@@ -143,10 +148,10 @@ export const JobScheduling = () => {
                         <div className="p-col-12 p-lg-12">
                             <div className="p-grid">
                                 <div className="p-col">
-                                <p style={{fontSize: '18px'}}><b>Job No. {jobList.job_order.job_no}</b></p>
+                                <p style={{fontSize: '16px'}}><b>Job No. {jobList.job_order.job_no}</b></p>
                                 </div>
-                                <div className="p-col" style={{textAlign:'right'}}>
-                                    <p><i className="pi pi-circle-on" style={{'color': 'orange'}}></i> PENDING</p>
+                                <div className="p-col" style={{textAlign:'right', padding:'5%'}}>
+                                    <b style={{backgroundColor:'gray', padding:'3%', borderRadius:'5px', color: 'white'}}>PENDING</b>
                                 </div>
                             </div>
                             <p><i className="pi pi-user"></i> {jobList.fieldman[0].field_man} <br></br>
@@ -171,6 +176,7 @@ export const JobScheduling = () => {
     }
 
     const submitTask = () => {
+        // console.log("save: ", fieldman)
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -196,7 +202,6 @@ export const JobScheduling = () => {
         .then((res) => {
             console.log(res.data);
             getTaskList();
-            
             toast.current.show({ severity: 'success', summary: 'Create Successful', detail: 'New task created.', life: 3000 });
             onHide('displayJobCreate');
         })
@@ -304,6 +309,28 @@ export const JobScheduling = () => {
         })
     }
 
+    const addFieldman = () => {
+        setCounterFieldman(counterFieldman => [...counterFieldman, counterFieldman.length]);
+    }
+
+    const removeFieldman = () => {
+        let cols = counterFieldman;
+        // cols.splice(-1, 1);
+        cols.pop();
+        setCounterFieldman(cols);
+    }
+
+    const editAddFieldman = () => {
+        setEditCounterFieldman(editCounterFieldman => [...editCounterFieldman, editCounterFieldman.length]);
+    }
+
+    const editRemoveFieldman = () => {
+        let cols = editCounterFieldman;
+        // cols.splice(-1, 1);
+        cols.pop();
+        setEditCounterFieldman(cols);
+    }
+
     const optionsFullCalendar = {
         plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
         defaultView: 'dayGridMonth',
@@ -357,7 +384,7 @@ export const JobScheduling = () => {
             
             
             <div className="p-col-12 p-lg-4 p-md-5 p-sm-12">
-                <div className="card" style={{paddingLeft:'1px', paddingRight:'1px', minWidth:'265px'}}>
+                <div className="card" style={{paddingLeft:'1px', paddingRight:'1px', minWidth:'245px'}}>
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                         <div className="p-grid">
                             <div className="p-col">
@@ -387,7 +414,19 @@ export const JobScheduling = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>FIELDMAN:</b></h6>
-                            <InputText placeholder="Input Name" value={fieldman} onChange={(e) => setFieldman(e.target.value)}/>
+                            <div className="p-grid p-fluid">
+                                {
+                                    counterFieldman.map(col =>
+                                        <div className="p-col-12 p-lg-12">
+                                            <InputText placeholder="Input Name" value={fieldman} onChange={(e) => setFieldman(e.target.value)}/>
+                                        </div>
+                                    )
+                                }
+
+                            </div>
+                            <Button label="+" onClick={() => addFieldman()} style={{ width: '50px', marginRight: '10px'}}/> 
+                            <Button label="-" onClick={() => removeFieldman()} style={{ width: '50px' }} disabled={counterFieldman.length === 1}/>
+                            {/* <InputText placeholder="Input Name" value={fieldman} onChange={(e) => setFieldman(e.target.value)}/> */}
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>MANAGER:</b></h6>
@@ -426,7 +465,19 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>FIELDMAN:</b></h6>
-                            <InputText placeholder="Input Name" value={editFieldman} onChange={(e) => setEditFieldman(e.target.value)}/>
+                            <div className="p-grid p-fluid">
+                                {
+                                    editCounterFieldman.map(col =>
+                                        <div className="p-col-12 p-lg-12">
+                                            <InputText placeholder="Input Name" value={fieldman} onChange={(e) => setFieldman(e.target.value)}/>
+                                        </div>
+                                    )
+                                }
+
+                            </div>
+                            <Button label="+" onClick={() => editAddFieldman()} style={{ width: '50px', marginRight: '10px'}}/> 
+                            <Button label="-" onClick={() => editRemoveFieldman()} style={{ width: '50px' }} disabled={editCounterFieldman.length === 1}/>
+                            {/* <InputText placeholder="Input Name" value={editFieldman} onChange={(e) => setEditFieldman(e.target.value)}/> */}
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>MANAGER:</b></h6>
