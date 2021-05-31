@@ -844,113 +844,116 @@ export const EditDeleteUser = () => {
                 <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
             </div>
 
-            <Dialog header="Edit Form" visible={displayBasic} style={{  width: '85vw' }} onHide={() => onHide('displayBasic')}>
-                <div className="p-col-12">
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>FIRSTNAME:</b></h6>
-                            <InputText placeholder="First Name" value={first_name} onChange={event => setFirst_Name(event.target.value)} />
+            <div className="dialog-display">
+            {/* <Dialog header="Edit Form" visible={displayBasic} style={{  width: '85vw' }} onHide={() => onHide('displayBasic')}> */}
+                <Dialog header="Edit Form" visible={displayBasic} onHide={() => onHide('displayBasic')}>
+                    <div className="p-col-12">
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>FIRSTNAME:</b></h6>
+                                <InputText placeholder="First Name" value={first_name} onChange={event => setFirst_Name(event.target.value)} />
+                            </div>
+                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>LASTNAME:</b></h6>
+                                <InputText placeholder="Last Name" value={last_name} onChange={event => setLast_Name(event.target.value)} />
+                            </div>
                         </div>
-                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>LASTNAME:</b></h6>
-                            <InputText placeholder="Last Name" value={last_name} onChange={event => setLast_Name(event.target.value)} />
-                        </div>
-                    </div>
 
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>EMAIL:</b></h6>
-                            <InputText placeholder="Email" value={email} onChange={event => setEmail(event.target.value)} />
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>EMAIL:</b></h6>
+                                <InputText placeholder="Email" value={email} onChange={event => setEmail(event.target.value)} />
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>USERNAME:</b></h6>
-                            <InputText placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>USERNAME:</b></h6>
+                                <InputText placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>PASSWORD:</b></h6>
-                            <div className="p-inputgroup">
-                                <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
-                                <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>PASSWORD:</b></h6>
+                                <div className="p-inputgroup">
+                                    <InputText placeholder="Password" type={passwordShown ? 'password' : 'text'} value={password} onChange={event => setPassword(event.target.value)} />
+                                    <Button icon={passwordShown ? 'pi pi-eye' : 'pi pi-eye-slash'} onClick={toggleShow}> </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>GENDER:</b></h6>
+                                <Dropdown value={mygender} options={genderOptions} optionLabel="name" placeholder="Select Gender" onChange={event => setGender(event.target.value)} />
+                            </div>
+                        </div>
+
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>COMPANY:</b></h6>
+                                <InputText placeholder="Company" value={company} onChange={event => setCompany(event.target.value)} />
+                            </div>
+                        </div>
+
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>POSITION:</b></h6>
+                                <InputText placeholder="Position" value={position} onChange={event => setPosition(event.target.value)} />
+                            </div>
+                        </div>
+
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>ADDRESS:</b></h6>
+                                <InputText placeholder="Address" value={address} onChange={event => setAddress(event.target.value)} />
+                            </div>
+                        </div>
+
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>PHONE NUMBER:</b></h6>
+                                <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
+                            </div>
+                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>BIRTHDAY: </b><i>(e.g. 1990-12-30)</i></h6>
+                                <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
+                            </div>
+                        </div>
+
+                        <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>
+                            <Panel header="PERMISSION" className="p-col-12 p-md-12"><center>
+                                <div className="p-grid p-fluid">
+                                    <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center', margin: 'auto'}}>
+                                        <Checkbox classname="p-checkbox-lg" checked={userLevel === "manager"} onChange={event => setPermissionLevel("manager")}> </Checkbox>
+                                        <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> MANAGER</label>
+                                    </div>
+                                    <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
+                                        <Checkbox classname="p-checkbox-lg" checked={userLevel === "technician"} onChange={event => setPermissionLevel("technician")}> </Checkbox>
+                                        <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> TECHNICIAN</label>
+                                    </div>
+                                    <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
+                                        <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setPermissionLevel("driver")}> </Checkbox>
+                                        <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DRIVER</label>
+                                    </div>
+                                    <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
+                                        <Checkbox classname="p-checkbox-lg" checked={userLevel === "viewer"} onChange={event => setPermissionLevel("viewer")}> </Checkbox>
+                                        <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEWER</label>
+                                    </div>
+                                </div></center>
+                            </Panel>
+                        </div>
+
+                        <div className="p-grid">
+                            <div className="p-col-12 p-md-9"> </div>
+                            <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '2%' }}>
+                            <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={saveChanges} />
                             </div>
                         </div>
                     </div>
-
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                        <h6><b>GENDER:</b></h6>
-                            <Dropdown value={mygender} options={genderOptions} optionLabel="name" placeholder="Select Gender" onChange={event => setGender(event.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>COMPANY:</b></h6>
-                            <InputText placeholder="Company" value={company} onChange={event => setCompany(event.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>POSITION:</b></h6>
-                            <InputText placeholder="Position" value={position} onChange={event => setPosition(event.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>ADDRESS:</b></h6>
-                            <InputText placeholder="Address" value={address} onChange={event => setAddress(event.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>PHONE NUMBER:</b></h6>
-                            <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
-                        </div>
-                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>BIRTHDAY: </b><i>(e.g. 1990-12-30)</i></h6>
-                            <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
-                        </div>
-                    </div>
-
-                    <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>
-                        <Panel header="PERMISSION" className="p-col-12 p-md-12"><center>
-                            <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center', margin: 'auto'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "manager"} onChange={event => setPermissionLevel("manager")}> </Checkbox>
-                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> MANAGER</label>
-                                </div>
-                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "technician"} onChange={event => setPermissionLevel("technician")}> </Checkbox>
-                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> TECHNICIAN</label>
-                                </div>
-                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "driver"} onChange={event => setPermissionLevel("driver")}> </Checkbox>
-                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> DRIVER</label>
-                                </div>
-                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center'}}>
-                                    <Checkbox classname="p-checkbox-lg" checked={userLevel === "viewer"} onChange={event => setPermissionLevel("viewer")}> </Checkbox>
-                                    <label style={{ paddingLeft: '2%', fontWeight: 'bold' }}> VIEWER</label>
-                                </div>
-                            </div></center>
-                        </Panel>
-                    </div>
-
-                    <div className="p-grid">
-                        <div className="p-col-12 p-md-9"> </div>
-                        <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '2%' }}>
-                        <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={saveChanges} />
-                        </div>
-                    </div>
-                </div>
-            </Dialog>
+                </Dialog>
+            </div>
 
             <Dialog header="Confirm Delete" visible={displayBasic2} style={{ width: '310px' }} footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
                 Are you sure to delete this record of <label style={{ fontWeight: 'bold' }}> {word} </label> ?

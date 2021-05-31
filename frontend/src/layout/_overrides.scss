@@ -239,6 +239,43 @@
   }
 }
 
+/* end css for for vehicle.js */
+
+
+.job-btn {
+  .p-button{
+    //box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
+    background-color: white;
+    color: black;
+    display: inline-block;
+    text-align: left;
+    padding-top: 0px;
+    line-height: .6;
+    font-family: "Gill Sans", sans-serif;
+    // border: none;
+    border-left: 5px solid blue;
+    
+  }
+}
+
+.dialog-display{
+  @media only screen and (max-width : 2500px) { 
+    .p-dialog{
+      width: 70vw;
+    }
+  }
+  @media only screen and (max-width : 991px) {
+    .p-dialog{
+      width: 70vw;
+    }
+  }
+  @media only screen and (max-width : 767px) { 
+    .p-dialog{
+      width: 310px;
+    }
+  }
+  
+}
 
 
 
