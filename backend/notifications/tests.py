@@ -30,7 +30,7 @@ class InspectionNotifyTestCase(APITestCase):
                 "can_view_inspection_reports": True,
                 "can_add_inspection_reports": True,
                 "can_edit_inspection_reports": True,
-                "can_delete_inspection_reports": True,
+                "can_show_all_inspection_reports": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",

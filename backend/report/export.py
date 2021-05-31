@@ -11,11 +11,11 @@ def export(inspection):
     
     # Get active worksheet/tab
     worksheet = workbook.active
-    worksheet.title = '{date}-Inspection-Report.xlsx'.format(
+    worksheet.title = '{date}-Inspections.xlsx'.format(
         date=datetime.now().strftime('%Y-%m-%d'))
 
-    cell_1 = ["B1","I1","Q1","U1","AA1","AP1","AR1","BB1"]
-    cell_2 = ["H1","P1","T1","Z1","AO1","AQ1","BA1","BF1"]
+    cell_1 = ["B1","H1","Q1","U1","AA1","AP1","AR1","BB1"]
+    cell_2 = ["G1","P1","T1","Z1","AO1","AQ1","BA1","BF1"]
     header = ["VEHICLE INFOMATION","EXTERIOR","INTERIOR","ENGINE BAY","ELECTRICS",
             "WHEELS AND TIRES","GAS AND OIL","CHECKLIST REPORT"]
     color = ["00FFFF00","003366FF","00FFCC99","00C0C0C0","0000FF00","00FF0000","00800080","00FFFFFF"]
@@ -36,7 +36,6 @@ def export(inspection):
     columns = [
         'ID',
         'Body No.',
-        'Vin No.',
         'Plate No.',
         'Make',
         'Current Location',
@@ -113,7 +112,7 @@ def export(inspection):
 
         if col_num >= 2:
             cell.fill = PatternFill("solid", fgColor=color[0])
-        if col_num >= 9:
+        if col_num >= 8:
             cell.fill = PatternFill("solid", fgColor=color[1])
         if col_num >= 17:
             cell.fill = PatternFill("solid", fgColor=color[2])
@@ -277,7 +276,6 @@ def export(inspection):
         row = [
             data.inspection_id,
             data.body_no.body_no,
-            data.body_no.vin_no,
             data.body_no.plate_no,
             data.body_no.make,
             data.body_no.current_loc,

@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from task.models import JobOrder
 
-from .models import Inspection, Maintenance
+from .models import Inspection, Repair
 
 # Create your tests here.
 
@@ -68,7 +68,7 @@ class InspectionReportTestCase(APITestCase):
                 "can_view_inspection_reports": True,
                 "can_add_inspection_reports": True,
                 "can_edit_inspection_reports": True,
-                "can_delete_inspection_reports": True,
+                "can_show_all_inspection_reports": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",
@@ -94,18 +94,18 @@ class InspectionReportTestCase(APITestCase):
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_inspection_report_list(self):
-        response1 = self.client.post('/report/inspection/', self.TEST_REPORT1, format='json')
-        response = self.client.get('/report/inspection/can_view_list/') # list of inspection report
+        response1 = self.client.post('/report/inspection-list/', self.TEST_REPORT1, format='json')
+        response = self.client.get('/report/inspection-list/can_view_list/') # list of inspection report
         self.assertEqual( response.status_code , status.HTTP_200_OK)
-        response = self.client.get('/report/inspection/can_view_list/?search=18-1654') # filter with body no
+        response = self.client.get('/report/inspection-list/can_view_list/?search=18-1654') # filter with body no
         self.assertNotEquals( response.content , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=NCT4511') # filter with plate no
+        response = self.client.get('/report/inspection-list/can_view_list/?search=NCT4511') # filter with plate no
         self.assertNotEquals( response.status_code , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=Marikina') # lfilter with location
+        response = self.client.get('/report/inspection-list/can_view_list/?search=Marikina') # lfilter with location
         self.assertNotEquals( response.status_code , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=PAEL65NYHJB005043') # filter with vin no
+        response = self.client.get('/report/inspection-list/can_view_list/?search=PAEL65NYHJB005043') # filter with vin no
         self.assertNotEquals( response.status_code , response1.content)
-        response = self.client.get('/report/inspection/can_view_list/?search=L30') # filter with make
+        response = self.client.get('/report/inspection-list/can_view_list/?search=L30') # filter with make
         self.assertNotEquals( response.status_code , response1.content)
 
     def test_inspection_report_retrieve(self): # retrieve inspection report
@@ -183,43 +183,44 @@ class InspectionReportTestCase(APITestCase):
         self.assertNotEqual(retrieve1.content, retrieve2.content) # the content must not equal
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-class MaintenanceReportTestCase(APITestCase):
+class RepairReportTestCase(APITestCase):
     TEST_REPORT1 = {  
-            "body_no": "18-1654",   
-            "mileage": 20000,  
-            "inspected_by": "sample",
-            "job_order" : 1,
+            "cost": [
+                {
+                    "cost_type":"P",
+                    "particulars":"sample",
+                    "cost":100, 
+                    "quantity":1
+                }
+            ],
+            "job_order": "2",
         } 
-    
-    TEST_REPORT2 = {  
-            "body_no": "18-1654",  
-            "mileage": 20000,  
-            "inspected_by": "sample",
-            "job_order" : 1
-        } 
-    TEST_REPORT3 = {  
-            "body_no": "18-1654",  
-            "mileage": 30000,  
-            "inspected_by": "sample",
-            "job_order" : 1
-        } 
+    TEST_UPDATE = {
+            "cost": [
+                {
+                    "cost_type":"P",
+                    "particulars":"sample",
+                    "cost":100, 
+                    "quantity":1
+                }
+            ],
+            "ir_no": "test0123",
+            "site_poc": "makatis",
+            "contact_no": "12345",
+            "incident_details": "testing",
+            "actual_findings": "testing",
+            "actual_remarks": "testing",
+            "action_taken": "testing",
+            "status_repair": "operational",
+            "remarks": "testing",
+        }
     INVALID_REPORT1 = {  
-            "body_no": "invalid",  
-            "inspected_by": "sample",
-            "job_order" : 1
+            "job_order": 3,
+            "diagnosed_by": 1,
+            "generated_by":1,
+            "repair_by":1,
+            "noted_by": "",
     }  
-    INVALID_REPORT2 = {  
-            "body_no": "18-1654",  
-            "inspected_by": "invalid",
-            "job_order" : 1
-    }  
-    INVALID_REPORT3 = {  
-            "body_no": "18-1654",  
-            "tread_depth" : 4,
-            "exterior_body": 4,
-            "inspected_by": "sample",
-            "job_order" : 1
-    } 
 
     TEST_USER = {
                 "username": "sample",
@@ -230,10 +231,10 @@ class MaintenanceReportTestCase(APITestCase):
             }
     TEST_PERMISSION = {
                 "slug": "sample",
-                "can_view_maintenance_reports": True,
-                "can_add_maintenance_reports": True,
-                "can_edit_maintenance_reports": True,
-                "can_delete_maintenance_reports": True,
+                "can_view_repair_reports": True,
+                "can_add_repair_reports": True,
+                "can_edit_repair_reports": True,
+                "can_delete_repair_reports": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",
@@ -249,84 +250,41 @@ class MaintenanceReportTestCase(APITestCase):
         self.permission = Permission.objects.create(user = self.user,**self.TEST_PERMISSION) # create permission
         self.car = Car.objects.create(**self.TEST_CAR) # create car instance
         self.job_order = JobOrder.objects.create()
-        self.maintenance = Maintenance.objects.create(body_no = self.car, job_order=self.job_order, inspected_by=self.user) # create maintenance
-        with reversion.create_revision(): # create reversion
-            self.maintenance.save()
+        self.job = JobOrder.objects.create()
+        self.repair = Repair.objects.create(
+                job_order=self.job_order,
+                diagnosed_by = self.user,
+                generated_by = self.user,
+                repair_by = self.user,
+            ) # create repair
             
-    def test_maintenance_report_list(self):
-        response = self.client.get('/report/maintenance-list/') # list of maintenanc report
+    def test_repair_report_list(self):
+        response = self.client.get('/report/repair/') # list of maintenanc report
         self.assertEqual( response.status_code, status.HTTP_200_OK)
 
-
-    def test_maintenance_report_retrieve(self):
-        response = self.client.get('/report/maintenance/1/') # retrieve maintenance report
+    def test_repair_report_retrieve(self):
+        response = self.client.get('/report/repair/1/') # retrieve repair report
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
-    def test_maintenance_report_create(self):
-        response = self.client.post('/report/maintenance/', self.TEST_REPORT1, format='json') # create maintenance report
+    def test_repair_report_create(self):
+        response = self.client.post('/report/repair/', self.TEST_REPORT1, format='json') # create repair report
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-
-    def test_maintenance_report_create_invalid(self):
-        # invalid body_no
-        response1 = self.client.post('/report/maintenance/', self.INVALID_REPORT1, format='json')
-        # invalid inspected_by
-        response2 = self.client.post('/report/maintenance/', self.INVALID_REPORT2, format='json')
-        # invalid choice field 
-        response3 = self.client.post('/report/maintenance/', self.INVALID_REPORT3, format='json')
+    def test_repair_report_create_invalid(self):
+        # invalid job_order
+        response1 = self.client.post('/report/repair/', self.INVALID_REPORT1, format='json')
         self.assertEquals(response1.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(response2.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(response3.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-    def test_maintenance_report_create_multiple(self):
-        # create maintenance report 
-        response1 = self.client.post('/report/maintenance/', self.TEST_REPORT1, format='json')
-        response2 = self.client.post('/report/maintenance/', self.TEST_REPORT2, format='json')
-        response3 = self.client.post('/report/maintenance/', self.TEST_REPORT3, format='json')
-        self.assertEquals(response1.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(response2.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(response3.status_code, status.HTTP_201_CREATED)
-        # retrieve maintenance report
-        retrieve1 = self.client.get('/report/maintenance/1/')
-        retrieve2 = self.client.get('/report/maintenance/2/')
-        retrieve3 = self.client.get('/report/maintenance/3/')
-        retrieve4 = self.client.get('/report/maintenance/4/')
-        # the first 3 report must not found
-        self.assertEquals(retrieve1.status_code, status.HTTP_200_OK)
-        self.assertEquals(retrieve2.status_code, status.HTTP_200_OK)
-        self.assertEquals(retrieve3.status_code, status.HTTP_200_OK)
-        self.assertEquals(retrieve4.status_code, status.HTTP_200_OK)    
-
     
-    def test_maintenance_report_update(self):
-        response = self.client.put('/report/maintenance/1/', # update maintenance report
-            json.dumps(self.TEST_REPORT1),
+    def test_repair_report_update(self):
+        response = self.client.put('/report/repair/1/', # update repair report
+            json.dumps(self.TEST_UPDATE),
             content_type = 'application/json'
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
-    def test_maintenance_report_update_invalid(self): # invalid update 
-        response = self.client.put('/report/maintenance/1/',
+    def test_repair_report_update_invalid(self): # invalid update 
+        response = self.client.put('/report/repair/1/',
             json.dumps(self.INVALID_REPORT1),
             content_type = 'application/json'
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-    def test_maintenance_report_update_multiple(self): # multiple update
-        response = self.client.put('/report/maintenance/1/',
-            json.dumps(self.TEST_REPORT2),
-            content_type = 'application/json'
-            )
-        retrieve1 = self.client.get('/report/maintenance/1/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response = self.client.put('/report/maintenance/1/',
-            json.dumps(self.TEST_REPORT3),
-            content_type = 'application/json'
-            )
-        retrieve2 = self.client.get('/report/maintenance/1/')
-        self.assertNotEqual(retrieve1.content, retrieve2.content) # the content must not equal
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
