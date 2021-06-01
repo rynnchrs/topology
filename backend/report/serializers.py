@@ -95,7 +95,7 @@ class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     
 
 class RepairSerializer(serializers.ModelSerializer): # repair serializer
-    cost = CostSerializer(many=True)
+    cost = CostSerializer(many=True, write_only=True)
     noted_by = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model = Repair

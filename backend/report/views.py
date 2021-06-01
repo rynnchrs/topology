@@ -4,6 +4,7 @@ from os import remove
 from wsgiref.util import FileWrapper
 
 from django.contrib.auth.models import User
+from rest_framework.utils import serializer_helpers
 
 from car.models import Car
 from django.conf import settings
@@ -18,8 +19,8 @@ from reversion.models import Version
 
 from .export import export
 from .filters import InspectionFilter
-from .models import Inspection, Repair
-from .serializers import (InspectionLastFourListSerializer,
+from .models import Cost, Inspection, Repair
+from .serializers import (CostSerializer, InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairSerializer)
 from .utils import reversion, user_permission
@@ -188,14 +189,21 @@ class RepairView(viewsets.ModelViewSet):  # add this
         if user_permission(user,'can_view_repair_reports'): 
             queryset = Repair.objects.all()
             repair = get_object_or_404(queryset, pk=pk) 
-            serializer = RepairSerializer(repair,  many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)          
+            serializer = RepairSerializer(repair,many=False)
+
+            parts = Cost.objects.filter(ro_no=repair, cost_type="P")
+            labor = Cost.objects.filter(ro_no=repair, cost_type="L")
+            serializer_data = serializer.data
+            if parts:
+                parts = CostSerializer(parts, many=True)
+                serializer_data['parts'] = parts.data
+            if labor:
+                labor = CostSerializer(labor, many=True)
+                serializer_data['labor'] = labor.data
+
+            return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
-            if pk == user.username:  
-                serializer = RepairSerializer(user,  many=False)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:    
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def update(self, request, pk=None):
         user = self.request.user
