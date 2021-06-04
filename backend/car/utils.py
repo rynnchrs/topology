@@ -1,6 +1,6 @@
 import datetime
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .models import TPL, Car, Insurance
 
@@ -126,7 +126,6 @@ def check_TPL_date(year):
     end_date = json.loads(end_date)
     return (end_date)
 
-
 def check_Com_date(year):
     jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
     dates = Insurance.objects.filter(end_date__isnull=False)
@@ -166,3 +165,15 @@ def check_Com_date(year):
     end_date = json.dumps(end_date)
     end_date = json.loads(end_date)
     return (end_date)
+
+def close_to_expire(datas):
+    count = 0
+    today = datetime.today()
+    for data in datas:
+        if data.end_date is not None:
+            days = datetime.strptime(data.end_date, '%Y-%m-%d')
+            months = days+timedelta(-90)
+            if today >= months and today < days:
+                count += 1
+    return count
+            

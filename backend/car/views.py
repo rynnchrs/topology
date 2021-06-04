@@ -1,5 +1,5 @@
-import datetime
 import subprocess
+from datetime import date
 from wsgiref.util import FileWrapper
 
 from django.conf import settings
@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
+from report.models import Repair
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -18,7 +19,8 @@ from .models import TPL, Car, Contract, Insurance
 from .serializers import (CarInfoSerializer, CarSerializer, ContractSerializer,
                           InsuranceSerializer, SearchInventorySerializer,
                           TotalCarSerializer, TPLSerializer)
-from .utils import check_Com_date, check_cr_date, check_or_date, check_TPL_date
+from .utils import (check_Com_date, check_cr_date, check_or_date,
+                    check_TPL_date, close_to_expire)
 
 
 class CarView(viewsets.ModelViewSet):  # add this
@@ -179,11 +181,50 @@ class InsuranceList(generics.ListAPIView):
         username = self.kwargs['username']
         return Insurance.objects.filter(car=username)
 
+
 class TotalView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = TotalCarSerializer
     queryset = Car.objects.all().order_by('date_created')[:1]
 
+
+class TotalReportView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request):
+        context = {}
+        operational = Car.objects.filter(operational=True)
+        unoperational = Car.objects.filter(operational=False)
+        inspection = Repair.objects.filter(job_order__type=False)
+        repair = Repair.objects.filter(job_order__type=True)
+        
+        context = {
+            'operational': operational.count(),
+            'unoperational': unoperational.count(),
+            'inspection': inspection.count(),
+            'repair': repair.count(),
+           }
+        return Response(context)
+
+
+class TotalExpiryView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request):
+        context = {}
+        expired_contract = Contract.objects.filter(end_date__lte=date.today())
+        expired_TPL = TPL.objects.filter(end_date__lte=date.today())
+        expired_insurance = Insurance.objects.filter(end_date__lte=date.today())
+        contract = Contract.objects.all()
+        tpls = TPL.objects.all()
+        insurance = Insurance.objects.all()
+        context = {
+            'expired_contract': expired_contract.count(),
+            'expiring_contract': close_to_expire(contract),
+            'expired_TPL': expired_TPL.count(),
+            'expiring_TPL': close_to_expire(tpls),
+            'expired_insurance': expired_insurance.count(),
+            'expiring_insurance': close_to_expire(insurance)
+            }
+        return Response(context)
 
 class ExpiryView(APIView): # expiry 
     permission_classes = [IsAuthenticated]
