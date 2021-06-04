@@ -179,6 +179,12 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['noted_by'] = ""
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['job_order'].task.body_no.body_no)
+                if request.data['status_repair'] == "Operational":
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
                 serializer.save()
             return Response("Successfully Created",status=status.HTTP_201_CREATED)          
         else:
@@ -216,6 +222,12 @@ class RepairView(viewsets.ModelViewSet):  # add this
             repair = get_object_or_404(queryset, pk=pk)   
             serializer = RepairSerializer(instance=repair, data=request.data)
             if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=repair.job_order.task.body_no.body_no)
+                if request.data['status_repair'] == "Operational":
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
