@@ -18,4 +18,5 @@ urlpatterns = [
     path('car-list/', views.CarListView.as_view(), name='car-list'), # 
     path('total-report/', views.TotalReportView.as_view(), name='total-report'),
     path('total-expiry/', views.TotalExpiryView.as_view(), name='total-expiry'),
+    path('total-inspection/', views.TotalInspectionView.as_view(), name='total-inspection'),
 ]
