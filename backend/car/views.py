@@ -1,5 +1,5 @@
 import subprocess
-from datetime import date
+from datetime import datetime, date, timedelta
 from wsgiref.util import FileWrapper
 
 from django.conf import settings
@@ -20,7 +20,7 @@ from .serializers import (CarInfoSerializer, CarSerializer, ContractSerializer,
                           InsuranceSerializer, SearchInventorySerializer,
                           TotalCarSerializer, TPLSerializer)
 from .utils import (check_Com_date, check_cr_date, check_or_date,
-                    check_TPL_date, close_to_expire)
+                    check_TPL_date, close_to_expire, inspection)
 
 
 class CarView(viewsets.ModelViewSet):  # add this
@@ -237,3 +237,24 @@ class ExpiryView(APIView): # expiry
             'TPL':check_TPL_date(year), # TPL Insurance
             'Com':check_Com_date(year), # Comprehensive Insurance
             })
+
+
+class TotalInspectionView(APIView): # driver inspection
+    # permission_classes = [IsAuthenticated]
+    def get(self, request):
+        day = datetime.strptime(request.GET['date'], '%Y-%m-%d')
+        mode = request.GET['mode']
+        if mode == "day":
+            first_day = day
+            last_day = day
+
+        elif mode == "week":
+            first_day = day + timedelta(days=0-date.weekday())
+            last_day = day + timedelta(days=6-date.weekday())
+
+        elif mode == "month":
+            first_day = day.replace(day=1)
+            last_day = date(year=(day.year + int(day.month % 12 == 0)),
+            month=(day.month + 1) % 12, day=1) - timedelta(days=1)
+
+        return Response(inspection(first_day, last_day))
