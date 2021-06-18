@@ -3,11 +3,9 @@ from datetime import datetime as date
 from os import remove
 from wsgiref.util import FileWrapper
 
-from django.contrib.auth.models import User
-from rest_framework.utils import serializer_helpers
-
 from car.models import Car
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
@@ -15,7 +13,9 @@ from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.utils import serializer_helpers
 from reversion.models import Version
+from task.models import JobOrder
 
 from .export import export
 from .filters import InspectionFilter
@@ -179,7 +179,9 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['noted_by'] = ""
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
-                car = Car.objects.get(body_no=request.data['job_order'].task.body_no.body_no)
+                print(request.data['job_order'])
+                job = JobOrder.objects.get(pk=request.data['job_order'])
+                car = Car.objects.get(body_no=job.task.body_no.body_no)
                 if request.data['status_repair'] == "Operational":
                     car.operational = True
                 else:
@@ -222,6 +224,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
             repair = get_object_or_404(queryset, pk=pk)   
             serializer = RepairSerializer(instance=repair, data=request.data)
             if serializer.is_valid(raise_exception=True):
+                job = JobOrder.objects.get(pk=request.data['job_order'])
                 car = Car.objects.get(body_no=repair.job_order.task.body_no.body_no)
                 if request.data['status_repair'] == "Operational":
                     car.operational = True

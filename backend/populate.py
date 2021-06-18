@@ -20,49 +20,48 @@ def datas():
         reader = csv.reader(f)
         data = [tuple(row) for row in reader]
         return (data)
-
-
-superuser = User.objects.create_superuser( #creating super user "admin"
-        username = 'admin',
-        password = 'password',
-        email = 'admin@test.com',
-        first_name = 'Admin',
-        last_name = 'Test',
-    )
-UserInfo.objects.create(
-        user=superuser,
-        company = "Careta",
-        position = "Admin",
-        gender = "M",
-        birthday = "2000-01-01",
-        phone = "09123456789",
-        address = "Makati"
+try:
+    superuser = User.objects.create_superuser( #creating super user "admin"
+            username = 'admin',
+            password = 'password',
+            email = 'admin@test.com',
+            first_name = 'Admin',
+            last_name = 'Test',
         )
-Permission.objects.create(user=superuser,  #create permission for admin only
-    can_view_users = True,
-    can_add_users = True,
-    can_edit_users = True,
-    can_delete_users = True,
-    can_view_inventory = True,
-    can_add_inventory = True,
-    can_edit_inventory = True,
-    can_delete_inventory = True,
-    can_view_inspection_reports = True,
-    can_add_inspection_reports = True,
-    can_edit_inspection_reports = True,
-    can_show_all_inspection_reports = True,
-    can_view_repair_reports = True,
-    can_add_repair_reports = True,
-    can_edit_repair_reports = True,
-    can_delete_repair_reports = True,
-    can_view_task = True,
-    can_add_task = True,
-    can_edit_task = True,
-    can_delete_task = True,)
-
+    UserInfo.objects.create(
+            user=superuser,
+            company = "Careta",
+            position = "Admin",
+            gender = "M",
+            birthday = "2000-01-01",
+            phone = "09123456789",
+            address = "Makati"
+            )
+    Permission.objects.create(user=superuser,  #create permission for admin only
+        can_view_users = True,
+        can_add_users = True,
+        can_edit_users = True,
+        can_delete_users = True,
+        can_view_inventory = True,
+        can_add_inventory = True,
+        can_edit_inventory = True,
+        can_delete_inventory = True,
+        can_view_inspection_reports = True,
+        can_add_inspection_reports = True,
+        can_edit_inspection_reports = True,
+        can_show_all_inspection_reports = True,
+        can_view_repair_reports = True,
+        can_add_repair_reports = True,
+        can_edit_repair_reports = True,
+        can_delete_repair_reports = True,
+        can_view_task = True,
+        can_add_task = True,
+        can_edit_task = True,
+        can_delete_task = True,)
+except:
+    pass
 
 for data in datas():
-
     if data[2] == "Not yet release":
         plate = None
     else:
@@ -282,15 +281,6 @@ for data in datas():
 
     ed3 = datetime.strptime(data[79], '%d-%b-%y')
     ed3 = ed3.strftime('%Y-%m-%d')
-        # start_date = data[67],
-        # end_date = data[68],
-        # date_issued = data[71],
-        # start_date = data[72],
-        # end_date = data[73],
-        # date_issued = data[77],
-        # start_date = data[78],
-        # end_date = data[79],
-
 
     Car.objects.create( # initializing car data
             slug = data[0],
@@ -398,5 +388,3 @@ for data in datas():
         start_date = sd3,
         end_date = ed3,
     )
-
-
