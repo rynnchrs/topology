@@ -1,13 +1,17 @@
 from datetime import datetime as date
 
+from careta.serializers import UserListSerializer
 from django.contrib.auth.models import User
+from django_filters import filters
+from django_filters import rest_framework as filter
 from report.models import Repair
-from rest_framework import serializers, status, viewsets
+from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from .filters import TaskFilter
 from .models import Fieldman, JobOrder, Task
 from .serializers import (JobOrderSerializer, RepairJobSerializer,
                           TaskSerializer, WarningTaskSerializer)
@@ -167,6 +171,37 @@ class TaskView(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class TaskListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+    filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
+    filter_class = TaskFilter
+    ordering_fields = ['body_no__body_no', 'date_created', 'task_id']
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user_permission(user, 'can_view_task'):  
+            queryset = Task.objects.all().order_by('task_id')
+        else:
+            queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('task_id')
+        return queryset
+
+
+class FieldmanListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserListSerializer
+    filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
+    filter_class = TaskFilter
+    ordering_fields = ['body_no__body_no', 'date_created', 'task_id']
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):  
+            queryset = User.objects.all().order_by('id')
+            queryset = queryset.filter(permission__can_add_task=False, permission__can_add_repair_reports=True)
+        return queryset
+
+
 class JobOrderView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = JobOrderSerializer
@@ -266,3 +301,4 @@ class JobOrderView(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+

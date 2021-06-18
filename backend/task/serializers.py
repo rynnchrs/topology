@@ -146,7 +146,7 @@ class RepairCarInfoSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.operational == False:
-            representation['operational'] = "Non-Operational"
+            representation['operational'] = "Unoperational"
             return representation
         else:
             representation['operational'] = "Operational"

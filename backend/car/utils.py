@@ -1,6 +1,9 @@
 import datetime
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from unittest.main import main
+
+from report.models import Inspection
 
 from .models import TPL, Car, Insurance
 
@@ -126,7 +129,6 @@ def check_TPL_date(year):
     end_date = json.loads(end_date)
     return (end_date)
 
-
 def check_Com_date(year):
     jan=feb=mar=apr=may=jun=jul=aug=sep=octo=nov=dec=0
     dates = Insurance.objects.filter(end_date__isnull=False)
@@ -166,3 +168,154 @@ def check_Com_date(year):
     end_date = json.dumps(end_date)
     end_date = json.loads(end_date)
     return (end_date)
+
+def close_to_expire(datas):
+    count = 0
+    today = datetime.today()
+    for data in datas:
+        if data.end_date is not None:
+            days = datetime.strptime(data.end_date, '%Y-%m-%d')
+            months = days+timedelta(-90)
+            if today >= months and today < days:
+                count += 1
+    return count
+            
+def inspection(first_day, last_day):
+    inspection = Inspection.objects.filter(date_created__gte=first_day, date_created__lte=last_day).distinct()
+
+    cleanliness_exterior = inspection.filter(cleanliness_exterior=True).count()
+        
+    condition_rust = inspection.filter(condition_rust=True).count()
+        
+    decals = inspection.filter(decals=True).count() 
+        
+    windows = inspection.filter(windows=True).count()
+        
+    rear_door = inspection.filter(rear_door=True).count()
+        
+    mirror = inspection.filter(mirror=True).count()
+        
+    roof_rack = inspection.filter(roof_rack=True).count()
+        
+    rear_step = inspection.filter(rear_step=True).count()
+        
+    seats = inspection.filter(seats=True).count()
+        
+    seat_belts = inspection.filter(seat_belts=True).count()
+        
+    general_condition = inspection.filter(general_condition=True).count()
+
+    vehicle_documents = inspection.filter(vehicle_documents=True).count()
+
+    main_beam = inspection.filter(main_beam=True).count()
+        
+    dipped_beam = inspection.filter(dipped_beam=True).count()
+        
+    side_lights = inspection.filter(side_lights=True).count()
+        
+    tail_lights = inspection.filter(tail_lights=True).count()
+        
+    indicators = inspection.filter(indicators=True).count()
+        
+    break_lights = inspection.filter(break_lights=True).count()
+        
+    reverse_lights = inspection.filter(reverse_lights=True).count()
+        
+    hazard_light = inspection.filter(hazard_light=True).count()
+        
+    rear_fog_lights = inspection.filter(rear_fog_lights=True).count()
+        
+    interior_lights = inspection.filter(interior_lights=True).count()
+        
+    screen_washer = inspection.filter(screen_washer=True).count()
+
+    wiper_blades = inspection.filter(wiper_blades=True).count()
+        
+    horn = inspection.filter(horn=True).count()
+        
+    radio = inspection.filter(radio=True).count()
+        
+    front_fog_lights = inspection.filter(front_fog_lights=True).count()
+
+    cleanliness_engine_bay = inspection.filter(cleanliness_engine_bay=True).count()
+
+    washer_fluid = inspection.filter(washer_fluid=True).count()
+        
+    coolant_level = inspection.filter(coolant_level=True).count()
+        
+    brake_fluid_level = inspection.filter(brake_fluid_level=True).count()
+        
+    power_steering_fluid = inspection.filter(power_steering_fluid=True).count()
+        
+    liquid_leak = inspection.filter(liquid_leak=True).count()
+        
+    gas_level = inspection.filter(gas_level=True).count()
+    
+    oil_level = inspection.filter(oil_level=True).count()
+        
+    tyres = inspection.filter(tyres=True).count()
+        
+    front_visual = inspection.filter(front_visual=True).count()
+        
+    rear_visual = inspection.filter(rear_visual=True).count()
+        
+    spare_visual = inspection.filter(spare_visual=True).count()
+        
+    wheel_brace = inspection.filter(wheel_brace=True).count()
+        
+    jack = inspection.filter(jack=True).count()
+        
+    front_right_wheel = inspection.filter(front_right_wheel=True).count()
+        
+    front_left_wheel = inspection.filter(front_left_wheel=True).count()
+        
+    rear_right_wheel = inspection.filter(rear_right_wheel=True).count()
+        
+    rear_left_wheel = inspection.filter(rear_left_wheel=True).count()    
+
+    return {'cleanliness_exterior': cleanliness_exterior,
+                'condition_rust': condition_rust,
+                'decals': decals,
+                'windows': windows,
+                'rear_door' : rear_door,
+                'mirror': mirror,
+                'roof_rack': roof_rack,
+                'rear_step': rear_step,
+                'seats':seats,
+                'seat_belts':seat_belts,
+                'general_condition':general_condition,
+                'vehicle_documents':vehicle_documents,
+                'main_beam':main_beam,
+                'dipped_beam':dipped_beam,
+                'side_lights':side_lights,
+                'tail_lights':tail_lights,
+                'indicators':indicators,
+                'break_lights':break_lights,
+                'reverse_lights':reverse_lights,
+                'hazard_light':hazard_light,
+                'rear_fog_lights':rear_fog_lights,
+                'interior_lights':interior_lights,
+                'screen_washer':screen_washer,
+                'wiper_blades':wiper_blades,
+                'horn':horn,
+                'radio':radio,
+                'front_fog_lights':front_fog_lights,
+                'cleanliness_engine_bay':cleanliness_engine_bay,
+                'washer_fluid':washer_fluid,
+                'coolant_level':coolant_level,
+                'brake_fluid_level':brake_fluid_level,
+                'power_steering_fluid':power_steering_fluid,
+                'liquid_leak':liquid_leak,
+                'gas_level':gas_level,
+                'oil_level':oil_level,
+                'tyres':tyres,
+                'front_visual':front_visual,
+                'rear_visual':rear_visual,
+                'spare_visual':spare_visual,
+                'wheel_brace':wheel_brace,
+                'jack':jack,
+                'front_right_wheel':front_right_wheel,
+                'front_left_wheel':front_left_wheel,
+                'rear_right_wheel':rear_right_wheel,
+                'rear_left_wheel':rear_left_wheel,
+                }

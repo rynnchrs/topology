@@ -95,14 +95,14 @@ class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
     
 
 class RepairSerializer(serializers.ModelSerializer): # repair serializer
-    cost = CostSerializer(many=True)
+    cost = CostSerializer(many=True, write_only=True)
     noted_by = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model = Repair
         fields = ['repair_id','job_order','cost','total_parts_cost','total_labor_cost','total_estimate_cost',
                 'ir_no','incident_date','date_receive','site_poc','contact_no','incident_details','diagnosed_by',
                 'perform_date','actual_findings','actual_remarks','generated_by','noted_by','repair_by',
-                'repair_date','action_taken','date_done','status_repair','remarks','date_updated','date_created']
+                'repair_date','action_taken','date_done','remarks','date_updated','date_created']
         extra_kwargs = {
             'job_order': {'required': False}
         }
@@ -143,7 +143,6 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
         instance.repair_date = validated_data.get('repair_date', instance.repair_date)
         instance.action_taken = validated_data.get('action_taken', instance.action_taken)
         instance.date_done = validated_data.get('date_done', instance.date_done)
-        instance.status_repair = validated_data.get('status_repair', instance.status_repair)
         instance.remarks = validated_data.get('remarks', instance.remarks)
         instance.save()
 
