@@ -78,7 +78,7 @@ class Car(models.Model):
     net_capacity = models.IntegerField(default=0, null=True, blank=True)
     lto_cr = models.CharField(max_length=30, null=True, blank=True)
     cr_date = models.CharField(max_length=20, null=True, blank=True)
-    or_no = models.IntegerField(default=0, null=True, blank=True)
+    or_no = models.CharField(max_length=50, null=True, blank=True)
     or_date = models.CharField(max_length=20, null=True, blank=True)
     top_load = models.BooleanField(default=False, null=True, blank=True)
     field_office = models.CharField(max_length=50, null=True, blank=True)
