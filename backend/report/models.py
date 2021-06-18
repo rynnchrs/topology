@@ -130,11 +130,10 @@ class Repair(models.Model):
     
     @property
     def total_labor_cost(self): # total cost of labor
-        ro_no = Repair.objects.get(repair_id=self.repair_id)
         repair_list = Cost.objects.filter(ro_no=self.repair_id, cost_type="L")
         total = 0
         for cost in repair_list:
-            total += cost.cost
+            total += cost.total_cost
         return total
     
     def total_estimate_cost(self): # total estimate
@@ -156,7 +155,7 @@ class Cost(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.ro_no.ro_no
+        return self.ro_no.job_order
 
     @property
     def total_cost(self): # total cost of an item per quantity
