@@ -241,23 +241,43 @@
 
 /* end css for for vehicle.js */
 
-
-.job-btn {
-  .p-button{
-    //box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
-    background-color: white;
-    color: black;
-    display: inline-block;
-    text-align: left;
-    padding-top: 0px;
-    line-height: .6;
-    font-family: "Gill Sans", sans-serif;
-    // border: none;
-    border-left: 5px solid blue;
-    
+/* css for task list datatable */
+.job-datatable {
+  .p-datatable-scrollable-wrapper table > .p-datatable-thead {
+    display: none
+  }
+  .p-datatable-scrollable-body > table > .p-datatable-tbody > tr:first-child > td {
+    border-top: 0 none;
+    padding-top: 15px;
+  }
+  .p-datatable-scrollable-body > table > .p-datatable-tbody > tr:last-child > td {
+    border-top: 0 none;
+    padding-bottom: 15px;
+  }
+  .p-datatable-scrollable-body > table > .p-datatable-tbody > tr > td {
+    border: 0 none;
+  }
+  .p-datatable-scrollable-body > table > .p-datatable-tbody > tr > td {
+    border: 0 none;
+    background-color: #eeeeee;
   }
 }
 
+.job-datatable-item {
+  padding: 9px 10px 9px;
+  background-color: white;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 0px 0px 5px #dfdfdf;
+  transition: 0.2s;
+}
+.job-datatable-item:hover {
+  background-color: rgb(247, 247, 247);
+}
+
+/* end css for task list datatable */
+
+/* override global size of dialog in all forms*/
 .dialog-display{
   @media only screen and (max-width : 2500px) { 
     .p-dialog{
@@ -276,6 +296,7 @@
   }
   
 }
+/* end override global size of dialog in all forms*/
 
 
 

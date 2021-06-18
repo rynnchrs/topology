@@ -35,10 +35,6 @@ export const Register = () => {
     const [addInspectionReport, setAddInspectionReport] = useState(false);
     const [editInspectionReport, setEditInspectionReport] = useState(false);
     const [viewAllInspectionReport, setViewAllInspectionReport] = useState(false);
-    const [viewMaintenanceReport, setViewMaintenanceReport] = useState(false);
-    const [addMaintenanceReport, setAddMaintenanceReport] = useState(false);
-    const [editMaintenanceReport, setEditMaintenanceReport] = useState(false);
-    const [delMaintenanceReport, setDelMaintenanceReport] = useState(false);
     const [viewRepairReport, setViewRepairReport] = useState(false);
     const [addRepairReport, setAddRepairReport] = useState(false);
     const [editRepairReport, setEditRepairReport] = useState(false);
@@ -129,10 +125,6 @@ export const Register = () => {
             setAddInspectionReport(true);
             setEditInspectionReport(true);
             setViewAllInspectionReport(true);
-            setViewMaintenanceReport(true);
-            setAddMaintenanceReport(true);
-            setEditMaintenanceReport(true);
-            setDelMaintenanceReport(true);
             setViewRepairReport(true);
             setAddRepairReport(true);
             setEditRepairReport(true);
@@ -159,18 +151,14 @@ export const Register = () => {
             setEditInspectionReport(true);
             setViewAllInspectionReport(true);
 
-            setViewMaintenanceReport(true);
-            setAddMaintenanceReport(true);
-            setEditMaintenanceReport(true);
-            setDelMaintenanceReport(true);
             setViewRepairReport(true);
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
-            setViewTask(true);
-            setAddTask(true);
-            setEditTask(true);
-            setDelTask(true);
+            setViewTask(false);
+            setAddTask(false);
+            setEditTask(false);
+            setDelTask(false);
             
         } else if (value === "driver") {
             //console.log("driver");
@@ -190,10 +178,6 @@ export const Register = () => {
             setEditInspectionReport(false);
             setViewAllInspectionReport(false);
 
-            setViewMaintenanceReport(true);
-            setAddMaintenanceReport(true);
-            setEditMaintenanceReport(true);
-            setDelMaintenanceReport(true);
             setViewRepairReport(true);
             setAddRepairReport(true);
             setEditRepairReport(true);
@@ -221,10 +205,6 @@ export const Register = () => {
             setEditInspectionReport(false);
             setViewAllInspectionReport(true);
 
-            setViewMaintenanceReport(true);
-            setAddMaintenanceReport(true);
-            setEditMaintenanceReport(true);
-            setDelMaintenanceReport(true);
             setViewRepairReport(true);
             setAddRepairReport(true);
             setEditRepairReport(true);
@@ -261,10 +241,6 @@ export const Register = () => {
             "can_add_inspection_reports": addInspectionReport,
             "can_edit_inspection_reports": editInspectionReport,
             "can_show_all_inspection_reports": viewAllInspectionReport,
-            "can_view_maintenance_reports": viewMaintenanceReport,
-            "can_add_maintenance_reports": addMaintenanceReport,
-            "can_edit_maintenance_reports": editMaintenanceReport,
-            "can_delete_maintenance_reports": delMaintenanceReport,
             "can_view_repair_reports": viewRepairReport,
             "can_add_repair_reports": addRepairReport,
             "can_edit_repair_reports": editRepairReport,
