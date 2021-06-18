@@ -9,14 +9,9 @@ router.register(r'careta-contract', views.ContractView, 'careta-contract')     #
 router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
 router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance') # add this
 router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
-router.register(r'total', views.TotalView, 'total') # total list api
 
 urlpatterns = [
     path('', include(router.urls)),
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
-    path('expiry/', views.ExpiryView.as_view(), name='expiry'),
     path('car-list/', views.CarListView.as_view(), name='car-list'), # 
-    path('total-report/', views.TotalReportView.as_view(), name='total-report'),
-    path('total-expiry/', views.TotalExpiryView.as_view(), name='total-expiry'),
-    path('total-inspection/', views.TotalInspectionView.as_view(), name='total-inspection'),
 ]
