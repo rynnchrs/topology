@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
+import { AutoComplete } from 'primereact/autocomplete';
 import { Calendar } from 'primereact/calendar';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -63,9 +64,11 @@ export const JobScheduling = () => {
     // const [makeData, setMakeData] = useState('');
     const jobTypeOptions = [{ name: 'Repair', val: true }, { name: 'Inspection', val: false }];
     const [disabledData, setDisabledData] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [suggestions, setSuggestions] = useState(null);
 
     //create task form
-    const [fieldman, setFieldman] = useState([{id: 0 , val: ""}]);
+    const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState('');
     const [jobType, setJobType] = useState([]);
     const [dateStart, setDateStart] = useState(null);
@@ -100,6 +103,28 @@ export const JobScheduling = () => {
     const [displayJobEdit, setDisplayJobEdit] = useState(false);
     const [displayConfirmFM, setDisplayConfirmFM] = useState(false);
     const [displayConfirmMN, setDisplayConfirmMN] = useState(false);
+    const [displayMessage, setDisplayMessage] = useState(false);
+    const [message, setMessage] = useState({title:"", content:""});
+
+    // useEffect(() => {
+    //     let token = localStorage.getItem("token");
+    //     const config = {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + token,
+    //         },
+    //     };
+
+    //     axios
+    //         .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', config)
+    //         .then((res) => {
+    //             setJobList(res.data);
+    //             fullCalendarDisplay(res.data);
+    //         })
+    //         .catch((err) => {
+                
+    //         });
+    // }, []);
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -110,16 +135,35 @@ export const JobScheduling = () => {
             },
         };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', config)
-            .then((res) => {
-                setJobList(res.data);
-                fullCalendarDisplay(res.data)
-            })
-            .catch((err) => {
-                
-            });
+        Promise.all([
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', config),
+            localStorage.getItem("viewUsers") === "true" ? axios.get(process.env.REACT_APP_SERVER_NAME + 'careta/users/', config) : '',
+        ]).then(([res1, res2]) => {
+            setJobList(res1.data);
+            fullCalendarDisplay(res1.data);
+            setUsers(res2.data);
+        }).catch((err) => {
+            console.log("joberr: ", err);
+        });
     }, []);
+
+    const searchList = (event) => {
+        setTimeout(() => {
+            if (!event.query.trim().length) {
+
+            } else {
+                try {
+                    setSuggestions(users.filter(item => item.username.startsWith(event.query)));
+                } catch (err){
+
+                }
+            }
+        }, 100);
+    };
+
+    const autoCompleteSelect = (id, event) => {
+        updateFieldman(id, event.value.username, event.value.user_info.full_name);
+    }
 
     const getTaskList = () => {
         let token = localStorage.getItem("token");
@@ -143,13 +187,13 @@ export const JobScheduling = () => {
 
     const fullCalendarDisplay = (value) => {
         setFullCalendarList([]);
-        value.filter(v => v.task_status_fm !== true || v.task_status_mn !== true).map(v => {
+        value.filter(v => v.task_status_fm !== true || v.task_status_mn !== true).map((v) => {
             let splitDate = v.end_date.split("-");
             let gmtDate = new Date(+splitDate[0], splitDate[1] - 1, +splitDate[2]);
             let d = new Date();
             d.setDate(gmtDate.getDate() + 1);
             let endDate = format(d, 'yyyy-MM-dd');
-            let f = v.fieldman.map(x =>
+            let f = v.fieldman.map((x) =>
                 x.field_man
             )
             return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.task_id + "\nFieldman: " + f,
@@ -169,15 +213,13 @@ export const JobScheduling = () => {
                 //     }
                 // },
                 {
-                    label: 'Edit',
-                    icon: 'pi pi-pencil',
+                    label: 'Edit', icon: 'pi pi-pencil',
                     command: () => {
                         editAssignData();
                     }
                 },
                 {
-                    label: 'Delete',
-                    icon: 'pi pi-trash',
+                    label: 'Delete', icon: 'pi pi-trash',
                     command: () => {
                         deleteTask(holdData);
                     }
@@ -185,6 +227,21 @@ export const JobScheduling = () => {
             ]
         }
     ];
+
+    const itemsFieldman = [
+        {
+            items: [
+                {
+                    label: 'Edit', icon: 'pi pi-pencil',
+                    command: () => {
+                        editAssignData();
+                    }
+                } 
+            ]
+        }
+    ];
+
+
 
     const actionBody = (jobList) => {
         let monthNames = ["January", "February", "March", "April", "May","June","July", "August", "September", "October", "November","December"];
@@ -219,8 +276,8 @@ export const JobScheduling = () => {
                                     <div className="p-col">
                                         <p style={{fontSize: '14px'}}><i className="pi pi-user"></i>
                                             {
-                                                jobList.fieldman.map(x =>
-                                                    <b> {x.field_man + ","}</b>
+                                                jobList.fieldman.map((x, index) =>
+                                                    <b key={index}> {x.field_man + ","}</b>
                                                 )
                                             }
                                         </p>
@@ -284,6 +341,7 @@ export const JobScheduling = () => {
     }
 
     const submitTask = () => {
+        console.log("f: ", fieldman);
         if (fieldman[0].val === "") { 
             toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
         } else if (bodyNo === "") {
@@ -323,10 +381,10 @@ export const JobScheduling = () => {
                 remarks: remarks
             }, config)
             .then((res) => {
-                console.log(res.data);
                 getTaskList();
-                toast.current.show({ severity: 'success', summary: 'Create Successful', detail: 'New task created.', life: 3000 });
                 onHide('displayJobCreate');
+                setMessage({title:"CREATE", content:"Successfully created."});
+                onClick('displayMessage');
             })
             .catch((err) => {
                 console.log(err.response);
@@ -426,8 +484,9 @@ export const JobScheduling = () => {
         }, config)
         .then((res) => {
             getTaskList();
-            toast.current.show({ severity: 'success', summary: 'Update successfully', detail: 'Task updated.', life: 3000 });
             onHide('displayJobEdit');
+            setMessage({title:"UPDATE", content:"Successfully update."});
+            onClick('displayMessage');
         })
         .catch((err) => {
             console.log(err.response);
@@ -468,8 +527,9 @@ export const JobScheduling = () => {
         }, config)
         .then((res) => {
             getTaskList();
-            toast.current.show({ severity: 'success', summary: 'Update successfully', detail: 'Task updated.', life: 3000 });
             onHide('displayJobEdit');
+            setMessage({title:"UPDATE", content:"Successfully update."});
+            onClick('displayMessage');
         })
         .catch((err) => {
             console.log(err.response);
@@ -505,10 +565,11 @@ export const JobScheduling = () => {
         };
 
         axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value.task_id + '/', config)
-        .then((res) => {
-            toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'Task deleted.', life: 3000 });
+        .then((res) => {;
             getTaskList();
             onHide('displayJobEdit');
+            setMessage({title:"DELETE", content:"Successfully delete."});
+            onClick('displayMessage');
         })
         .catch((err) => {
             console.log(err.response)
@@ -529,10 +590,11 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/status_fm/', "", config)
         .then((res) => {
-            toast.current.show({ severity: 'success', summary: 'Status Update', detail: 'Change to approval.', life: 3000 });
             getTaskList();
             onHide('displayJobDetails');
             onHide('displayConfirmFM');
+            setMessage({title:"APPROVAL", content:"Task approval sent."});
+            onClick('displayMessage');
         })
         .catch((err) => {
             console.log(err.response)
@@ -551,11 +613,11 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/status_mn/', "", config)
         .then((res) => {
-            console.log(res);
-            toast.current.show({ severity: 'success', summary: 'Status Update', detail: 'Change to Approve.', life: 3000 });
             getTaskList();
             onHide('displayJobDetails');
             onHide('displayConfirmMN');
+            setMessage({title:"APPROVE", content:"Task approve."});
+            onClick('displayMessage');
         })
         .catch((err) => {
             console.log(err.response)
@@ -573,9 +635,9 @@ export const JobScheduling = () => {
         setFieldman(cols);
     }
 
-    const updateFieldman = (index, value) => {
+    const updateFieldman = (index, value, fn) => {
         let arr = fieldman.slice();
-        arr[index] = {id: index, val: value};
+        arr[index] = {id: index, val: value, fullname: fn};
         setFieldman(arr);
     }
 
@@ -589,9 +651,9 @@ export const JobScheduling = () => {
         setEditFieldman(cols);
     }
 
-    const updateEditFieldman = (index, value) => {
+    const updateEditFieldman = (index, value, fn) => {
         let arr = editFieldman.slice();
-        arr[index] = {id: index, val: value};
+        arr[index] = {id: index, val: value, fullname: fn};
         setEditFieldman(arr);
     }
 
@@ -611,7 +673,8 @@ export const JobScheduling = () => {
         'displayJobCreate': setDisplayJobCreate,
         'displayJobEdit': setDisplayJobEdit,
         'displayConfirmFM': setDisplayConfirmFM,
-        'displayConfirmMN': setDisplayConfirmMN
+        'displayConfirmMN': setDisplayConfirmMN,
+        'displayMessage': setDisplayMessage
     }
 
     const onClick = (name) => {
@@ -622,22 +685,28 @@ export const JobScheduling = () => {
         dialogFuncMap[`${name}`](false);
     }
 
-    const renderFooterFM = (name) => {
-        return (
-            <div>
-                <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
-                <Button label="Yes" icon="pi pi-check" onClick={() => statusFieldman(jobData.task_id)} />
-            </div>
-        );
-    }
-
-    const renderFooterMN = (name) => {
-        return (
-            <div>
-                <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
-                <Button label="Yes" icon="pi pi-check" onClick={() => statusManager(jobData.task_id)} />
-            </div>
-        );
+    const renderFooter = (name) => {
+        if (name === 'displayConfirmFM') {
+            return (
+                <div>
+                    <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => statusFieldman(jobData.task_id)}/>
+                </div>
+            );
+        } else if (name === 'displayConfirmMN') {
+            return (
+                <div>
+                    <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => statusManager(jobData.task_id)}/>
+                </div>
+            );
+        }else if (name === 'displayMessage') {
+            return (
+                <div>
+                    <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus/>
+                </div>
+            );
+        }
     }
 
     return (
@@ -674,7 +743,11 @@ export const JobScheduling = () => {
                             
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 job-datatable">
-                            <Menu model={items} popup ref={menu} id="popup_menu" />
+                            {
+                                localStorage.getItem("viewUsers") === "true" ? 
+                                <Menu model={items} popup ref={menu} id="popup_menu" /> :
+                                <Menu model={itemsFieldman} popup ref={menu} id="popup_menu" />
+                            }
                             <DataTable ref={dt} value={jobList} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                                 scrollable scrollHeight="325px" emptyMessage="No data found">
                                 <Column body={actionBody}></Column>
@@ -691,15 +764,17 @@ export const JobScheduling = () => {
             </div>
 
             <div className="dialog-display">
-                <Dialog header="CREATE TASK" visible={displayJobCreate} onHide={() => onHide('displayJobCreate')} blockScroll="true">
+                <Dialog header="CREATE TASK" visible={displayJobCreate} onHide={() => onHide('displayJobCreate')} blockScroll={true}>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>FIELDMAN:</b></h6>
                             <div className="p-grid p-fluid">
                                 {
-                                    fieldman.map(x =>
-                                        <div className="p-col-12 p-lg-12">
-                                            <InputText placeholder="Input Name" value={x.val} onChange={(e) => updateFieldman(x.id, e.target.value)}/>
+                                    fieldman.map((x, index) =>
+                                        <div className="p-col-12 p-lg-12" key={index}>
+                                            {/* <InputText placeholder="Input Name" value={x.val} onChange={(e) => updateFieldman(x.id, e.target.value)}/> */}
+                                            <AutoComplete forceSelection field="user_info.full_name" placeholder="Input Fieldman" value={x.fullname} suggestions={suggestions} completeMethod={searchList} 
+                                            onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)}/>
                                         </div>
                                     )
                                 }
@@ -739,7 +814,7 @@ export const JobScheduling = () => {
                     </div>
                 </Dialog>
 
-                <Dialog header="EDIT TASK" visible={displayJobEdit} onHide={() => onHide('displayJobEdit')} blockScroll="true">
+                <Dialog header="EDIT TASK" visible={displayJobEdit} onHide={() => onHide('displayJobEdit')} blockScroll={true}>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB NO.:</b></h6>
@@ -749,8 +824,8 @@ export const JobScheduling = () => {
                             <h6><b>FIELDMAN:</b></h6>
                             <div className="p-grid p-fluid">
                                 {
-                                    editFieldman.map(x =>
-                                        <div className="p-col-12 p-lg-12">
+                                    editFieldman.map((x, index) =>
+                                        <div className="p-col-12 p-lg-12" key={index}>
                                             <InputText placeholder="Input Name" value={x.val} onChange={(e) => updateEditFieldman(x.id, e.target.value)} disabled={disabledData}/>
                                         </div>
                                     )
@@ -804,7 +879,7 @@ export const JobScheduling = () => {
                 </Dialog>
             </div>
 
-            <Dialog header="JOB DETAILS" visible={displayJobDetails} style={{ width: '310px' }} onHide={() => onHide('displayJobDetails')} blockScroll="true">
+            <Dialog header="JOB DETAILS" visible={displayJobDetails} style={{ width: '310px' }} onHide={() => onHide('displayJobDetails')} blockScroll={true}>
                 <div className="p-grid p-fluid">
                     <div className="p-col-12 p-lg-12" style={{paddingTop:'5%'}}>
                         <div className="p-grid p-nogutter">
@@ -819,8 +894,8 @@ export const JobScheduling = () => {
                     </div>
                     <div className="p-col-12 p-lg-12" style={{borderBottom: '1px solid #dedede'}}>
                         {
-                            jobData.fieldman.map(x =>
-                                <div>
+                            jobData.fieldman.map((x,index) =>
+                                <div key={index}>
                                     <label>FIELDMAN: </label><b>{x.field_man}</b>
                                 </div>
                             )
@@ -900,26 +975,37 @@ export const JobScheduling = () => {
                 </div>
             </Dialog>
 
-            <Dialog header="CONFIRM" visible={displayConfirmFM} style={{ width: '280px' }} footer={renderFooterFM('displayConfirmFM')} onHide={() => onHide('displayConfirmFM')}>
+            <Dialog header="CONFIRM" visible={displayConfirmFM} style={{ width: '280px' }} footer={renderFooter('displayConfirmFM')} onHide={() => onHide('displayConfirmFM')}>
                 <div className="p-grid">
                     <div className="p-col-2">
                         <i className="pi pi-check-circle" style={{fontSize: '25px', color: 'orange'}}/>
                     </div>
                     <div className="p-col">
                         <h5><b>Approval Request</b></h5>
-                        <div style={{fontSize: '16px'}}>Are you sure to submit approval? {jobData.task_id}</div>
+                        <div style={{fontSize: '16px'}}>Are you sure to submit approval? </div>
                     </div>
                 </div>
             </Dialog>
 
-            <Dialog header="CONFIRM" visible={displayConfirmMN} style={{ width: '280px' }} footer={renderFooterMN('displayConfirmMN')} onHide={() => onHide('displayConfirmMN')}>
+            <Dialog header="CONFIRM" visible={displayConfirmMN} style={{ width: '280px' }} footer={renderFooter('displayConfirmMN')} onHide={() => onHide('displayConfirmMN')}>
                 <div className="p-grid">
                     <div className="p-col-2">
                         <i className="pi pi-check" style={{fontSize: '25px', color: 'green'}}/>
                     </div>
                     <div className="p-col">
                         <h5><b>Approve Task</b></h5>
-                        <div style={{fontSize: '16px'}}>Are you sure to approve this? {jobData.task_id}</div>
+                        <div style={{fontSize: '16px'}}>Are you sure to approve this? </div>
+                    </div>
+                </div>
+            </Dialog>
+
+            <Dialog header={message.title} visible={displayMessage} style={{ width: '310px' }} footer={renderFooter('displayMessage')} onHide={() => onHide('displayMessage')} closable={false}>
+                <div className="p-grid">
+                    <div className="p-col-2">
+                        <i className="pi pi-exclamation-circle" style={{fontSize: '28px', color: 'gray'}}/>
+                    </div>
+                    <div className="p-col">
+                        <div style={{fontSize: '16px'}}>{message.content}</div>
                     </div>
                 </div>
             </Dialog>
