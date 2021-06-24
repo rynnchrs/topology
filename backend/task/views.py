@@ -173,7 +173,7 @@ class TaskView(viewsets.ModelViewSet):
 
 class TaskListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = TaskSerializer
+    serializer_class = WarningTaskSerializer
     filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
     filter_class = TaskFilter
     ordering_fields = ['body_no__body_no', 'date_created', 'task_id']
