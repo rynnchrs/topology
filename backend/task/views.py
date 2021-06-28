@@ -22,7 +22,7 @@ class TaskView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Task.objects.all().order_by('task_id')
     serializer_class = TaskSerializer
-    
+
     def list(self, request):    
         user = self.request.user
         if user_permission(user, 'can_view_task'):  
@@ -149,25 +149,37 @@ class TaskView(viewsets.ModelViewSet):
         user = self.request.user
         if user_permission(user, 'can_view_task'):  
             queryset = Task.objects.filter(task_status_fm=True, task_status_mn=False).order_by('task_id')
-            serializer = TaskSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)      
+            serializer = WarningTaskSerializer(queryset, many=True)
+            page = self.paginate_queryset(serializer.data)
+            if page is not None:
+                return self.get_paginated_response(serializer.data)   
+            return Response(serializer.data, status=status.HTTP_200_OK)        
         else:
             queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('task_id')
             queryset = queryset.filter(task_status_fm=True, task_status_mn=False)
-            serializer = TaskSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK) 
+            serializer = WarningTaskSerializer(queryset, many=True)
+            page = self.paginate_queryset(serializer.data)
+            if page is not None:
+                return self.get_paginated_response(serializer.data)      
+            return Response(serializer.data, status=status.HTTP_200_OK)
             
     @action(detail=False)
     def status_approved(self, request):  # List of approved task
         user = self.request.user
         if user_permission(user, 'can_view_task'):  
             queryset = Task.objects.filter(task_status_fm=True, task_status_mn=True).order_by('task_id')
-            serializer = TaskSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)      
+            serializer = WarningTaskSerializer(queryset, many=True)
+            page = self.paginate_queryset(serializer.data)
+            if page is not None:
+                return self.get_paginated_response(serializer.data)  
+            return Response(serializer.data, status=status.HTTP_200_OK)    
         else:
             queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('task_id')
             queryset = queryset.filter(task_status_fm=True, task_status_mn=True)
-            serializer = TaskSerializer(queryset, many=True)
+            serializer = WarningTaskSerializer(queryset, many=True)
+            page = self.paginate_queryset(serializer.data)
+            if page is not None:
+                return self.get_paginated_response(serializer.data)   
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
