@@ -134,7 +134,8 @@ class WarningTaskSerializer(serializers.ModelSerializer):
     job_order = JobOrderSerializer()
     class Meta:
         model= Task
-        fields =  ['job_order','fieldman','start_date','end_date','schedule_date']
+        fields =  ['task_id','job_order','fieldman','start_date','end_date',
+                    'task_status_fm','task_status_mn']
 
 
 
