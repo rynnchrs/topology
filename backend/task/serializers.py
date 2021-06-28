@@ -39,7 +39,8 @@ class FieldmanSerializer(serializers.ModelSerializer):
     def validate(self, obj): # validate input in foreign keys
         errors = []
         try:
-            obj['field_man'] = User.objects.get(username=obj['field_man'])
+            fieldman = obj['field_man'].split()
+            obj['field_man'] = User.objects.get(first_name=fieldman[0], last_name=fieldman[1])
         except:
             errors.append({"field_man": 'Invalid Fieldman.'})
         if errors:
@@ -57,6 +58,14 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate(self, obj): # validate input in foreign keys
         errors = []
+        fieldmans = []
+        for fieldman in obj['fieldman']:
+            fieldmans.append(fieldman['field_man'].pk)
+
+        if(len(set(fieldmans)) == len(fieldmans)):
+            pass
+        else:
+            errors.append({"field_man": 'There have a duplicate fieldman in the list.'})
         try:
             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:

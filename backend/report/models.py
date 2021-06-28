@@ -118,7 +118,7 @@ class Repair(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.job_order
+        return str(self.job_order)
         
     @property
     def total_parts_cost(self):  # total cost of particular

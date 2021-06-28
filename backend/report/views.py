@@ -17,7 +17,7 @@ from rest_framework.utils import serializer_helpers
 from reversion.models import Version
 from task.models import JobOrder
 
-from .export import export
+from .export import export, repair_export
 from .filters import InspectionFilter
 from .models import Cost, Inspection, Repair
 from .serializers import (CostSerializer, InspectionLastFourListSerializer,
@@ -89,7 +89,6 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def export_post(self, request, pk=None):
-        # print(request.data)
         inspection_id = []
         if len(request.data['inspection_id']) == 0:
             return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)            
@@ -107,7 +106,6 @@ class InspectionView(viewsets.ViewSet):  # inspection report Form
 
     @action(detail=False,permission_classes=[AllowAny])
     def export_get(self, request):
-        # print(request.data)
         filename = '{date}-Inspections.xlsx'.format(
         date=date.now().strftime('%Y-%m-%d'))
 
@@ -177,9 +175,10 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['noted_by'] = ""
+            cost = request.data['parts'] + request.data['labor']
+            request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
-                print(request.data['job_order'])
                 job = JobOrder.objects.get(pk=request.data['job_order'])
                 car = Car.objects.get(body_no=job.task.body_no.body_no)
                 if request.data['status_repair'] == "Operational":
@@ -261,3 +260,34 @@ class RepairView(viewsets.ModelViewSet):  # add this
             return Response("Successfully Added", status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def export_post(self, request, pk=None):
+        repair_id = []
+        if len(request.data['repair_id']) == 0:
+            return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)            
+        for data in (request.data['repair_id']):
+            repair_id.append(data)
+            try:
+                repair = Repair.objects.get(repair_id=data)
+            except Repair.DoesNotExist:
+                return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
+        repair = Repair.objects.all().filter(repair_id__in=repair_id)
+        if repair_export(repair):
+            return Response("Excel generated",status=status.HTTP_200_OK)
+        else:
+            return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False,permission_classes=[AllowAny])
+    def export_get(self, request):
+        filename = '{date}-Repair.xlsx'.format(
+        date=date.now().strftime('%Y-%m-%d'))
+
+        file_path = '.'+settings.MEDIA_URL+filename
+        file = open(file_path,"rb")
+        response = HttpResponse(FileWrapper(file),
+         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=' + filename
+        file = remove(file_path)
+        return response
