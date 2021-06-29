@@ -46,6 +46,10 @@ class FieldmanSerializer(serializers.ModelSerializer):
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
+    
+    def to_representation(self, instance): # instances
+        self.fields['field_man'] =  serializers.CharField(source='field_man.user_info.full_name')
+        return super(FieldmanSerializer, self).to_representation(instance)
 
         
 class TaskSerializer(serializers.ModelSerializer):
