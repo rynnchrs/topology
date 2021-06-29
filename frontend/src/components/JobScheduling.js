@@ -63,18 +63,19 @@ export const JobScheduling = () => {
 
     const [holdData, setHoldData] = useState([]);
     // const [makeData, setMakeData] = useState('');
-    const jobTypeOptions = [{ name: 'Repair', val: true }, { name: 'Inspection', val: false }];
+    const jobTypeOptions = [{ name: 'REPAIR', val: true }, { name: 'INSPECTION', val: false }];
     const [disabledData, setDisabledData] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
 
+    const [searchFieldman, setSearchFieldman] = useState(null);
     const [searchStartDate, setSearchStartDate] = useState(null);
     const [searchEndDate, setSearchEndDate] = useState(null);
-    const searchStatusOptions = [{ name: 'PENDING', val: 'p' }, { name: 'FOR APPROVAL', val: 'fa' }, { name: 'APPROVE', val: 'a' }];
+    const searchStatusOptions = [{ name: 'FOR APPROVAL', val: 'fa' }, { name: 'APPROVE', val: 'a' }];
     const [searchStatus, setSearchStatus] = useState([]);
-    const searchJobTypeOptions = [{ name: 'Repair', val: 'True' }, { name: 'Inspection', val: 'False' }];
+    const searchJobTypeOptions = [{ name: 'REPAIR', val: 'True' }, { name: 'INSPECTION', val: 'False' }];
     const [searchJobType, setSearchJobType] = useState([]);
 
     //paginator
@@ -435,14 +436,14 @@ export const JobScheduling = () => {
         let jobTypeColor = jobList.job_order.type === "Repair" ? 'blue' : jobList.job_order.type === "Inspection" ? 'green' : ''; 
 
         return (
-            <div className="p-grid p-fluid p-nogutter" role="button" style={{cursor: 'pointer'}} onClick={(event) => btnJobData(jobList)}>
+            <div className="p-grid p-fluid p-nogutter" role="button" style={{cursor: 'pointer'}} onClick={(event) => getTaskScheduling(jobList.job_order.job_id)}>
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                     <div className="job-datatable-item" style={{borderLeft: '5px solid ' + jobTypeColor}}>
                         <div className="p-grid p-fluid p-nogutter">
                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                 <div className="p-grid p-fluid p-nogutter">
                                     <div className="p-col" style={{maxWidth: '70px'}}>
-                                        <p style={{fontSize: '14px'}}><b>{jobList.task_id}</b></p>
+                                        <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_id}</b></p>
                                     </div>
                                     <div className="p-col">
                                         <p style={{fontSize: '14px'}}><i className="pi pi-user"></i>
@@ -473,7 +474,7 @@ export const JobScheduling = () => {
                                     </div>
                                     <div className="p-col">
                                         <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '35px', height: '27px', color: 'black'}}
-                                        onClick={(event) => holdJobData(event, jobList)} />
+                                        onClick={(event) => holdJobData(event, jobList.job_order.job_id)} />
                                     </div>
                                 </div>
                             </div>
@@ -488,7 +489,53 @@ export const JobScheduling = () => {
         menu.current.toggle(event);
         event.stopPropagation();
         setHoldData(value);
-        setJobData(value);
+        getTaskScheduling1(value);
+    }
+
+    const getTaskScheduling = (value) => {
+        if (value !== null) {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
+                .then((res) => {
+                    btnJobData(res.data);
+                })
+                .catch((err) => {
+                    
+                });
+        } else {
+            
+        }
+    }
+
+    const getTaskScheduling1 = (value) => {
+        if (value !== null) {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
+                .then((res) => {
+                    setJobData(res.data);
+                })
+                .catch((err) => {
+                    
+                });
+        } else {
+            
+        }
     }
 
     const btnJobData = (value) => {
@@ -514,8 +561,17 @@ export const JobScheduling = () => {
         }
     }
 
-    const submitSearch = () => {
-        console.log(searchJobType);
+    const [timeOutId, setTimeOutId] = useState(null);
+    const bodySearch = (event) => {
+        setSearchFieldman(event.target.value);
+        clearTimeout(timeOutId);
+        setTimeOutId(setTimeout(() => {
+            submitSearch(event.target.value);
+        }, 1000));
+    }
+
+    const submitSearch = (value) => {
+        let sf = value; //search fieldman data 
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -524,11 +580,32 @@ export const JobScheduling = () => {
             },
         };
 
-        // if((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 === null){
-        if (searchStartDate === null && searchEndDate === null && searchJobType.length <= 0) {
+        if ((sf === null || sf === "") && searchStartDate === null && searchEndDate === null && searchJobType.length <= 0) {
             console.log("all null");
-        } else if (searchStartDate !== null && searchEndDate === null && searchJobType.length <= 0) {
-            console.log("startdate, enddateN, jobtypeN");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/', config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf !== null || sf !== "") && searchStartDate === null && searchEndDate === null && searchJobType.length <= 0) {
+            console.log("fieldman, startdateN, enddateN, jobtypeN");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf, config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf === null || sf === "") && searchStartDate !== null && searchEndDate === null && searchJobType.length <= 0) {
+            console.log("fieldmanN, startdate, enddateN, jobtypeN");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?start_date=' + format(searchStartDate, 'yyyy-MM-dd'), config)
                 .then((res) => {
@@ -539,8 +616,8 @@ export const JobScheduling = () => {
                 .catch((err) => {
                     
                 });
-        } else if (searchStartDate === null && searchEndDate !== null && searchJobType.length <= 0) {
-            console.log("startdateN, enddate, jobtypeN");
+        } else if ((sf === null || sf === "") && searchStartDate === null && searchEndDate !== null && searchJobType.length <= 0) {
+            console.log("fieldmanN, startdateN, enddate, jobtypeN");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?end_date=' + format(searchEndDate, 'yyyy-MM-dd'), config)
                 .then((res) => {
@@ -551,8 +628,8 @@ export const JobScheduling = () => {
                 .catch((err) => {
                     
                 });
-        } else if (searchStartDate === null && searchEndDate === null && searchJobType.length !== null) {
-            console.log("startdateN, enddateN, jobtype");
+        } else if ((sf === null || sf === "") && searchStartDate === null && searchEndDate === null && searchJobType !== null) {
+            console.log("fieldmanN, startdateN, enddateN, jobtype");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?job_type=' + searchJobType.val, config)
                 .then((res) => {
@@ -563,8 +640,47 @@ export const JobScheduling = () => {
                 .catch((err) => {
                     
                 });
-        } else if (searchStartDate !== null && searchEndDate !== null && searchJobType.length <= 0) {
-            console.log("startdate, enddate, jobtypeN");
+        } else if ((sf !== null || sf !== "") && searchStartDate !== null && searchEndDate === null && searchJobType.length <= 0) { //sf sd
+            console.log("fieldman, startdate, enddateN, jobtypeN");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf
+                + '&start_date=' + format(searchStartDate, 'yyyy-MM-dd'), config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf !== null || sf !== "") && searchStartDate === null && searchEndDate !== null && searchJobType.length <= 0) { //sf ed
+            console.log("fieldman, startdateN, enddate, jobtypeN");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf
+                + '&end_date=' + format(searchEndDate, 'yyyy-MM-dd'), config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf !== null || sf !== "") && searchStartDate === null && searchEndDate === null && searchJobType !== null) { //sf jt
+            console.log("fieldman, startdateN, enddateN, jobtype");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf 
+                + '&job_type=' + searchJobType.val, config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf === null || sf === "") && searchStartDate !== null && searchEndDate !== null && searchJobType.length <= 0) { //sd ed
+            console.log("fieldmanN, startdate, enddate, jobtypeN");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?start_date=' + format(searchStartDate, 'yyyy-MM-dd') 
                 + '&end_date=' + format(searchEndDate, 'yyyy-MM-dd'), config)
@@ -576,8 +692,8 @@ export const JobScheduling = () => {
                 .catch((err) => {
                     
                 });
-        } else if (searchStartDate !== null && searchEndDate === null && searchJobType.length !== null) {
-            console.log("startdate, enddateN, jobtype");
+        } else if ((sf === null || sf === "") && searchStartDate !== null && searchEndDate === null && searchJobType !== null) { //sd jt
+            console.log("fieldmanN, startdate, enddateN, jobtype");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?start_date=' + format(searchStartDate, 'yyyy-MM-dd') 
                 + '&job_type=' + searchJobType.val, config)
@@ -589,8 +705,8 @@ export const JobScheduling = () => {
                 .catch((err) => {
                     
                 });
-        } else if (searchStartDate === null && searchEndDate !== null && searchJobType.length !== null) {
-            console.log("startdateN, enddate, jobtype");
+        } else if ((sf === null || sf === "") && searchStartDate === null && searchEndDate !== null && searchJobType !== null) { //ed jt
+            console.log("fieldmanN, startdateN, enddate, jobtype");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?end_date=' + format(searchEndDate, 'yyyy-MM-dd') 
                 + '&job_type=' + searchJobType.val, config)
@@ -602,10 +718,62 @@ export const JobScheduling = () => {
                 .catch((err) => {
                     
                 });
-        } else if (searchStartDate !== null && searchEndDate !== null && searchJobType !== null) {
-            console.log("startdate, enddate, jobtype");
+        } else if ((sf !== null || sf !== "") && searchStartDate !== null && searchEndDate !== null && searchJobType.length <= 0) { //sf sd ed
+            console.log("fieldman, startdate, enddate, jobtypeN");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf + '&start_date=' + format(searchStartDate, 'yyyy-MM-dd') 
+                + '&end_date=' + format(searchEndDate, 'yyyy-MM-dd'), config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf !== null || sf !== "") && searchStartDate !== null && searchEndDate === null && searchJobType !== null) { //sf sd jt
+            console.log("fieldman, startdate, enddateN, jobtype");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf + '&start_date=' + format(searchStartDate, 'yyyy-MM-dd') 
+                + '&job_type=' + searchJobType.val, config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf !== null || sf !== "") && searchStartDate === null && searchEndDate !== null && searchJobType !== null) { //sf ed jt
+            console.log("fieldman, startdateN, enddate, jobtype");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf + '&end_date=' + format(searchEndDate, 'yyyy-MM-dd') 
+                + '&job_type=' + searchJobType.val, config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf === null || sf === "") && searchStartDate !== null && searchEndDate !== null && searchJobType !== null) { //sd ed jt
+            console.log("fieldmanN, startdate, enddate, jobtype");
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?start_date=' + format(searchStartDate, 'yyyy-MM-dd') 
+                + '&end_date=' + format(searchEndDate, 'yyyy-MM-dd') + '&job_type=' + searchJobType.val, config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else if ((sf !== null || sf !== "") && searchStartDate !== null && searchEndDate !== null && searchJobType !== null) { //sf sd ed jt
+            console.log("fieldman, startdate, enddate, jobtype");
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/?fieldman=' + sf + '&start_date=' + format(searchStartDate, 'yyyy-MM-dd') 
                 + '&end_date=' + format(searchEndDate, 'yyyy-MM-dd') + '&job_type=' + searchJobType.val, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
@@ -619,11 +787,72 @@ export const JobScheduling = () => {
     }
 
     const onSelectSearchStatus = (value) => {
-        console.log(value);
+        setSearchStatus(value);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        
+        if (value.val === "fa") {
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/status_approval/', config)
+                .then((res) => {
+                    setTotalCount(res.data.count);
+                    setJobList(res.data.results);
+                    fullCalendarDisplay(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } else {
+            axios
+            .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/status_approved/', config)
+            .then((res) => {
+                setTotalCount(res.data.count);
+                setJobList(res.data.results);
+                fullCalendarDisplay(res.data.results);
+            })
+            .catch((err) => {
+                
+            });
+        }
+    }
+
+    const taskWarningList = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        let fieldmanData = "";
+        fieldman.map((x) =>
+            fieldmanData += x.val + ","
+        )
+
+        axios
+            .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
+             + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
+            .then((res) => {
+                console.log(res.data);
+                if (res.data.length <= 0){
+                    submitTask();
+                } else {
+                    toast.current.show({ severity: 'error', summary: 'Task', detail: 'Already have task.', life: 3000 });
+                }
+            })
+            .catch((err) => {
+                
+            });
     }
 
     const submitTask = () => {
-        console.log("B: ", bodyNo)
+        console.log("f: ", fieldman);
         if (fieldman[0].val === "") { 
             toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
         } else if (bodyNo === "" || bodyNo.length <= 0) {
@@ -639,7 +868,7 @@ export const JobScheduling = () => {
         } else {
             let fieldmanData = [];
             fieldman.map((x) =>
-                fieldmanData.push({field_man: x.val})
+                fieldmanData.push({field_man: x.fullname})
             )
 
             let token = localStorage.getItem("token");
@@ -691,7 +920,7 @@ export const JobScheduling = () => {
         }
     }
 
-    const editAssignData = () => {
+    const editAssignData = (value) => {
         setEditFieldman([]);
         jobData.fieldman.map((x, index) =>
             setEditFieldman(editFieldman => [...editFieldman, {id: index, val: x.field_man}])
@@ -741,7 +970,7 @@ export const JobScheduling = () => {
     const editTask = () => {
         let fieldmanData = [];
         editFieldman.map((x) => 
-            fieldmanData.push({field_man: x.val})
+            fieldmanData.push({field_man: x.fullname})
         )
 
         let token = localStorage.getItem("token");
@@ -846,7 +1075,7 @@ export const JobScheduling = () => {
             },
         };
 
-        axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value.task_id + '/', config)
+        axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
         .then((res) => {;
             getTaskList();
             onHide('displayJobEdit');
@@ -1012,12 +1241,14 @@ export const JobScheduling = () => {
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText placeholder="Search Task"/>
+                                <InputText placeholder="Search" value={searchFieldman} onChange={(event) => bodySearch(event)}/>
+                                {/* <InputText placeholder="Search Task"/> */}
                             </span>
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                             <Dropdown value={searchStatus} options={searchStatusOptions} optionLabel="name" placeholder="Select Status" 
-                            onSelect={event => onSelectSearchStatus(event.target.value)} onChange={event => setSearchStatus(event.target.value)} />
+                            // onSelect={event => onSelectSearchStatus()} 
+                            onChange={event => onSelectSearchStatus(event.target.value)} />
                             {/* <Dropdown placeholder="Select Status" /> */}
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
@@ -1030,7 +1261,7 @@ export const JobScheduling = () => {
                             <Dropdown value={searchJobType} options={searchJobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setSearchJobType(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
-                            <Button label="SEARCH" onClick={() => submitSearch()}/>
+                            <Button label="SEARCH" onClick={() => submitSearch(searchFieldman)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 job-datatable">
                             {
@@ -1103,7 +1334,8 @@ export const JobScheduling = () => {
 
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
-                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitTask()}/>
+                            {/* <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitTask()}/> */}
+                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()}/>
                         </div>
                     </div>
                 </Dialog>
@@ -1130,7 +1362,9 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                            <InputText placeholder="Input Vehicle(Body No.)" value={editBodyNo} onChange={(e) => setEditBodyNo(e.target.value)} disabled={disabledData}/>
+                            <AutoComplete forceSelection field="body_no" placeholder="Input Vehicle(Body No.)" value={editBodyNo} suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
+                                onChange={(e) => setEditBodyNo(e.target.value)} disabled={disabledData}/>
+                            {/* <InputText placeholder="Input Vehicle(Body No.)" value={editBodyNo} onChange={(e) => setEditBodyNo(e.target.value)} disabled={disabledData}/> */}
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE: </b></h6>
