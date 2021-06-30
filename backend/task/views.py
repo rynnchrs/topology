@@ -16,7 +16,7 @@ from .models import Fieldman, JobOrder, Task
 from .serializers import (JobOrderSerializer, RepairJobSerializer,
                           TaskSerializer, WarningTaskSerializer)
 from .utils import user_permission
-
+from car.models import Car
 
 class TaskView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -40,6 +40,12 @@ class TaskView(viewsets.ModelViewSet):
             request.data['manager'] = user.id
             serializer = TaskSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['body_no'])
+                if request.data['job_order']['type'] == False:
+                    car.status = "M"
+                else:
+                    car.status = "R"
+                car.save()
                 serializer.save()
             return Response("Successfully Created",status=status.HTTP_201_CREATED)          
         else:
@@ -139,6 +145,10 @@ class TaskView(viewsets.ModelViewSet):
                 task.task_status_mn = True;
             else:
                 task.task_status_mn = False;
+            
+            car = Car.objects.get(body_no=task.body_no.body_no)
+            car.status = "A"
+            car.save()
             task.save()
             return Response("Success",status=status.HTTP_200_OK)       
         else:
