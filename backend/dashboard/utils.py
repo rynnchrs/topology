@@ -170,12 +170,17 @@ def check_Com_date(year):
     return (end_date)
 
 def close_to_expire(datas):
-    count = 0
     today = datetime.today()
     months = datetime(today.year + int(today.month / 12), ((today.month % 12) + 3), 1)
     count = datas.filter(end_date__range=[today,months]).count()
     return count
-            
+
+def expiry_body_no(datas):
+    today = datetime.today()
+    months = datetime(today.year + int(today.month / 12), ((today.month % 12) + 3), 1)
+    expiry = datas.filter(end_date__range=[today,months])
+    return expiry
+    
 def inspection(first_day, last_day):
 
     inspection = Inspection.objects.filter(date_created__gte=first_day, date_created__lte=last_day)

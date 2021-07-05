@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django_filters import filters
 from django_filters import rest_framework as filter
 from report.models import Repair
-from rest_framework import filters, generics, serializers, status, viewsets
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated

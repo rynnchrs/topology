@@ -1,3 +1,4 @@
+from car.models import TPL, Contract, Insurance
 from car.serializers import CarInfoSerializer
 from rest_framework import serializers
 
@@ -20,3 +21,25 @@ class TotalCarSerializer(serializers.ModelSerializer):
                     'plate_with_dnr','fan_date_with_dnr','ewd_date_with_dnr','tools_with_dnr','cigarettePlug_with_dnr','tools_with_dnr',
                     'decals_with_dnr','userManual_with_dnr','warrantyBook_with_dnr','unitKey_with_dnr','bodyKey_with_dnr',
                  ]
+
+class ExpiryContractSerializer(serializers.ModelSerializer):
+    body_no = serializers.CharField(source='car.body_no')
+    class Meta:
+        model = Contract
+        fields = ['contract_id','body_no','start_date','end_date']
+
+
+class ExpiryTPLSerializer(serializers.ModelSerializer):
+    body_no = serializers.CharField(source='car.body_no')
+    class Meta:
+        model = TPL
+        fields = ['tpl_id','body_no','start_date','end_date']
+
+        
+class ExpiryInsuranceSerializer(serializers.ModelSerializer):
+    body_no = serializers.CharField(source='car.body_no')
+    class Meta:
+        model = Insurance
+        fields = ['insurance_id','body_no','start_date','end_date']
+
+        
