@@ -45,8 +45,10 @@ class TotalExpiryView(APIView):
         context = {}
         expired_contract = Contract.objects.filter(end_date__lte=date.today()).count()
         expired_TPL = TPL.objects.filter(end_date__lte=date.today()).count()
-        expired_insurance19 = Insurance.objects.filter(start_date__year__lte='2019').count()
-        expired_insurance20 = Insurance.objects.filter(start_date__year='2020').count()
+        expired_insurance19 = Insurance.objects.filter(start_date__year__lte='2019')
+        expired_insurance20 = Insurance.objects.filter(start_date__year='2020',)
+        expired_insurance19 = expired_insurance19.filter(end_date__lte=date.today()).count()
+        expired_insurance20 = expired_insurance20.filter(end_date__lte=date.today()).count()
 
         contract = Contract.objects.all()
         tpls = TPL.objects.all()
@@ -60,7 +62,7 @@ class TotalExpiryView(APIView):
             'expiring_TPL': close_to_expire(tpls),
             'expired_insurance19': expired_insurance19,
             'expiring_insurance19': close_to_expire(insurance19),
-            'expired_insurance20': expired_insurance19,
+            'expired_insurance20': expired_insurance20,
             'expiring_insurance20': close_to_expire(insurance20),
             }
         return Response(context)
@@ -100,15 +102,18 @@ class ExpiryStatusView(APIView):
     
 
 class ExpiryView(APIView): # expiry 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def get(self, request):
-        year = request.data.get('year')
-        print(year)
+        year = request.GET['year']
+        or_date = Car.objects.filter(or_date__isnull=False)
+        cr_date = Car.objects.filter(cr_date__isnull=False)
+        tpl_date = TPL.objects.filter(end_date__isnull=False)
+        com_date = Insurance.objects.filter(end_date__isnull=False)
         return Response({
-            'OR':check_or_date(year), # OR
-            'CR':check_cr_date(year), # CR
-            'TPL':check_TPL_date(year), # TPL Insurance
-            'Com':check_Com_date(year), # Comprehensive Insurance
+            'OR':check_or_date(year,or_date), # OR
+            'CR':check_cr_date(year,cr_date), # CR
+            'TPL':check_TPL_date(year,tpl_date), # TPL Insurance
+            'Com':check_Com_date(year,com_date), # Comprehensive Insurance
             })
 
 
