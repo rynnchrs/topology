@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from .filters import TaskFilter
 from .models import Fieldman, JobOrder, Task
-from .serializers import (JobOrderSerializer, RepairJobSerializer,
+from .serializers import (RepairJobSerializer, RepairJobSerializer,
                           TaskSerializer, WarningTaskSerializer)
 from .utils import user_permission
 from car.models import Car
@@ -226,14 +226,14 @@ class FieldmanListView(generics.ListAPIView):
 
 class JobOrderView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class = JobOrderSerializer
+    serializer_class = RepairJobSerializer
     
     @action(detail=False)
     def inspection_list(self, request):
         user = self.request.user
         if user_permission(user, 'can_view_task'):
             queryset = JobOrder.objects.all().filter(type=False) # get all False (inspection)
-            serializer = JobOrderSerializer(queryset, many=True)
+            serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -248,7 +248,7 @@ class JobOrderView(viewsets.ViewSet):
             queryset = JobOrder.objects.filter(type=False).filter(job_no__in=inspection) 
             # filter the job order with the fieldman = current user 
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
-            serializer = JobOrderSerializer(queryset, many=True)
+            serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
             repair = Repair.objects.all().values_list('job_order', flat=True)
@@ -269,7 +269,7 @@ class JobOrderView(viewsets.ViewSet):
             queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=inspection)
             # filter the job order with the fieldman = current user 
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
-            serializer = JobOrderSerializer(queryset, many=True)
+            serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
             repair = Repair.objects.all().values_list('job_order', flat=True)
@@ -285,7 +285,7 @@ class JobOrderView(viewsets.ViewSet):
         user = self.request.user
         if user_permission(user, 'can_view_task'):
             queryset = JobOrder.objects.all().filter(type=True)
-            serializer = JobOrderSerializer(queryset, many=True)
+            serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -296,7 +296,7 @@ class JobOrderView(viewsets.ViewSet):
         if user_permission(user, 'can_add_task'):
             repair = Repair.objects.values_list('job_order', flat=True)
             queryset = JobOrder.objects.filter(type=True).filter(job_id__in=repair)
-            serializer = JobOrderSerializer(queryset, many=True)
+            serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
             repair = Repair.objects.all().values_list('job_order', flat=True)
@@ -313,7 +313,7 @@ class JobOrderView(viewsets.ViewSet):
         if user_permission(user, 'can_add_task'):
             repair = Repair.objects.all().values_list('job_order', flat=True)
             queryset = JobOrder.objects.filter(type=True).exclude(job_id__in=repair)
-            serializer = JobOrderSerializer(queryset, many=True)
+            serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
             repair = Repair.objects.all().values_list('job_order', flat=True)
