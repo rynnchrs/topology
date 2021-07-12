@@ -143,6 +143,11 @@ for data in datas():
         or_date = datetime.strptime(data[31], '%d-%b-%y')
         or_date = or_date.strftime('%Y-%m-%d')
 
+    if data[44] == 'No Bidding Docs':
+        bid_date = None
+    else:
+        bid_date = '2019-01-31'
+
     if data[48] == "NO RECEIVING COPY":
         plate_date = "NRC"
     elif len(data[48]) == 10 or len(data[48]) == 11:
@@ -353,7 +358,7 @@ for data in datas():
         contract_no = data[47],
         bid_no = data[46],
         bid_name = data[45],
-        bid_date = data[44],
+        bid_date = bid_date,
     )
 
     TPL.objects.create(

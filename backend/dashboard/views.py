@@ -3,14 +3,16 @@ from datetime import date, datetime, timedelta
 from car.models import TPL, Car, Contract, Insurance
 from django_filters import rest_framework as filter
 from report.models import Repair
-from rest_framework import viewsets
+from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import TotalCarSerializer
+from .serializers import (ExpiryContractSerializer, ExpiryInsuranceSerializer,
+                          ExpiryTPLSerializer, TotalCarSerializer)
 from .utils import (check_Com_date, check_cr_date, check_or_date,
-                    check_TPL_date, close_to_expire, inspection)
+                    check_TPL_date, close_to_expire, expiry_body_no,
+                    inspection)
 
 
 class TotalView(viewsets.ModelViewSet):
@@ -41,34 +43,77 @@ class TotalExpiryView(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, request):
         context = {}
-        expired_contract = Contract.objects.filter(end_date__lte=date.today())
-        expired_TPL = TPL.objects.filter(end_date__lte=date.today())
-        expired_insurance = Insurance.objects.filter(end_date__lte=date.today())
+        expired_contract = Contract.objects.filter(end_date__lte=date.today()).count()
+        expired_TPL = TPL.objects.filter(end_date__lte=date.today()).count()
+        expired_insurance19 = Insurance.objects.filter(start_date__year__lte='2019')
+        expired_insurance20 = Insurance.objects.filter(start_date__year='2020',)
+        expired_insurance19 = expired_insurance19.filter(end_date__lte=date.today()).count()
+        expired_insurance20 = expired_insurance20.filter(end_date__lte=date.today()).count()
 
         contract = Contract.objects.all()
         tpls = TPL.objects.all()
-        insurance = Insurance.objects.all()
+        insurance19 = Insurance.objects.filter(start_date__year__lte='2019')
+        insurance20 = Insurance.objects.filter(start_date__year='2020')
 
         context = {
-            'expired_contract': expired_contract.count(),
+            'expired_contract': expired_contract,
             'expiring_contract': close_to_expire(contract),
-            'expired_TPL': expired_TPL.count(),
+            'expired_TPL': expired_TPL,
             'expiring_TPL': close_to_expire(tpls),
-            'expired_insurance': expired_insurance.count(),
-            'expiring_insurance': close_to_expire(insurance)
+            'expired_insurance19': expired_insurance19,
+            'expiring_insurance19': close_to_expire(insurance19),
+            'expired_insurance20': expired_insurance20,
+            'expiring_insurance20': close_to_expire(insurance20),
             }
         return Response(context)
 
-class ExpiryView(APIView): # expiry 
-    permission_classes = [IsAuthenticated]
+
+class ExpiryBodyNoView(generics.ListAPIView):
     def get(self, request):
-        year = request.data.get('year')
-        print(year)
+        mode = request.GET['mode']
+        if mode == "contract":
+            queryset = Contract.objects.all()
+            serializer = ExpiryContractSerializer(expiry_body_no(queryset), many=True)
+        elif mode == "tpl":
+            queryset = TPL.objects.all()
+            serializer = ExpiryTPLSerializer(expiry_body_no(queryset), many=True)
+        elif mode == "insurance19":
+            queryset = Insurance.objects.filter(start_date__year__lte='2019')
+            serializer = ExpiryInsuranceSerializer(expiry_body_no(queryset), many=True)
+        elif mode == "insurance20":
+            queryset = Insurance.objects.filter(start_date__year='2020')
+            serializer = ExpiryInsuranceSerializer(expiry_body_no(queryset), many=True)
+
+        page = self.paginate_queryset(serializer.data)
+        if page is not None:
+            return self.get_paginated_response(serializer.data)   
+        return Response(serializer.data)   
+
+class ExpiryStatusView(APIView):
+    def get(self, request):
+        context = {}
+        repair = Repair.objects.filter(job_order__type=True).count()
+        inspection = Repair.objects.filter(job_order__type=False).count()
+        context = {
+            "Repair": repair,
+            "Inspection": inspection,
+        } 
+        return Response(context)   
+    
+
+class ExpiryView(APIView): # expiry 
+    # permission_classes = [IsAuthenticated]
+    def get(self, request):
+        year = request.GET['year']
+        or_date = Car.objects.filter(or_date__isnull=False)
+        cr_date = Car.objects.filter(cr_date__isnull=False)
+        tpl_date = TPL.objects.filter(end_date__isnull=False)
+        com_date = Insurance.objects.filter(end_date__isnull=False)
         return Response({
-            'OR':check_or_date(year), # OR
-            'CR':check_cr_date(year), # CR
-            'TPL':check_TPL_date(year), # TPL Insurance
-            'Com':check_Com_date(year), # Comprehensive Insurance
+            'OR':check_or_date(year,or_date), # OR
+            'CR':check_cr_date(year,cr_date), # CR
+            'TPL':check_TPL_date(year,tpl_date), # TPL Insurance
+            'Com':check_Com_date(year,com_date), # Comprehensive Insurance
             })
 
 

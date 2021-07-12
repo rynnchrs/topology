@@ -118,7 +118,7 @@ class Repair(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.job_order)
+        return str(self.repair_id)
         
     @property
     def total_parts_cost(self):  # total cost of particular
@@ -148,14 +148,14 @@ class Cost(models.Model):
         ('L', 'Labor'),
     ]
     cost_type = models.CharField(max_length=1, choices=Cost_List, default="L")
-    particulars = models.CharField(max_length=50)
+    particulars = models.CharField(max_length=50, null=True, blank=True)
     cost = models.IntegerField(default=0)
     quantity = models.IntegerField(default=0)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.ro_no.job_order
+        return str(self.cost_id)
 
     @property
     def total_cost(self): # total cost of an item per quantity
