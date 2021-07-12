@@ -23,7 +23,7 @@ from .models import Cost, Inspection, Repair
 from .serializers import (CostSerializer, InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairSerializer)
-from .utils import reversion, user_permission
+from .utils import repair_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
@@ -201,13 +201,11 @@ class RepairView(viewsets.ModelViewSet):  # add this
             parts = Cost.objects.filter(ro_no=repair, cost_type="P")
             labor = Cost.objects.filter(ro_no=repair, cost_type="L")
             serializer_data = serializer.data
-            if parts:
-                parts = CostSerializer(parts, many=True)
-                serializer_data['parts'] = parts.data
-            if labor:
-                labor = CostSerializer(labor, many=True)
-                serializer_data['labor'] = labor.data
-
+            parts = CostSerializer(parts, many=True)
+            serializer_data['parts'] = parts.data
+            labor = CostSerializer(labor, many=True)
+            serializer_data['labor'] = labor.data
+            serializer_data['revised'] = repair_reversion(repair)
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -219,18 +217,24 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['noted_by'] = "" 
+            cost = request.data['parts'] + request.data['labor']
+            request.data['cost'] = cost
             queryset = Repair.objects.all()
             repair = get_object_or_404(queryset, pk=pk)   
             serializer = RepairSerializer(instance=repair, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 job = JobOrder.objects.get(pk=request.data['job_order'])
-                car = Car.objects.get(body_no=repair.job_order.task.body_no.body_no)
+                car = Car.objects.get(body_no=job.task.body_no.body_no)
                 if request.data['status_repair'] == "Operational":
                     car.operational = True
                 else:
                     car.operational = False
                 car.save()
                 serializer.save()
+                # costs = Cost.objects.filter(ro_no__job_order=request.data.get('job_order'))
+                # for cost in costs:
+                #     reversion = Version.objects.get_for_object(cost)[0]
+                #     reversion.delete()
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)

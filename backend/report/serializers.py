@@ -120,16 +120,45 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
     def create(self, validated_data):       # Creating Repair with many Cost
         costs_data = validated_data.pop('cost')
         ro_no = Repair.objects.create(**validated_data)
-        for cost_data in costs_data:
-            Cost.objects.create(ro_no=ro_no, **cost_data)
-        return ro_no
+        parts = [x for x in costs_data if x['cost_type'] == 'P']
+        for part in parts:
+            Cost.objects.create(ro_no=ro_no, **part)
+        for i in range(5-len(parts)):
+            Cost.objects.create(ro_no=ro_no, cost_type='P')
+        
+        labors = [x for x in costs_data if x['cost_type'] == 'L']
+        for labor in labors:
+            Cost.objects.create(ro_no=ro_no, **labor)
+        for i in range(5-len(labors)):
+            Cost.objects.create(ro_no=ro_no, cost_type='L')
+
+        return (ro_no)
 
     def update(self, instance, validated_data):     
         costs_data = validated_data.pop("cost")
-        costs = (instance.cost).all()
-
-        for cost in costs:
-            cost.delete()
+        parts = (instance.cost).filter(cost_type='P')
+        part = [x for x in costs_data if x['cost_type'] == 'P']
+        for i in range(len(parts)):
+            if i < len(part):
+                Cost.objects.filter(pk=parts[i].pk).update(**part[i])
+            else:
+                obj = Cost.objects.get(pk=parts[i].pk)
+                obj.particulars = None
+                obj.cost = 0
+                obj.quantity = 0
+                obj.save()
+        
+        labors = (instance.cost).filter(cost_type='L')
+        labor = [x for x in costs_data if x['cost_type'] == 'L']
+        for i in range(len(labors)):
+            if i < len(labor):
+                Cost.objects.filter(pk=labors[i].pk).update(**labor[i])
+            else:
+                obj = Cost.objects.get(pk=labors[i].pk)
+                obj.particulars = None
+                obj.cost = 0
+                obj.quantity = 0
+                obj.save()
 
         instance.ir_no = validated_data.get('ir_no', instance.ir_no)
         instance.incident_date = validated_data.get('incident_date', instance.incident_date)
@@ -147,8 +176,6 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
         instance.remarks = validated_data.get('remarks', instance.remarks)
         instance.save()
 
-        for cost_data in costs_data:
-            Cost.objects.create(ro_no=instance, **cost_data)
 
         return instance
 
