@@ -12,4 +12,6 @@ urlpatterns = [
     path('total-report/', views.TotalReportView.as_view(), name='total-report'),
     path('total-expiry/', views.TotalExpiryView.as_view(), name='total-expiry'),
     path('total-inspection/', views.TotalInspectionView.as_view(), name='total-inspection'),
+    path('expiry-body-no/', views.ExpiryBodyNoView.as_view(), name='expiry-body-no'),
+    path('expiry-status/', views.ExpiryStatusView.as_view(), name='expiry-status')
 ]
