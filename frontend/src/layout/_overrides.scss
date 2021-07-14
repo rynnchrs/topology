@@ -87,7 +87,7 @@
 }
 
 @media only screen and (min-width : 100px) and (max-width : 500px) { 
-  h4{
+  h4 {
     font-size: 17px;
     letter-spacing: -1px;
   }
@@ -110,7 +110,7 @@
   }
 }
 
-.gray-out{
+.gray-out {
   position: fixed;
   z-index: 1;
   left: 0;
@@ -162,7 +162,7 @@
   }
 
   @media only screen and (min-width : 100px) and (max-width : 600px) { 
-    h4{
+    h4 {
       font-size: 15.5px;
       letter-spacing: -1px;
     }
@@ -189,7 +189,7 @@
 .gas-oil-img {
   padding-top: 4%;
 
-  img{
+  img {
     //box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
     max-width: 100%;
     height: fit-content;
@@ -209,7 +209,7 @@
       margin: 2px;
       //border: 1px solid blue;
     }
-    .p-button{
+    .p-button {
       height: 53px;
       line-height: 1.1;
     }
@@ -223,7 +223,7 @@
       margin: 2px;
       //border: 1px solid green;
     }
-    .p-button{
+    .p-button {
       height: 53px;
       line-height: 1.1;
     }
@@ -233,7 +233,7 @@
       width:100%;
       //border: 1px solid red;
     }
-    .p-button{
+    .p-button {
       height: 100%;
     }
   }
@@ -276,26 +276,73 @@
 }
 /* end css for task list datatable */
 
+/* css for repair report */
+.repair-title {
+  h4 {
+    color: white;
+    background-color: blue;
+    border-radius: 5px 5px 0 0;
+    display: inline;
+    padding: 4px 20px;
+    font-weight: 500;
+  } 
+  h5 {
+    color: rgb(16, 166, 253);
+    background: linear-gradient(90deg, rgb(233, 232, 232) 0%, rgb(255, 255, 255) 100%);
+    padding: 4px 10px;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.repair-table {
+  table {
+    width: 100%;
+  }
+  td {
+    width: 52%;
+  }
+  td:first-child + td {
+    width: 15%;
+  }
+  td:first-child + td + td {
+    width: 33%;
+  }
+}
+
+/* end css for repair report */
+
 /* override global size of dialog in all forms*/
 .dialog-display{
   @media only screen and (max-width : 2500px) { 
-    .p-dialog{
+    .p-dialog {
       width: 70vw;
     }
   }
   @media only screen and (max-width : 991px) {
-    .p-dialog{
+    .p-dialog {
       width: 70vw;
     }
   }
   @media only screen and (max-width : 767px) { 
-    .p-dialog{
-      width: 310px;
+    .p-dialog {
+      width: 340px;
     }
   }
   
 }
 /* end override global size of dialog in all forms*/
+
+/* global */
+.required-asterisk {
+  h6::after { 
+    content: " *";
+    color: red;
+    font-weight: 700;
+    letter-spacing: -2px;
+  }
+}
+/* end global */
 
 
 

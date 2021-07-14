@@ -31,6 +31,8 @@ import { JobScheduling } from './components/JobScheduling';
 
 import  DriverRecordForms from './components/DriverRecordForms';
 import  VehiclesGPS from './components/VehiclesGPS';
+import  RepairReport from './components/RepairReport';
+import  RepairRecords from './components/RepairRecords';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
@@ -116,6 +118,7 @@ const App = () => {
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
     const sidebarSubMenu3 = [];
+    const sidebarSubMenu4 = [];
     
     if (localStorage.getItem("viewInventory") === "true") {
         sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
@@ -166,7 +169,10 @@ const App = () => {
         //console.log("permission data none");
     // }
 
-    //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
+    sidebarSubMenu4.push({label: 'Repair Report', icon: 'pi pi-file', to: '/repairreport' });
+    sidebarSubMenu4.push({label: 'Repair Record', icon: 'pi pi-file', to: '/repairrecords'});
+    sidebarMenu.push({label: 'Repair Management', icon: 'pi pi-file', items: sidebarSubMenu4});
+
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);
     }
@@ -295,6 +301,8 @@ const App = () => {
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
                 <Route path="/jobscheduling" exact component={JobScheduling} />
+                <Route path="/repairreport" exact component={RepairReport} />
+                <Route path="/repairrecords" exact component={RepairRecords} />
             </div>
 
             <AppFooter />

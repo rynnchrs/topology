@@ -86,7 +86,7 @@ export const JobScheduling = () => {
     // const [counter, setCounter] = useState(1);
 
     //create task form
-    const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
+    const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}, {id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState([]);
     const [jobType, setJobType] = useState([]);
     const [dateStart, setDateStart] = useState(null);
@@ -125,26 +125,6 @@ export const JobScheduling = () => {
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
 
-    // useEffect(() => {
-    //     let token = localStorage.getItem("token");
-    //     const config = {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': 'Bearer ' + token,
-    //         },
-    //     };
-
-    //     axios
-    //         .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', config)
-    //         .then((res) => {
-    //             setJobList(res.data);
-    //             fullCalendarDisplay(res.data);
-    //         })
-    //         .catch((err) => {
-                
-    //         });
-    // }, []);
-
     useEffect(() => {
         let token = localStorage.getItem("token");
         const config = {
@@ -160,12 +140,10 @@ export const JobScheduling = () => {
         ]).then(([res1, res2]) => {
             setTotalCount(res1.data.count);
             setJobList(res1.data.results);
-            // fullCalendarDisplay(res1.data.results);
             setFieldmanList(res2.data.results);
             if (res2.data.next === null){
                 
             } else {
-                // setCounter(2);
                 nextPageFieldman(res2.data.next);
             }
         }).catch((err) => {
@@ -188,7 +166,6 @@ export const JobScheduling = () => {
                 if (res.data.next === null){
                 
                 } else {
-                    // setCounter(2);
                     nextPageBodyNo(res.data.next);
                 }
             })
@@ -269,7 +246,6 @@ export const JobScheduling = () => {
         };
 
         axios
-            // .get(process.env.REACT_APP_SERVER_NAME + 'task/fieldman-list/?page=' + counter, config)
             .get(value, config)
             .then((res) => {
                 appendFieldmanList(res.data.results, res.data.next);
@@ -286,7 +262,6 @@ export const JobScheduling = () => {
         if (value2 === null){
                 
         } else {
-            // setCounter(counter + 1);
             nextPageFieldman(value2);
         }
     }
@@ -685,6 +660,7 @@ export const JobScheduling = () => {
     }
 
     const taskWarningList = () => {
+        console.log(fieldman)
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -693,24 +669,31 @@ export const JobScheduling = () => {
             },
         };
 
-        let fieldmanData = "";
-        fieldman.map((x) =>
-            fieldmanData += x.val + ","
-        )
+        if (dateStart === null) {
+            toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
+        } else if (dateEnd === null) {
+            toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+        } else {
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
-             + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
-            .then((res) => {
-                if (res.data.length <= 0){
-                    submitTask();
-                } else {
-                    toast.current.show({ severity: 'error', summary: 'Task', detail: 'Already have task.', life: 3000 });
-                }
-            })
-            .catch((err) => {
-                
-            });
+            let fieldmanData = "";
+            fieldman.map((x) =>
+                fieldmanData += x.val + ","
+            )
+
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
+                + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
+                .then((res) => {
+                    if (res.data.length <= 0){
+                        submitTask();
+                    } else {
+                        toast.current.show({ severity: 'error', summary: 'Task', detail: 'Already have task.', life: 3000 });
+                    }
+                })
+                .catch((err) => {
+                    
+                });
+        }
     }
 
     const submitTask = () => {
