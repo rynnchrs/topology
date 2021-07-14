@@ -185,38 +185,85 @@ class InspectionReportTestCase(APITestCase):
 
 
 class RepairReportTestCase(APITestCase):
-    TEST_REPORT1 = {  
-            "cost": [
+    TEST_REPORT1 = {
+            "parts": [
                 {
-                    "cost_type":"P",
-                    "particulars":"sample",
-                    "cost":100, 
-                    "quantity":1
+                    "cost_type": "P",
+                    "particulars": "parts1",
+                    "cost": 100,
+                    "quantity": 2,
+                    "total_cost": 200
                 }
             ],
-            "job_order": "2",
-        } 
-    TEST_UPDATE = {
-            "cost": [
+            "labor": [
                 {
-                    "cost_type":"P",
-                    "particulars":"sample",
-                    "cost":100, 
-                    "quantity":1
+                    "cost_type": "L",
+                    "particulars": "labor",
+                    "cost": 100,
+                    "quantity": 1,
+                    "total_cost": 100
                 }
             ],
-            "ir_no": "test0123",
+            "ir_no": "testing",
             "site_poc": "makati",
             "contact_no": "12345",
-            "incident_details": "testing",
-            "actual_findings": "testing",
-            "actual_remarks": "testing",
-            "action_taken": "testing",
-            "status_repair": "operational",
-            "remarks": "testing",
-            "job_order": "1",
+            "incident_details": "",
+            "actual_findings": "",
+            "actual_remarks": "",
+            "action_taken": "",
+            "status_repair": "Non-Operational",
+            "remarks": "321",
+            "job_order": "1"
+        }
+    TEST_UPDATE = {
+            "parts": [
+                {
+                    "cost_type": "P",
+                    "particulars": "parts1",
+                    "cost": 100,
+                    "quantity": 2,
+                    "total_cost": 200
+                }
+            ],
+            "labor": [
+                {
+                    "cost_type": "L",
+                    "particulars": "labor",
+                    "cost": 100,
+                    "quantity": 1,
+                    "total_cost": 100
+                }
+            ],
+            "ir_no": "testing",
+            "site_poc": "makati",
+            "contact_no": "12345",
+            "incident_details": "",
+            "actual_findings": "",
+            "actual_remarks": "",
+            "action_taken": "",
+            "status_repair": "Non-Operational",
+            "remarks": "321",
+            "job_order": "1"
         }
     INVALID_REPORT1 = {  
+            "parts": [
+                {
+                    "cost_type": "P",
+                    "particulars": "parts1",
+                    "cost": 100,
+                    "quantity": 2,
+                    "total_cost": 200
+                }
+            ],
+            "labor": [
+                {
+                    "cost_type": "L",
+                    "particulars": "labor",
+                    "cost": 100,
+                    "quantity": 1,
+                    "total_cost": 100
+                }
+            ],
             "job_order": 3,
             "diagnosed_by": 1,
             "generated_by":1,
@@ -275,6 +322,8 @@ class RepairReportTestCase(APITestCase):
                 generated_by = self.user,
                 repair_by = self.user,
             ) # create repair
+        with reversion.create_revision(): # create reversion for careta report
+            self.repair.save()
             
     def test_repair_report_list(self):
         response = self.client.get('/report/repair/') # list of maintenanc report

@@ -18,13 +18,12 @@ class TaskTestCase(APITestCase):
                 "type": True
             },
             "fieldman": [
-                {"field_man": "sample"}
+                {"field_man": "sample sample"}
             ],
             "desc": "",
             "remarks": "",
             "start_date": str(date.today()),
             "end_date": str(date.today()),
-            "manager": "sample",
             "body_no": "18-1654"
         } 
             
