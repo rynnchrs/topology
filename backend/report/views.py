@@ -18,10 +18,10 @@ from reversion.models import Version
 from task.models import JobOrder
 
 from .export import export, repair_export
-from .filters import InspectionFilter
+from .filters import InspectionFilter, RepairFilter
 from .models import Cost, Inspection, Repair
 from .serializers import (CostSerializer, InspectionLastFourListSerializer,
-                          InspectionListSerializer, InspectionSerializer,
+                          InspectionListSerializer, InspectionSerializer, RepairListSerializer,
                           RepairSerializer)
 from .utils import repair_reversion, reversion, user_permission
 
@@ -155,16 +155,19 @@ class RepairView(viewsets.ModelViewSet):  # add this
     permission_classes = [IsAuthenticated]
     queryset = Repair.objects.all()  # add this
     serializer_class = RepairSerializer  # add this
-    # search_fields = ['vin_no__vin_no','date_created']
-    # filter_backends = [filters.SearchFilter]
-
+    filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = RepairFilter
+    ordering_fields = ['repair_id', 'date_created']
     
     def list(self, request): 
         user = self.request.user   
         if user_permission(user, 'can_view_repair_reports'): 
             queryset = Repair.objects.all()
-            serializer = RepairSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)            
+            serializer = RepairListSerializer(self.filter_queryset(queryset), many=True)
+            page = self.paginate_queryset(serializer.data)
+            if page is not None:
+                return self.get_paginated_response(serializer.data)      
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
