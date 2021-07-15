@@ -246,8 +246,6 @@ class JobOrderView(viewsets.ViewSet):
             inspection = Repair.objects.values_list('job_order', flat=False)
             # filter True(inspection) and used job order
             queryset = JobOrder.objects.filter(type=False).filter(job_no__in=inspection) 
-            # filter the job order with the fieldman = current user 
-            queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
@@ -267,8 +265,6 @@ class JobOrderView(viewsets.ViewSet):
             inspection = Repair.objects.all().values_list('job_order', flat=True)
             # filter True(inspection) and remove all used job order
             queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=inspection)
-            # filter the job order with the fieldman = current user 
-            queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
