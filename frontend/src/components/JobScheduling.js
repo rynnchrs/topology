@@ -86,7 +86,7 @@ export const JobScheduling = () => {
     // const [counter, setCounter] = useState(1);
 
     //create task form
-    const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}, {id: 0 , val: "", fullname: ""}]);
+    const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState([]);
     const [jobType, setJobType] = useState([]);
     const [dateStart, setDateStart] = useState(null);
@@ -660,7 +660,6 @@ export const JobScheduling = () => {
     }
 
     const taskWarningList = () => {
-        console.log(fieldman)
         let token = localStorage.getItem("token");
         const config = {
             headers: {

@@ -6,6 +6,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
 import axios from "axios";
@@ -13,17 +14,26 @@ import { format } from 'date-fns';
 
 export default function RepairReport() {
 
-    // const jobTypeOptions = [{ name: 'REPAIR', val: true }, { name: 'INSPECTION', val: false }];
-    const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NOT OPERATIONAL', val: "Not Operational" }];
+    const jobTypeOptions = [{ name: 'REPAIR', val: 'Repair' }, { name: 'INSPECTION', val: 'Inspection' }];
+    const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NON-OPERATIONAL', val: "Non-Operational" }];
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
+    const [jobNotCreatedList, setJobNotCreatedList] = useState([]);
+    const [suggestionsJobNotCreatedList, setSuggestionsJobNotCreatedList] = useState(null);
 
     // const [reportDetails, setReportDetails] = useState([]);
-    const [bodyNo, setBodyNo] = useState([]);
-    // const [jobType, setJobType] = useState([]);
+    const [jobType, setJobType] = useState([]);
+    const [scheduleDate, setScheduleDate] = useState(null);
+    const [bodyNo, setBodyNo] = useState('');
+    const [make, setMake] = useState('');
+    const [status, setStatus] = useState('');
+    const [location, setLocation] = useState('');
+    const [plateNumber, setPlateNumber] = useState('');
+    const [CSNumber, setCSNumber] = useState('');
+    const [chassisNumber, setChassisNumber] = useState('');
 
     //variables to be saved
-    const [jobOrder, setJobOrder] = useState('');
+    const [jobOrder, setJobOrder] = useState([]);
     const [IRNumber, setIRNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
@@ -58,8 +68,13 @@ export default function RepairReport() {
 
     const toast = useRef(null);
 
+    const [isLoading, setIsLoading] = useState(false);
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
+
+    // useEffect(() => {
+    //     console.log(jobType)
+    // },[jobType]);
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -128,6 +143,20 @@ export default function RepairReport() {
         }, 100);
     };
 
+    const searchListJobNotCreated = (event) => {
+        setTimeout(() => {
+            if (!event.query.trim().length) {
+
+            } else {
+                try {
+                    setSuggestionsJobNotCreatedList(jobNotCreatedList.filter(item => item.job_id.toString().startsWith(event.query)));
+                } catch (err){
+
+                }
+            }
+        }, 100);
+    };
+
     const partsData = (index, column, value) => {
         if (column === "p") {
             let arr = parts.slice();
@@ -175,6 +204,10 @@ export default function RepairReport() {
     };
 
     const submitRepairReport = () => {
+        console.log(bodyNoList);
+        console.log(jobNotCreatedList);
+        console.log(suggestionsJobNotCreatedList);
+        console.log(suggestionsBodyNo);
         if (IRNumber === "") { 
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIncident === null) { 
@@ -232,39 +265,78 @@ export default function RepairReport() {
                 },
             };
 
-            axios.post(process.env.REACT_APP_SERVER_NAME + 'report/repair/', {
-                parts: submitParts,
-                labor: submitLabor,
-                ir_no: IRNumber,
-                incident_date: format(dateIncident, 'yyyy-MM-dd'),
-                date_receive: format(dateReceive, 'yyyy-MM-dd'),
-                incident_details: detailsIncident,
-                site_poc: sitePOC,
-                contact_no: contactNumber,
-                perform_date: format(datePerformed, 'yyyy-MM-dd'),
-                actual_findings: detailsActualFindings,
-                actual_remarks: detailsActualRemarks,
-                repair_date: format(dateRepaired, 'yyyy-MM-dd'),
-                action_taken: detailsActionTaken,
-                date_done: format(dateDone, 'yyyy-MM-dd'),
-                status_repair: statusRepair.val,
-                remarks: remarks,
-                job_order: jobOrder
+            // axios.post(process.env.REACT_APP_SERVER_NAME + 'report/repair/', {
+            //     parts: submitParts,
+            //     labor: submitLabor,
+            //     ir_no: IRNumber,
+            //     incident_date: format(dateIncident, 'yyyy-MM-dd'),
+            //     date_receive: format(dateReceive, 'yyyy-MM-dd'),
+            //     incident_details: detailsIncident,
+            //     site_poc: sitePOC,
+            //     contact_no: contactNumber,
+            //     perform_date: format(datePerformed, 'yyyy-MM-dd'),
+            //     actual_findings: detailsActualFindings,
+            //     actual_remarks: detailsActualRemarks,
+            //     repair_date: format(dateRepaired, 'yyyy-MM-dd'),
+            //     action_taken: detailsActionTaken,
+            //     date_done: format(dateDone, 'yyyy-MM-dd'),
+            //     status_repair: statusRepair.val,
+            //     remarks: remarks,
+            //     job_order: jobOrder
                
-            }, config)
+            // }, config)
+            // .then((res) => {
+            //     setMessage({title:"CREATE", content:"Successfully created."});
+            //     onClick('displayMessage');
+            // })
+            // .catch((err) => {
+            //     console.log(err.response);
+            //     if (err.toJSON().message === 'Network Error'){
+            //         toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+            //     } else if (err.response.data.job_order) {
+            //         toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'The report no. had a report already.', life: 3000 });
+            //     }
+            // })
+        }
+    }
+
+    const handleChangeJobType = (value) => {
+        setJobType(value);
+        let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/' + value.val.toLowerCase() + '_not_created/', config)
             .then((res) => {
-                setMessage({title:"CREATE", content:"Successfully created."});
-                onClick('displayMessage');
+                setJobNotCreatedList(res.data);
+                // setBodyNoList(res.data.results);
+                // if (res.data.next === null){
+                
+                // } else {
+                //     nextPageBodyNo(res.data.next);
+                // }
             })
             .catch((err) => {
-                console.log(err.response);
-                if (err.toJSON().message === 'Network Error'){
-                    toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
-                } else if (err.response.data.job_order) {
-                    toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'The report no. had a report already.', life: 3000 });
-                }
-            })
-        }
+                
+            });
+    }
+
+    const handleSelectReportNo = (value) =>{
+        console.log(value.value);
+        let splitScheduleDate = value.value.task.schedule_date.split("-");
+        let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
+        setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
+        setBodyNo(value.value.task.body_no.body_no);
+        setMake(value.value.task.body_no.make);
+        setStatus(value.value.task.body_no.operational);
+        setLocation(value.value.task.body_no.current_loc);
+        setPlateNumber(value.value.task.body_no.plate_no);
+        setCSNumber(value.value.task.body_no.vin_no);
+        setChassisNumber(value.value.task.body_no.vin_no);
     }
 
     const dialogFuncMap = {
@@ -290,45 +362,56 @@ export default function RepairReport() {
     return(
         <div>
             <Toast ref={toast} />
+            <div className="gray-out" style={{display: isLoading ? "flex": "none"}}>
+                    <ProgressSpinner />
+                </div>
             <div className="p-grid p-fluid">
+                {/* <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                    <label><b>SELECT JOB TYPE:</b></label>
+                    <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" onChange={event => setJobType(event.target.value)} />
+                </div> */}
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12  repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                         <h4>FIELD REPORT</h4>
                     </div>
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" >
                         <div className="card card-w-title" >
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
-                                    <h6><b>REPORT No.:</b></h6>
-                                    <InputText placeholder="Input Report No." value={jobOrder} onChange={(e) => setJobOrder(e.target.value)}/>
-                                </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>JOB TYPE:</b></h6>
-                                    <InputText placeholder="Input Job Type"/>
-                                    {/* <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setJobType(event.target.value)} /> */}
+                                    {/* <InputText placeholder="Input Job Type" value={jobType.val}/> */}
+                                    <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => handleChangeJobType(event.target.value)} />
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                    <h6><b>REPORT No.:</b></h6>
+                                    {/* <InputText placeholder="Input Report No." value={jobOrder} onChange={(e) => setJobOrder(e.target.value)}/> */}
+                                    <AutoComplete forceSelection field="job_id" placeholder="Input Report No." value={jobOrder} suggestions={suggestionsJobNotCreatedList} 
+                                    completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>SCHEDULE DATE:</b></h6>
-                                    <Calendar placeholder="Input Date" showIcon />
+                                    <InputText placeholder="Input Date" value={scheduleDate} disabled/>
+                                    {/* <Calendar placeholder="Input Date" showIcon /> */}
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                                    <AutoComplete forceSelection field="body_no" placeholder="Body No." value={bodyNo} suggestions={suggestionsBodyNo} 
-                                    completeMethod={searchListBodyNo} onChange={(e) => setBodyNo(e.target.value)} />
+                                    <InputText placeholder="Input Body No." value={bodyNo} disabled/>
+                                    {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." value={bodyNo} suggestions={suggestionsBodyNo} 
+                                    completeMethod={searchListBodyNo} onChange={(e) => setBodyNo(e.target.value)} /> */}
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>MAKE:</b></h6>
-                                    <InputText placeholder="Input Make"/>
+                                    <InputText placeholder="Input Make" value={make} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>STATUS:</b></h6>
-                                    <Dropdown options={statusRepairOptions} optionLabel="name" placeholder="Select Status" />
+                                    <InputText placeholder="Input Make" value={status} disabled/>
+                                    {/* <Dropdown options={statusRepairOptions} optionLabel="name" placeholder="Select Status" disabled/> */}
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>LOCATION:</b></h6>
-                                    <InputText placeholder="Input Location"/>
+                                    <InputText placeholder="Input Location" value={location} disabled/>
                                 </div>
-
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
                                     <h5>VEHICLE INFORMATION</h5>
@@ -339,11 +422,11 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>PLATE No.:</b></h6>
-                                    <InputText placeholder="Input Plate Number"/>
+                                    <InputText placeholder="Input Plate Number" value={plateNumber} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>CS No.:</b></h6>
-                                    <InputText placeholder="Input CS Number"/>
+                                    <InputText placeholder="Input CS Number" value={CSNumber} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>INCIDENT DATE:</b></h6>
@@ -364,7 +447,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>CHASSIS No.:</b></h6>
-                                    <InputText placeholder="Input Chassis Number"/>
+                                    <InputText placeholder="Input Chassis Number" value={chassisNumber} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>SITE POC:</b></h6>
@@ -472,7 +555,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>NOTED BY:</b></h6>
-                                    <InputText placeholder="Input Name"/>
+                                    <InputText placeholder="Input Name" disabled/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">

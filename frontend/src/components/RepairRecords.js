@@ -21,12 +21,22 @@ export default function RepairRecords() {
     const [repairRecordList, setRepairRecordList] = useState([]);
     // const [repairRecordData, setRepairRecordData] = useState([]);
 
-    const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NOT OPERATIONAL', val: "Not Operational" }];
+    const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NON-OPERATIONAL', val: "Non-Operational" }];
 
     let arrParts = useRef([]);
     let arrLabor = useRef([]);
 
     const [repairID, setRepairID] = useState('');
+    const [jobType, setJobType] = useState([]);
+    const [scheduleDate, setScheduleDate] = useState(null);
+    const [bodyNo, setBodyNo] = useState('');
+    const [make, setMake] = useState('');
+    const [status, setStatus] = useState('');
+    const [location, setLocation] = useState('');
+    const [plateNumber, setPlateNumber] = useState('');
+    const [CSNumber, setCSNumber] = useState('');
+    const [chassisNumber, setChassisNumber] = useState('');
+
     //variables to be edit
     const [jobOrder, setJobOrder] = useState('');
     const [IRNumber, setIRNumber] = useState('');
@@ -122,7 +132,19 @@ export default function RepairRecords() {
     }
 
     const assignRepairRecordEdit = (value) => {
+        console.log(value);
         setRepairID(value.repair_id);
+        let splitScheduleDate = value.job_order.task.schedule_date.split("-");
+        let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
+        setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
+        setBodyNo(value.job_order.task.body_no.body_no);
+        setMake(value.job_order.task.body_no.make);
+        setStatus(value.job_order.task.body_no.operational);
+        setLocation(value.job_order.task.body_no.current_loc);
+        setPlateNumber(value.job_order.task.body_no.plate_no);
+        setCSNumber(value.job_order.task.body_no.vin_no);
+        setChassisNumber(value.job_order.task.body_no.vin_no);
+
         setJobOrder(value.job_order.job_id);
         setIRNumber(value.ir_no);
         setDateIncident(convertDatetoGMT(value.incident_date));
@@ -142,7 +164,7 @@ export default function RepairRecords() {
                     arrParts[i] = {...arrParts[i], p: "", q: "", c: ""};
                     setParts(arrParts);
                 } else {
-                    arrParts[i] = {...arrParts[i], p: value.parts[i].particulars, q: String(value.parts[i].quantity), c: String(value.parts[i].cost)};
+                    arrParts[i] = {...arrParts[i], p: value.parts[i].particulars === null ? "" : value.parts[i].particulars, q: String(value.parts[i].quantity), c: String(value.parts[i].cost)};
                     setParts(arrParts);
                 }
             }
@@ -157,7 +179,7 @@ export default function RepairRecords() {
                     arrLabor[i] = {...arrLabor[i], p: "", q: "", c: ""};
                     setLabor(arrLabor);
                 } else {
-                    arrLabor[i] = {...arrLabor[i], p: value.labor[i].particulars, q: String(value.labor[i].quantity), c: String(value.labor[i].cost)};
+                    arrLabor[i] = {...arrLabor[i], p: value.labor[i].particulars === null ? "" : value.labor[i].particulars, q: String(value.labor[i].quantity), c: String(value.labor[i].cost)};
                     setLabor(arrLabor);
                 }
             }
@@ -229,8 +251,6 @@ export default function RepairRecords() {
     };
 
     const submitEditRepairRecord = () => {
-        console.log(parts);
-        console.log(labor);
         if (IRNumber === "") { 
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIncident === null) { 
@@ -269,7 +289,6 @@ export default function RepairRecords() {
                     quantity: x.q
                 })
             )
-            console.log(submitParts);
 
             let submitLabor = [];
             labor.filter(f => f.p !== "").map((x) =>
@@ -306,7 +325,7 @@ export default function RepairRecords() {
                 date_done: format(dateDone, 'yyyy-MM-dd'),
                 status_repair: statusRepair.val,
                 remarks: remarks,
-                //job_order: jobOrder
+                job_order: jobOrder
                 
             }, config)
             .then((res) => {
@@ -408,44 +427,40 @@ export default function RepairRecords() {
                     <Dialog header="EDIT REPAIR" visible={displayRepairRecordEdit} onHide={() => onHide('displayRepairRecordEdit')} blockScroll={true}>
                         <div className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12  repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                     <h4>FIELD REPORT</h4>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" >
                                     <div className="card card-w-title" >
                                         <div className="p-grid p-fluid">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>JOB TYPE:</b></h6>
+                                                <InputText placeholder="Input Job Type" value={jobType} disabled/>
+                                            </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT No.:</b></h6>
-                                                <InputText placeholder="Input Report No." value={jobOrder} onChange={(e) => setJobOrder(e.target.value)}/>
-                                            </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                                <h6><b>JOB TYPE:</b></h6>
-                                                <InputText placeholder="Input Job Type"/>
-                                                {/* <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setJobType(event.target.value)} /> */}
+                                                <InputText placeholder="Input Report No." value={jobOrder} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>SCHEDULE DATE:</b></h6>
-                                                <Calendar placeholder="Input Date" showIcon />
+                                                <InputText placeholder="Input Date" value={scheduleDate} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                                                {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." value={bodyNo} suggestions={suggestionsBodyNo} 
-                                                completeMethod={searchListBodyNo} onChange={(e) => setBodyNo(e.target.value)} /> */}
-                                                <InputText placeholder="Input Body No."/>
+                                                <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <h6><b>MAKE:</b></h6>
-                                                <InputText placeholder="Input Make"/>
+                                                <InputText placeholder="Input Make" value={make} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <h6><b>STATUS:</b></h6>
-                                                <Dropdown options={statusRepairOptions} optionLabel="name" placeholder="Select Status" />
+                                                <InputText placeholder="Input Make" value={status} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <h6><b>LOCATION:</b></h6>
-                                                <InputText placeholder="Input Location"/>
+                                                <InputText placeholder="Input Location" value={location} disabled/>
                                             </div>
-
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
                                                 <h5>VEHICLE INFORMATION</h5>
@@ -456,11 +471,11 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>PLATE No.:</b></h6>
-                                                <InputText placeholder="Input Plate Number"/>
+                                                <InputText placeholder="Input Plate Number" value={plateNumber} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>CS No.:</b></h6>
-                                                <InputText placeholder="Input CS Number"/>
+                                                <InputText placeholder="Input CS Number" value={CSNumber} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>INCIDENT DATE:</b></h6>
@@ -481,7 +496,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>CHASSIS No.:</b></h6>
-                                                <InputText placeholder="Input Chassis Number"/>
+                                                <InputText placeholder="Input Chassis Number" value={chassisNumber} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>SITE POC:</b></h6>
@@ -589,7 +604,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>NOTED BY:</b></h6>
-                                                <InputText placeholder="Input Name"/>
+                                                <InputText placeholder="Input Name" disabled/>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">

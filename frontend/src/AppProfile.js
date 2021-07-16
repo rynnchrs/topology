@@ -110,9 +110,9 @@ export const AppProfile = () => {
     return (
         <div className="layout-profile">
             <Toast ref={toast} />
-            <div>
+            {/* <div>
                 <img src="assets/layout/images/avatar_4.png" alt="Profile" />
-            </div>
+            </div> */}
             <button className="p-link layout-profile-link" onClick={onClick}>
                 {/*<span className="username">Ryann Ang</span>*/}
                 <span className="username">{userData}</span>
