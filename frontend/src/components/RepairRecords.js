@@ -7,6 +7,7 @@ import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Paginator } from 'primereact/paginator';
 import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 
@@ -15,39 +16,39 @@ import { format } from 'date-fns';
 
 export default function RepairRecords() {
 
-    const searchJobTypeOptions = [{ name: 'SHOW ALL', val: '' }, { name: 'REPAIR', val: 'True' }, { name: 'INSPECTION', val: 'False' }];
+    //search fields
+    const [searchJobNumber, setSearchJobNumber] = useState("");
+    const searchJobTypeOptions = [{ name: "SHOW ALL", val: "" }, { name: "REPAIR", val: "True" }, { name: "INSPECTION", val: "False" }];
     const [searchJobType, setSearchJobType] = useState([]);
+    const [searchDateCreated, setSearchDateCreated] = useState(null);
 
     const [repairRecordList, setRepairRecordList] = useState([]);
-    // const [repairRecordData, setRepairRecordData] = useState([]);
-
-    const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NON-OPERATIONAL', val: "Non-Operational" }];
 
     let arrParts = useRef([]);
     let arrLabor = useRef([]);
 
-    const [repairID, setRepairID] = useState('');
+    const [repairID, setRepairID] = useState("");
     const [jobType, setJobType] = useState([]);
     const [scheduleDate, setScheduleDate] = useState(null);
-    const [bodyNo, setBodyNo] = useState('');
-    const [make, setMake] = useState('');
-    const [status, setStatus] = useState('');
-    const [location, setLocation] = useState('');
-    const [plateNumber, setPlateNumber] = useState('');
-    const [CSNumber, setCSNumber] = useState('');
-    const [chassisNumber, setChassisNumber] = useState('');
+    const [bodyNo, setBodyNo] = useState("");
+    const [make, setMake] = useState("");
+    const [status, setStatus] = useState("");
+    const [location, setLocation] = useState("");
+    const [plateNumber, setPlateNumber] = useState("");
+    const [CSNumber, setCSNumber] = useState("");
+    const [chassisNumber, setChassisNumber] = useState("");
 
     //variables to be edit
-    const [jobOrder, setJobOrder] = useState('');
-    const [IRNumber, setIRNumber] = useState('');
+    const [jobOrder, setJobOrder] = useState("");
+    const [IRNumber, setIRNumber] = useState("");
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
-    const [detailsIncident, setDetailsIncident] = useState('');
-    const [sitePOC, setSitePOC] = useState('');
-    const [contactNumber, setContactNumber] = useState('');
+    const [detailsIncident, setDetailsIncident] = useState("");
+    const [sitePOC, setSitePOC] = useState("");
+    const [contactNumber, setContactNumber] = useState("");
     const [datePerformed, setDatePerformed] = useState(null);
-    const [detailsActualFindings, setDetailsActualFindings] = useState('');
-    const [detailsActualRemarks, setDetailsActualRemarks] = useState('');
+    const [detailsActualFindings, setDetailsActualFindings] = useState("");
+    const [detailsActualRemarks, setDetailsActualRemarks] = useState("");
     const initialPartsLabor = [
         {p: "", q: "", c: ""},
         {p: "", q: "", c: ""},
@@ -62,7 +63,7 @@ export default function RepairRecords() {
         {p: "", q: "", c: ""},
         {p: "", q: "", c: ""}
     ]);
-    const [totalPartsCost, setTotalPartsCost] = useState('0.00');
+    const [totalPartsCost, setTotalPartsCost] = useState("0.00");
     const [labor, setLabor] = useState([
         {p: "", q: "", c: ""},
         {p: "", q: "", c: ""},
@@ -70,13 +71,20 @@ export default function RepairRecords() {
         {p: "", q: "", c: ""},
         {p: "", q: "", c: ""}
     ]);
-    const [totalLaborCost, setTotalLaborCost] = useState('0.00');
-    const [totalEstimateCost, setTotalEstimateCost] = useState('0.00');
+    const [totalLaborCost, setTotalLaborCost] = useState("0.00");
+    const [totalEstimateCost, setTotalEstimateCost] = useState("0.00");
     const [dateRepaired, setDateRepaired] = useState(null);
-    const [detailsActionTaken, setDetailsActionTaken] = useState('');
+    const [detailsActionTaken, setDetailsActionTaken] = useState("");
     const [dateDone, setDateDone] = useState(null);
+    const statusRepairOptions = [{ name: "OPERATIONAL", val: "Operational" }, { name: "NON-OPERATIONAL", val: "Non-Operational" }];
     const [statusRepair, setStatusRepair] = useState([]);
-    const [remarks, setRemarks] = useState('');
+    const [remarks, setRemarks] = useState("");
+
+    //paginator
+    const [first, setFirst] = useState(0);
+    const rows = 10;
+    const [flagPages, setFlagPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(1);
 
     const dt = useRef(null);
     const toast = useRef(null);
@@ -96,7 +104,8 @@ export default function RepairRecords() {
 
         axios.get(process.env.REACT_APP_SERVER_NAME + 'report/repair/', config)
             .then((res) => {
-                setRepairRecordList(res.data);
+                setTotalCount(res.data.count);
+                setRepairRecordList(res.data.results);
             })
             .catch((err) => {
                 
@@ -112,6 +121,53 @@ export default function RepairRecords() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         arrLabor = labor.slice();
     },[labor]);
+
+    //for pagination
+    useEffect(() => {
+        try {
+            const sentPage = (first / rows) + 1;
+
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+            let sjobNumber = searchJobNumber;
+            let sDateCreated = searchDateCreated === null ? "" : format(searchDateCreated, 'yyyy-MM-dd');
+            let sJobType = searchJobType.length <= 0 ? "" : searchJobType.val;
+
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'report/repair/?job_no=' + sjobNumber 
+                + '&type=' + sJobType
+                + '&date_created=' + sDateCreated
+                + '&page=' + sentPage, config)
+                .then((res) => {
+                    console.log("p:",res.data.results);
+                    setTotalCount(res.data.count);
+                    setRepairRecordList(res.data.results);
+                })
+                .catch((err) => {
+                    
+                });
+        } catch(err) {
+
+        }
+    }, [flagPages]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    //for pagination
+    const onPageChange = (event) =>  {
+        setFirst(event.first);
+        if (event.first > first) {
+            setFlagPages(flagPages + 1);
+        } else if (event.first < first) {
+            setFlagPages(flagPages - 1);
+        } else {
+
+        }          
+    }
 
     const getRepairRecordData = (value) => {
         let token = localStorage.getItem("token");
@@ -250,6 +306,42 @@ export default function RepairRecords() {
         }
     };
 
+    const [timeOutId, setTimeOutId] = useState(null);
+    useEffect(() => {
+        clearTimeout(timeOutId);
+        setTimeOutId(setTimeout(() => {
+            submitSearch();
+        }, 1000));
+    },[searchJobNumber]);
+
+    const submitSearch = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        let sjobNumber = searchJobNumber;
+        let sDateCreated = searchDateCreated === null ? "" : format(searchDateCreated, 'yyyy-MM-dd');
+        let sJobType = searchJobType.length <= 0 ? "" : searchJobType.val;
+
+        axios
+            .get(process.env.REACT_APP_SERVER_NAME + 'report/repair/?job_no=' + sjobNumber 
+            + '&type=' + sJobType
+            + '&date_created=' + sDateCreated
+            + '&page=1', config)
+            .then((res) => {
+                console.log("s: ",res.data.results);
+                setTotalCount(res.data.count);
+                setRepairRecordList(res.data.results);
+            })
+            .catch((err) => {
+                
+            });
+    }
+
     const submitEditRepairRecord = () => {
         if (IRNumber === "") { 
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
@@ -381,7 +473,6 @@ export default function RepairRecords() {
         );
     }
     
-
     return(
         <div>
             <Toast ref={toast}/>
@@ -392,7 +483,7 @@ export default function RepairRecords() {
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
-                                    <InputText placeholder="Search Report No."/>
+                                    <InputText placeholder="Search Report No." value={searchJobNumber} onChange={(event) => setSearchJobNumber(event.target.value)}/>
                                 </span>
                             </div>
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
@@ -403,7 +494,7 @@ export default function RepairRecords() {
                             </div>
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <div className="p-d-flex">
-                                    <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search"/></div>
+                                    <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
                                 </div>
                             </div>
                         </div>
@@ -414,11 +505,11 @@ export default function RepairRecords() {
             <div className="p-grid p-fluid">
                 <div className="p-col-12">
                     <DataTable ref={dt} header={renderHeader()} value={repairRecordList} className="p-datatable-sm" 
-                        resizableColumns columnResizeMode="expand" emptyMessage="No data found">
+                        resizableColumns columnResizeMode="expand" emptyMessage="No records found">
                         <Column field="repair_id" header="Repair No." style={{ paddingLeft: '3%' }}></Column>
                         <Column body={actionBody}></Column>
                     </DataTable>
-                    {/* <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator> */}
+                    <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
                 </div>
             </div>
 

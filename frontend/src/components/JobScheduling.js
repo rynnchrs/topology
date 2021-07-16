@@ -62,7 +62,6 @@ export const JobScheduling = () => {
     });
 
     const [holdData, setHoldData] = useState([]);
-    // const [makeData, setMakeData] = useState('');
     const jobTypeOptions = [{ name: 'REPAIR', val: true }, { name: 'INSPECTION', val: false }];
     const [disabledData, setDisabledData] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
@@ -83,7 +82,6 @@ export const JobScheduling = () => {
     const rows = 10;
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
-    // const [counter, setCounter] = useState(1);
 
     //create task form
     const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
@@ -407,9 +405,6 @@ export const JobScheduling = () => {
         value.filter(v => v.task_status_fm !== true || v.task_status_mn !== true).map((v) => {
             let splitDate = v.end_date.split("-");
             let gmtDate = new Date(+splitDate[0], splitDate[1] - 1, +splitDate[2] + 1);
-            // let d = new Date();
-            // d.setDate(gmtDate.getDate() + 1);
-            // console.log(d);
             let endDate = format(gmtDate, 'yyyy-MM-dd');
             let f = v.fieldman.map((x) =>
                 x.field_man
@@ -423,13 +418,6 @@ export const JobScheduling = () => {
     const items = [
         {
             items: [
-                // {
-                //     label: 'Show More',
-                //     icon: 'pi pi-refresh',
-                //     command: () => {
-                //         btnJobData(holdData);
-                //     }
-                // },
                 {
                     label: 'Edit', icon: 'pi pi-pencil',
                     command: () => {
@@ -439,7 +427,6 @@ export const JobScheduling = () => {
                 {
                     label: 'Delete', icon: 'pi pi-trash',
                     command: () => {
-                        // deleteTask(holdData);
                         onClick('displayConfirmDelete');
                     }
                 }
@@ -741,7 +728,6 @@ export const JobScheduling = () => {
                 onClick('displayMessage');
             })
             .catch((err) => {
-                // console.log(err.response);
                 if (err.toJSON().message === 'Network Error'){
                     toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                 } else if (err.response.data.fieldman) {
@@ -1086,13 +1072,11 @@ export const JobScheduling = () => {
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
                                 <InputText placeholder="Search" value={searchFieldman} onChange={(event) => bodySearch(event)}/>
-                                {/* <InputText placeholder="Search Task"/> */}
                             </span>
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                             <Dropdown value={searchStatus} options={searchStatusOptions} optionLabel="name" placeholder="Select Status"
                             onChange={event => setSearchStatus(event.target.value)} />
-                            {/* <Dropdown placeholder="Select Status" /> */}
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                             <Calendar id="icon" placeholder="Start Date" value={searchStartDate} onChange={(e) => setSearchStartDate(e.value)} showIcon />
@@ -1113,7 +1097,7 @@ export const JobScheduling = () => {
                                 <Menu model={itemsFieldman} popup ref={menu} id="popup_menu" />
                             }
                             <DataTable ref={dt} value={jobList} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
-                                scrollable scrollHeight="325px" emptyMessage="No data found">
+                                scrollable scrollHeight="325px" emptyMessage="No records found">
                                 <Column body={actionBody}></Column>
                             </DataTable>
                             <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
@@ -1137,9 +1121,8 @@ export const JobScheduling = () => {
                                 {
                                     fieldman.map((x, index) =>
                                         <div className="p-col-12 p-lg-12" key={index}>
-                                            {/* <InputText placeholder="Input Name" value={x.val} onChange={(e) => updateFieldman(x.id, e.target.value)}/> */}
-                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" value={x.fullname} suggestions={suggestions} completeMethod={searchList} 
-                                            onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)}/>
+                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" suggestions={suggestions} completeMethod={searchList} 
+                                            value={x.fullname} onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)}/>
                                         </div>
                                     )
                                 }
@@ -1149,10 +1132,8 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                            <AutoComplete forceSelection field="body_no" placeholder="Body No." value={bodyNo} suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
-                                // onSelect={event => this.convertData(event)} 
-                                onChange={(e) => setBodyNo(e.target.value)}/>
-                            {/* <InputText placeholder="Input Vehicle (Body No.)" value={bodyNo} onChange={(e) => setBodyNo(e.target.value)}/> */}
+                            <AutoComplete forceSelection field="body_no" placeholder="Body No." suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
+                            value={bodyNo} onChange={(e) => setBodyNo(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE: </b></h6>
@@ -1177,7 +1158,6 @@ export const JobScheduling = () => {
 
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
-                            {/* <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitTask()}/> */}
                             <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()}/>
                         </div>
                     </div>
@@ -1195,9 +1175,8 @@ export const JobScheduling = () => {
                                 {
                                     editFieldman.map((x, index) =>
                                         <div className="p-col-12 p-lg-12" key={index}>
-                                            {/* <InputText placeholder="Input Name" value={x.val} onChange={(e) => updateEditFieldman(x.id, e.target.value)} disabled={disabledData}/> */}
-                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" value={x.fullname} suggestions={suggestions} completeMethod={searchList} 
-                                            onSelect={event => autoCompleteSelectEdit(x.id, event)} onChange={(e) => updateEditFieldman(x.id, e.target.value)} disabled={disabledData}/>
+                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" suggestions={suggestions} completeMethod={searchList} 
+                                            value={x.fullname} onSelect={event => autoCompleteSelectEdit(x.id, event)} onChange={(e) => updateEditFieldman(x.id, e.target.value)} disabled={disabledData}/>
                                         </div>
                                     )
                                 }
@@ -1207,9 +1186,8 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                            <AutoComplete forceSelection field="body_no" placeholder="Input Vehicle(Body No.)" value={editBodyNo} suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
-                                onChange={(e) => setEditBodyNo(e.target.value)} disabled={disabledData}/>
-                            {/* <InputText placeholder="Input Vehicle(Body No.)" value={editBodyNo} onChange={(e) => setEditBodyNo(e.target.value)} disabled={disabledData}/> */}
+                            <AutoComplete forceSelection field="body_no" placeholder="Input Vehicle(Body No.)" suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
+                            value={editBodyNo} onChange={(e) => setEditBodyNo(e.target.value)} disabled={disabledData}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE: </b></h6>

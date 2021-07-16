@@ -16,8 +16,6 @@ export default function RepairReport() {
 
     const jobTypeOptions = [{ name: 'REPAIR', val: 'Repair' }, { name: 'INSPECTION', val: 'Inspection' }];
     const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NON-OPERATIONAL', val: "Non-Operational" }];
-    const [bodyNoList, setBodyNoList] = useState([]);
-    const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
     const [jobNotCreatedList, setJobNotCreatedList] = useState([]);
     const [suggestionsJobNotCreatedList, setSuggestionsJobNotCreatedList] = useState(null);
 
@@ -71,77 +69,6 @@ export default function RepairReport() {
     const [isLoading, setIsLoading] = useState(false);
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
-
-    // useEffect(() => {
-    //     console.log(jobType)
-    // },[jobType]);
-
-    useEffect(() => {
-        let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'car/car-list/', config)
-            .then((res) => {
-                setBodyNoList(res.data.results);
-                if (res.data.next === null){
-                
-                } else {
-                    nextPageBodyNo(res.data.next);
-                }
-            })
-            .catch((err) => {
-                
-            });
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const nextPageBodyNo = (value) => {
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
-
-        axios
-            .get(value, config)
-            .then((res) => {
-                appendBodyNo(res.data.results, res.data.next);
-            })
-            .catch((err) => {
-                
-            });
-    };
-
-    const appendBodyNo = (value1, value2) => {
-        value1.map((i) => {
-            return setBodyNoList(bodyNoList => [...bodyNoList, i]);
-        });
-        if (value2 === null){
-                
-        } else {
-            nextPageBodyNo(value2);
-        }
-    }
-
-    const searchListBodyNo = (event) => {
-        setTimeout(() => {
-            if (!event.query.trim().length) {
-
-            } else {
-                try {
-                    setSuggestionsBodyNo(bodyNoList.filter(item => item.body_no.startsWith(event.query)));
-                } catch (err){
-
-                }
-            }
-        }, 100);
-    };
 
     const searchListJobNotCreated = (event) => {
         setTimeout(() => {
@@ -204,11 +131,10 @@ export default function RepairReport() {
     };
 
     const submitRepairReport = () => {
-        console.log(bodyNoList);
-        console.log(jobNotCreatedList);
-        console.log(suggestionsJobNotCreatedList);
-        console.log(suggestionsBodyNo);
-        if (IRNumber === "") { 
+        console.log(jobOrder.job_id)
+        if (typeof(jobOrder.job_id) === "undefined") {
+            toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'Please select report no. first.', life: 3000 });
+        } else if (IRNumber === "") { 
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIncident === null) { 
             toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
@@ -265,38 +191,38 @@ export default function RepairReport() {
                 },
             };
 
-            // axios.post(process.env.REACT_APP_SERVER_NAME + 'report/repair/', {
-            //     parts: submitParts,
-            //     labor: submitLabor,
-            //     ir_no: IRNumber,
-            //     incident_date: format(dateIncident, 'yyyy-MM-dd'),
-            //     date_receive: format(dateReceive, 'yyyy-MM-dd'),
-            //     incident_details: detailsIncident,
-            //     site_poc: sitePOC,
-            //     contact_no: contactNumber,
-            //     perform_date: format(datePerformed, 'yyyy-MM-dd'),
-            //     actual_findings: detailsActualFindings,
-            //     actual_remarks: detailsActualRemarks,
-            //     repair_date: format(dateRepaired, 'yyyy-MM-dd'),
-            //     action_taken: detailsActionTaken,
-            //     date_done: format(dateDone, 'yyyy-MM-dd'),
-            //     status_repair: statusRepair.val,
-            //     remarks: remarks,
-            //     job_order: jobOrder
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'report/repair/', {
+                parts: submitParts,
+                labor: submitLabor,
+                ir_no: IRNumber,
+                incident_date: format(dateIncident, 'yyyy-MM-dd'),
+                date_receive: format(dateReceive, 'yyyy-MM-dd'),
+                incident_details: detailsIncident,
+                site_poc: sitePOC,
+                contact_no: contactNumber,
+                perform_date: format(datePerformed, 'yyyy-MM-dd'),
+                actual_findings: detailsActualFindings,
+                actual_remarks: detailsActualRemarks,
+                repair_date: format(dateRepaired, 'yyyy-MM-dd'),
+                action_taken: detailsActionTaken,
+                date_done: format(dateDone, 'yyyy-MM-dd'),
+                status_repair: statusRepair.val,
+                remarks: remarks,
+                job_order: jobOrder.job_id
                
-            // }, config)
-            // .then((res) => {
-            //     setMessage({title:"CREATE", content:"Successfully created."});
-            //     onClick('displayMessage');
-            // })
-            // .catch((err) => {
-            //     console.log(err.response);
-            //     if (err.toJSON().message === 'Network Error'){
-            //         toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
-            //     } else if (err.response.data.job_order) {
-            //         toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'The report no. had a report already.', life: 3000 });
-            //     }
-            // })
+            }, config)
+            .then((res) => {
+                setMessage({title:"CREATE", content:"Successfully created."});
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                console.log(err.response);
+                if (err.toJSON().message === 'Network Error'){
+                    toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                } else if (err.response.data.job_order) {
+                    toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'The report no. had a report already.', life: 3000 });
+                }
+            })
         }
     }
 
@@ -312,6 +238,7 @@ export default function RepairReport() {
 
         axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/' + value.val.toLowerCase() + '_not_created/', config)
             .then((res) => {
+                console.log(res.data)
                 setJobNotCreatedList(res.data);
                 // setBodyNoList(res.data.results);
                 // if (res.data.next === null){
@@ -366,10 +293,6 @@ export default function RepairReport() {
                     <ProgressSpinner />
                 </div>
             <div className="p-grid p-fluid">
-                {/* <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                    <label><b>SELECT JOB TYPE:</b></label>
-                    <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" onChange={event => setJobType(event.target.value)} />
-                </div> */}
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                         <h4>FIELD REPORT</h4>
@@ -379,25 +302,21 @@ export default function RepairReport() {
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>JOB TYPE:</b></h6>
-                                    {/* <InputText placeholder="Input Job Type" value={jobType.val}/> */}
                                     <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => handleChangeJobType(event.target.value)} />
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
                                     {/* <InputText placeholder="Input Report No." value={jobOrder} onChange={(e) => setJobOrder(e.target.value)}/> */}
-                                    <AutoComplete forceSelection field="job_id" placeholder="Input Report No." value={jobOrder} suggestions={suggestionsJobNotCreatedList} 
-                                    completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/>
+                                    <AutoComplete forceSelection field="job_id" placeholder="Input Report No." suggestions={suggestionsJobNotCreatedList} 
+                                    value={jobOrder} completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>SCHEDULE DATE:</b></h6>
                                     <InputText placeholder="Input Date" value={scheduleDate} disabled/>
-                                    {/* <Calendar placeholder="Input Date" showIcon /> */}
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
                                     <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                    {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." value={bodyNo} suggestions={suggestionsBodyNo} 
-                                    completeMethod={searchListBodyNo} onChange={(e) => setBodyNo(e.target.value)} /> */}
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>MAKE:</b></h6>
@@ -551,7 +470,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>GENERATED BY:</b></h6>
-                                    <InputText placeholder="Input Name"/>
+                                    <InputText placeholder="Input Name" value={localStorage.getItem("myfirst")} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>NOTED BY:</b></h6>
