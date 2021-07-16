@@ -190,8 +190,17 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
 
 
 class RepairListSerializer(serializers.ModelSerializer): # list of all repair
-    body_no = serializers.CharField(source='body_no.body_no')
+    body_no = serializers.CharField(source='job_order.task.body_no.body_no')
+    job_order = serializers.CharField(source='job_order.job_no')
+    type = serializers.SerializerMethodField()
     class Meta:
         model = Repair
-        fields = [  'repair_id','ro_no','body_no']
+        fields = [  'repair_id','body_no','job_order','type','date_created']
+    
+    def get_type(self, obj):
+        print(obj.job_order.type)
+        if obj.job_order.type == False:
+            return "Inspection"
+        else:
+            return "Repair"
 
