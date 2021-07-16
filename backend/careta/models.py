@@ -5,6 +5,11 @@ from django.contrib.auth.models import User  # authenticate User
 from django.db import models
 from phone_field import PhoneField
 
+def upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    path = str(instance.user.username)
+    filename = '{}.{}'.format(instance.full_name, ext)
+    return '/'.join(['careta_users/',path,filename])
 
 class UserInfo(models.Model):  # User Info Model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_info')
@@ -19,6 +24,7 @@ class UserInfo(models.Model):  # User Info Model
     birthday = models.DateField(auto_now=False, auto_now_add=False, null=True)
     phone = PhoneField(blank=True, help_text='Contact phone number')
     address = models.CharField(max_length=100, null=True, blank=True)
+    image = models.ImageField(upload_to=upload_path, null=True, blank=True)
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
