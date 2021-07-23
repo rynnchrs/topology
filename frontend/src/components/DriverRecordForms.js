@@ -488,6 +488,7 @@ export default function DriverRecordForms() {
 
     const revised = () => {
         /* eslint-disable no-unused-expressions */
+        console.log(selectedCar)
         setMileage(selectedCar.mileage);
         isCleanlinessExterior(selectedCar.cleanliness_exterior);
         isConditionRust(selectedCar.condition_rust);

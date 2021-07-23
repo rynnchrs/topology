@@ -276,7 +276,7 @@
 }
 /* end css for task list datatable */
 
-/* css for repair report */
+/* css for careta report */
 .repair-title {
   h4 {
     color: white;
@@ -308,9 +308,20 @@
   td:first-child + td + td {
     width: 33%;
   }
-}
 
-/* end css for repair report */
+  .red .p-inputtext{
+    border: 1px solid red;
+  }
+}
+/* end css for careta report */
+
+/* css for careta record */
+.red-field {
+  .red .p-inputtext {
+    border: 1px solid red;
+  }
+}
+/* end css for careta report */
 
 /* override global size of dialog in all forms*/
 .dialog-display{

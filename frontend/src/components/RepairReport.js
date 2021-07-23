@@ -31,7 +31,7 @@ export default function RepairReport() {
     const [chassisNumber, setChassisNumber] = useState('');
 
     //variables to be saved
-    const [jobOrder, setJobOrder] = useState([]);
+    const [jobID, setJobID] = useState([]);
     const [IRNumber, setIRNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
@@ -131,8 +131,7 @@ export default function RepairReport() {
     };
 
     const submitRepairReport = () => {
-        console.log(jobOrder.job_id)
-        if (typeof(jobOrder.job_id) === "undefined") {
+        if (typeof(jobID.job_id) === "undefined") {
             toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'Please select report no. first.', life: 3000 });
         } else if (IRNumber === "") { 
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
@@ -172,6 +171,7 @@ export default function RepairReport() {
                     quantity: x.q
                 })
             )
+            // console.log(submitParts)
 
             let submitLabor = [];
             labor.filter(f => f.p !== "").map((x) =>
@@ -182,6 +182,7 @@ export default function RepairReport() {
                     quantity: x.q
                 })
             )
+            // console.log(submitLabor)
 
             let token = localStorage.getItem("token");
             const config = {
@@ -208,7 +209,7 @@ export default function RepairReport() {
                 date_done: format(dateDone, 'yyyy-MM-dd'),
                 status_repair: statusRepair.val,
                 remarks: remarks,
-                job_order: jobOrder.job_id
+                job_order: jobID.job_id
                
             }, config)
             .then((res) => {
@@ -221,6 +222,12 @@ export default function RepairReport() {
                     toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                 } else if (err.response.data.job_order) {
                     toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'The report no. had a report already.', life: 3000 });
+                } else if (err.response.data.contact_no) {
+                    toast.current.show({ severity: 'error', summary: 'CONTACT NO.', detail: `${err.response.data.contact_no.join()}`, life: 3000 });
+                } else if (err.response.data.cost) {
+                    toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Cost', life: 3000 });
+                } else if (err.response.data.quantity) {
+                    toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Quantity', life: 3000 });
                 }
             })
         }
@@ -297,18 +304,20 @@ export default function RepairReport() {
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                         <h4>FIELD REPORT</h4>
                     </div>
-                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" >
-                        <div className="card card-w-title" >
+                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                        <div className="card card-w-title">
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>JOB TYPE:</b></h6>
-                                    <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => handleChangeJobType(event.target.value)} />
+                                    <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" 
+                                    onChange={event => handleChangeJobType(event.target.value)} />
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
-                                    {/* <InputText placeholder="Input Report No." value={jobOrder} onChange={(e) => setJobOrder(e.target.value)}/> */}
-                                    <AutoComplete forceSelection field="job_id" placeholder="Input Report No." suggestions={suggestionsJobNotCreatedList} 
-                                    value={jobOrder} completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/>
+                                    <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
+                                    onChange={event => (setJobID(event.target.value), handleSelectReportNo(event))} disabled={jobType.length === 0}/>
+                                    {/* <AutoComplete forceSelection field="job_id" placeholder="Input Report No." suggestions={suggestionsJobNotCreatedList} 
+                                    value={jobOrder} completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/> */}
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>SCHEDULE DATE:</b></h6>
@@ -324,8 +333,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>STATUS:</b></h6>
-                                    <InputText placeholder="Input Make" value={status} disabled/>
-                                    {/* <Dropdown options={statusRepairOptions} optionLabel="name" placeholder="Select Status" disabled/> */}
+                                    <InputText placeholder="Input Status" value={status} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>LOCATION:</b></h6>
@@ -374,7 +382,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>CONTACT No.:</b></h6>
-                                    <InputText placeholder="Input Contact Number" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)}/>
+                                    <InputText placeholder="Input Contact Number" keyfilter="int" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)}/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
