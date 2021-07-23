@@ -160,17 +160,20 @@ class TaskView(viewsets.ModelViewSet):
         if user_permission(user, 'can_view_task'):  
             queryset = Task.objects.filter(task_status_fm=True, task_status_mn=False).order_by('task_id')
             serializer = WarningTaskSerializer(queryset, many=True)
-            page = self.paginate_queryset(serializer.data)
+            page = self.paginate_queryset(self.filter_queryset(queryset))
             if page is not None:
-                return self.get_paginated_response(serializer.data)   
+                serializer = WarningTaskSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data) 
+            serializer = WarningTaskSerializer(queryset, many=True)   
             return Response(serializer.data, status=status.HTTP_200_OK)        
         else:
             queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('task_id')
             queryset = queryset.filter(task_status_fm=True, task_status_mn=False)
-            serializer = WarningTaskSerializer(queryset, many=True)
-            page = self.paginate_queryset(serializer.data)
+            page = self.paginate_queryset(self.filter_queryset(queryset))
             if page is not None:
-                return self.get_paginated_response(serializer.data)      
+                serializer = WarningTaskSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data) 
+            serializer = WarningTaskSerializer(queryset, many=True)     
             return Response(serializer.data, status=status.HTTP_200_OK)
             
     @action(detail=False)

@@ -5,6 +5,11 @@ from django.contrib.auth.models import User  # authenticate User
 from django.db import models
 from phone_field import PhoneField
 
+def upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    path = str(instance.user.username)
+    filename = '{}.{}'.format(instance.full_name, ext)
+    return '/'.join(['careta_users/',path,filename])
 
 class UserInfo(models.Model):  # User Info Model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_info')

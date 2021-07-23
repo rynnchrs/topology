@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'notifications',
     'task',
     'dashboard',
+    'image',
 ]
 
 REST_FRAMEWORK = {
