@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.parsers import MultiPartParser, FormParser
+
 from .filters import UserFilter
 from .models import Permission
 from .serializers import (MyTokenObtainPairSerializer,
@@ -29,7 +29,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
-    perser_classes = [MultiPartParser, FormParser]
     def post(self, request): # add this
         serializer = UserSerializer(data=request.data) # add this
         if serializer.is_valid(raise_exception=True): # add this

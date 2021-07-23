@@ -59,23 +59,31 @@ def repair_reversion(repair):
     cost_parts = []
     parts = Cost.objects.filter(ro_no=repair, cost_type="P")
     for part in parts:
+        lists =  Version.objects.get_for_object(part)
         parts_first = Version.objects.get_for_object(part).last() # get the oldest version
-        if parts_first.field_dict['particulars'] is not None:
+        if parts_first.field_dict['particulars'] is None and len(lists) > 1:
+            parts_first.delete()
+        else:
             parts_latest = Version.objects.get_for_object(part)[0] # get the latest version
             parts_revised = diff(parts_latest.field_dict,parts_first.field_dict) # get the old item only
-        
+            # if parts_revised:
             cost_parts.append(parts_revised)
         
     cost_labor = []
     labor = Cost.objects.filter(ro_no=repair, cost_type="L")
     for lab in labor:
+        lists =  Version.objects.get_for_object(lab)
         labor_first = Version.objects.get_for_object(lab).last() # get the oldest version
-        if labor_first.field_dict['particulars'] is not None:
+        if labor_first.field_dict['particulars'] is None and len(lists) > 1:
+            labor_first.delete()
+        else:
             labor_latest = Version.objects.get_for_object(lab)[0] # get the latest version
             labor_revised = diff(labor_latest.field_dict,labor_first.field_dict) # get the old item only
+            # if labor_revised:
             cost_labor.append(labor_revised)
 
+   
     revised['parts'] = cost_parts
     revised['labor'] = cost_labor
-
+    
     return revised

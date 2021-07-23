@@ -2,6 +2,8 @@ import os
 
 import django
 
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 

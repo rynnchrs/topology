@@ -27,5 +27,6 @@ urlpatterns = [
     path('notifications/',  include('notifications.urls')), 
     path('task/',  include('task.urls')), 
     path('dashboard/',  include('dashboard.urls')),
+    path('image/',  include('image.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

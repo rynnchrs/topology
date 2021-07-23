@@ -24,7 +24,6 @@ class UserInfo(models.Model):  # User Info Model
     birthday = models.DateField(auto_now=False, auto_now_add=False, null=True)
     phone = PhoneField(blank=True, help_text='Contact phone number')
     address = models.CharField(max_length=100, null=True, blank=True)
-    image = models.ImageField(upload_to=upload_path, null=True, blank=True)
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):

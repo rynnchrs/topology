@@ -1,20 +1,13 @@
 from car.models import Car
 from car.serializers import CarInfoSerializer
 from django.contrib.auth.models import User
-from django.db.models import fields
 from rest_framework import serializers
 from task.serializers import RepairJobSerializer
 
 from .models import Cost, Inspection, Repair
 
-#class InspectionImageSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = InspectionImage
-#        fields = ['id','images']
-
 
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
-    #images = InspectionImageSerializer(many=True)
     body_no = serializers.CharField()
     driver = serializers.CharField(required=False, allow_blank=True)
     edited_by = serializers.CharField(required=False, allow_blank=True)
@@ -28,7 +21,7 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
                     'washer_fluid','coolant_level','brake_fluid_level','power_steering_fluid','liquid_leak',
                     'gas_level','oil_level','tyres','front_visual','rear_visual','spare_visual','wheel_brace',
                     'jack','front_right_wheel','front_left_wheel','rear_right_wheel','rear_left_wheel','driver',
-                    'edited_by','notes','date_updated','date_created']#,'images']
+                    'edited_by','notes','date_updated','date_created']
 
     def validate(self, obj): # validate if vin_no input is vin_no
         errors = []
@@ -60,11 +53,8 @@ class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer
         return super().update(instance, validated_data)
 
     def create(self, validated_data):       # Creating report
-        # images_data = validated_data.pop('images') 
         validated_data.pop('edited_by', None) 
         report = Inspection.objects.create(**validated_data)
-        # for image_data in images_data:
-        #     ReportImage.objects.create(report=report, **image_data)
         return report
 
     def to_representation(self, instance): # instance of vin_no
@@ -132,7 +122,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
         for i in range(5-len(labors)):
             Cost.objects.create(ro_no=ro_no, cost_type='L')
 
-        return (ro_no)
+        return ro_no
 
     def update(self, instance, validated_data):     
         costs_data = validated_data.pop("cost")
@@ -175,7 +165,6 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
         instance.status_repair = validated_data.get('status_repair', instance.status_repair)
         instance.remarks = validated_data.get('remarks', instance.remarks)
         instance.save()
-
 
         return instance
 

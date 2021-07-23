@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import serializer_helpers
@@ -21,13 +22,14 @@ from .export import export, repair_export
 from .filters import InspectionFilter, RepairFilter
 from .models import Cost, Inspection, Repair
 from .serializers import (CostSerializer, InspectionLastFourListSerializer,
-                          InspectionListSerializer, InspectionSerializer, RepairListSerializer,
-                          RepairSerializer)
+                          InspectionListSerializer, InspectionSerializer,
+                          RepairListSerializer, RepairSerializer)
 from .utils import repair_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     serializer_class = InspectionSerializer
 
     def list(self, request):        
@@ -153,7 +155,7 @@ class CanViewListView(generics.ListAPIView): #list of inspection with filtering
 
 class RepairView(viewsets.ModelViewSet):  # add this
     permission_classes = [IsAuthenticated]
-    queryset = Repair.objects.all()  # add this
+    queryset = Repair.objects.all().order_by('-repair_id')  # add this
     serializer_class = RepairSerializer  # add this
     filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = RepairFilter
@@ -162,11 +164,12 @@ class RepairView(viewsets.ModelViewSet):  # add this
     def list(self, request): 
         user = self.request.user   
         if user_permission(user, 'can_view_repair_reports'): 
-            queryset = Repair.objects.all()
-            serializer = RepairListSerializer(self.filter_queryset(queryset), many=True)
-            page = self.paginate_queryset(serializer.data)
+            queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
             if page is not None:
+                serializer = RepairListSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)      
+            serializer = RepairListSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -178,8 +181,11 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['noted_by'] = ""
-            cost = request.data['parts'] + request.data['labor']
-            request.data['cost'] = cost
+            parts = dict(request.POST.items())
+            print(parts)
+            # print(request.data['parts'])
+            # cost = request.POST.get('parts') + request.POST.get('labor')
+            # request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 job = JobOrder.objects.get(pk=request.data['job_order'])
@@ -190,7 +196,8 @@ class RepairView(viewsets.ModelViewSet):  # add this
                     car.operational = False
                 car.save()
                 serializer.save()
-            return Response("Successfully Created",status=status.HTTP_201_CREATED)          
+                return Response("Successfully Created",status=status.HTTP_201_CREATED)  
+            return Response(serializer.errors)        
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)    
 
@@ -234,10 +241,6 @@ class RepairView(viewsets.ModelViewSet):  # add this
                     car.operational = False
                 car.save()
                 serializer.save()
-                # costs = Cost.objects.filter(ro_no__job_order=request.data.get('job_order'))
-                # for cost in costs:
-                #     reversion = Version.objects.get_for_object(cost)[0]
-                #     reversion.delete()
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
