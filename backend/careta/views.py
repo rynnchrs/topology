@@ -29,7 +29,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 class RegisterView(generics.GenericAPIView):  # for register user
     serializer_class = UserSerializer # add this
-
     def post(self, request): # add this
         serializer = UserSerializer(data=request.data) # add this
         if serializer.is_valid(raise_exception=True): # add this
