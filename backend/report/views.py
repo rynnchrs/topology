@@ -181,11 +181,8 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['noted_by'] = ""
-            parts = dict(request.POST.items())
-            print(parts)
-            # print(request.data['parts'])
-            # cost = request.POST.get('parts') + request.POST.get('labor')
-            # request.data['cost'] = cost
+            cost = request.data['parts'] + request.data['labor']
+            request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 job = JobOrder.objects.get(pk=request.data['job_order'])
