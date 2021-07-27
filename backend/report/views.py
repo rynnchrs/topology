@@ -257,7 +257,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
         user = self.request.user
         if user_permission(user, 'can_edit_task'): 
             queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, pk=pk) 
+            repair = get_object_or_404(queryset, job_order=pk) 
             if repair.noted_by is None:  
                 repair.noted_by = user
                 repair.save()    
