@@ -9,7 +9,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Paginator } from 'primereact/paginator';
 import { Dialog } from 'primereact/dialog';
-import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
 
 import axios from "axios";
@@ -204,7 +203,6 @@ export default function RepairRecords() {
 
         axios.get(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + value.repair_id + '/', config)
             .then((res) => {
-                console.log(res.data);
                 setRepairRecordDetails(res.data);
                 setFlagRepairRecordDetails(true);
             })
@@ -909,8 +907,8 @@ export default function RepairRecords() {
         return (
             <div>
                 <center>
-                <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" tooltip="Edit" onClick={() => getRepairRecordData(rowData)}/>
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" tooltip="Delete" onClick={() => {setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
+                <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getRepairRecordData(rowData)}/>
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
                 </center>
             </div>
         );
@@ -1165,7 +1163,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>NOTED BY:</b></h6>
-                                                <InputText placeholder="Input Name" disabled/>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.noted_by} disabled/>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">

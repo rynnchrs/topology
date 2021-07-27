@@ -21,7 +21,7 @@ export default function RepairReport() {
 
     // const [reportDetails, setReportDetails] = useState([]);
     const [jobType, setJobType] = useState([]);
-    const [scheduleDate, setScheduleDate] = useState(null);
+    const [scheduleDate, setScheduleDate] = useState('');
     const [bodyNo, setBodyNo] = useState('');
     const [make, setMake] = useState('');
     const [status, setStatus] = useState('');
@@ -41,20 +41,27 @@ export default function RepairReport() {
     const [datePerformed, setDatePerformed] = useState(null);
     const [detailsActualFindings, setDetailsActualFindings] = useState('');
     const [detailsActualRemarks, setDetailsActualRemarks] = useState('');
+    const initialPartsLabor = [
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}, 
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}
+    ];
     const [parts, setParts] = useState([
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}, 
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}, 
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}
     ]);
     const [totalPartsCost, setTotalPartsCost] = useState('0.00');
     const [labor, setLabor] = useState([
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}, 
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}, 
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}
     ]);
     const [totalLaborCost, setTotalLaborCost] = useState('0.00');
     const [totalEstimateCost, setTotalEstimateCost] = useState('0.00');
@@ -91,15 +98,22 @@ export default function RepairReport() {
             setParts(arr);
         } else if (column === "q") {
             let arr = parts.slice();
-            arr[index] = {...arr[index], q: value};
-            setParts(arr);
-        } else {
-            let arr = parts.slice();
-            arr[index] = {...arr[index], c: value};
+            arr[index] = {...arr[index], q: Number(value)};
             setParts(arr);
             let cost = 0;
             arr.filter(f => f.c !== "").map((x) =>
-                cost += Number(x.c)
+                cost += Number(x.c) * Number(x.q)
+            )
+            setTotalPartsCost(cost.toFixed(2));
+            let estCost = cost + Number(totalLaborCost);
+            setTotalEstimateCost(estCost.toFixed(2));
+        } else {
+            let arr = parts.slice();
+            arr[index] = {...arr[index], c: Number(value)};
+            setParts(arr);
+            let cost = 0;
+            arr.filter(f => f.c !== "").map((x) =>
+                cost += Number(x.c) * Number(x.q)
             )
             setTotalPartsCost(cost.toFixed(2));
             let estCost = cost + Number(totalLaborCost);
@@ -114,15 +128,22 @@ export default function RepairReport() {
             setLabor(arr);
         } else if (column === "q") {
             let arr = labor.slice();
-            arr[index] = {...arr[index], q: value};
-            setLabor(arr);
-        } else {
-            let arr = labor.slice();
-            arr[index] = {...arr[index], c: value};
+            arr[index] = {...arr[index], q: Number(value)};
             setLabor(arr);
             let cost = 0;
             arr.filter(f => f.c !== "").map((x) =>
-                cost += Number(x.c)
+                cost += Number(x.c) * Number(x.q)
+            )
+            setTotalLaborCost(cost.toFixed(2));
+            let estCost = cost + Number(totalPartsCost);
+            setTotalEstimateCost(estCost.toFixed(2));
+        } else {
+            let arr = labor.slice();
+            arr[index] = {...arr[index], c: Number(value)};
+            setLabor(arr);
+            let cost = 0;
+            arr.filter(f => f.c !== "").map((x) =>
+                cost += Number(x.c) * Number(x.q)
             )
             setTotalLaborCost(cost.toFixed(2));
             let estCost = cost + Number(totalPartsCost);
@@ -131,6 +152,7 @@ export default function RepairReport() {
     };
 
     const submitRepairReport = () => {
+        setIsLoading(true);
         if (typeof(jobID.job_id) === "undefined") {
             toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'Please select report no. first.', life: 3000 });
         } else if (IRNumber === "") { 
@@ -163,18 +185,17 @@ export default function RepairReport() {
             toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS and/or RECOMMENDATIONS', detail: 'This field is required.', life: 3000 });
         } else {
             let submitParts = [];
-            parts.filter(f => f.p !== "").map((x) =>
+            parts.map((x) =>
                 submitParts.push({
                     cost_type: "P",
                     particulars: x.p,
                     cost: x.c,
-                    quantity: x.q
+                    quantity:  x.q
                 })
             )
-            // console.log(submitParts)
 
             let submitLabor = [];
-            labor.filter(f => f.p !== "").map((x) =>
+            labor.map((x) =>
                 submitLabor.push({
                     cost_type: "L",
                     particulars: x.p,
@@ -182,7 +203,6 @@ export default function RepairReport() {
                     quantity: x.q
                 })
             )
-            // console.log(submitLabor)
 
             let token = localStorage.getItem("token");
             const config = {
@@ -214,6 +234,43 @@ export default function RepairReport() {
             }, config)
             .then((res) => {
                 setMessage({title:"CREATE", content:"Successfully created."});
+                try {
+                setScheduleDate('');
+                setJobType([]);
+                
+                }catch (err) {
+                    console.log(err)
+                }
+                setBodyNo('');
+                setMake('');
+                setStatus('');
+                setLocation('');
+                setPlateNumber('');
+                setCSNumber('');
+                setChassisNumber('');
+
+                setJobID([]);
+                setIRNumber('');
+                setDateIncident(null);
+                setDateReceive(null);
+                setDetailsIncident('');
+                setSitePOC('');
+                setContactNumber('');
+                setDatePerformed(null);
+                setDetailsActualFindings('');
+                setDetailsActualRemarks('');
+                setParts(initialPartsLabor);
+                setTotalPartsCost('0.00');
+                setLabor(initialPartsLabor);
+                setTotalLaborCost('0.00');
+                setTotalEstimateCost('0.00');
+                setDateRepaired(null);
+                setDetailsActionTaken('');
+                setDateDone(null);
+                setStatusRepair([]);
+                setRemarks('');
+                window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+                setIsLoading(false);
                 onClick('displayMessage');
             })
             .catch((err) => {
@@ -245,7 +302,6 @@ export default function RepairReport() {
 
         axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/' + value.val.toLowerCase() + '_not_created/', config)
             .then((res) => {
-                console.log(res.data)
                 setJobNotCreatedList(res.data);
                 // setBodyNoList(res.data.results);
                 // if (res.data.next === null){
@@ -260,7 +316,6 @@ export default function RepairReport() {
     }
 
     const handleSelectReportNo = (value) =>{
-        console.log(value.value);
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
@@ -296,9 +351,9 @@ export default function RepairReport() {
     return(
         <div>
             <Toast ref={toast} />
-            <div className="gray-out" style={{display: isLoading ? "flex": "none"}}>
-                    <ProgressSpinner />
-                </div>
+            <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                <ProgressSpinner />
+            </div>
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>

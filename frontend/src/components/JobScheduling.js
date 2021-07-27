@@ -64,6 +64,7 @@ export const JobScheduling = () => {
     const [holdData, setHoldData] = useState([]);
     const jobTypeOptions = [{ name: 'REPAIR', val: true }, { name: 'INSPECTION', val: false }];
     const [disabledData, setDisabledData] = useState(false);
+    const [disabledApproval, setDisabledApproval] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
@@ -470,7 +471,7 @@ export const JobScheduling = () => {
         let jobTypeColor = jobList.job_order.type === "Repair" ? 'blue' : jobList.job_order.type === "Inspection" ? 'green' : ''; 
 
         return (
-            <div className="p-grid p-fluid p-nogutter" role="button" style={{cursor: 'pointer'}} onClick={(event) => getTaskScheduling(jobList.job_order.job_id)}>
+            <div className="p-grid p-fluid p-nogutter" role="button" style={{cursor: 'pointer'}} onClick={(event) => getTaskScheduling(jobList.job_order.job_id, jobList.job_order.type)}>
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                     <div className="job-datatable-item" style={{borderLeft: '5px solid ' + jobTypeColor}}>
                         <div className="p-grid p-fluid p-nogutter">
@@ -525,7 +526,7 @@ export const JobScheduling = () => {
         getTaskScheduling1(value);
     }
 
-    const getTaskScheduling = (value) => {
+    const getTaskScheduling = (value, type) => {
         if (value !== null) {
             let token = localStorage.getItem("token");
             const config = {
@@ -534,6 +535,16 @@ export const JobScheduling = () => {
                     'Authorization': 'Bearer ' + token,
                 },
             };
+
+            axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/' + type.toLowerCase() + '_not_created/', config)
+                .then((res) => {
+                    let b = res.data.filter(item => item.job_id === value);
+                    b.length <= 0 ? setDisabledApproval(false) : setDisabledApproval(true);
+            })
+            .catch((err) => {
+                
+            });
 
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
@@ -673,7 +684,8 @@ export const JobScheduling = () => {
                     if (res.data.length <= 0){
                         submitTask();
                     } else {
-                        toast.current.show({ severity: 'error', summary: 'Task', detail: 'Already have task.', life: 3000 });
+                        toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
+                        submitTask();
                     }
                 })
                 .catch((err) => {
@@ -922,8 +934,6 @@ export const JobScheduling = () => {
 
     const statusFieldman = (value) => {
         let token = localStorage.getItem("token");
-        let decoded = jwt_decode(token);
-        console.log("dcd: ",decoded)
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -940,12 +950,11 @@ export const JobScheduling = () => {
             onClick('displayMessage');
         })
         .catch((err) => {
-            console.log(err.response)
-            toast.current.show({ severity: 'error', summary: 'Status Update Error', detail: 'Something went wrong.', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'APPROVAL ERROR', detail: 'Something went wrong.', life: 3000 });
         });
     }
 
-    const statusManager = (value) => {
+    const statusManager = (value, jobOrderID) => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -956,15 +965,21 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/status_mn/', "", config)
         .then((res) => {
-            getTaskList();
-            onHide('displayJobDetails');
-            onHide('displayConfirmMN');
-            setMessage({title:"APPROVE", content:"Task approve."});
-            onClick('displayMessage');
+
+            axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + jobOrderID + '/approved/' , "", config)
+            .then((res) => {
+                getTaskList();
+                onHide('displayJobDetails');
+                onHide('displayConfirmMN');
+                setMessage({title:"APPROVE", content:"Task approve."});
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
+            });
         })
         .catch((err) => {
-            console.log(err.response)
-            toast.current.show({ severity: 'error', summary: 'Status Update Error', detail: 'Something went wrong.', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
         });
     }
 
@@ -1031,7 +1046,7 @@ export const JobScheduling = () => {
             return (
                 <div>
                     <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
-                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => statusManager(jobData.task_id)}/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => statusManager(jobData.task_id, jobData.job_order.job_id)}/>
                 </div>
             );
         } else if (name === 'displayMessage') {
@@ -1317,7 +1332,7 @@ export const JobScheduling = () => {
                             onClick={() => onClick('displayConfirmMN')} disabled={status !== "FOR APPROVAL"}/> 
                             :
                             <Button icon="pi pi-check-circle" label="APPROVAL" className="p-button-rounded p-button-warning"
-                            onClick={() => onClick('displayConfirmFM')} disabled={status !== "PENDING"}/>
+                            onClick={() => onClick('displayConfirmFM')} disabled={status !== "PENDING" || disabledApproval}/>
                         }
                     </div>
                     <div className="p-col-12 p-lg-6">
