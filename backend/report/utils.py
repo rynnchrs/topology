@@ -82,8 +82,7 @@ def repair_reversion(repair):
             # if labor_revised:
             cost_labor.append(labor_revised)
 
-   
     revised['parts'] = cost_parts
     revised['labor'] = cost_labor
-    
+    del revised['noted_by_id']
     return revised

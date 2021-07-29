@@ -181,11 +181,8 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['noted_by'] = ""
-            parts = dict(request.POST.items())
-            print(parts)
-            # print(request.data['parts'])
-            # cost = request.POST.get('parts') + request.POST.get('labor')
-            # request.data['cost'] = cost
+            cost = request.data['parts'] + request.data['labor']
+            request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 job = JobOrder.objects.get(pk=request.data['job_order'])
@@ -260,7 +257,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
         user = self.request.user
         if user_permission(user, 'can_edit_task'): 
             queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, pk=pk) 
+            repair = get_object_or_404(queryset, job_order=pk) 
             if repair.noted_by is None:  
                 repair.noted_by = user
                 repair.save()    
