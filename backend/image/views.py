@@ -31,6 +31,8 @@ class UserImageView(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         queryset = self.filter_queryset(self.get_queryset())
         image = get_object_or_404(queryset, pk=pk)
+        image.delete()
+        return Response("Successfully Deleted",status=status.HTTP_200_OK)  
 
 
 class ReportImageView(viewsets.ModelViewSet):
