@@ -31,6 +31,8 @@ import { JobScheduling } from './components/JobScheduling';
 
 import  DriverRecordForms from './components/DriverRecordForms';
 import  VehiclesGPS from './components/VehiclesGPS';
+import  RepairReport from './components/RepairReport';
+import  RepairRecords from './components/RepairRecords';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
@@ -116,6 +118,7 @@ const App = () => {
     const sidebarSubMenu1 = [];
     const sidebarSubMenu2 = [];
     const sidebarSubMenu3 = [];
+    const sidebarSubMenu4 = [];
     
     if (localStorage.getItem("viewInventory") === "true") {
         sidebarMenu.push({label: 'Dashboard', icon: 'pi pi-fw pi-home', command: () => {window.location = '#/'}});
@@ -130,13 +133,10 @@ const App = () => {
     if (localStorage.getItem("viewUsers") === "true" || localStorage.getItem("addUsers") === "true" || localStorage.getItem("editUsers") === "true" || localStorage.getItem("deleteUsers") === "true") {
         sidebarMenu.push({label: 'Users Management', icon: 'pi pi-user', items: sidebarSubMenu1});
     } else {
-        //console.log("permission data none");
+
     }
 
     //inventory permission
-    // if (localStorage.getItem("viewInventory") === "true") {
-    //     sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
-    // }
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarSubMenu2.push({label: 'Vehicles GPS', icon: 'pi pi-file', to: '/vehiclesgps' });
         sidebarSubMenu2.push({label: 'Vehicles Inventory', icon: 'pi pi-file', to: '/vehicles' });
@@ -144,18 +144,18 @@ const App = () => {
     if (localStorage.getItem("viewInventory") === "true" || localStorage.getItem("addInventory") === "true" || localStorage.getItem("editInventory") === "true" || localStorage.getItem("deleteInventory") === "true") {
         sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', items: sidebarSubMenu2});
     } else {
-        //console.log("permission data none");
+
     }
 
     //inspection permission
     if (localStorage.getItem("addInspectionReport") === "true") {
-        sidebarSubMenu3.push({label: 'Driver Inspection Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
+        sidebarSubMenu3.push({label: 'Driver Report', icon: 'pi pi-file', to: '/driverinspectionreport' });
     }
     if (localStorage.getItem("viewInspectionReport") === "true") {
-        sidebarSubMenu3.push({label: 'Driver Inspection Records', icon: 'pi pi-file', to: '/driverrecordforms' });
+        sidebarSubMenu3.push({label: 'Driver Records', icon: 'pi pi-file', to: '/driverrecordforms' });
     }
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("viewAllInspectionReport") === "true") {
-        sidebarMenu.push({label: 'Inspection Management', icon: 'pi pi-file', items: sidebarSubMenu3});
+        sidebarMenu.push({label: 'Driver Management', icon: 'pi pi-file', items: sidebarSubMenu3});
     } else {
         console.log("permission data none");
     }
@@ -166,7 +166,10 @@ const App = () => {
         //console.log("permission data none");
     // }
 
-    //sidebarMenu.push({label: 'Vehicles Info', icon: 'pi pi-fw pi-align-left', to: '/vehicles'});
+    sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-file', to: '/repairreport' });
+    sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-file', to: '/repairrecords'});
+    sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-file', items: sidebarSubMenu4});
+
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);
     }
@@ -295,6 +298,8 @@ const App = () => {
                 <Route path="/driverinspectionreport" exact component={DriverInspectionReport} />
                 <Route path="/driverrecordforms" exact component={DriverRecordForms} />
                 <Route path="/jobscheduling" exact component={JobScheduling} />
+                <Route path="/repairreport" exact component={RepairReport} />
+                <Route path="/repairrecords" exact component={RepairRecords} />
             </div>
 
             <AppFooter />

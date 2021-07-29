@@ -488,6 +488,7 @@ export default function DriverRecordForms() {
 
     const revised = () => {
         /* eslint-disable no-unused-expressions */
+        console.log(selectedCar)
         setMileage(selectedCar.mileage);
         isCleanlinessExterior(selectedCar.cleanliness_exterior);
         isConditionRust(selectedCar.condition_rust);
@@ -1566,20 +1567,10 @@ export default function DriverRecordForms() {
                 </div>
             </div>
 
-            {/* <ListBox value={selectedCar} options={carValues} onChange={(e) =>  onChangeHandler(e)} filter optionLabel="body_no"/> */}
-
-            {/* <DataTable ref={dt} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
-                globalFilter={globalFilter} selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
-                paginator rows={10} emptyMessage="No users found.">
-                <Column selectionMode="single" style={{width:'3em'}}/>
-                <Column field="body_no" header="Body No." style={{ paddingLeft: '2%' }}></Column>
-                <Column body={actionBody}></Column>
-            </DataTable> */}
-
             <div className="p-col-12">
                 <DataTable ref={dt} header={renderHeader()} value={carValues} className="p-datatable-sm" resizableColumns columnResizeMode="expand"
                     selectionMode="single" selection={selected} onSelectionChange={e => setSelected(e.value)}
-                    emptyMessage="No data found">
+                    emptyMessage="No records found">
                     <Column field="body_no" header="Body No." style={{ paddingLeft: '3%' }}></Column>
                     <Column body={actionBody}></Column>
                 </DataTable>
