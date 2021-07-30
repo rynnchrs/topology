@@ -966,17 +966,17 @@ export const JobScheduling = () => {
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/status_mn/', "", config)
         .then((res) => {
 
-            axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + jobOrderID + '/approved/' , "", config)
-            .then((res) => {
+            // axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + jobOrderID + '/approved/' , "", config)
+            // .then((res) => {
                 getTaskList();
                 onHide('displayJobDetails');
                 onHide('displayConfirmMN');
                 setMessage({title:"APPROVE", content:"Task approve."});
                 onClick('displayMessage');
-            })
-            .catch((err) => {
-                toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
-            });
+            // })
+            // .catch((err) => {
+            //     toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
+            // });
         })
         .catch((err) => {
             toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
