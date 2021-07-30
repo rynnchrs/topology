@@ -140,17 +140,19 @@ class TaskView(viewsets.ModelViewSet):
         if user_permission(user, 'can_edit_task'): 
             queryset = Task.objects.all()
             task = get_object_or_404(queryset, pk=pk)    # get user
+            queryset = Repair.objects.all()
+            repair = get_object_or_404(queryset, job_order__task=pk) 
+            print(repair.noted_by)
             print(task.task_status_mn)
-            if task.task_status_mn == False:
+            if task.task_status_mn == False and repair.noted_by is None:
                 task.task_status_mn = True;
-            else:
-                task.task_status_mn = False;
-            
-            car = Car.objects.get(body_no=task.body_no.body_no)
-            car.status = "A"
-            car.save()
-            task.save()
-            return Response("Success",status=status.HTTP_200_OK)       
+                repair.noted_by = user
+                car = Car.objects.get(body_no=task.body_no.body_no)
+                car.status = "A"
+                car.save()
+                task.save()
+                repair.save()
+                return Response("Success",status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
