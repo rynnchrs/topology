@@ -66,7 +66,7 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-            return Response(status=status.HTTP_201_CREATED)          
+            return Response(serializer.data,status=status.HTTP_201_CREATED)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)     
     def retrieve(self, request, pk=None):   # retrieve user

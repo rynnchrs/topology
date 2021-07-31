@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import serializer_helpers
@@ -29,7 +28,6 @@ from .utils import repair_reversion, reversion, user_permission
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
     serializer_class = InspectionSerializer
 
     def list(self, request):        
@@ -193,7 +191,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
                     car.operational = False
                 car.save()
                 serializer.save()
-                return Response("Successfully Created",status=status.HTTP_201_CREATED)  
+                return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)    
