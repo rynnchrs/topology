@@ -91,8 +91,6 @@ export const Register = () => {
                     submitPermission();
                 })
                 .catch((err) => {
-                    console.log('err: ');
-                    console.log(err.response)
                     if (err.response.data.username) {
                         toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.username.join()}`, life: 5000 });
                     } else if (err.response.data.email) {
@@ -111,7 +109,6 @@ export const Register = () => {
 
     const setPermissionLevel = (value) => {
         if (value === "manager") {
-            //console.log("manager");
             setUserLevel("manager");
             setViewUsers(true);
             setAddUsers(true);
@@ -134,7 +131,6 @@ export const Register = () => {
             setEditTask(true);
             setDelTask(true);
         } else if (value === "technician") {
-            //console.log("technician");
             setUserLevel("technician");
             setViewUsers(false);
             setAddUsers(false);
@@ -161,7 +157,6 @@ export const Register = () => {
             setDelTask(false);
             
         } else if (value === "driver") {
-            //console.log("driver");
             setUserLevel("driver");
             setViewUsers(false);
             setAddUsers(false);
@@ -188,7 +183,6 @@ export const Register = () => {
             setDelTask(true);
            
         } else if (value === "viewer") {
-            //console.log("viewer");
             setUserLevel("viewer");
             setViewUsers(false);
             setAddUsers(false);
@@ -254,13 +248,22 @@ export const Register = () => {
         axios
             .post(process.env.REACT_APP_SERVER_NAME + 'careta/permission/', body, config)
             .then((res) => {
-                // console.log('succ permission: ');
-                // console.log(res.data)
+                setFirst_Name('');
+                setLast_Name('');
+                setEmail('');
+                setUsername('');
+                setPassword('');
+                setGender([]);
+                setCompany('');
+                setPosition('');
+                setAddress('');
+                setPhone('');
+                setBirthday('');
+                setUserLevel("");
+                window.scrollTo({top: 0, left: 0, behavior:'smooth'});
                 toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
             })
             .catch((err) => {
-                console.log('err permission: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal', detail: 'Something went wrong.', life: 5000 });
                     
             });

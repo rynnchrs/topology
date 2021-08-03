@@ -70,7 +70,7 @@ const App = () => {
             localStorage.clear();
             window.location.reload();
         } else {
-            //console.log("remain: ", remainingMinutes);
+            
         }
     }, []);
 
@@ -95,14 +95,13 @@ const App = () => {
                         setCounter(0);
                     })
                     .catch((error) => {
-                        console.log('error refresh: ');
-                        console.log(error);
+                        
                     });
             } else if (remainingMinutes <= 0) {
                 localStorage.clear();
                 window.location.reload();
             } else {
-                //console.log("remaining: ", remainingMinutes);
+                
             }
           }, 5000);
         
@@ -157,18 +156,18 @@ const App = () => {
     if (localStorage.getItem("viewInspectionReport") === "true" || localStorage.getItem("addInspectionReport") === "true" || localStorage.getItem("editInspectionReport") === "true" || localStorage.getItem("viewAllInspectionReport") === "true") {
         sidebarMenu.push({label: 'Driver Management', icon: 'pi pi-file', items: sidebarSubMenu3});
     } else {
-        console.log("permission data none");
+        
     }
 
     // if (localStorage.getItem("viewTask") === "true" || localStorage.getItem("addTask") === "true" || localStorage.getItem("editTask") === "true" || localStorage.getItem("deleteTask") === "true") {
         sidebarMenu.push({label: 'Job Schedule', icon: 'pi pi-fw pi-calendar', to: '/jobscheduling'});
     // } else {
-        //console.log("permission data none");
+        
     // }
 
-    sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-file', to: '/repairreport' });
-    sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-file', to: '/repairrecords'});
-    sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-file', items: sidebarSubMenu4});
+    sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-th-large', to: '/repairreport' });
+    sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-th-large', to: '/repairrecords'});
+    sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
 
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);

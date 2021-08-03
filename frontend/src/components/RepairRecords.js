@@ -144,6 +144,7 @@ export default function RepairRecords() {
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
         flagRepairRecordDetails ? assignRepairRecordEdit(repairRecordDetails) : '';
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[flagRepairRecordDetails]);
 
     //for pagination
@@ -213,7 +214,6 @@ export default function RepairRecords() {
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
-        // console.log(value);
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
@@ -377,7 +377,7 @@ export default function RepairRecords() {
 
             }
         } catch(err) {
-            console.log(err);
+
         }
         onClick('displayRepairRecordEdit');
     }
@@ -502,6 +502,7 @@ export default function RepairRecords() {
         setTimeOutId(setTimeout(() => {
             submitSearch();
         }, 1000));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[searchJobNumber]);
 
     const submitSearch = () => {
@@ -614,7 +615,6 @@ export default function RepairRecords() {
                 onClick('displayMessage');
             })
             .catch((err) => {
-                console.log(err.response);
                 if (err.toJSON().message === 'Network Error'){
                     toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                 } else if (err.response.data.job_order) {
@@ -641,8 +641,7 @@ export default function RepairRecords() {
                 onHide('displayConfirmDelete');
                 onClick('displayMessage');
             })
-            .catch((err) => {;
-                console.log(err.response)
+            .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
             });
     }
