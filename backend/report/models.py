@@ -3,6 +3,7 @@ import datetime
 from car.models import Car
 from django.contrib.auth.models import User
 from django.db import models
+from phone_field import PhoneField
 from task.models import JobOrder
 
 # Create your models here.
@@ -97,7 +98,7 @@ class Repair(models.Model):
     incident_date = models.DateField(default=datetime.date.today)
     date_receive = models.DateField(default=datetime.date.today)
     site_poc = models.CharField(max_length=30, null=True, blank=True)  
-    contact_no = models.IntegerField(default=0, null=True, blank=True)
+    contact_no = PhoneField(null=True, blank=True)
     incident_details = models.TextField(max_length=200, null=True, blank=True)
     #actual findings    
     diagnosed_by = models.ForeignKey(User, related_name='diagnosed', on_delete=models.CASCADE)

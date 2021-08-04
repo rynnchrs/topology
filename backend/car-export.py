@@ -214,7 +214,7 @@ for data in datas:
         contract_end_date = contract.end_date
         contract_bid_no = contract.bid_no
         contract_bid_name = contract.bid_name
-        contract_bid_date = contract.bid_name
+        contract_bid_date = contract.bid_date
         contract_cost = contract.cost
     try:
         tpl = TPL.objects.get(car=data.car_id)
