@@ -1,5 +1,4 @@
-import React, {useState, useEffect, useRef } from 'react';
-import { AutoComplete } from 'primereact/autocomplete';
+import React, {useState, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -7,6 +6,7 @@ import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';
+// import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 
 import axios from "axios";
@@ -17,7 +17,7 @@ export default function RepairReport() {
     const jobTypeOptions = [{ name: 'REPAIR', val: 'Repair' }, { name: 'INSPECTION', val: 'Inspection' }];
     const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NON-OPERATIONAL', val: "Non-Operational" }];
     const [jobNotCreatedList, setJobNotCreatedList] = useState([]);
-    const [suggestionsJobNotCreatedList, setSuggestionsJobNotCreatedList] = useState(null);
+    // const [suggestionsJobNotCreatedList, setSuggestionsJobNotCreatedList] = useState(null);
 
     // const [reportDetails, setReportDetails] = useState([]);
     const [jobType, setJobType] = useState([]);
@@ -70,6 +70,7 @@ export default function RepairReport() {
     const [dateDone, setDateDone] = useState(null);
     const [statusRepair, setStatusRepair] = useState([]);
     const [remarks, setRemarks] = useState('');
+    // const refImageUpload = useRef(null);
 
     const toast = useRef(null);
 
@@ -77,19 +78,19 @@ export default function RepairReport() {
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
 
-    const searchListJobNotCreated = (event) => {
-        setTimeout(() => {
-            if (!event.query.trim().length) {
+    // const searchListJobNotCreated = (event) => {
+    //     setTimeout(() => {
+    //         if (!event.query.trim().length) {
 
-            } else {
-                try {
-                    setSuggestionsJobNotCreatedList(jobNotCreatedList.filter(item => item.job_id.toString().startsWith(event.query)));
-                } catch (err){
+    //         } else {
+    //             try {
+    //                 setSuggestionsJobNotCreatedList(jobNotCreatedList.filter(item => item.job_id.toString().startsWith(event.query)));
+    //             } catch (err){
 
-                }
-            }
-        }, 100);
-    };
+    //             }
+    //         }
+    //     }, 100);
+    // };
 
     const partsData = (index, column, value) => {
         if (column === "p") {
@@ -152,7 +153,6 @@ export default function RepairReport() {
     };
 
     const submitRepairReport = () => {
-        setIsLoading(true);
         if (typeof(jobID.job_id) === "undefined") {
             toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'Please select report no. first.', life: 3000 });
         } else if (IRNumber === "") { 
@@ -184,6 +184,7 @@ export default function RepairReport() {
         } else if (remarks === "") { 
             toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS and/or RECOMMENDATIONS', detail: 'This field is required.', life: 3000 });
         } else {
+            setIsLoading(true);
             let submitParts = [];
             parts.map((x) =>
                 submitParts.push({
@@ -234,13 +235,8 @@ export default function RepairReport() {
             }, config)
             .then((res) => {
                 setMessage({title:"CREATE", content:"Successfully created."});
-                try {
                 setScheduleDate('');
                 setJobType([]);
-                
-                }catch (err) {
-                    console.log(err)
-                }
                 setBodyNo('');
                 setMake('');
                 setStatus('');
@@ -274,7 +270,6 @@ export default function RepairReport() {
                 onClick('displayMessage');
             })
             .catch((err) => {
-                console.log(err.response);
                 if (err.toJSON().message === 'Network Error'){
                     toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                 } else if (err.response.data.job_order) {
@@ -286,6 +281,7 @@ export default function RepairReport() {
                 } else if (err.response.data.quantity) {
                     toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Quantity', life: 3000 });
                 }
+                setIsLoading(false);
             })
         }
     }
@@ -370,7 +366,7 @@ export default function RepairReport() {
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
                                     <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
-                                    onChange={event => (setJobID(event.target.value), handleSelectReportNo(event))} disabled={jobType.length === 0}/>
+                                    onChange={event => {setJobID(event.target.value); handleSelectReportNo(event)}} disabled={jobType.length === 0}/>
                                     {/* <AutoComplete forceSelection field="job_id" placeholder="Input Report No." suggestions={suggestionsJobNotCreatedList} 
                                     value={jobOrder} completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/> */}
                                 </div>

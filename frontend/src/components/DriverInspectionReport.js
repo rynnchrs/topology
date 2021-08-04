@@ -126,7 +126,6 @@ export class DriverInspectionReport extends Component {
             fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config).then(res => res.json())
         ]).then(([res1, res2]) => {
             const bodyno = res1;
-            //console.log("res", res1);
             this.setState({
                 bodyno: bodyno.results,
                 carValues: res2
@@ -168,15 +167,14 @@ export class DriverInspectionReport extends Component {
                 }
             })
             .catch((err) => {
-                console.log('err nxt: ');
-                console.log(err)
+                
             });
         // }, 500);
     }
 
     showBodyNumberTags () {
         if (this.state.carValues.length <= 0) {
-            //console.log("recent null");
+            
         } else if (this.state.carValues.length === 1) { //1
             return <div> 
             <ul>
@@ -283,7 +281,7 @@ export class DriverInspectionReport extends Component {
                     });
                     
                 } catch (err){
-                    //console.log("autocomplete err:", err);
+                    
                 }
             }
         }, 100);
@@ -295,9 +293,9 @@ export class DriverInspectionReport extends Component {
         });
 
         if (this.state.bn === null){
-           // console.log("bn is null");
+            
         } else {
-            //console.log("bn is no null");
+            
         }
     }
 
@@ -476,12 +474,10 @@ export class DriverInspectionReport extends Component {
                     });
                 })
                 .catch((error) => {
-                    console.log('error report insp: ');
-                    console.log(error);
+
                 });
           })
           .catch((err) => {
-            console.log(err.response);
             if (err.toJSON().message === 'Network Error'){
                 this.setState({errorMessage: {title:"NETWEORK ERROR:", content: "Please check internet connection."}});
             } else if (err.response.data.body_no) {

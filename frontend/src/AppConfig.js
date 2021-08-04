@@ -46,9 +46,9 @@ export const AppConfig = (props) => {
         return !(config.current.isSameNode(event.target) || config.current.contains(event.target));
     }
 
-    const toggleConfigurator = (event) => {
-        setActive(prevState => !prevState);
-    }
+    // const toggleConfigurator = (event) => {
+    //     setActive(prevState => !prevState);
+    // }
 
     const configClassName = classNames('layout-config', {
         'layout-config-active': active

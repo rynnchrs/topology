@@ -27,7 +27,7 @@ export default function DriverRecordForms() {
     const [iconBtnSave, setIconBtnSave] = useState("");
     const [labelBtnSave, setLabelBtnSave] = useState("SAVE CHANGES");
     const [isBtnSave, setIsBtnSave] = useState(false);
-    const [bodyNo, setBodyNo] = useState(null);
+    const [bodyNo, setBodyNo] = useState("");
     const [date2, setDate2] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const cities = [
@@ -158,7 +158,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
@@ -169,7 +169,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
@@ -180,7 +180,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
@@ -191,7 +191,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
@@ -202,7 +202,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
@@ -213,7 +213,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
@@ -224,7 +224,7 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
@@ -235,12 +235,11 @@ export default function DriverRecordForms() {
                     setcarValues(data.results);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
         } catch(err) {
-            console.log("pages error")
-            console.log(err)
+            
         }
     }, [flagPages]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -282,7 +281,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 === null){
@@ -293,7 +292,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 === null){
@@ -304,7 +303,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 !== null){
@@ -315,7 +314,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 === null){
@@ -326,7 +325,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 !== null){
@@ -337,7 +336,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 !== null){
@@ -348,7 +347,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
         else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 !== null){ //last
@@ -359,7 +358,7 @@ export default function DriverRecordForms() {
                 setcarValues(data.results);
             })
             .catch((err) => {
-                console.log(err.response)
+                
             });
         }
     }
@@ -451,8 +450,7 @@ export default function DriverRecordForms() {
                 onClick('displayBasic');
             })
             .catch((error) => {
-                console.log('error: ');
-                console.log(error);
+                
             });
         } else {
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
@@ -478,8 +476,7 @@ export default function DriverRecordForms() {
                 onClick('displayBasic2');
             })
             .catch((error) => {
-                console.log('error: ');
-                console.log(error);
+                
             });
         } else {
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
@@ -488,7 +485,6 @@ export default function DriverRecordForms() {
 
     const revised = () => {
         /* eslint-disable no-unused-expressions */
-        console.log(selectedCar)
         setMileage(selectedCar.mileage);
         isCleanlinessExterior(selectedCar.cleanliness_exterior);
         isConditionRust(selectedCar.condition_rust);
@@ -682,7 +678,6 @@ export default function DriverRecordForms() {
                 setIsLoading(false);
             })
             .catch((err) => {
-                console.log(err.response);
                 if (err.toJSON().message === 'Network Error'){
                     setErrorMessage({title:"NETWEORK ERROR:", content:"Please check internet connection."});
                 } else if (err.response.data.body_no) {
@@ -802,7 +797,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
@@ -812,7 +807,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
@@ -822,7 +817,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
@@ -832,7 +827,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
@@ -842,7 +837,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
@@ -852,7 +847,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
@@ -862,7 +857,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
         else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
@@ -872,7 +867,7 @@ export default function DriverRecordForms() {
                 analyzeNext(data);
             })
             .catch((err) => {
-                console.log(err)
+                
             });
         }
     }
@@ -919,8 +914,7 @@ export default function DriverRecordForms() {
                 window.open(url);
             })
             .catch((error) => {
-                console.log('error export: ');
-                console.log(error);
+                
             });
         }
     }
@@ -940,7 +934,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
@@ -950,7 +944,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
@@ -960,7 +954,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
@@ -970,7 +964,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
@@ -980,7 +974,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
@@ -990,7 +984,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
@@ -1000,7 +994,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
             else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
@@ -1010,7 +1004,7 @@ export default function DriverRecordForms() {
                     analyzeNext(data);
                 })
                 .catch((err) => {
-                    console.log(err.response)
+                    
                 });
             }
     }

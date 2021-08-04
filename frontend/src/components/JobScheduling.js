@@ -19,7 +19,6 @@ import '@fullcalendar/daygrid/main.css';
 import '@fullcalendar/timegrid/main.css';
 import axios from "axios";
 import { format } from 'date-fns';
-import jwt_decode from "jwt-decode";
 
 
 export const JobScheduling = () => {
@@ -91,7 +90,7 @@ export const JobScheduling = () => {
     const [dateStart, setDateStart] = useState(null);
     const [dateEnd, setDateEnd] = useState(null);
     const [scheduleDate, setScheduleDate] = useState(null);
-    const [remarks, setRemarks] = useState('none');
+    const [remarks, setRemarks] = useState('');
 
     //edit task form
     const [editJobNo, setEditJobNo] = useState('');
@@ -218,8 +217,7 @@ export const JobScheduling = () => {
                     
                 });
         } catch(err) {
-            console.log("pages error")
-            console.log(err)
+            
         }
     }, [flagPages]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -645,7 +643,6 @@ export const JobScheduling = () => {
             + '&job_type=' + jt
             + '&page=1', config)
             .then((res) => {
-                console.log("cnt:", res.data.count);
                 setTotalCount(res.data.count);
                 setJobList(res.data.results);
                 fullCalendarDisplay(res.data.results);
@@ -797,7 +794,7 @@ export const JobScheduling = () => {
         try {
             setEditJobType(jobTypeOptions.find(x => x.name === jobData.job_order.type.toUpperCase()));
         } catch(err){
-            console.log("err jobtype: ", err)
+
         }
         setEditDateStart(gmtDateStart);
         setEditDateEnd(gmtDateEnd);
@@ -843,7 +840,6 @@ export const JobScheduling = () => {
             onClick('displayMessage');
         })
         .catch((err) => {
-            console.log(err.response);
             if (err.toJSON().message === 'Network Error'){
                 toast.current.show({ severity: 'error', summary: 'Network Error', detail: 'Please check internet connection.', life: 3000 });
             } else if (err.response.data.fieldman) {
@@ -886,7 +882,6 @@ export const JobScheduling = () => {
             onClick('displayMessage');
         })
         .catch((err) => {
-            console.log(err.response);
             if (err.toJSON().message === 'Network Error'){
                 toast.current.show({ severity: 'error', summary: 'Network Error', detail: 'Please check internet connection.', life: 3000 });
             } else if (err.response.data === "Already Updated") {
@@ -927,7 +922,6 @@ export const JobScheduling = () => {
             onClick('displayMessage');
         })
         .catch((err) => {
-            console.log(err.response)
             toast.current.show({ severity: 'error', summary: 'Delete Task Error', detail: 'Something went wrong.', life: 3000 });
         });
     }

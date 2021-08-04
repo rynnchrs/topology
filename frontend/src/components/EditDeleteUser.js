@@ -122,7 +122,6 @@ export const EditDeleteUser = () => {
                 setUsers(res.data.results);
             })
             .catch((err) => {
-                console.log(err.response);
                 if(err.response.data.detail === "Invalid page."){
                     errorGet();
                 }
@@ -146,7 +145,6 @@ export const EditDeleteUser = () => {
                 setUsers(res.data.results);
             })
             .catch((err) => {
-                console.log(err.response);
             });
     }
 
@@ -166,13 +164,11 @@ export const EditDeleteUser = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'careta/user-list/?search=' + event.target.value, config)
                 .then((res) => {
-                    console.log("paginF:", res.data);
                     setTotalCount(res.data.count);
                     setUsers(res.data.results);
                 })
                 .catch((err) => {
-                    console.log("getusersflag err:");
-                    console.log(err.response);
+                    
                 });
         }, 1000));
     }
@@ -229,8 +225,6 @@ export const EditDeleteUser = () => {
                     updatePermissionUser();
                 })
                 .catch((err) => {
-                    console.log("save changes err:");
-                    console.log(err.response);
                     if (err.response.data.username) {
                         toast.current.show({ severity: 'error', summary: 'Username', detail: `${err.response.data.username.join()}`, life: 3000 });
                     } else if (err.response.data.email) {
@@ -268,7 +262,7 @@ export const EditDeleteUser = () => {
                     try{
                         setGender(genderOptions.find(x => x.val === res.data.user_info.gender));
                     } catch(err){
-                        console.log("err gender: ", err)
+                        
                     }
                     setCompany(res.data.user_info.company);
                     setPosition(res.data.user_info.position);
@@ -278,8 +272,7 @@ export const EditDeleteUser = () => {
                     getPermission();
                 })
                 .catch((err) => {
-                    console.log("userdata err:");
-                    console.log(err.response);
+                    
                 });
         } else {
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
@@ -342,8 +335,7 @@ export const EditDeleteUser = () => {
                 onClick('displayBasic')
             })
             .catch((err) => {
-                console.log("permission err:");
-                console.log(err.response);
+                
             });
     }
 
@@ -497,8 +489,7 @@ export const EditDeleteUser = () => {
                     setIsChanged(true);
                 })
                 .catch((err) => {
-                    console.log("local permission err:");
-                    console.log(err.response);
+
                 });
         }
     }
@@ -524,13 +515,9 @@ export const EditDeleteUser = () => {
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/user/', body, config)
             .then((res) => {
-                //console.log('succ permission user: ');
-                //console.log(res.data)
                 updatePermissionInventory();
             })
             .catch((err) => {
-                console.log('err permission user: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal User', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -556,13 +543,9 @@ export const EditDeleteUser = () => {
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/inventory/', body, config)
             .then((res) => {
-                //console.log('succ permission inventory: ');
-                //console.log(res.data)
                 updatePermissionInspectionReport();
             })
             .catch((err) => {
-                console.log('err permission inventory: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal Inventory', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -588,13 +571,9 @@ export const EditDeleteUser = () => {
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/inspection/', body, config)
             .then((res) => {
-                //console.log('succ permission inspect: ');
-                //console.log(res.data)
                 updatePermissionRepairReport();
             })
             .catch((err) => {
-                console.log('err permission inspect: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal Inspection Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -620,13 +599,9 @@ export const EditDeleteUser = () => {
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/repair/', body, config)
             .then((res) => {
-                //console.log('succ permission repair: ');
-                //console.log(res.data)
                 updatePermissionTask();
             })
             .catch((err) => {
-                console.log('err permission repair: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -652,16 +627,12 @@ export const EditDeleteUser = () => {
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/task/', body, config)
             .then((res) => {
-                //console.log('succ permission task: ');
-                //console.log(res.data)
                 onHide('displayBasic')
                 toast.current.show({ severity: 'success', summary: 'Update Successfully', detail: 'User details updated.', life: 3000 });
                 getUsers();
                 updateLocalPermission();
             })
             .catch((err) => {
-                console.log('err permission task: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -703,15 +674,11 @@ export const EditDeleteUser = () => {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
             .then((res) => {
-                //console.log('succ delete user: ');
-                //console.log(res.data)
                 toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
                 getUsers();
                 setSelectedUser(null);
             })
             .catch((err) => {
-                console.log('err delete user: ');
-                console.log(err.response)
                 toast.current.show({ severity: 'error', summary: 'Delete User Error', detail: 'Something went wrong.', life: 5000 });
             });
     }

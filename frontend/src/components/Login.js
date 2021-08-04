@@ -26,7 +26,6 @@ export const Login = (props) => {
 
     const keyPress = event => {
         if(event.key === "Enter"){
-            //console.log("key press", event.key);
             submitData();
         }
     }

@@ -39,7 +39,7 @@ export class Vehicles extends Component {
 
             //vehicle data object for CRUD
             newvehicleData : {
-                car_id : 0, slug : '', vin_no : '', body_no : '', cs_no : '', plate_no : '', brand : '', release_year :2020, make : '', series : '', 
+                car_id : 0, slug : '', vin_no : '', body_no : '', cs_no : '', plate_no : '', brand : '', release_year : 2020, make : '', series : '', 
                 body_type : '', color : '', dealer : '', dealer_phone : '', dealer_email : '', po_no : '', po_date : '', body_builder : '', fabricator : '',
                 sale_price : 0, vat_price : 0, engine_no : '', battery_no : '', fuel_type : '', transmission : '', denomination : '', piston : 0, cylinder : 0,
                 procuring_entity : '', capacity : 0, gross_weight : 0, net_weight : 0, shipping_weight : 0, net_capacity : 0, lto_cr : 0, cr_date : '', or_no : 0,
@@ -1532,8 +1532,6 @@ export class Vehicles extends Component {
                     //     showNoResult();
                 })
                 .catch((error) => {
-                    console.log('error select: ');
-                    console.log(error);
                     showNoResult();
                 });
         }
@@ -1947,7 +1945,7 @@ export class Vehicles extends Component {
                                             <div className="p-grid p-col-12">
                                                 <label htmlFor="vYear" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Year:</label>
                                                 <div className="p-col-12 p-lg-10 p-md-12">
-                                                    <InputMask id="vYear" mask="9999" name='release_year' value={this.state.newvehicleData.release_year} onChange={(e) => onChangeHandler(e)}></InputMask>
+                                                    <InputMask id="vYear" mask="9999" name='release_year' value={this.state.newvehicleData.release_year.toString()} onChange={(e) => onChangeHandler(e)}></InputMask>
                                                 </div>
                                             </div>
                                             <div className="p-grid p-col-12">
