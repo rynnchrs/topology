@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import django
 
@@ -397,5 +398,10 @@ def populate():
         )
     return "Success"
 
-populate()
+for data in datas():
+    car = Car.objects.filter(body_no=data[0])
+    car.delete()
+print(populate())
+
+subprocess.Popen(["python","car-export.py"], shell=True)    
 

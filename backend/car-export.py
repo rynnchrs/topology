@@ -1,8 +1,8 @@
 import os
+import sys
 
 import django
 
-import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
@@ -13,8 +13,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 from car.models import TPL, Car, Contract, Insurance
-
-
 
 datas = Car.objects.all()
 workbook = Workbook()
