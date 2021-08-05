@@ -10,7 +10,7 @@ from .serializers import ImageInfoSerializer, ReportImageSerializer
 # Create your views here.
 
 class UserImageView(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = ImageInfoSerializer
     queryset = Image.objects.all().order_by('-id')
@@ -36,7 +36,7 @@ class UserImageView(viewsets.ModelViewSet):
 
 
 class ReportImageView(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = ReportImageSerializer
     queryset = Image.objects.all().order_by('-id')
