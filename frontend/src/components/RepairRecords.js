@@ -334,7 +334,7 @@ export default function RepairRecords() {
                     let r = "red";
                     let e = "";
 
-                    if (typeof(value.revised.labor[i].particulars) === "undefined") {;
+                    if (typeof(value.revised.labor[i].particulars) === "undefined") {
                         arrLabor[i] = {...arrLabor[i], p: value.labor[i].particulars === null ? "" : value.labor[i].particulars};
                         setLabor(arrLabor);
                     } else {
@@ -636,10 +636,16 @@ export default function RepairRecords() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', config)
             .then((res) => {
-                getRepairRecord();
-                setMessage({title:"DELETE", content:"Successfully deleted."});
-                onHide('displayConfirmDelete');
-                onClick('displayMessage');
+                // axios.delete(process.env.REACT_APP_SERVER_NAME + '/image/report-image/'+ +'/?mode=ci&id=1,2',  config)
+                // .then((res) => {
+                    getRepairRecord();
+                    setMessage({title:"DELETE", content:"Successfully deleted."});
+                    onHide('displayConfirmDelete');
+                    onClick('displayMessage');
+                // })
+                // .catch((err) => {
+
+                // });
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
@@ -907,7 +913,7 @@ export default function RepairRecords() {
             <div>
                 <center>
                 <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getRepairRecordData(rowData)}/>
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {console.log(rowData); setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
                 </center>
             </div>
         );

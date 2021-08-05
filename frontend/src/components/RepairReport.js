@@ -6,7 +6,7 @@ import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';
-// import { FileUpload } from 'primereact/fileupload';
+import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 
 import axios from "axios";
@@ -70,7 +70,7 @@ export default function RepairReport() {
     const [dateDone, setDateDone] = useState(null);
     const [statusRepair, setStatusRepair] = useState([]);
     const [remarks, setRemarks] = useState('');
-    // const refImageUpload = useRef(null);
+    const refImageUpload = useRef(null);
 
     const toast = useRef(null);
 
@@ -183,6 +183,8 @@ export default function RepairReport() {
             toast.current.show({ severity: 'error', summary: 'STATUS AFTER REPAIR', detail: 'This field is required.', life: 3000 });
         } else if (remarks === "") { 
             toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS and/or RECOMMENDATIONS', detail: 'This field is required.', life: 3000 });
+        } else if (refImageUpload.current.state.files.length <= 0) { 
+            toast.current.show({ severity: 'error', summary: 'IMAGE', detail: 'Image required.', life: 3000 });
         } else {
             setIsLoading(true);
             let submitParts = [];
@@ -204,6 +206,14 @@ export default function RepairReport() {
                     quantity: x.q
                 })
             )
+
+            let formData = new FormData();
+            refImageUpload.current.state.files.map((f, index) => {
+                formData.append("images[" + index + "]image", f);
+                formData.append("images[" + index + "]mode", "ci");
+                formData.append("images[" + index + "]image_name", jobID.job_id);
+                return null;
+            })
 
             let token = localStorage.getItem("token");
             const config = {
@@ -231,43 +241,49 @@ export default function RepairReport() {
                 status_repair: statusRepair.val,
                 remarks: remarks,
                 job_order: jobID.job_id
-               
             }, config)
             .then((res) => {
-                setMessage({title:"CREATE", content:"Successfully created."});
-                setScheduleDate('');
-                setJobType([]);
-                setBodyNo('');
-                setMake('');
-                setStatus('');
-                setLocation('');
-                setPlateNumber('');
-                setCSNumber('');
-                setChassisNumber('');
+                console.log(res);
+                axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
+                .then((res) => {
+                    setMessage({title:"CREATE", content:"Successfully created."});
+                    setScheduleDate('');
+                    setJobType([]);
+                    setBodyNo('');
+                    setMake('');
+                    setStatus('');
+                    setLocation('');
+                    setPlateNumber('');
+                    setCSNumber('');
+                    setChassisNumber('');
 
-                setJobID([]);
-                setIRNumber('');
-                setDateIncident(null);
-                setDateReceive(null);
-                setDetailsIncident('');
-                setSitePOC('');
-                setContactNumber('');
-                setDatePerformed(null);
-                setDetailsActualFindings('');
-                setDetailsActualRemarks('');
-                setParts(initialPartsLabor);
-                setTotalPartsCost('0.00');
-                setLabor(initialPartsLabor);
-                setTotalLaborCost('0.00');
-                setTotalEstimateCost('0.00');
-                setDateRepaired(null);
-                setDetailsActionTaken('');
-                setDateDone(null);
-                setStatusRepair([]);
-                setRemarks('');
-                window.scrollTo({top: 0, left: 0, behavior:'smooth'});
-                setIsLoading(false);
-                onClick('displayMessage');
+                    setJobID([]);
+                    setIRNumber('');
+                    setDateIncident(null);
+                    setDateReceive(null);
+                    setDetailsIncident('');
+                    setSitePOC('');
+                    setContactNumber('');
+                    setDatePerformed(null);
+                    setDetailsActualFindings('');
+                    setDetailsActualRemarks('');
+                    setParts(initialPartsLabor);
+                    setTotalPartsCost('0.00');
+                    setLabor(initialPartsLabor);
+                    setTotalLaborCost('0.00');
+                    setTotalEstimateCost('0.00');
+                    setDateRepaired(null);
+                    setDetailsActionTaken('');
+                    setDateDone(null);
+                    setStatusRepair([]);
+                    setRemarks('');
+                    window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+                    setIsLoading(false);
+                    onClick('displayMessage');
+                })
+                .catch((err) => {
+
+                });
             })
             .catch((err) => {
                 if (err.toJSON().message === 'Network Error'){
@@ -566,6 +582,10 @@ export default function RepairReport() {
                                     <h6><b>ADDITIONAL REMARKS and/or RECOMMENDATIONS:</b></h6>
                                     <InputTextarea placeholder="Discuss remarks/recommendation here or leave it blank." rows={5} cols={30} autoResize
                                     value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
+                                </div>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk image-upload">
+                                    <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                                        emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />
                                 </div>
                                 <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">

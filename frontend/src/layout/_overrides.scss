@@ -313,6 +313,12 @@
     border: 1px solid red;
   }
 }
+
+.image-upload {
+  .p-fileupload-buttonbar .p-button + .p-button {
+    display: none;
+  }
+}
 /* end css for careta report */
 
 /* css for careta record */
