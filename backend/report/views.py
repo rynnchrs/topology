@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
+from image.models import Image
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -245,7 +246,10 @@ class RepairView(viewsets.ModelViewSet):  # add this
         if user_permission(user, 'can_delete_repair_reports'): 
             queryset = Repair.objects.all()
             repair = get_object_or_404(queryset, pk=pk)
+            queryset = Image.objects.all()
+            image = get_object_or_404(queryset, image_name=pk)
             repair.delete()
+            image.delete()
             return Response(status=status.HTTP_200_OK)        
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
