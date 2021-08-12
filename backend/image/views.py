@@ -23,7 +23,7 @@ class UserImageView(viewsets.ModelViewSet):
         return Response(serializer.errors)  
 
     def retrieve(self, request, pk=None):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset()).filter(mode="cu")
         image = get_object_or_404(queryset, image_name=pk) 
         serializer = ImageInfoSerializer(image, many=False)
         return Response(serializer.data,status=status.HTTP_200_OK)  
