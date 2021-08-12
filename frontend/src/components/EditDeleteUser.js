@@ -8,6 +8,7 @@ import { InputMask } from 'primereact/inputmask';
 import { Checkbox } from 'primereact/checkbox';
 import { Panel } from 'primereact/panel';
 import { Dialog } from 'primereact/dialog';
+import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 import { Paginator } from 'primereact/paginator';
 import axios from "axios";
@@ -57,6 +58,8 @@ export const EditDeleteUser = () => {
     const [delTask, setDelTask] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
+    const refImageUpload = useRef(null);
+    const [reportImage, setReportImage] = useState({ id: "", image: "" });
 
     const dt = useRef(null);
 
@@ -222,7 +225,30 @@ export const EditDeleteUser = () => {
             axios
                 .put(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + usernames + '/', body, config)
                 .then((res) => {
-                    updatePermissionUser();
+                    if (refImageUpload.current.state.files.length <= 0) {
+                        updatePermissionUser();
+                    } else {
+                        let formData = new FormData();
+                        refImageUpload.current.state.files.map((f, index) => {
+                            formData.append("image", f);
+                            formData.append("mode", "cu");
+                            formData.append("image_name", usernames);
+                            return null;
+                        })
+                        axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/user-image/'+ reportImage.id +'/',  config)
+                        .then((res) => {
+                            axios.post(process.env.REACT_APP_SERVER_NAME + 'image/user-image/', formData,  config)
+                            .then((res) => {
+                                updatePermissionUser();
+                            })
+                            .catch((err) => {
+        
+                            });
+                        })
+                        .catch((err) => {
+
+                        });
+                    }
                 })
                 .catch((err) => {
                     if (err.response.data.username) {
@@ -269,7 +295,14 @@ export const EditDeleteUser = () => {
                     setAddress(res.data.user_info.address);
                     setPhone(res.data.user_info.phone);
                     setBirthday(res.data.user_info.birthday);
-                    getPermission();
+                    axios.get(process.env.REACT_APP_SERVER_NAME + 'image/user-image/' + username +'/', config)
+                    .then((res) => {
+                        setReportImage(res.data);
+                        getPermission();
+                    })
+                    .catch((err) => {
+                        
+                    });
                 })
                 .catch((err) => {
                     
@@ -674,9 +707,21 @@ export const EditDeleteUser = () => {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
             .then((res) => {
-                toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
-                getUsers();
-                setSelectedUser(null);
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/user-image/' + username +'/', config)
+                .then((res) => {
+                    axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/user-image/'+ res.data.id +'/',  config)
+                    .then((res) => {
+                        toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'User deleted.', life: 5000 });
+                        getUsers();
+                        setSelectedUser(null);
+                    })
+                    .catch((err) => {
+
+                    });
+                })
+                .catch((err) => {
+                    
+                });
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete User Error', detail: 'Something went wrong.', life: 5000 });
@@ -854,6 +899,20 @@ export const EditDeleteUser = () => {
                                     </div>
                                 </div></center>
                             </Panel>
+                        </div>
+
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-md-12 image-upload" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>IMAGE UPLOAD:</b></h6>
+                                <FileUpload ref={refImageUpload} mode="basic" accept="image/*" maxFileSize={1000000}
+                                    emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
+                            </div>
+                        </div>
+                        <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                                <h6><b>PROFILE PICTURE:</b></h6>
+                                <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                            </div>
                         </div>
 
                         <div className="p-grid">

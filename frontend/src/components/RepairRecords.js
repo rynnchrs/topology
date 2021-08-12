@@ -9,8 +9,9 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Paginator } from 'primereact/paginator';
 import { Dialog } from 'primereact/dialog';
+import { Carousel } from 'primereact/carousel';
+import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
-
 import axios from "axios";
 import { format } from 'date-fns';
 
@@ -48,7 +49,7 @@ export default function RepairRecords() {
     const [repairID, setRepairID] = useState("");
     const [jobOrder, setJobOrder] = useState("");
     const [jobType, setJobType] = useState("");
-    const [scheduleDate, setScheduleDate] = useState(null);
+    const [scheduleDate, setScheduleDate] = useState("");
     const [bodyNo, setBodyNo] = useState("");
     const [make, setMake] = useState("");
     const [status, setStatus] = useState("");
@@ -68,26 +69,26 @@ export default function RepairRecords() {
     const [detailsActualFindings, setDetailsActualFindings] = useState("");
     const [detailsActualRemarks, setDetailsActualRemarks] = useState("");
     const initialPartsLabor = [
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}, 
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}, 
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}
     ];
     const [parts, setParts] = useState([
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}, 
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}, 
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}
     ]);
     const [totalPartsCost, setTotalPartsCost] = useState("0.00");
     const [labor, setLabor] = useState([
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}, 
-        {p: "", q: "", c: ""},
-        {p: "", q: "", c: ""}
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}, 
+        {p: "", q: 0, c: 0},
+        {p: "", q: 0, c: 0}
     ]);
     const [totalLaborCost, setTotalLaborCost] = useState("0.00");
     const [totalEstimateCost, setTotalEstimateCost] = useState("0.00");
@@ -97,6 +98,9 @@ export default function RepairRecords() {
     const statusRepairOptions = [{ name: "OPERATIONAL", val: "Operational" }, { name: "NON-OPERATIONAL", val: "Non-Operational" }];
     const [statusRepair, setStatusRepair] = useState([]);
     const [remarks, setRemarks] = useState("");
+    const refImageUpload = useRef(null);
+    const [reportImage, setReportImage] = useState([{ id: "", image: "" }]);
+    const [holdImageID, setHoldImageID] = useState("");
 
     //paginator
     const [first, setFirst] = useState(0);
@@ -111,6 +115,7 @@ export default function RepairRecords() {
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
+    const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -195,17 +200,24 @@ export default function RepairRecords() {
 
     const getRepairRecordData = (value) => {
         let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + value.repair_id + '/', config)
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + value + '/', config)
             .then((res) => {
                 setRepairRecordDetails(res.data);
-                setFlagRepairRecordDetails(true);
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.repair_id +'/?mode=ci', config)
+                    .then((res) => {
+                        setReportImage(res.data);
+                        setFlagRepairRecordDetails(true);
+                    })
+                    .catch((err) => {
+                        
+                    });
             })
             .catch((err) => {
                 
@@ -228,35 +240,7 @@ export default function RepairRecords() {
         setCSNumber(value.job_order.task.body_no.vin_no);
         setChassisNumber(value.job_order.task.body_no.vin_no);
 
-        // if (typeof(value.parts) === "undefined") {
-
-        // } else {
-        //     arrParts = parts.slice();
-        //     for (let i = 0; i < 5; i++) {
-        //         if (typeof(value.parts[i]) === "undefined") {
-        //             arrParts[i] = {...arrParts[i], p: "", q: "", c: ""};
-        //             setParts(arrParts);
-        //         } else {
-        //             arrParts[i] = {...arrParts[i], p: value.parts[i].particulars === null ? "" : value.parts[i].particulars, q: String(value.parts[i].quantity), c: String(value.parts[i].cost)};
-        //             setParts(arrParts);
-        //         }
-        //     }
-        // }
         setTotalPartsCost(value.total_parts_cost.toFixed(2));
-        // if (typeof(value.labor) === "undefined") {
-
-        // } else {
-        //     arrLabor = labor.slice();
-        //     for (let i = 0; i < 5; i++) {
-        //         if (typeof(value.labor[i]) === "undefined") {
-        //             arrLabor[i] = {...arrLabor[i], p: "", q: "", c: ""};
-        //             setLabor(arrLabor);
-        //         } else {
-        //             arrLabor[i] = {...arrLabor[i], p: value.labor[i].particulars === null ? "" : value.labor[i].particulars, q: String(value.labor[i].quantity), c: String(value.labor[i].cost)};
-        //             setLabor(arrLabor);
-        //         }
-        //     }
-        // }
         setTotalLaborCost(value.total_labor_cost.toFixed(2));
         setTotalEstimateCost(value.total_estimate_cost.toFixed(2));
         
@@ -382,6 +366,45 @@ export default function RepairRecords() {
         onClick('displayRepairRecordEdit');
     }
 
+    const reportImageTemplate = (reportImage) => {
+        return (
+            <div>
+                <center>
+                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                </center>
+                <center>
+                    <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={(e) => {setHoldImageID(reportImage.id); onClick('displayConfirmDeleteImage');}}/>
+                </center>
+            </div>
+        );
+    }
+
+    const submitDeleteImage = () => {
+        console.log(holdImageID);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        axios
+            .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=ci&id=' + holdImageID, config)
+            .then((res) => {
+                console.log("rID: ", repairID);
+                getRepairRecordData(repairID);
+                setMessage({title:"DELETE", content:"Successfully deleted."});
+                onHide('displayConfirmDeleteImage');
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                toast.current.show({ severity: 'error', summary: 'Delete Image Error', detail: 'Something went wrong.', life: 5000 });
+            });
+
+
+    }
+
     const updateRedFieldsPartsP = (index, color, revise) => {
         redFieldPartsP[index] = color;
         redFieldRevisePartsP[index] = revise;
@@ -422,6 +445,7 @@ export default function RepairRecords() {
             let arr = parts.slice();
             arr[index] = {...arr[index], p: value};
             setParts(arr);
+            if (value === "") value = null;
             if (typeof(rrd.revised.parts[index].particulars) === "undefined") {
                 value !== rrd.parts[index].particulars ? updateRedFieldsPartsP(index, r, rrd.parts[index].particulars) : updateRedFieldsPartsP(index, e, e);
             } else {
@@ -429,16 +453,23 @@ export default function RepairRecords() {
             }
         } else if (column === "q") {
             let arr = parts.slice();
-            arr[index] = {...arr[index], q: value};
+            arr[index] = {...arr[index], q: Number(value)};
             setParts(arr);
             if (typeof(rrd.revised.parts[index].quantity) === "undefined") {
                 Number(value) !== rrd.parts[index].quantity ? updateRedFieldsPartsQ(index, r, rrd.parts[index].quantity) : updateRedFieldsPartsQ(index, e, e);
             } else {
                 Number(value) !== rrd.revised.parts[index].quantity ? updateRedFieldsPartsQ(index, r, rrd.revised.parts[index].quantity) : updateRedFieldsPartsQ(index, e, e);
             }
+            let cost = 0;
+            arr.filter(f => f.c !== "").map((x) =>
+                cost += Number(x.c) * Number(x.q)
+            )
+            setTotalPartsCost(cost.toFixed(2));
+            let estCost = cost + Number(totalLaborCost);
+            setTotalEstimateCost(estCost.toFixed(2));
         } else {
             let arr = parts.slice();
-            arr[index] = {...arr[index], c: value};
+            arr[index] = {...arr[index], c: Number(value)};
             setParts(arr);
             if (typeof(rrd.revised.parts[index].cost) === "undefined") {
                 Number(value) !== rrd.parts[index].cost ? updateRedFieldsPartsC(index, r, rrd.parts[index].cost) : updateRedFieldsPartsC(index, e, e);
@@ -447,7 +478,7 @@ export default function RepairRecords() {
             }
             let cost = 0;
             arr.filter(f => f.c !== "").map((x) =>
-                cost += Number(x.c)
+                cost += Number(x.c) * Number(x.q)
             )
             setTotalPartsCost(cost.toFixed(2));
             let estCost = cost + Number(totalLaborCost);
@@ -463,6 +494,7 @@ export default function RepairRecords() {
             let arr = labor.slice();
             arr[index] = {...arr[index], p: value};
             setLabor(arr);
+            if (value === "") value = null;
             if (typeof(rrd.revised.labor[index].particulars) === "undefined") {
                 value !== rrd.labor[index].particulars ? updateRedFieldsLaborP(index, r, rrd.labor[index].particulars) : updateRedFieldsLaborP(index, e, e);
             } else {
@@ -470,16 +502,23 @@ export default function RepairRecords() {
             }
         } else if (column === "q") {
             let arr = labor.slice();
-            arr[index] = {...arr[index], q: value};
+            arr[index] = {...arr[index], q: Number(value)};
             setLabor(arr);
             if (typeof(rrd.revised.labor[index].quantity) === "undefined") {
                 Number(value) !== rrd.labor[index].quantity ? updateRedFieldsLaborQ(index, r, rrd.labor[index].quantity) : updateRedFieldsLaborQ(index, e, e);
             } else {
                 Number(value) !== rrd.revised.labor[index].quantity ? updateRedFieldsLaborQ(index, r, rrd.revised.labor[index].quantity) : updateRedFieldsLaborQ(index, e, e);
             }
+            let cost = 0;
+            arr.filter(f => f.c !== "").map((x) =>
+                cost += Number(x.c) * Number(x.q)
+            )
+            setTotalLaborCost(cost.toFixed(2));
+            let estCost = cost + Number(totalPartsCost);
+            setTotalEstimateCost(estCost.toFixed(2));
         } else {
             let arr = labor.slice();
-            arr[index] = {...arr[index], c: value};
+            arr[index] = {...arr[index], c: Number(value)};
             setLabor(arr);
             if (typeof(rrd.revised.labor[index].cost) === "undefined") {
                 Number(value) !== rrd.labor[index].cost ? updateRedFieldsLaborC(index, r, rrd.labor[index].cost) : updateRedFieldsLaborC(index, e, e);
@@ -488,7 +527,7 @@ export default function RepairRecords() {
             }
             let cost = 0;
             arr.filter(f => f.c !== "").map((x) =>
-                cost += Number(x.c)
+                cost += Number(x.c) * Number(x.q)
             )
             setTotalLaborCost(cost.toFixed(2));
             let estCost = cost + Number(totalPartsCost);
@@ -610,9 +649,24 @@ export default function RepairRecords() {
                 job_order: jobOrder
             }, config)
             .then((res) => {
-                setMessage({title:"EDIT", content:"Successfully updated."});
-                onHide('displayRepairRecordEdit');
-                onClick('displayMessage');
+                if (refImageUpload.current.state.files.length <= 0) {
+                    submitEditRepairRecordAfter();
+                } else {
+                    let formData = new FormData();
+                    refImageUpload.current.state.files.map((f, index) => {
+                        formData.append("images[" + index + "]image", f);
+                        formData.append("images[" + index + "]mode", "ci");
+                        formData.append("images[" + index + "]image_name", res.data.repair_id);
+                        return null;
+                    })
+                    axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData, config)
+                    .then((res) => {
+                        submitEditRepairRecordAfter();
+                    })
+                    .catch((err) => {
+    
+                    });
+                }
             })
             .catch((err) => {
                 if (err.toJSON().message === 'Network Error'){
@@ -622,6 +676,13 @@ export default function RepairRecords() {
                 }
             })
         }
+    }
+
+    const submitEditRepairRecordAfter = () => {
+        setMessage({title:"EDIT", content:"Successfully updated."});
+        onHide('displayRepairRecordEdit');
+        onClick('displayMessage');
+
     }
 
     const submitDeleteRepairRecord = () => {
@@ -636,16 +697,27 @@ export default function RepairRecords() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', config)
             .then((res) => {
-                // axios.delete(process.env.REACT_APP_SERVER_NAME + '/image/report-image/'+ +'/?mode=ci&id=1,2',  config)
-                // .then((res) => {
-                    getRepairRecord();
-                    setMessage({title:"DELETE", content:"Successfully deleted."});
-                    onHide('displayConfirmDelete');
-                    onClick('displayMessage');
-                // })
-                // .catch((err) => {
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + repairID +'/?mode=ci', config)
+                .then((res) => {
+                    let imageIDs = "";
+                    res.data.map((x) => {
+                        imageIDs += x.id;
+                        imageIDs += ",";
+                    })
+                    axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=ci&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
+                    .then((res) => {
+                        getRepairRecord();
+                        setMessage({title:"DELETE", content:"Successfully deleted."});
+                        onHide('displayConfirmDelete');
+                        onClick('displayMessage');
+                    })
+                    .catch((err) => {
 
-                // });
+                    });
+                })
+                .catch((err) => {
+                    
+                });
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
@@ -718,8 +790,6 @@ export default function RepairRecords() {
                 } else {
                     value !== rrd.revised.ir_no ? updateRedFields(arrIndex, r, rrd.revised.ir_no) : updateRedFields(arrIndex, e, e);
                 }
-                // let rev = typeof(rrd.revised.ir_no) === "undefined" ? rrd.ir_no : rrd.revised.ir_no;
-                // value !== rrd.revised.ir_no ? updateRedFields(arrIndex, r, rev) : updateRedFields(arrIndex, e, e);
                 break;
             case "f1":
                 try {
@@ -858,6 +928,7 @@ export default function RepairRecords() {
         'displayRepairRecordEdit': setDisplayRepairRecordEdit,
         'displayConfirmDelete': setDisplayConfirmDelete,
         'displayMessage': setDisplayMessage,
+        'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
     }
 
     const onClick = (name) => {
@@ -866,23 +937,27 @@ export default function RepairRecords() {
 
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
-        setParts(initialPartsLabor);
-        setLabor(initialPartsLabor);
-        setFlagRepairRecordDetails(false);
-        setRedField(Array(14).fill(""));
-        setRedFieldRevise(Array(14).fill(""));
-        setRedFieldPartsP(Array(15).fill(""));
-        setRedFieldRevisePartsP(Array(15).fill(""));
-        setRedFieldPartsQ(Array(15).fill(""));
-        setRedFieldRevisePartsQ(Array(15).fill(""));
-        setRedFieldPartsC(Array(15).fill(""));
-        setRedFieldRevisePartsC(Array(15).fill(""));
-        setRedFieldLaborP(Array(15).fill(""));
-        setRedFieldReviseLaborP(Array(15).fill(""));
-        setRedFieldLaborQ(Array(15).fill(""));
-        setRedFieldReviseLaborQ(Array(15).fill(""));
-        setRedFieldLaborC(Array(15).fill(""));
-        setRedFieldReviseLaborC(Array(15).fill(""));
+        if (name === 'displayConfirmDeleteImage') {
+            setHoldImageID("");
+        } else if (name === 'displayRepairRecordEdit') {
+            setParts(initialPartsLabor);
+            setLabor(initialPartsLabor);
+            setFlagRepairRecordDetails(false);
+            setRedField(Array(14).fill(""));
+            setRedFieldRevise(Array(14).fill(""));
+            setRedFieldPartsP(Array(15).fill(""));
+            setRedFieldRevisePartsP(Array(15).fill(""));
+            setRedFieldPartsQ(Array(15).fill(""));
+            setRedFieldRevisePartsQ(Array(15).fill(""));
+            setRedFieldPartsC(Array(15).fill(""));
+            setRedFieldRevisePartsC(Array(15).fill(""));
+            setRedFieldLaborP(Array(15).fill(""));
+            setRedFieldReviseLaborP(Array(15).fill(""));
+            setRedFieldLaborQ(Array(15).fill(""));
+            setRedFieldReviseLaborQ(Array(15).fill(""));
+            setRedFieldLaborC(Array(15).fill(""));
+            setRedFieldReviseLaborC(Array(15).fill(""));
+        }
     }
 
     const renderFooter = (name) => {
@@ -899,6 +974,13 @@ export default function RepairRecords() {
                     <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus/>
                 </div>
             );
+        } else if (name === 'displayConfirmDeleteImage') {
+            return (
+                <div>
+                    <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => submitDeleteImage()}/>
+                </div>
+            );
         }
     }
 
@@ -912,8 +994,8 @@ export default function RepairRecords() {
         return (
             <div>
                 <center>
-                <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getRepairRecordData(rowData)}/>
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {console.log(rowData); setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
+                <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getRepairRecordData(rowData.repair_id)}/>
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
                 </center>
             </div>
         );
@@ -936,7 +1018,7 @@ export default function RepairRecords() {
                                 <Dropdown placeholder="Select Job Type" optionLabel="name"  value={searchJobType} options={searchJobTypeOptions} onChange={event => setSearchJobType(event.target.value)}/>
                             </div>
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
-                                <Calendar placeholder="Select a Date" value={searchDateCreated} onChange={(e) => setSearchDateCreated(e.value)} showIcon />
+                                <Calendar placeholder="Select Date" value={searchDateCreated} onChange={(e) => setSearchDateCreated(e.value)} showIcon />
                             </div>
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <div className="p-d-flex">
@@ -964,7 +1046,7 @@ export default function RepairRecords() {
                     <Dialog header="EDIT REPAIR" visible={displayRepairRecordEdit} onHide={() => onHide('displayRepairRecordEdit')} blockScroll={true}>
                         <div className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                     <h4>FIELD REPORT</h4>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
@@ -999,7 +1081,7 @@ export default function RepairRecords() {
                                                 <InputText placeholder="Input Location" value={location} disabled/>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                                 <h5>VEHICLE INFORMATION</h5>
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[0]}>
@@ -1017,16 +1099,16 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[1]}>
                                                 <h6><b>INCIDENT DATE:</b></h6>
-                                                <Calendar id="f1" placeholder="Input Date" value={dateIncident} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <Calendar id="f1" placeholder="Select Date" value={dateIncident} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[1]}</small>
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[2]}>
                                                 <h6><b>DATE RECEIVE:</b></h6>
-                                                <Calendar id="f2" placeholder="Input Date" value={dateReceive} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <Calendar id="f2" placeholder="Select Date" value={dateReceive} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[2]}</small>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                                 <h5>INCIDENT DETAILS</h5>
                                             </div>
                                             <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[3]}>
@@ -1050,7 +1132,7 @@ export default function RepairRecords() {
                                                 <small className="p-invalid p-d-block">{redFieldRevise[5]}</small>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                                 <h5>ACTUAL FINDINGS</h5>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
@@ -1059,7 +1141,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[6]}>
                                                 <h6><b>DATE PERFORMED:</b></h6>
-                                                <Calendar id="f6" placeholder="Input Date" value={datePerformed} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <Calendar id="f6" placeholder="Select Date" value={datePerformed} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[6]}</small>
                                             </div>
                                             <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[7]}>
@@ -1076,9 +1158,9 @@ export default function RepairRecords() {
                                                 <small className="p-invalid p-d-block">{redFieldRevise[8]}</small>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 repair-title">
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 report-title">
                                                 <div className="p-grid p-fluid">
-                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                                         <h5>PARTS</h5>
                                                     </div>
                                                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
@@ -1117,9 +1199,9 @@ export default function RepairRecords() {
                                                 </div>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 repair-title">
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 report-title">
                                                 <div className="p-grid p-fluid">
-                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                                         <h5>LABOR</h5>
                                                     </div>
                                                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
@@ -1168,10 +1250,10 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>NOTED BY:</b></h6>
-                                                <InputText placeholder="Input Name" value={repairRecordDetails.noted_by} disabled/>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.noted_by === null ? "" : repairRecordDetails.noted_by} disabled/>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                                 <h5>ACTION TAKEN</h5>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
@@ -1180,7 +1262,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[9]}>
                                                 <h6><b>REPAIR DATE:</b></h6>
-                                                <Calendar id="f9" placeholder="Input Date" value={dateRepaired} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <Calendar id="f9" placeholder="Select Date" value={dateRepaired} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[9]}</small>
                                             </div>
                                             <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[10]}>
@@ -1192,7 +1274,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[11]}>
                                                 <h6><b>DATE DONE:</b></h6>
-                                                <Calendar id="f11" placeholder="Input Date" value={dateDone} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <Calendar id="f11" placeholder="Select Date" value={dateDone} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[11]}</small>
                                             </div>
                                             <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[12]}>
@@ -1206,6 +1288,15 @@ export default function RepairRecords() {
                                                 <InputTextarea id="f13" placeholder="Discuss remarks/recommendation here or leave it blank." rows={5} cols={30} autoResize
                                                 value={remarks} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[13]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk image-upload">
+                                                <h6><b>IMAGE UPLOAD:</b></h6>
+                                                <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                                                    emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <h6><b>REPORT IMAGES:</b></h6>
+                                                <Carousel style={{border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
                                             </div>
                                             <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
                                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
@@ -1228,6 +1319,18 @@ export default function RepairRecords() {
                         <div className="p-col">
                             <h5><b>Delete Record</b></h5>
                             <div style={{fontSize: '16px'}}>Are you sure to delete this record no. {repairID}?</div>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="CONFIRMATION" visible={displayConfirmDeleteImage} style={{ width: '310px' }} footer={renderFooter('displayConfirmDeleteImage')} onHide={() => onHide('displayConfirmDeleteImage')}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-trash" style={{fontSize: '25px', color: 'red'}}/>
+                        </div>
+                        <div className="p-col">
+                            <h5><b>Delete Image</b></h5>
+                            <div style={{fontSize: '16px'}}>Are you sure to delete this image ?</div>
                         </div>
                     </div>
                 </Dialog>

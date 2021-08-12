@@ -183,12 +183,10 @@ export default function RepairReport() {
             toast.current.show({ severity: 'error', summary: 'STATUS AFTER REPAIR', detail: 'This field is required.', life: 3000 });
         } else if (remarks === "") { 
             toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS and/or RECOMMENDATIONS', detail: 'This field is required.', life: 3000 });
-        } else if (refImageUpload.current.state.files.length <= 0) { 
-            toast.current.show({ severity: 'error', summary: 'IMAGE', detail: 'Image required.', life: 3000 });
         } else {
             setIsLoading(true);
             let submitParts = [];
-            parts.map((x) =>
+            parts.filter(x => x.p !== "").map((x) =>
                 submitParts.push({
                     cost_type: "P",
                     particulars: x.p,
@@ -198,7 +196,7 @@ export default function RepairReport() {
             )
 
             let submitLabor = [];
-            labor.map((x) =>
+            labor.filter(x => x.p !== "").map((x) =>
                 submitLabor.push({
                     cost_type: "L",
                     particulars: x.p,
@@ -206,14 +204,6 @@ export default function RepairReport() {
                     quantity: x.q
                 })
             )
-
-            let formData = new FormData();
-            refImageUpload.current.state.files.map((f, index) => {
-                formData.append("images[" + index + "]image", f);
-                formData.append("images[" + index + "]mode", "ci");
-                formData.append("images[" + index + "]image_name", jobID.job_id);
-                return null;
-            })
 
             let token = localStorage.getItem("token");
             const config = {
@@ -243,47 +233,24 @@ export default function RepairReport() {
                 job_order: jobID.job_id
             }, config)
             .then((res) => {
-                console.log(res);
-                axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
-                .then((res) => {
-                    setMessage({title:"CREATE", content:"Successfully created."});
-                    setScheduleDate('');
-                    setJobType([]);
-                    setBodyNo('');
-                    setMake('');
-                    setStatus('');
-                    setLocation('');
-                    setPlateNumber('');
-                    setCSNumber('');
-                    setChassisNumber('');
+                if (refImageUpload.current.state.files.length <= 0) {
+                    submitRepairReportAfter();
+                } else {
+                    let formData = new FormData();
+                    refImageUpload.current.state.files.map((f, index) => {
+                        formData.append("images[" + index + "]image", f);
+                        formData.append("images[" + index + "]mode", "ci");
+                        formData.append("images[" + index + "]image_name", res.data.repair_id);
+                        return null;
+                    })
+                    axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData, config)
+                    .then((res) => {
+                        submitRepairReportAfter();
+                    })
+                    .catch((err) => {
 
-                    setJobID([]);
-                    setIRNumber('');
-                    setDateIncident(null);
-                    setDateReceive(null);
-                    setDetailsIncident('');
-                    setSitePOC('');
-                    setContactNumber('');
-                    setDatePerformed(null);
-                    setDetailsActualFindings('');
-                    setDetailsActualRemarks('');
-                    setParts(initialPartsLabor);
-                    setTotalPartsCost('0.00');
-                    setLabor(initialPartsLabor);
-                    setTotalLaborCost('0.00');
-                    setTotalEstimateCost('0.00');
-                    setDateRepaired(null);
-                    setDetailsActionTaken('');
-                    setDateDone(null);
-                    setStatusRepair([]);
-                    setRemarks('');
-                    window.scrollTo({top: 0, left: 0, behavior:'smooth'});
-                    setIsLoading(false);
-                    onClick('displayMessage');
-                })
-                .catch((err) => {
-
-                });
+                    });
+                }
             })
             .catch((err) => {
                 if (err.toJSON().message === 'Network Error'){
@@ -300,6 +267,43 @@ export default function RepairReport() {
                 setIsLoading(false);
             })
         }
+    }
+
+    const submitRepairReportAfter = () => {
+        setMessage({title:"CREATE", content:"Successfully created."});
+        setScheduleDate('');
+        setJobType([]);
+        setBodyNo('');
+        setMake('');
+        setStatus('');
+        setLocation('');
+        setPlateNumber('');
+        setCSNumber('');
+        setChassisNumber('');
+
+        setJobID([]);
+        setIRNumber('');
+        setDateIncident(null);
+        setDateReceive(null);
+        setDetailsIncident('');
+        setSitePOC('');
+        setContactNumber('');
+        setDatePerformed(null);
+        setDetailsActualFindings('');
+        setDetailsActualRemarks('');
+        setParts(initialPartsLabor);
+        setTotalPartsCost('0.00');
+        setLabor(initialPartsLabor);
+        setTotalLaborCost('0.00');
+        setTotalEstimateCost('0.00');
+        setDateRepaired(null);
+        setDetailsActionTaken('');
+        setDateDone(null);
+        setStatusRepair([]);
+        setRemarks('');
+        window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+        setIsLoading(false);
+        onClick('displayMessage');
     }
 
     const handleChangeJobType = (value) => {
@@ -368,7 +372,7 @@ export default function RepairReport() {
             </div>
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                         <h4>FIELD REPORT</h4>
                     </div>
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
@@ -407,7 +411,7 @@ export default function RepairReport() {
                                     <InputText placeholder="Input Location" value={location} disabled/>
                                 </div>
 
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                     <h5>VEHICLE INFORMATION</h5>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
@@ -424,14 +428,14 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>INCIDENT DATE:</b></h6>
-                                    <Calendar placeholder="Input Date" value={dateIncident} onChange={(e) => setDateIncident(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={dateIncident} onChange={(e) => setDateIncident(e.value)} showIcon/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>DATE RECEIVE:</b></h6>
-                                    <Calendar placeholder="Input Date" value={dateReceive} onChange={(e) => setDateReceive(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={dateReceive} onChange={(e) => setDateReceive(e.value)} showIcon/>
                                 </div>
 
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                     <h5>INCIDENT DETAILS</h5>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
@@ -452,7 +456,7 @@ export default function RepairReport() {
                                     <InputText placeholder="Input Contact Number" keyfilter="int" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)}/>
                                 </div>
 
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                     <h5>ACTUAL FINDINGS</h5>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
@@ -461,7 +465,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>DATE PERFORMED:</b></h6>
-                                    <Calendar placeholder="Input Date" value={datePerformed} onChange={(e) => setDatePerformed(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={datePerformed} onChange={(e) => setDatePerformed(e.value)} showIcon/>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
                                     <h6><b>FINDINGS:</b></h6>
@@ -475,9 +479,9 @@ export default function RepairReport() {
                                     value={detailsActualRemarks} onChange={(e) => setDetailsActualRemarks(e.target.value)}/>
                                 </div>
 
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 repair-title">
+                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 report-title">
                                     <div className="p-grid p-fluid">
-                                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                             <h5>PARTS</h5>
                                         </div>
                                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
@@ -507,9 +511,9 @@ export default function RepairReport() {
                                     </div>
                                 </div>
 
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 repair-title">
+                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 report-title">
                                     <div className="p-grid p-fluid">
-                                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                             <h5>LABOR</h5>
                                         </div>
                                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
@@ -552,7 +556,7 @@ export default function RepairReport() {
                                     <InputText placeholder="Input Name" disabled/>
                                 </div>
 
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-title">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
                                     <h5>ACTION TAKEN</h5>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
@@ -561,7 +565,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>REPAIR DATE:</b></h6>
-                                    <Calendar placeholder="Input Date" value={dateRepaired} onChange={(e) => setDateRepaired(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={dateRepaired} onChange={(e) => setDateRepaired(e.value)} showIcon/>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
                                     <h6><b>ACTION TAKEN DETAILS:</b></h6>
@@ -571,7 +575,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>DATE DONE:</b></h6>
-                                    <Calendar placeholder="Input Date" value={dateDone} onChange={(e) => setDateDone(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={dateDone} onChange={(e) => setDateDone(e.value)} showIcon/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>STATUS AFTER REPAIR:</b></h6>
@@ -583,13 +587,14 @@ export default function RepairReport() {
                                     <InputTextarea placeholder="Discuss remarks/recommendation here or leave it blank." rows={5} cols={30} autoResize
                                     value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk image-upload">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 image-upload">
+                                    <h6><b>IMAGE UPLOAD:</b></h6>
                                     <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
-                                        emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />
+                                        emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
                                 </div>
                                 <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
-                                    <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitRepairReport()}/>
+                                    <Button label="SUBMIT" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitRepairReport()}/>
                                 </div>
 
                             </div>

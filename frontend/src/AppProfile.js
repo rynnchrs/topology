@@ -110,9 +110,10 @@ export const AppProfile = () => {
     return (
         <div className="layout-profile">
             <Toast ref={toast} />
-            {/* <div>
-                <img src="assets/layout/images/avatar_4.png" alt="Profile" />
-            </div> */}
+            <div className="img-profile">
+                {/* <img src="assets/layout/images/avatar_4.png" alt="Profile" /> */}
+                <img src={process.env.REACT_APP_SERVER_NAME + "media/Careta-Users/" + localStorage.getItem("username") + ".jpg"} alt="Profile" />
+            </div>
             <button className="p-link layout-profile-link" onClick={onClick}>
                 {/*<span className="username">Ryann Ang</span>*/}
                 <span className="username">{userData}</span>
