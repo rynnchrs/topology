@@ -39,6 +39,17 @@
     height: 35px;
 }
 
+/* css for profile picture  */
+.img-profile{
+  img {
+    border-radius: 50%;
+    width: 110px;
+    height: 110px;
+    border: 1px solid gray;
+  }
+}
+/* end css for profile picture  */
+
 //driver inspection report badge
 .driver-insp-rep {
   .p-tag {
@@ -277,17 +288,17 @@
 /* end css for task list datatable */
 
 /* css for careta report */
-.repair-title {
+.report-title {
   h4 {
     color: white;
-    background-color: blue;
+    background-color: rgba(0, 0, 255, 0.897);
     border-radius: 5px 5px 0 0;
     display: inline;
     padding: 4px 20px;
     font-weight: 500;
   } 
   h5 {
-    color: rgb(16, 166, 253);
+    color: rgba(16, 99, 253, 0.945);
     background: linear-gradient(90deg, rgb(233, 232, 232) 0%, rgb(255, 255, 255) 100%);
     padding: 4px 10px;
     font-weight: 500;
@@ -311,6 +322,12 @@
 
   .red .p-inputtext{
     border: 1px solid red;
+  }
+}
+
+.image-upload {
+  .p-fileupload-buttonbar .p-button + .p-button {
+    display: none;
   }
 }
 /* end css for careta report */

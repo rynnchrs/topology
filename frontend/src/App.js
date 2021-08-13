@@ -33,6 +33,8 @@ import  DriverRecordForms from './components/DriverRecordForms';
 import  VehiclesGPS from './components/VehiclesGPS';
 import  RepairReport from './components/RepairReport';
 import  RepairRecords from './components/RepairRecords';
+import  ChecklistReport from './components/ChecklistReport';
+import  IncidentReport from './components/IncidentReport';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
@@ -167,6 +169,8 @@ const App = () => {
 
     sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-th-large', to: '/repairreport' });
     sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-th-large', to: '/repairrecords'});
+    sidebarSubMenu4.push({label: 'Checklist Report', icon: 'pi pi-th-large', to: '/checklistreport'});
+    sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
     sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
 
     const onInputStyleChange = (inputStyle) => {
@@ -277,7 +281,7 @@ const App = () => {
             <CSSTransition classNames="layout-sidebar" timeout={{ enter: 200, exit: 200 }} in={isSidebarVisible()} unmountOnExit>
                 <div ref={sidebar} className={sidebarClassName} onClick={onSidebarClick}>
                     <div className="layout-logo">
-                        <img alt="Logo" src={logo} />
+                        {/* <img alt="Logo" src={logo} /> */}
                     </div>
                     <AppProfile />
                     {/*<AppMenu model={menu} onMenuItemClick={onMenuItemClick} />*/}
@@ -299,6 +303,8 @@ const App = () => {
                 <Route path="/jobscheduling" exact component={JobScheduling} />
                 <Route path="/repairreport" exact component={RepairReport} />
                 <Route path="/repairrecords" exact component={RepairRecords} />
+                <Route path="/checklistreport" exact component={ChecklistReport} />
+                <Route path="/incidentreport" exact component={IncidentReport} />
             </div>
 
             <AppFooter />
