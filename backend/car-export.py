@@ -1,8 +1,8 @@
 import os
+import sys
 
 import django
 
-import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
@@ -13,8 +13,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 from car.models import TPL, Car, Contract, Insurance
-
-
 
 datas = Car.objects.all()
 workbook = Workbook()
@@ -214,7 +212,7 @@ for data in datas:
         contract_end_date = contract.end_date
         contract_bid_no = contract.bid_no
         contract_bid_name = contract.bid_name
-        contract_bid_date = contract.bid_name
+        contract_bid_date = contract.bid_date
         contract_cost = contract.cost
     try:
         tpl = TPL.objects.get(car=data.car_id)
