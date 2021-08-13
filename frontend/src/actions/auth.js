@@ -22,9 +22,7 @@ export const login = (username, password) => (dispatch) => {
     
     axios
         .post(process.env.REACT_APP_SERVER_NAME + 'careta/login/', body, config)
-        //.post(SERVER_NAME + 'api/login/', body, config)
         .then((res) => {
-            //console.log('login token: ' + res.data.access)
             localStorage.setItem('username', res.data.username);
             localStorage.setItem('token', res.data.access);
             localStorage.setItem('refreshToken', res.data.refresh);
@@ -41,8 +39,6 @@ export const login = (username, password) => (dispatch) => {
                 axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/', config)
                 .then((res) => {
-                    //console.log("permission login:");
-                    //console.log(res.data);
                     res.data.can_view_users ? localStorage.setItem('viewUsers', "true") : localStorage.setItem('viewUsers', "false")
                     res.data.can_add_users ? localStorage.setItem('addUsers', "true") : localStorage.setItem('addUsers', "false")
                     res.data.can_edit_users ? localStorage.setItem('editUsers', "true") : localStorage.setItem('editUsers', "false")
@@ -70,15 +66,22 @@ export const login = (username, password) => (dispatch) => {
 
                 })
                 .catch((err) => {
-                    console.log("permission err:");
-                    console.log(err.response);
+
+                });
+
+                axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'image/user-image/' + username +'/', config)
+                .then((res) => {
+                    localStorage.setItem('myimage', process.env.REACT_APP_SERVER_NAME + res.data.image.substring(1));
+                })
+                .catch((err) => {
+                    localStorage.setItem('myimage', "assets/layout/images/avatar.jpg");
                 });
             } catch (e){
-                console.log("trycattcherr:");
-                console.log(e.response);
+
             }
             dispatch(createMessage({ okayLogin: "okay" }));
-            // i added delay 1.5second to make dispatch above perform the toast before the dispatch below
+            //added delay 1second to make dispatch above perform the toast before the dispatch below
             setTimeout(() => {
                 dispatch({
                     type: LOGIN_SUCCESS,
@@ -87,7 +90,6 @@ export const login = (username, password) => (dispatch) => {
             }, 1000);
         })
         .catch((err) => {
-            console.log(err.response);
             const errors = {
                 msg: err.response.data,
                 status: err.response.status

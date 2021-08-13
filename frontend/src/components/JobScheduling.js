@@ -122,6 +122,7 @@ export const JobScheduling = () => {
     const [displayMessage, setDisplayMessage] = useState(false);
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
+    const [displayJobCreateInspection, setDisplayJobCreateInspection] = useState(false);
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -137,7 +138,7 @@ export const JobScheduling = () => {
             localStorage.getItem("viewUsers") === "true" ? axios.get(process.env.REACT_APP_SERVER_NAME + 'task/fieldman-list/', config) : '',
         ]).then(([res1, res2]) => {
             setTotalCount(res1.data.count);
-            setJobList(res1.data.results);
+            setJobList(res1.data.results.reverse());
             setFieldmanList(res2.data.results);
             if (res2.data.next === null){
                 
@@ -210,7 +211,7 @@ export const JobScheduling = () => {
                 + '&page=' + sentPage, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
-                    setJobList(res.data.results);
+                    setJobList(res.data.results.reverse());
                     fullCalendarDisplay(res.data.results);
                 })
                 .catch((err) => {
@@ -299,7 +300,7 @@ export const JobScheduling = () => {
 
             } else {
                 try {
-                    setSuggestions(fieldmanList.filter(item => item.username.startsWith(event.query)));
+                    setSuggestions(fieldmanList.filter(item => item.full_name.toLowerCase().startsWith(event.query)));
                 } catch (err){
 
                 }
@@ -364,7 +365,7 @@ export const JobScheduling = () => {
             + '&page=' + sentPage, config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results);
+                setJobList(res.data.results.reverse());
                 fullCalendarDisplay(res.data.results);
             })
             .catch((err) => {
@@ -377,7 +378,7 @@ export const JobScheduling = () => {
                     + '&page=1', config)
                     .then((res) => {
                         setTotalCount(res.data.count);
-                        setJobList(res.data.results);
+                        setJobList(res.data.results.reverse());
                         fullCalendarDisplay(res.data.results);
                         setFirst(0);
                         setFlagPages(1);
@@ -644,7 +645,7 @@ export const JobScheduling = () => {
             + '&page=1', config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results);
+                setJobList(res.data.results.reverse());
                 fullCalendarDisplay(res.data.results);
                 setFirst(0);
                 setFlagPages(1);
@@ -1017,7 +1018,7 @@ export const JobScheduling = () => {
         'displayConfirmMN': setDisplayConfirmMN,
         'displayMessage': setDisplayMessage,
         'displayConfirmDelete': setDisplayConfirmDelete,
-
+        'displayJobCreateInspection': setDisplayJobCreateInspection,
     }
 
     const onClick = (name) => {
@@ -1026,6 +1027,13 @@ export const JobScheduling = () => {
 
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
+        setFieldman([{id: 0 , val: "", fullname: ""}]);
+        setBodyNo([]);
+        setJobType([]);
+        setDateStart(null);
+        setDateEnd(null);
+        setScheduleDate(null);
+        setRemarks('');
     }
 
     const renderFooter = (name) => {
@@ -1067,20 +1075,31 @@ export const JobScheduling = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                             <div className="p-grid p-fluid">
-                                <div className="p-col">
-                                    <b style={{fontSize: '20px', color:'gray'}}>Task List</b>
-                                </div>
-                                <div className="p-col">
-                                {
-                                    localStorage.getItem("viewUsers") === "true" ? <Button label="CREATE" icon="pi pi-plus" onClick={() => onClick('displayJobCreate')} style={{ float: 'right', width:'130px'}}/> : ''
-                                }
+                                <div className="p-col-12">
+                                    <div style={{float: 'left'}}>
+                                        <b style={{fontSize: '20px', color:'gray'}}>Task List</b>
+                                    </div>
+                                    <div style={{float: 'right'}}>
+                                        {
+                                            localStorage.getItem("viewUsers") === "true" ? 
+                                                <div className="p-formgroup-inline">
+                                                    <div className="p-field" style={{marginRight:'5px'}}>
+                                                    <Button className="p-button-success p-button-sm" label="CREATE" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
+                                                    </div>
+                                                    <div className="p-field" style={{marginRight:'0px'}}>
+                                                    <Button className="p-button-sm" label="CREATE" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/>
+                                                    </div>
+                                                </div>
+                                            : ''
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText placeholder="Search" value={searchFieldman} onChange={(event) => bodySearch(event)}/>
+                                <InputText placeholder="Search Name" value={searchFieldman} onChange={(event) => bodySearch(event)}/>
                             </span>
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
@@ -1122,7 +1141,7 @@ export const JobScheduling = () => {
             </div>
 
             <div className="dialog-display">
-                <Dialog header="CREATE TASK" visible={displayJobCreate} onHide={() => onHide('displayJobCreate')} blockScroll={true}>
+                <Dialog header="CREATE REPAIR TASK" visible={displayJobCreate} onHide={() => onHide('displayJobCreate')} blockScroll={true}>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>FIELDMAN:</b></h6>
@@ -1145,29 +1164,78 @@ export const JobScheduling = () => {
                             value={bodyNo} onChange={(e) => setBodyNo(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>JOB TYPE: </b></h6>
+                            <h6><b>JOB TYPE:</b></h6>
                             <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setJobType(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>
-                            <Calendar id="icon" placeholder="Input Date" value={dateStart} onChange={(e) => setDateStart(e.value)} showIcon />
+                            <Calendar id="icon" placeholder="Select Date" value={dateStart} onChange={(e) => setDateStart(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>END DATE:</b></h6>
-                            <Calendar id="icon" placeholder="Input Date" value={dateEnd} onChange={(e) => setDateEnd(e.value)} showIcon />
+                            <Calendar id="icon" placeholder="Select Date" value={dateEnd} onChange={(e) => setDateEnd(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>SCHEDULE DATE:</b></h6>
-                            <Calendar id="icon" placeholder="Input Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon />
+                            <Calendar id="icon" placeholder="Select Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>REMARKS:</b></h6>
-                            <InputText placeholder="Add other remarks here" value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
+                            <InputText placeholder="Add other remarks here." value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
                         </div>
 
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
                             <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()}/>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="CREATE INSPECTION TASK" visible={displayJobCreateInspection} onHide={() => onHide('displayJobCreateInspection')} blockScroll={true}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>FIELDMAN:</b></h6>
+                            <div className="p-grid p-fluid">
+                                {
+                                    fieldman.map((x, index) =>
+                                        <div className="p-col-12 p-lg-12" key={index}>
+                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" suggestions={suggestions} completeMethod={searchList} 
+                                            value={x.fullname} onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)}/>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                            <Button label="+" onClick={() => addFieldman()} style={{ width: '50px', marginRight: '10px'}}/> 
+                            <Button label="-" onClick={() => removeFieldman()} style={{ width: '50px' }} disabled={fieldman.length === 1}/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>LOCATION:</b></h6>
+                            <Dropdown /* value={jobType} options={jobTypeOptions} */ optionLabel="name" placeholder="Select Location" /* onChange={event => setJobType(event.target.value)} */ />
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>JOB TYPE:</b></h6>
+                            <InputText value="INSPECTION" disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>START DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Select Date" value={dateStart} onChange={(e) => setDateStart(e.value)} showIcon />
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>END DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Select Date" value={dateEnd} onChange={(e) => setDateEnd(e.value)} showIcon />
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>SCHEDULE DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Select Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon />
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REMARKS:</b></h6>
+                            <InputText placeholder="Add other remarks here." value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
+                        </div>
+
+                        <div className="p-col-12 p-md-9"> </div>
+                        <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
+                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()} disabled/>
                         </div>
                     </div>
                 </Dialog>
