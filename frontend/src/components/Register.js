@@ -5,6 +5,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputMask } from 'primereact/inputmask';
 import { Checkbox } from 'primereact/checkbox';
 import { Panel } from 'primereact/panel';
+import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 
@@ -45,6 +46,7 @@ export const Register = () => {
     const [delTask, setDelTask] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
+    const refImageUpload = useRef(null);
 
     const submitData = event => {
         if (first_name === "") {
@@ -88,7 +90,24 @@ export const Register = () => {
             axios
                 .post(process.env.REACT_APP_SERVER_NAME + 'careta/register/', body, config)
                 .then((res) => {
-                    submitPermission();
+                    if (refImageUpload.current.state.files.length <= 0) {
+                        submitPermission();
+                    } else {
+                        let formData = new FormData();
+                        refImageUpload.current.state.files.map((f, index) => {
+                            formData.append("image", f);
+                            formData.append("mode", "cu");
+                            formData.append("image_name", username);
+                            return null;
+                        })
+                        axios.post(process.env.REACT_APP_SERVER_NAME + 'image/user-image/', formData,  config)
+                        .then((res) => {
+                            submitPermission();
+                        })
+                        .catch((err) => {
+    
+                        });
+                    }
                 })
                 .catch((err) => {
                     if (err.response.data.username) {
@@ -374,6 +393,14 @@ export const Register = () => {
                                 </div>
                             </div></center>
                         </Panel>
+                    </div>
+
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-md-12 image-upload" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>IMAGE UPLOAD:</b></h6>
+                            <FileUpload ref={refImageUpload} mode="basic" accept="image/*" maxFileSize={1000000}
+                                emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
+                        </div>
                     </div>
 
                     <div className="p-grid p-fluid">

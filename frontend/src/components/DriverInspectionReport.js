@@ -5,6 +5,7 @@ import { Button } from 'primereact/button';
 import { AutoComplete } from 'primereact/autocomplete';
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { FileUpload } from 'primereact/fileupload';
 import axios from "axios";
 
 export class DriverInspectionReport extends Component {
@@ -95,6 +96,7 @@ export class DriverInspectionReport extends Component {
 
         this.onClick = this.onClick.bind(this);
         this.onHide = this.onHide.bind(this);
+        this.refImageUpload = React.createRef(null);
 
     }
 
@@ -394,88 +396,106 @@ export class DriverInspectionReport extends Component {
             edited_by: this.state.editor,
           }, config)
           .then((res) => {
-            this.setState({
-                radioValue1: null,
-                radioValue2: null,
-                radioValue3: null,
-                radioValue4: null,
-                radioValue5: null,
-                radioValue6: null,
-                radioValue7: null,
-                radioValue8: null,
-                radioValue9: null,
-                radioValue10: null,
-                radioValue11: null,
-                radioValue12: null,
-                radioValue13: null,
-                radioValue14: null,
-                radioValue15: null,
-                radioValue16: null,
-                radioValue17: null,
-                radioValue18: null,
-                radioValue19: null,
-                radioValue20: null,
-                radioValue21: null,
-                radioValue22: null,
-                radioValue23: null,
-                radioValue24: null,
-                radioValue25: null,
-                radioValue26: null,
-                radioValue27: null,
-                radioValue28: null,
-                radioValue29: null,
-                radioValue30: null,
-                radioValue31: null,
-                radioValue32: null,
-                radioValue33: null,
-                radioValue34: null,
-                radioValue35: null,
-                radioValue36: null,
-                radioValue37: null,
-                radioValue38: null,
-                radioValue39: null,
-                radioValue40: null,
-                radioValue41: null,
-                radioValue42: null,
-                radioValue43: null,
-                radioValue44: null,
-                radioValue45: null,
-                radioValue46: null,
-                radioValue47: null,
-                radioValue48: null,
-                radioValue49: null,
-                radioValue50: null,
-                radioValue51: null,
-                bn: "",
-                make: "",
-                mil: "",
-                locc: "",
-                gpsData: "",
-                com: "",
-                labelBtnSubmit:"SUBMIT",
-                isBtnSubmit: false,
-                iconBtnSubmit: "",
-                isLoading: false,
-            })
-            window.scrollTo({top: 0, left: 0, behavior:'smooth'});
-            this.onClick('displaySuccess');
-            let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config)
-                .then(response => response.json())
-                .then(data => {
+              console.log(res)
+            // if (this.refImageUpload.current.state.files.length <= 0) {
+            //     submitRepairReportAfter();
+            // } else {
+            //     let formData = new FormData();
+            //     this.refImageUpload.current.state.files.map((f, index) => {
+            //         formData.append("images[" + index + "]image", f);
+            //         formData.append("images[" + index + "]mode", "dr");
+            //         formData.append("images[" + index + "]image_name", res.data.repair_id);
+            //         return null;
+            //     })
+            //     axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
+            //     .then((res) => {
                     this.setState({
-                        carValues: data
-                    });
-                })
-                .catch((error) => {
+                        radioValue1: null,
+                        radioValue2: null,
+                        radioValue3: null,
+                        radioValue4: null,
+                        radioValue5: null,
+                        radioValue6: null,
+                        radioValue7: null,
+                        radioValue8: null,
+                        radioValue9: null,
+                        radioValue10: null,
+                        radioValue11: null,
+                        radioValue12: null,
+                        radioValue13: null,
+                        radioValue14: null,
+                        radioValue15: null,
+                        radioValue16: null,
+                        radioValue17: null,
+                        radioValue18: null,
+                        radioValue19: null,
+                        radioValue20: null,
+                        radioValue21: null,
+                        radioValue22: null,
+                        radioValue23: null,
+                        radioValue24: null,
+                        radioValue25: null,
+                        radioValue26: null,
+                        radioValue27: null,
+                        radioValue28: null,
+                        radioValue29: null,
+                        radioValue30: null,
+                        radioValue31: null,
+                        radioValue32: null,
+                        radioValue33: null,
+                        radioValue34: null,
+                        radioValue35: null,
+                        radioValue36: null,
+                        radioValue37: null,
+                        radioValue38: null,
+                        radioValue39: null,
+                        radioValue40: null,
+                        radioValue41: null,
+                        radioValue42: null,
+                        radioValue43: null,
+                        radioValue44: null,
+                        radioValue45: null,
+                        radioValue46: null,
+                        radioValue47: null,
+                        radioValue48: null,
+                        radioValue49: null,
+                        radioValue50: null,
+                        radioValue51: null,
+                        bn: "",
+                        make: "",
+                        mil: "",
+                        locc: "",
+                        gpsData: "",
+                        com: "",
+                        labelBtnSubmit:"SUBMIT",
+                        isBtnSubmit: false,
+                        iconBtnSubmit: "",
+                        isLoading: false,
+                    })
+                    window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+                    this.onClick('displaySuccess');
+                    let token = localStorage.getItem("token");
+                    const config = {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token,
+                        },
+                    };
+                    fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.setState({
+                                carValues: data
+                            });
+                        })
+                        .catch((error) => {
+        
+                        });
+            //     })
+            //     .catch((err) => {
 
-                });
+            //     });
+            // }
           })
           .catch((err) => {
             if (err.toJSON().message === 'Network Error'){
@@ -1165,7 +1185,15 @@ export class DriverInspectionReport extends Component {
                             </div>
                         </div>
                     </div>
-                </div>  
+                </div>
+
+                <div className="p-col-12 p-lg-12">
+                    <div className="card card-w-title image-upload">
+                        <h1>Image Upload</h1>
+                        <FileUpload ref={this.refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                            emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
+                    </div>
+                </div>
 
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
