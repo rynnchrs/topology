@@ -193,3 +193,63 @@ class RepairListSerializer(serializers.ModelSerializer): # list of all repair
         else:
             return "Repair"
 
+# class IRSerializers(serializers.ModelSerializer): # Inspection serializer 
+#     body_no = serializers.CharField()
+#     class Meta:
+#         model = IR
+#         fields = '__all__'
+
+#     def validate(self, obj): # validate if vin_no input is vin_no
+#         errors = []
+#         try:
+#             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+#         except:
+#            errors.append({"body_no": 'Invalid Body No.'})
+#         if errors:
+#             raise serializers.ValidationError({'errors':errors})
+#         return obj
+
+#     # def update(self, instance, validated_data):
+
+#     # def create(self, validated_data):       # Creating report
+#     #     validated_data.pop('edited_by', None) 
+#     #     report = Inspection.objects.create(**validated_data)
+#     #     return report
+
+#     def to_representation(self, instance): # instance of vin_no
+#         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+#         return super(InspectionSerializer, self).to_representation(instance)
+
+
+
+# class CheckListSerializers(serializers.ModelSerializer): # Inspection serializer 
+#     body_no = serializers.CharField()
+#     email = serializers.CharField()
+#     class Meta:
+#         model = CheckList
+#         fields = '__all__'
+
+#     def validate(self, obj): # validate if vin_no input is vin_no
+#         errors = []
+#         try:
+#             obj['email'] = User.objects.get(email=obj['email'])
+#         except:
+#            errors.append({"email": 'Invalid Email.'})
+#         try:
+#             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+#         except:
+#            errors.append({"body_no": 'Invalid Body No.'})
+#         if errors:
+#             raise serializers.ValidationError({'errors':errors})
+#         return obj
+
+#     # def update(self, instance, validated_data):
+
+#     # def create(self, validated_data):       # Creating report
+#     #     validated_data.pop('edited_by', None) 
+#     #     report = Inspection.objects.create(**validated_data)
+#     #     return report
+
+#     def to_representation(self, instance): # instance of vin_no
+#         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+#         return super(InspectionSerializer, self).to_representation(instance)

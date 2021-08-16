@@ -1,5 +1,7 @@
+import json
 from datetime import datetime as date
 
+from car.models import Car
 from careta.serializers import UserListSerializer
 from django.contrib.auth.models import User
 from django_filters import filters
@@ -13,10 +15,56 @@ from rest_framework.response import Response
 
 from .filters import TaskFilter
 from .models import Fieldman, JobOrder, Task
-from .serializers import (RepairJobSerializer, RepairJobSerializer,
-                          TaskSerializer, WarningTaskSerializer)
+from .serializers import (RepairJobSerializer, TaskSerializer,
+                          WarningTaskSerializer)
 from .utils import user_permission
-from car.models import Car
+
+
+class LocationListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+    filter_backends = [filter.DjangoFilterBackend]
+    filter_class = TaskFilter
+    
+    def get(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):  
+            dictlist = []
+            context = {}
+            queryset = Car.objects.order_by().values('current_loc').distinct()
+            for value in queryset:
+                if value['current_loc'] is not None:
+                    dictlist.append(value['current_loc'])
+            for i in range(len(dictlist)):
+                context[i]=dictlist[i]
+        return Response(context, status=status.HTTP_200_OK)
+
+
+class TaskInspectionView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Task.objects.all().order_by('task_id')
+    serializer_class = TaskSerializer
+
+    def create(self, request):  # create user
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            request.data['manager'] = user.id
+            cars = Car.objects.filter(current_loc=request.data['body_no'])
+            for car in cars:
+                request.data['body_no']=car.current_loc
+                serializer = TaskSerializer(data=request.data)
+                if serializer.is_valid(raise_exception=True):
+                    car = Car.objects.get(body_no=request.data['body_no'])
+                    if request.data['job_order']['type'] == False:
+                        car.status = "M"
+                    else:
+                        car.status = "R"
+                    car.save()
+                    serializer.save()
+            return Response("Successfully Created",status=status.HTTP_201_CREATED)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+
 
 class TaskView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

@@ -39,8 +39,8 @@ class FieldmanSerializer(serializers.ModelSerializer):
     def validate(self, obj): # validate input in foreign keys
         errors = []
         try:
-            fieldman = obj['field_man'].split()
-            obj['field_man'] = User.objects.get(first_name=fieldman[0], last_name=fieldman[1])
+            fieldman = obj['field_man']
+            obj['field_man'] = User.objects.get(username=fieldman)
         except:
             errors.append({"field_man": 'Invalid Fieldman.'})
         if errors:

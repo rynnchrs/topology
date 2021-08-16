@@ -1,8 +1,11 @@
 import datetime
 
+from django.db.models.fields import CharField
+
 from car.models import Car
 from django.contrib.auth.models import User
 from django.db import models
+from multiselectfield import MultiSelectField
 from task.models import JobOrder
 
 # Create your models here.
@@ -161,4 +164,74 @@ class Cost(models.Model):
     def total_cost(self): # total cost of an item per quantity
         return self.cost * self.quantity
 
-    
+
+# class IR(models.Model):
+#     ir_id = models.AutoField(primary_key=True)
+#     req_name = models.ForeignKey(User, related_name='requestor', on_delete=models.CASCADE)
+#     body_no = models.ForeignKey(Car, related_name='ir', on_delete=models.CASCADE)
+#     project_name = models.CharField(max_length=30, null=True, blank=True)
+#     sub_project = models.CharField(max_length=30, null=True, blank=True)
+#     region = models.CharField(max_length=30, null=True, blank=True)
+#     exact_loc = models.CharField(max_length=70, null=True, blank=True)
+#     vehicle_supp = models.CharField(max_length=50, null=True, blank=True)
+#     odometer = models.IntegerField(default=0, null=True, blank=True)
+#     Repair_List = [
+#         ('me', 'Mehcanical'),
+#         ('el', 'Electrical'),
+#         ('ba', 'Battery'),
+#         ('ti', 'Tires'),
+#         ('pm', 'PMS'),
+#         ('ac', 'Accident'),
+#         ('ot', 'Others'),
+#     ]
+#     repair_type = MultiSelectField(max_length=2, choices=Repair_List, null=True, blank=True)
+#     damaged_parts = models.TextField(max_length=200, null=True, blank=True)
+#     incedent_loc = models.CharField(max_length=20, null=True, blank=True)
+#     problem_obs = models.TextField(max_length=200, null=True, blank=True)
+#     recommendation = models.TextField(max_length=200, null=True, blank=True)
+#     date_time = models.DateTimeField(default=datetime.datetime.now())
+#     prepared_by = models.ForeignKey(User, related_name='prepared_by', on_delete=models.CASCADE)
+#     noted_by = models.ForeignKey(User, related_name='noted_by', on_delete=models.CASCADE)
+#     admin_name = models.ForeignKey(User, related_name='admin', on_delete=models.CASCADE)
+#     approved_by = models.ForeignKey(User, related_name='approved_by', on_delete=models.CASCADE)
+#     contact_number = models.CharField(max_length=12, null=True, blank=True)
+
+
+class CheckList(models.Model):
+    check_list_id = models.AutoField(primary_key=True)
+    email = models.ForeignKey(User, related_name='checklist', on_delete=models.CASCADE)
+    schedule_date = models.DateField(default=datetime.date.today)
+    body_no = models.ForeignKey(Car, related_name='checklist', on_delete=models.CASCADE)
+    odometer = models.IntegerField(default=0, null=True, blank=True)
+    Job_List = [
+        ('in', 'Inspection'),
+        ('re', 'Repair'),
+        ('pm', 'PMS'),
+    ]
+    job_desc = models.IntegerChoices(max_length=2, choices=Job_List, defualt='pm')
+    pair_ewd = models.BooleanField(default=False)
+    Color_List = [
+        ('yo', 'Yellow only'),
+        ('ro', 'Red only'),
+        ('bo', 'both'),
+    ]
+    color_ewd = models.IntegerChoices(max_length=2, choices=Color_List, defualt='bo')
+    body_no_ewd = models.BooleanField(default=False)
+    body_no_fl_tire = models.BooleanField(default=False)
+    body_no_fr_tire = models.BooleanField(default=False)
+    body_no_rl_tire = models.BooleanField(default=False)
+    body_no_rr_tire = models.BooleanField(default=False)
+    spare_tire = models.BooleanField(default=False)
+    body_no_batt = models.BooleanField(default=False)
+    vehicle_wt = models.BooleanField(default=False)
+    remarks = models.TextField(max_length=200, null=True, blank=True)
+    Repair_List = [
+        ('me', 'Mehcanical'),
+        ('el', 'Electrical'),
+        ('ba', 'Battery'),
+        ('ti', 'Tires'),
+        ('pm', 'PMS'),
+        ('ac', 'Accident'),
+        ('ot', 'Others'),
+    ]
+    replaced = MultiSelectField(max_length=2, choices=Repair_List, null=True, blank=True)
