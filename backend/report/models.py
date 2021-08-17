@@ -93,9 +93,9 @@ class InspectiontImage(models.Model):
 
 class CheckList(models.Model):
     check_list_id = models.AutoField(primary_key=True)
+    job_order = models.OneToOneField(JobOrder, null=True, related_name='checklist', on_delete=models.CASCADE)
     task = models.ForeignKey(Task, related_name='checklist', on_delete=models.CASCADE)
     email = models.ForeignKey(User, related_name='checklist', on_delete=models.CASCADE)
-    schedule_date = models.DateField(default=datetime.date.today)
     body_no = models.ForeignKey(Car, related_name='checklist', on_delete=models.CASCADE)
     odometer = models.IntegerField(default=0, null=True, blank=True)
     Job_List = [
@@ -135,6 +135,8 @@ class CheckList(models.Model):
     parts_included = MultiSelectField(choices=Parts_List, null=True, blank=True)
     remarks = models.TextField(max_length=200, null=True, blank=True)
     
+    noted_by = models.ForeignKey(User, related_name='check_noted', on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=20, null=True, blank=True)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 

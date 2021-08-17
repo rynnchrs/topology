@@ -51,7 +51,7 @@ class TaskInspectionView(viewsets.ModelViewSet):
             request.data['manager'] = user.id
             cars = Car.objects.filter(current_loc=request.data['body_no'])
             for car in cars:
-                request.data['body_no']=car.current_loc
+                request.data['body_no']=car.body_no
                 serializer = TaskSerializer(data=request.data)
                 if serializer.is_valid(raise_exception=True):
                     car = Car.objects.get(body_no=request.data['body_no'])
