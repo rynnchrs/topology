@@ -48,7 +48,7 @@ export const Register = () => {
     const toast = useRef(null);
     const refImageUpload = useRef(null);
 
-    const submitData = event => {
+    const submitData = () => {
         if (first_name === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Firstname is required.', life: 5000 });
         } else if (last_name === "") {
@@ -71,6 +71,8 @@ export const Register = () => {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 5000 });
         } else if (birthday === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
+        } else if (refImageUpload.current.state.files.length <= 0) {
+            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Image is required.', life: 5000 });
         } else {
             let token = localStorage.getItem("token");
             
@@ -280,12 +282,17 @@ export const Register = () => {
                 setBirthday('');
                 setUserLevel("");
                 window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+                refImageUpload.current.clear();
                 toast.current.show({ severity: 'success', summary: 'Successfully Registered', detail: 'Account is ready to use.', life: 5000 });
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal', detail: 'Something went wrong.', life: 5000 });
                     
             });
+    }
+
+    const onClearImageFile = () => {
+        //empty
     }
 
     const toggleShow = () => {
@@ -301,11 +308,11 @@ export const Register = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>FIRSTNAME:</b></h6>
-                            <InputText placeholder="First Name" value={first_name} onChange={event => setFirst_Name(event.target.value)} />
+                            <InputText placeholder="First Name" value={first_name} onChange={event => setFirst_Name(event.target.value.replace(/\b(\w)/g, s => s.toUpperCase()))} />
                         </div>
                         <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>LASTNAME:</b></h6>
-                            <InputText placeholder="Last Name" value={last_name} onChange={event => setLast_Name(event.target.value)} />
+                            <InputText placeholder="Last Name" value={last_name} onChange={event => setLast_Name(event.target.value.replace(/\b(\w)/g, s => s.toUpperCase()))} />
                         </div>
                     </div>
 
@@ -398,7 +405,7 @@ export const Register = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-md-12 image-upload" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>IMAGE UPLOAD:</b></h6>
-                            <FileUpload ref={refImageUpload} mode="basic" accept="image/*" maxFileSize={1000000}
+                            <FileUpload ref={refImageUpload} mode="basic" accept="image/*" maxFileSize={1000000} onClear={onClearImageFile}
                                 emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
                         </div>
                     </div>

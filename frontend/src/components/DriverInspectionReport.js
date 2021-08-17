@@ -145,33 +145,31 @@ export class DriverInspectionReport extends Component {
     }
 
     nextPage = () => {
-        // setTimeout(() => {
-            let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-            fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    bodyno: this.state.bodyno.concat(data.results)
-                });
-                if (data.next === null){
-
-                } else {
-                    this.setState({
-                        counter: this.state.counter + 1
-                    });
-                    this.nextPage();
-                }
-            })
-            .catch((err) => {
-                
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        fetch(process.env.REACT_APP_SERVER_NAME + 'car/car-list/?page=' + this.state.counter, config)
+        .then(response => response.json())
+        .then(data => {
+            this.setState({
+                bodyno: this.state.bodyno.concat(data.results)
             });
-        // }, 500);
+            if (data.next === null){
+
+            } else {
+                this.setState({
+                    counter: this.state.counter + 1
+                });
+                this.nextPage();
+            }
+        })
+        .catch((err) => {
+            
+        });
     }
 
     showBodyNumberTags () {
@@ -340,7 +338,6 @@ export class DriverInspectionReport extends Component {
             },
         };
         axios.post(process.env.REACT_APP_SERVER_NAME + 'report/inspection/', {
-            //car: this.state.bn.car_id,
             body_no: this.state.bn.body_no,
             make: this.state.bn.make,
             mileage: this.state.mil,
@@ -394,209 +391,213 @@ export class DriverInspectionReport extends Component {
             notes: this.state.com,
             driver: this.state.driver,
             edited_by: this.state.editor,
-          }, config)
-          .then((res) => {
-              console.log(res)
-            // if (this.refImageUpload.current.state.files.length <= 0) {
-            //     submitRepairReportAfter();
-            // } else {
-            //     let formData = new FormData();
-            //     this.refImageUpload.current.state.files.map((f, index) => {
-            //         formData.append("images[" + index + "]image", f);
-            //         formData.append("images[" + index + "]mode", "dr");
-            //         formData.append("images[" + index + "]image_name", res.data.repair_id);
-            //         return null;
-            //     })
-            //     axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
-            //     .then((res) => {
-                    this.setState({
-                        radioValue1: null,
-                        radioValue2: null,
-                        radioValue3: null,
-                        radioValue4: null,
-                        radioValue5: null,
-                        radioValue6: null,
-                        radioValue7: null,
-                        radioValue8: null,
-                        radioValue9: null,
-                        radioValue10: null,
-                        radioValue11: null,
-                        radioValue12: null,
-                        radioValue13: null,
-                        radioValue14: null,
-                        radioValue15: null,
-                        radioValue16: null,
-                        radioValue17: null,
-                        radioValue18: null,
-                        radioValue19: null,
-                        radioValue20: null,
-                        radioValue21: null,
-                        radioValue22: null,
-                        radioValue23: null,
-                        radioValue24: null,
-                        radioValue25: null,
-                        radioValue26: null,
-                        radioValue27: null,
-                        radioValue28: null,
-                        radioValue29: null,
-                        radioValue30: null,
-                        radioValue31: null,
-                        radioValue32: null,
-                        radioValue33: null,
-                        radioValue34: null,
-                        radioValue35: null,
-                        radioValue36: null,
-                        radioValue37: null,
-                        radioValue38: null,
-                        radioValue39: null,
-                        radioValue40: null,
-                        radioValue41: null,
-                        radioValue42: null,
-                        radioValue43: null,
-                        radioValue44: null,
-                        radioValue45: null,
-                        radioValue46: null,
-                        radioValue47: null,
-                        radioValue48: null,
-                        radioValue49: null,
-                        radioValue50: null,
-                        radioValue51: null,
-                        bn: "",
-                        make: "",
-                        mil: "",
-                        locc: "",
-                        gpsData: "",
-                        com: "",
-                        labelBtnSubmit:"SUBMIT",
-                        isBtnSubmit: false,
-                        iconBtnSubmit: "",
-                        isLoading: false,
-                    })
-                    window.scrollTo({top: 0, left: 0, behavior:'smooth'});
-                    this.onClick('displaySuccess');
-                    let token = localStorage.getItem("token");
-                    const config = {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token,
-                        },
-                    };
-                    fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config)
-                        .then(response => response.json())
-                        .then(data => {
-                            this.setState({
-                                carValues: data
-                            });
-                        })
-                        .catch((error) => {
-        
-                        });
-            //     })
-            //     .catch((err) => {
+        }, config)
+        .then((res) => {
+            if (this.refImageUpload.current.state.files.length <= 0) {
+                this.submitDataAfter();
+            } else {
+                let formData = new FormData();
+                this.refImageUpload.current.state.files.map((f, index) => {
+                    formData.append("images[" + index + "]image", f);
+                    formData.append("images[" + index + "]mode", "dr");
+                    formData.append("images[" + index + "]image_name", res.data.inspection_id);
+                    return null;
+                })
+                axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
+                .then((res) => {
+                    this.submitDataAfter();
+                })
+                .catch((err) => {
 
-            //     });
-            // }
-          })
-          .catch((err) => {
-            if (err.toJSON().message === 'Network Error'){
-                this.setState({errorMessage: {title:"NETWEORK ERROR:", content: "Please check internet connection."}});
-            } else if (err.response.data.body_no) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Body No."}});
-            } else if (err.response.data.mileage) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Mileage"}});
-            } else if (err.response.data.cleanliness_exterior) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Exterior: Cleanliness"}});
-            } else if (err.response.data.condition_rust) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Condition Rust"}});
-            } else if (err.response.data.decals) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Decals/Livery Intact"}});
-            } else if (err.response.data.windows) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Windows/Windscreen"}});
-            } else if (err.response.data.rear_door) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Read Door"}});
-            } else if (err.response.data.mirror) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Mirror"}});
-            } else if (err.response.data.roof_rack) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Roof Rack"}});
-            } else if (err.response.data.rear_step) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear Step"}});
-            } else if (err.response.data.seats) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Seats"}});
-            } else if (err.response.data.seat_belts) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Seat Belts"}});
-            } else if (err.response.data.general_condition) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "General Condition"}});
-            } else if (err.response.data.vehicle_documents) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Vehicle Documents"}});
-            } else if (err.response.data.liquid_leak) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Liquid Leak"}});
-            } else if (err.response.data.cleanliness_engine_bay) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Engine Bay: Cleanliness"}});
-            } else if (err.response.data.washer_fluid) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Washer Fluid"}});
-            } else if (err.response.data.coolant_level) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Coolant Level"}});
-            } else if (err.response.data.brake_fluid_level) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Brake Fluid Level"}});
-            } else if (err.response.data.power_steering_fluid) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Power Steering Fluid"}});
-            } else if (err.response.data.main_beam) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Main Beam"}});
-            } else if (err.response.data.dipped_beam) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Dipped Beam"}});
-            } else if (err.response.data.side_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Side Lights"}});
-            } else if (err.response.data.tail_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Tail Lights"}});
-            } else if (err.response.data.indicators) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Indicators"}});
-            } else if (err.response.data.break_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Break Lights"}});
-            } else if (err.response.data.reverse_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Reverse Lights"}});
-            } else if (err.response.data.hazard_light) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Hazard Lights"}});
-            } else if (err.response.data.rear_fog_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear Fog Light"}});
-            } else if (err.response.data.interior_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Interior Lights"}});
-            } else if (err.response.data.screen_washer) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Screen Washer"}});
-            } else if (err.response.data.wiper_blades) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Wiper Blades"}});
-            } else if (err.response.data.horn) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Horn"}});
-            } else if (err.response.data.radio) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Radio/CD"}});
-            } else if (err.response.data.front_fog_lights) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Front Fog Lights"}});
-            } else if (err.response.data.tyres) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Tyres"}});
-            } else if (err.response.data.front_visual) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Front (Visual)"}});
-            } else if (err.response.data.rear_visual) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear (Visual)"}});
-            } else if (err.response.data.spare_visual) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Spare (Visual)"}});
-            } else if (err.response.data.wheel_brace) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Wheel Brace"}});
-            } else if (err.response.data.jack) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Jack"}});
-            } else if (err.response.data.front_left_wheel) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Left Front"}});
-            } else if (err.response.data.front_right_wheel) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Right Front"}});
-            } else if (err.response.data.rear_left_wheel) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Left Rear"}});
-            } else if (err.response.data.rear_right_wheel) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Right Rear"}});
-            } else if (err.response.data.gas_level) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Gas Level"}});
-            } else if (err.response.data.oil_level) {
-                this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Oil Level"}});
-            } 
-            this.onClick('displayError');
-          })
+                });
+            }
+        })
+        .catch((err) => {
+        if (err.toJSON().message === 'Network Error'){
+            this.setState({errorMessage: {title:"NETWEORK ERROR:", content: "Please check internet connection."}});
+        } else if (err.response.data.body_no) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Body No."}});
+        } else if (err.response.data.mileage) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Mileage"}});
+        } else if (err.response.data.cleanliness_exterior) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Exterior: Cleanliness"}});
+        } else if (err.response.data.condition_rust) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Condition Rust"}});
+        } else if (err.response.data.decals) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Decals/Livery Intact"}});
+        } else if (err.response.data.windows) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Windows/Windscreen"}});
+        } else if (err.response.data.rear_door) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Read Door"}});
+        } else if (err.response.data.mirror) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Mirror"}});
+        } else if (err.response.data.roof_rack) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Roof Rack"}});
+        } else if (err.response.data.rear_step) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear Step"}});
+        } else if (err.response.data.seats) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Seats"}});
+        } else if (err.response.data.seat_belts) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Seat Belts"}});
+        } else if (err.response.data.general_condition) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "General Condition"}});
+        } else if (err.response.data.vehicle_documents) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Vehicle Documents"}});
+        } else if (err.response.data.liquid_leak) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Liquid Leak"}});
+        } else if (err.response.data.cleanliness_engine_bay) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Engine Bay: Cleanliness"}});
+        } else if (err.response.data.washer_fluid) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Washer Fluid"}});
+        } else if (err.response.data.coolant_level) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Coolant Level"}});
+        } else if (err.response.data.brake_fluid_level) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Brake Fluid Level"}});
+        } else if (err.response.data.power_steering_fluid) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Power Steering Fluid"}});
+        } else if (err.response.data.main_beam) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Main Beam"}});
+        } else if (err.response.data.dipped_beam) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Dipped Beam"}});
+        } else if (err.response.data.side_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Side Lights"}});
+        } else if (err.response.data.tail_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Tail Lights"}});
+        } else if (err.response.data.indicators) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Indicators"}});
+        } else if (err.response.data.break_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Break Lights"}});
+        } else if (err.response.data.reverse_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Reverse Lights"}});
+        } else if (err.response.data.hazard_light) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Hazard Lights"}});
+        } else if (err.response.data.rear_fog_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear Fog Light"}});
+        } else if (err.response.data.interior_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Interior Lights"}});
+        } else if (err.response.data.screen_washer) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Screen Washer"}});
+        } else if (err.response.data.wiper_blades) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Wiper Blades"}});
+        } else if (err.response.data.horn) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Horn"}});
+        } else if (err.response.data.radio) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Radio/CD"}});
+        } else if (err.response.data.front_fog_lights) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Front Fog Lights"}});
+        } else if (err.response.data.tyres) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Tyres"}});
+        } else if (err.response.data.front_visual) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Front (Visual)"}});
+        } else if (err.response.data.rear_visual) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Rear (Visual)"}});
+        } else if (err.response.data.spare_visual) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Spare (Visual)"}});
+        } else if (err.response.data.wheel_brace) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Wheel Brace"}});
+        } else if (err.response.data.jack) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Jack"}});
+        } else if (err.response.data.front_left_wheel) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Left Front"}});
+        } else if (err.response.data.front_right_wheel) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Right Front"}});
+        } else if (err.response.data.rear_left_wheel) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Left Rear"}});
+        } else if (err.response.data.rear_right_wheel) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Right Rear"}});
+        } else if (err.response.data.gas_level) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Gas Level"}});
+        } else if (err.response.data.oil_level) {
+            this.setState({errorMessage: {title:"REQUIRED FIELD:", content: "Oil Level"}});
+        } 
+        this.onClick('displayError');
+        })
+    }
+
+    submitDataAfter = () => {
+        this.setState({
+            radioValue1: null,
+            radioValue2: null,
+            radioValue3: null,
+            radioValue4: null,
+            radioValue5: null,
+            radioValue6: null,
+            radioValue7: null,
+            radioValue8: null,
+            radioValue9: null,
+            radioValue10: null,
+            radioValue11: null,
+            radioValue12: null,
+            radioValue13: null,
+            radioValue14: null,
+            radioValue15: null,
+            radioValue16: null,
+            radioValue17: null,
+            radioValue18: null,
+            radioValue19: null,
+            radioValue20: null,
+            radioValue21: null,
+            radioValue22: null,
+            radioValue23: null,
+            radioValue24: null,
+            radioValue25: null,
+            radioValue26: null,
+            radioValue27: null,
+            radioValue28: null,
+            radioValue29: null,
+            radioValue30: null,
+            radioValue31: null,
+            radioValue32: null,
+            radioValue33: null,
+            radioValue34: null,
+            radioValue35: null,
+            radioValue36: null,
+            radioValue37: null,
+            radioValue38: null,
+            radioValue39: null,
+            radioValue40: null,
+            radioValue41: null,
+            radioValue42: null,
+            radioValue43: null,
+            radioValue44: null,
+            radioValue45: null,
+            radioValue46: null,
+            radioValue47: null,
+            radioValue48: null,
+            radioValue49: null,
+            radioValue50: null,
+            radioValue51: null,
+            bn: "",
+            make: "",
+            mil: "",
+            locc: "",
+            gpsData: "",
+            com: "",
+            labelBtnSubmit:"SUBMIT",
+            isBtnSubmit: false,
+            iconBtnSubmit: "",
+            isLoading: false,
+        })
+        window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+        this.refImageUpload.current.clear();
+        this.onClick('displaySuccess');
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection/',config)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    carValues: data
+                });
+            })
+            .catch((error) => {
+
+            });
     }
 
     onClick(name) {
@@ -631,6 +632,10 @@ export class DriverInspectionReport extends Component {
                 </div>
             );
         }
+    }
+
+    onClearImageFile = () => {
+        //empty
     }
 
     render() {
@@ -1190,7 +1195,7 @@ export class DriverInspectionReport extends Component {
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title image-upload">
                         <h1>Image Upload</h1>
-                        <FileUpload ref={this.refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                        <FileUpload ref={this.refImageUpload} multiple accept="image/*" maxFileSize={1000000} onClear={this.onClearImageFile}
                             emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
                     </div>
                 </div>

@@ -210,7 +210,7 @@ export default function RepairRecords() {
         axios.get(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + value + '/', config)
             .then((res) => {
                 setRepairRecordDetails(res.data);
-                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.repair_id +'/?mode=ci', config)
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.repair_id +'/?mode=cr', config)
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagRepairRecordDetails(true);
@@ -390,9 +390,8 @@ export default function RepairRecords() {
         };
 
         axios
-            .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=ci&id=' + holdImageID, config)
+            .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=cr&id=' + holdImageID, config)
             .then((res) => {
-                console.log("rID: ", repairID);
                 getRepairRecordData(repairID);
                 setMessage({title:"DELETE", content:"Successfully deleted."});
                 onHide('displayConfirmDeleteImage');
@@ -401,8 +400,6 @@ export default function RepairRecords() {
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Image Error', detail: 'Something went wrong.', life: 5000 });
             });
-
-
     }
 
     const updateRedFieldsPartsP = (index, color, revise) => {
@@ -655,7 +652,7 @@ export default function RepairRecords() {
                     let formData = new FormData();
                     refImageUpload.current.state.files.map((f, index) => {
                         formData.append("images[" + index + "]image", f);
-                        formData.append("images[" + index + "]mode", "ci");
+                        formData.append("images[" + index + "]mode", "cr");
                         formData.append("images[" + index + "]image_name", res.data.repair_id);
                         return null;
                     })
@@ -697,14 +694,14 @@ export default function RepairRecords() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', config)
             .then((res) => {
-                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + repairID +'/?mode=ci', config)
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + repairID +'/?mode=cr', config)
                 .then((res) => {
                     let imageIDs = "";
                     res.data.map((x) => {
                         imageIDs += x.id;
                         imageIDs += ",";
                     })
-                    axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=ci&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
+                    axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=cr&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
                     .then((res) => {
                         getRepairRecord();
                         setMessage({title:"DELETE", content:"Successfully deleted."});
@@ -1335,7 +1332,7 @@ export default function RepairRecords() {
                     </div>
                 </Dialog>
 
-                <div className="p-grid p-fluid">
+                {/* <div className="p-grid p-fluid"> */}
                     <Dialog header={message.title} visible={displayMessage} style={{ width: '310px' }} footer={renderFooter('displayMessage')} onHide={() => onHide('displayMessage')} closable={false}>
                         <div className="p-grid">
                             <div className="p-col-2">
@@ -1346,7 +1343,7 @@ export default function RepairRecords() {
                             </div>
                         </div>
                     </Dialog>
-                </div>
+                {/* </div> */}
 
             </div>
         </div>

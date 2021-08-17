@@ -239,7 +239,7 @@ export default function RepairReport() {
                     let formData = new FormData();
                     refImageUpload.current.state.files.map((f, index) => {
                         formData.append("images[" + index + "]image", f);
-                        formData.append("images[" + index + "]mode", "ci");
+                        formData.append("images[" + index + "]mode", "cr");
                         formData.append("images[" + index + "]image_name", res.data.repair_id);
                         return null;
                     })
@@ -302,6 +302,7 @@ export default function RepairReport() {
         setStatusRepair([]);
         setRemarks('');
         window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+        refImageUpload.current.clear();
         setIsLoading(false);
         onClick('displayMessage');
     }
@@ -362,6 +363,10 @@ export default function RepairReport() {
                 <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus/>
             </div>
         );
+    }
+
+    const onClearImageFile = () => {
+        //empty
     }
 
     return(
@@ -589,7 +594,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 image-upload">
                                     <h6><b>IMAGE UPLOAD:</b></h6>
-                                    <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                                    <FileUpload ref={refImageUpload} multiple accept="image/*" maxFileSize={1000000} onClear={onClearImageFile}
                                         emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
                                 </div>
                                 <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
