@@ -1,3 +1,4 @@
+import report.models
 import datetime
 from datetime import date
 
@@ -5,7 +6,6 @@ from car.models import Car
 from django.contrib.auth.models import User
 from django.db import models
 from multiselectfield import MultiSelectField
-from report.models import CheckList
 
 
 class JobOrder(models.Model):
@@ -62,7 +62,7 @@ class Task(models.Model):
     manager = models.ForeignKey(User, related_name='task', on_delete=models.CASCADE)
     body_no = models.ForeignKey(Car, related_name='task', on_delete=models.CASCADE)
     ir_no = models.OneToOneField(IR, null=True, blank=True, related_name='task', on_delete=models.CASCADE)
-    check_list = models.OneToOneField(CheckList, null=True, blank=True, related_name='task', on_delete=models.CASCADE)
+    check_list = models.ForeignKey("report.CheckList", null=True, blank=True, related_name='ck_task', on_delete=models.CASCADE)
     job_order = models.OneToOneField(JobOrder, related_name='task', on_delete=models.CASCADE)
     desc = models.TextField(blank=True, null=True)
     schedule_date = models.DateField(default=datetime.date.today)

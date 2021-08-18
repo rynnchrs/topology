@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from task.serializers import RepairJobSerializer
 
-from .models import Cost, Inspection, Repair
+from .models import CheckList, CheckListParts, CheckListReportParts, Cost, Inspection, Repair
 
 
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
@@ -179,7 +179,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
 
 
 class RepairListSerializer(serializers.ModelSerializer): # list of all repair
-    body_no = serializers.CharField(source='job_order.task.body_no.body_no')
+    body_no = serializers.CharField(source='body_no.body_no')
     job_order = serializers.CharField(source='job_order.job_no')
     type = serializers.SerializerMethodField()
     class Meta:
@@ -222,34 +222,78 @@ class RepairListSerializer(serializers.ModelSerializer): # list of all repair
 
 
 
-# class CheckListSerializers(serializers.ModelSerializer): # Inspection serializer 
-#     body_no = serializers.CharField()
-#     email = serializers.CharField()
-#     class Meta:
-#         model = CheckList
-#         fields = '__all__'
+class CheckListPartsSerializer(serializers.ModelSerializer): # cost info ingeritance
+    class Meta:
+        model = CheckListParts
+        fields = ['id','name']
+    
 
-#     def validate(self, obj): # validate if vin_no input is vin_no
-#         errors = []
-#         try:
-#             obj['email'] = User.objects.get(email=obj['email'])
-#         except:
-#            errors.append({"email": 'Invalid Email.'})
-#         try:
-#             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
-#         except:
-#            errors.append({"body_no": 'Invalid Body No.'})
-#         if errors:
-#             raise serializers.ValidationError({'errors':errors})
-#         return obj
+class CheckListReportPartsSerializer(serializers.ModelSerializer): # cost info ingeritance
+    check_list_parts = serializers.CharField()
+    class Meta:
+        model = CheckListReportParts
+        fields = ['id','quantity','check_list_parts']
+    
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['check_list_parts'] = CheckListParts.objects.get(name=obj['check_list_parts'])
+        except:
+           errors.append({"check_list_parts": 'Invalid check_list_parts.'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
 
-#     # def update(self, instance, validated_data):
 
-#     # def create(self, validated_data):       # Creating report
-#     #     validated_data.pop('edited_by', None) 
-#     #     report = Inspection.objects.create(**validated_data)
-#     #     return report
+class CheckListSerializers(serializers.ModelSerializer): # Inspection serializer 
+    parts = CheckListReportPartsSerializer(many=True, required=False)
+    body_no = serializers.CharField()
+    email = serializers.CharField()
+    class Meta:
+        model = CheckList
+        fields = '__all__'
 
-#     def to_representation(self, instance): # instance of vin_no
-#         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
-#         return super(InspectionSerializer, self).to_representation(instance)
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['email'] = User.objects.get(email=obj['email'])
+        except:
+           errors.append({"email": 'Invalid Email.'})
+        try:
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+        except:
+           errors.append({"body_no": 'Invalid Body No.'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+
+    # def update(self, instance, validated_data):
+
+    def create(self, validated_data):       # Creating report
+        parts_data = validated_data.pop('parts') 
+        print(validated_data)
+        check_list = CheckList.objects.create(**validated_data)
+        for part_data in parts_data:
+            CheckListReportParts.objects.create(check_list=check_list, **part_data)
+        return check_list
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+        return super(CheckListSerializers, self).to_representation(instance)
+
+
+
+class CheckListListSerializer(serializers.ModelSerializer): # list of all repair
+    body_no = serializers.CharField(source='body_no.body_no')
+    job_order = serializers.CharField(source='job_order.job_no')
+    type = serializers.SerializerMethodField()
+    class Meta:
+        model = CheckList
+        fields = [  'check_list_id','body_no','job_order','type','date_created']
+    
+    def get_type(self, obj):
+        print(obj.job_order.type)
+        if obj.job_order.type == False:
+            return "Inspection"
+        else:
+            return "Repair"
