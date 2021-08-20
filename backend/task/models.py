@@ -1,6 +1,6 @@
 import report.models
 import datetime
-from datetime import date
+from datetime import datetime as time
 
 from car.models import Car
 from django.contrib.auth.models import User
@@ -16,11 +16,11 @@ class JobOrder(models.Model):
     def __str__(self):
         return str(self.job_id)
 
-
+    
 class IR(models.Model):
     ir_id = models.AutoField(primary_key=True)
     ir_no = models.CharField(unique=True, max_length=50, null=True, blank=True)
-    date = models.DateTimeField(default=datetime.datetime.now)
+    date = models.DateField(default=datetime.date.today)
     weiver = models.BooleanField(default=False)
     req_name = models.CharField(max_length=50, null=True, blank=True)
     body_no = models.ForeignKey(Car, related_name='ir_body_no', on_delete=models.CASCADE)
@@ -39,12 +39,12 @@ class IR(models.Model):
         ('ac', 'Accident'),
         ('ot', 'Others'),
     ]
-    repair_type = MultiSelectField(max_length=2, choices=Repair_List, null=True, blank=True)
+    repair_type = MultiSelectField(choices=Repair_List, null=True, blank=True)
     damaged_parts = models.TextField(max_length=200, null=True, blank=True)
     incedent_loc = models.CharField(max_length=20, null=True, blank=True)
     problem_obs = models.TextField(max_length=200, null=True, blank=True)
     recommendation = models.TextField(max_length=200, null=True, blank=True)
-    date_time = models.DateTimeField(default=datetime.datetime.now)
+    date_time = models.DateTimeField(blank=True, null=True)
     prepared_by = models.CharField(max_length=50, null=True, blank=True)
     noted_by = models.CharField(max_length=50, null=True, blank=True)
     admin_name = models.CharField(max_length=50, null=True, blank=True)
@@ -55,7 +55,8 @@ class IR(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.ir_id)
+        return self.ir_no
+
 
 class Task(models.Model):
     task_id = models.AutoField(primary_key=True)
@@ -75,6 +76,7 @@ class Task(models.Model):
     task_status_mn = models.BooleanField(default=False)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
+
     def __str__(self):
         return str(self.task_id)
     

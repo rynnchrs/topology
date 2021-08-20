@@ -1,9 +1,8 @@
 from rest_framework.fields import CharField, SerializerMethodField
 from car.models import Car
 from django.contrib.auth.models import User
-from rest_framework import serializers
-
-from .models import Fieldman, JobOrder, Task
+from rest_framework import fields, serializers
+from .models import Fieldman, IR, JobOrder, Task
 
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
     make = serializers.SerializerMethodField()
@@ -56,6 +55,7 @@ class TaskSerializer(serializers.ModelSerializer):
     job_order = JobOrderSerializer()
     fieldman = FieldmanSerializer(many=True)
     body_no = serializers.CharField()
+    ir_no = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model= Task
         fields =  '__all__'
@@ -74,6 +74,14 @@ class TaskSerializer(serializers.ModelSerializer):
             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:
             errors.append({"body_no": 'Invalid Body number.'})
+        
+        if obj['ir_no'] != "":
+            try:
+                obj['ir_no'] = IR.objects.get(ir_no=obj['ir_no'])
+            except:
+                errors.append({"ir_no": 'Invalid IR No.'})
+        else:
+            obj['ir_no'] = None
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
@@ -130,6 +138,7 @@ class TaskSerializer(serializers.ModelSerializer):
     def to_representation(self, instance): # instances
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         self.fields['manager'] =  serializers.CharField(source='manager.user_info.full_name')
+        self.fields['ir_no'] =  IRListSerializers(read_only=True)
         return super(TaskSerializer, self).to_representation(instance)
 
 
@@ -192,3 +201,38 @@ class RepairJobSerializer(serializers.ModelSerializer):
     def to_representation(self, instance): 
         self.fields['task'] = RepairTaskSerializer(read_only=True)
         return super(RepairJobSerializer, self).to_representation(instance)   
+
+
+class IRListSerializers(serializers.ModelSerializer):
+    body_no = serializers.CharField(source='body_no.body_no')
+    class Meta:
+        model= IR
+        fields =  ['ir_id','ir_no','date','body_no','project_name']
+
+class IRSerializers(serializers.ModelSerializer): # Inspection serializer 
+    repair_type = fields.MultipleChoiceField(choices=IR.Repair_List)
+    body_no = serializers.CharField()
+    class Meta:
+        model = IR
+        fields = '__all__'
+
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+        except:
+           errors.append({"body_no": 'Invalid Body No.'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+
+    # def update(self, instance, validated_data):
+
+    # def create(self, validated_data):       # Creating report
+    #     validated_data.pop('edited_by', None) 
+    #     report = Inspection.objects.create(**validated_data)
+    #     return report
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+        return super(IRSerializers, self).to_representation(instance)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Fieldman, JobOrder, Task
+from .models import Fieldman, IR, JobOrder, Task
 
 admin.site.register(JobOrder) 
 
@@ -13,3 +13,4 @@ class TaskAdmin(admin.ModelAdmin):
 
 admin.site.register(Task, TaskAdmin)  
 admin.site.register(Fieldman)  
+admin.site.register(IR)  

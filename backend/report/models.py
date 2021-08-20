@@ -122,7 +122,7 @@ class CheckList(models.Model):
     Parts_List = [
         (0, 'Unit is in good condition'),
         (1, 'Cracked windshield'),
-        (2, 'Rough idling, Cleaned and adjust throttle valve'),
+        (2, 'Rough idling. Cleaned and adjust throttle valve'),
         (3, 'For warranty'),
         (4, 'For body repair'),
         (5, 'Concern out of scope'),

@@ -7,6 +7,7 @@ router = routers.DefaultRouter()                      # add this
 router.register(r'job-order', views.JobOrderView, 'job-order') # job-order list api
 router.register(r'task-scheduling', views.TaskView, 'task-scheduling') 
 router.register(r'task-inspection', views.TaskInspectionView, 'task-inspection') 
+router.register(r'ir-report', views.IRView, 'ir-report') 
 
 urlpatterns = [
     path('', include(router.urls)),

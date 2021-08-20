@@ -21,7 +21,7 @@ from task.models import JobOrder
 from .export import export, repair_export
 from .filters import CheckListFilter, InspectionFilter, RepairFilter
 from .models import CheckList, CheckListParts, Cost, Inspection, Repair
-from .serializers import (CheckListSerializers, CostSerializer, InspectionLastFourListSerializer,
+from .serializers import (CheckListListSerializer, CheckListPartsSerializer, CheckListSerializer, CostSerializer, InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
 from .utils import repair_reversion, reversion, user_permission
@@ -306,7 +306,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
 class CheckListView(viewsets.ModelViewSet):  # add this
     permission_classes = [IsAuthenticated]
     queryset = CheckList.objects.all().order_by('-check_list_id')  # add this
-    serializer_class = CheckListSerializers  # add this
+    serializer_class = CheckListSerializer  # add this
     filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = CheckListFilter
     ordering_fields = ['check_list_id', 'date_created']
@@ -317,17 +317,30 @@ class CheckListView(viewsets.ModelViewSet):  # add this
             queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
-                serializer = CheckListSerializers(page, many=True)
+                serializer = CheckListListSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)      
-            serializer = CheckListSerializers(queryset, many=True)
+            serializer = CheckListListSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+    action(detail=False, methods=['post'])
+    def create_parts(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_repair_reports'): 
+            serializer = CheckListPartsSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_201_CREATED)  
+            return Response(serializer.errors)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+            
+
     def create(self, request):
         user = self.request.user
         if user_permission(user, 'can_add_repair_reports'): 
-            serializer = CheckListSerializers(data=request.data)
+            serializer = CheckListSerializer(data=request.data)
             if request.data['parts_name']:
                 for part_name in request.data['parts_name']:
                     CheckListParts.objects.create(**part_name)
@@ -347,75 +360,66 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     def retrieve(self, request, pk=None):  
         user = self.request.user
         if user_permission(user,'can_view_repair_reports'): 
-            queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, pk=pk) 
-            serializer = RepairSerializer(repair,many=False)
-
-            parts = Cost.objects.filter(ro_no=repair, cost_type="P")
-            labor = Cost.objects.filter(ro_no=repair, cost_type="L")
-            serializer_data = serializer.data
-            parts = CostSerializer(parts, many=True)
-            serializer_data['parts'] = parts.data
-            labor = CostSerializer(labor, many=True)
-            serializer_data['labor'] = labor.data
-            serializer_data['revised'] = repair_reversion(repair)
-            return Response(serializer_data, status=status.HTTP_200_OK)          
+            queryset = CheckList.objects.all()
+            check_list = get_object_or_404(queryset, pk=pk) 
+            serializer = CheckListSerializer(check_list,many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def update(self, request, pk=None):
-        user = self.request.user
-        if user_permission(user, 'can_edit_repair_reports'): 
-            request.data['diagnosed_by'] = user.id 
-            request.data['generated_by'] = user.id 
-            request.data['repair_by'] = user.id 
-            request.data['noted_by'] = "" 
-            cost = request.data['parts'] + request.data['labor']
-            request.data['cost'] = cost
-            queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, pk=pk)   
-            serializer = RepairSerializer(instance=repair, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                job = JobOrder.objects.get(pk=request.data['job_order'])
-                car = Car.objects.get(body_no=job.task.body_no.body_no)
-                if request.data['status_repair'] == "Operational":
-                    car.operational = True
-                else:
-                    car.operational = False
-                car.save()
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)       
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # def update(self, request, pk=None):
+    #     user = self.request.user
+    #     if user_permission(user, 'can_edit_repair_reports'): 
+    #         request.data['diagnosed_by'] = user.id 
+    #         request.data['generated_by'] = user.id 
+    #         request.data['repair_by'] = user.id 
+    #         request.data['noted_by'] = "" 
+    #         cost = request.data['parts'] + request.data['labor']
+    #         request.data['cost'] = cost
+    #         queryset = Repair.objects.all()
+    #         repair = get_object_or_404(queryset, pk=pk)   
+    #         serializer = RepairSerializer(instance=repair, data=request.data)
+    #         if serializer.is_valid(raise_exception=True):
+    #             job = JobOrder.objects.get(pk=request.data['job_order'])
+    #             car = Car.objects.get(body_no=job.task.body_no.body_no)
+    #             if request.data['status_repair'] == "Operational":
+    #                 car.operational = True
+    #             else:
+    #                 car.operational = False
+    #             car.save()
+    #             serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)       
+    #     else:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
             
-    def destroy(self, request, pk=None):      
-        user = self.request.user
-        if user_permission(user, 'can_delete_repair_reports'): 
-            queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, pk=pk)
-            queryset = Image.objects.all()
-            image = get_object_or_404(queryset, image_name=pk)
-            repair.delete()
-            image.delete()
-            return Response(status=status.HTTP_200_OK)        
-        else: 
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # def destroy(self, request, pk=None):      
+    #     user = self.request.user
+    #     if user_permission(user, 'can_delete_repair_reports'): 
+    #         queryset = Repair.objects.all()
+    #         repair = get_object_or_404(queryset, pk=pk)
+    #         queryset = Image.objects.all()
+    #         image = get_object_or_404(queryset, image_name=pk)
+    #         repair.delete()
+    #         image.delete()
+    #         return Response(status=status.HTTP_200_OK)        
+    #     else: 
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(detail=True,  methods=['put'])  # edit the noted_by Field
-    def approved(self, request, pk=None):
-        user = self.request.user
-        if user_permission(user, 'can_edit_task'): 
-            queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, job_order=pk) 
-            if repair.noted_by is None:  
-                repair.noted_by = user
-                repair.save()    
-            else:
-                return Response("Already approved",status=status.HTTP_400_BAD_REQUEST)
+    # @action(detail=True,  methods=['put'])  # edit the noted_by Field
+    # def approved(self, request, pk=None):
+    #     user = self.request.user
+    #     if user_permission(user, 'can_edit_task'): 
+    #         queryset = Repair.objects.all()
+    #         repair = get_object_or_404(queryset, job_order=pk) 
+    #         if repair.noted_by is None:  
+    #             repair.noted_by = user
+    #             repair.save()    
+    #         else:
+    #             return Response("Already approved",status=status.HTTP_400_BAD_REQUEST)
 
-            return Response("Successfully Added", status=status.HTTP_200_OK)       
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    #         return Response("Successfully Added", status=status.HTTP_200_OK)       
+    #     else:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     # def export_post(self, request, pk=None):
