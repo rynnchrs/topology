@@ -15,10 +15,20 @@ class InspectionFilter(filters.FilterSet):
 
 class RepairFilter(filters.FilterSet):
     repair_id = filters.NumberFilter(field_name="repair_id", lookup_expr='exact')
-    body_no = filters.CharFilter(field_name="job_order__task__body_no__body_no", lookup_expr='startswith')
+    body_no = filters.CharFilter(field_name="body_no__body_no", lookup_expr='startswith')
     job_no = filters.CharFilter(field_name="job_order__job_no", lookup_expr='startswith')
     type = filters.CharFilter(field_name="job_order__type", lookup_expr='exact')
     date_created = filters.CharFilter(field_name="date_created", lookup_expr='startswith')
     class Meta:
         models = Repair
         fields = ['repair_id','body_no','job_no','type','date_created']
+
+class CheckListFilter(filters.FilterSet):
+    check_list_id = filters.NumberFilter(field_name="check_list_id", lookup_expr='exact')
+    body_no = filters.CharFilter(field_name="body_no__body_no", lookup_expr='startswith')
+    job_no = filters.CharFilter(field_name="job_order__job_no", lookup_expr='startswith')
+    type = filters.CharFilter(field_name="job_order__type", lookup_expr='exact')
+    date_created = filters.CharFilter(field_name="date_created", lookup_expr='startswith')
+    class Meta:
+        models = Repair
+        fields = ['check_list_id','body_no','job_no','type','date_created']
