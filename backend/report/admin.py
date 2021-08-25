@@ -2,7 +2,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
 
-from .models import Cost, Inspection, Repair
+from .models import CheckList, CheckListParts, Cost, Inspection, Repair
 
 # Register your models here.
 
@@ -25,3 +25,5 @@ class CostAdmin(admin.ModelAdmin):
     list_display = ['cost_id','ro_no']
 
 admin.site.register(Cost, CostAdmin) 
+admin.site.register(CheckList)
+admin.site.register(CheckListParts)
