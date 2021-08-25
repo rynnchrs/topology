@@ -370,10 +370,10 @@ export default function RepairRecords() {
         return (
             <div>
                 <center>
-                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt=""/>
                 </center>
                 <center>
-                    <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={(e) => {setHoldImageID(reportImage.id); onClick('displayConfirmDeleteImage');}}/>
+                    <Button style={{width: '37px', height: '37px'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={(e) => {setHoldImageID(reportImage.id); onClick('displayConfirmDeleteImage');}}/>
                 </center>
             </div>
         );
@@ -1293,7 +1293,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                                                 <h6><b>REPORT IMAGES:</b></h6>
-                                                <Carousel style={{border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
+                                                <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
                                             </div>
                                             <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
                                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">

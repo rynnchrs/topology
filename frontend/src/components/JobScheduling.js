@@ -61,7 +61,6 @@ export const JobScheduling = () => {
     });
 
     const [holdData, setHoldData] = useState([]);
-    const jobTypeOptions = [{ name: 'REPAIR', val: true }, { name: 'INSPECTION', val: false }];
     const [disabledData, setDisabledData] = useState(false);
     const [disabledApproval, setDisabledApproval] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
@@ -86,7 +85,6 @@ export const JobScheduling = () => {
     //create task form
     const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState([]);
-    const [jobType, setJobType] = useState([]);
     const [dateStart, setDateStart] = useState(null);
     const [dateEnd, setDateEnd] = useState(null);
     const [scheduleDate, setScheduleDate] = useState(null);
@@ -96,7 +94,6 @@ export const JobScheduling = () => {
     const [editJobNo, setEditJobNo] = useState('');
     const [editFieldman, setEditFieldman] = useState([]);
     const [editBodyNo, setEditBodyNo] = useState([]);
-    const [editJobType, setEditJobType] = useState([]);
     const [editDateStart, setEditDateStart] = useState(null);
     const [editDateEnd, setEditDateEnd] = useState(null);
     const [editDateStartActual, setEditDateStartActual] = useState(null);
@@ -134,16 +131,13 @@ export const JobScheduling = () => {
         };
 
         Promise.all([
-            axios.get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/', config),
             localStorage.getItem("viewUsers") === "true" ? axios.get(process.env.REACT_APP_SERVER_NAME + 'task/fieldman-list/', config) : '',
-        ]).then(([res1, res2]) => {
-            setTotalCount(res1.data.count);
-            setJobList(res1.data.results.reverse());
-            setFieldmanList(res2.data.results);
-            if (res2.data.next === null){
+        ]).then(([res1]) => {
+            setFieldmanList(res1.data.results);
+            if (res1.data.next === null){
                 
             } else {
-                nextPageFieldman(res2.data.next);
+                nextPageFieldman(res1.data.next);
             }
         }).catch((err) => {
 
@@ -364,6 +358,7 @@ export const JobScheduling = () => {
             + '&job_type=' + jt
             + '&page=' + sentPage, config)
             .then((res) => {
+                console.log(res.data)
                 setTotalCount(res.data.count);
                 setJobList(res.data.results.reverse());
                 fullCalendarDisplay(res.data.results);
@@ -409,7 +404,7 @@ export const JobScheduling = () => {
             let f = v.fieldman.map((x) =>
                 x.field_man
             )
-            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFieldman: " + f,
+            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFIELDMAN: " + f + "\nLOCATION: Sample",
             "start": v.start_date, "end": String(endDate)}]);
         });
     }
@@ -473,14 +468,18 @@ export const JobScheduling = () => {
             <div className="p-grid p-fluid p-nogutter" role="button" style={{cursor: 'pointer'}} onClick={(event) => getTaskScheduling(jobList.job_order.job_id, jobList.job_order.type)}>
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                     <div className="job-datatable-item" style={{borderLeft: '5px solid ' + jobTypeColor}}>
+                        <div style={{float: 'left', width:'40px'}}>
+                            <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_id}</b></p>
+                        </div>
+                        <div style={{float: 'right', width:'27px'}}>
+                            <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '27px', height: '27px', color: 'black'}}
+                            onClick={(event) => holdJobData(event, jobList.job_order.job_id)} />
+                        </div>
                         <div className="p-grid p-fluid p-nogutter">
-                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                <div className="p-grid p-fluid p-nogutter">
-                                    <div className="p-col" style={{maxWidth: '70px'}}>
-                                        <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_id}</b></p>
-                                    </div>
-                                    <div className="p-col">
-                                        <p style={{fontSize: '14px'}}><i className="pi pi-user"></i>
+                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-grid p-fluid">
+                                    <div className="p-col-12 p-lg-6 p-md-12 p-sm-12">
+                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-user"></i>
                                             {
                                                 jobList.fieldman.map((x, index) =>
                                                     <b key={index}> {x.field_man + ","}</b>
@@ -488,10 +487,13 @@ export const JobScheduling = () => {
                                             }
                                         </p>
                                     </div>
+                                    <div className="p-col-12 p-lg-6 p-md-12 p-sm-12">
+                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-map-marker"></i> Metro manila makata quezon city </p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">
-                                <div className="p-grid p-fluid p-nogutter">
+                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-grid p-fluid">
                                     <div className="p-col" style={{minWidth:'150px'}}>
                                         <p style={{fontSize: '14px'}}>
                                             <i className="pi pi-calendar"></i> {monthNames[gmtScheduleDate.getUTCMonth()] + " " + (gmtScheduleDate.getUTCDate()) + ", " + gmtScheduleDate.getUTCFullYear()} <br></br>
@@ -500,14 +502,14 @@ export const JobScheduling = () => {
                                         </p>
                                     </div>
                                     <div className="p-col" style={{minWidth:'115px'}}>
-                                        <small style={{fontSize: '13px', backgroundColor: statusColor1, color: 'white', padding:'2px 5px 3px', borderRadius: '5px'}}>{status1} </small>
-                                    </div>
-                                    <div className="p-col" style={{minWidth:'75px'}}>
-                                        <b style={{fontSize: '14px', color: jobTypeColor, textTransform: 'uppercase'}}>{jobList.job_order.type} </b>
-                                    </div>
-                                    <div className="p-col">
-                                        <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '35px', height: '27px', color: 'black'}}
-                                        onClick={(event) => holdJobData(event, jobList.job_order.job_id)} />
+                                        <div className="p-grid p-fluid">
+                                            <div className="p-col-12 p-lg-12">
+                                                <small style={{fontSize: '13px', backgroundColor: statusColor1, color: 'white', padding:'2px 5px 3px', borderRadius: '5px'}}>{status1} </small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12">
+                                                <b style={{fontSize: '14px', color: jobTypeColor, textTransform: 'uppercase'}}>{jobList.job_order.type} </b>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -680,10 +682,10 @@ export const JobScheduling = () => {
                 + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
                 .then((res) => {
                     if (res.data.length <= 0){
-                        submitTask();
+                        submitTaskRepair();
                     } else {
                         toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
-                        submitTask();
+                        submitTaskRepair();
                     }
                 })
                 .catch((err) => {
@@ -692,13 +694,11 @@ export const JobScheduling = () => {
         }
     }
 
-    const submitTask = () => {
+    const submitTaskRepair = () => {
         if (fieldman[0].val === "") { 
             toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
         } else if (bodyNo === "" || bodyNo.length <= 0) {
             toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
-        } else if (jobType.length === 0) {
-            toast.current.show({ severity: 'error', summary: 'JOB TYPE', detail: 'This field is required.', life: 3000 });
         } else if (dateStart === null) {
             toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
         } else if (dateEnd === null) {
@@ -721,7 +721,7 @@ export const JobScheduling = () => {
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', {
                 job_order: {
-                    type: jobType.val
+                    type: true
                 },
                 fieldman: fieldmanData,
                 desc:"",
@@ -792,11 +792,6 @@ export const JobScheduling = () => {
 
         setEditJobNo(jobData.task_id);
         setEditBodyNo(jobData.body_no.body_no);
-        try {
-            setEditJobType(jobTypeOptions.find(x => x.name === jobData.job_order.type.toUpperCase()));
-        } catch(err){
-
-        }
         setEditDateStart(gmtDateStart);
         setEditDateEnd(gmtDateEnd);
         setEditDateStartActual(parseDateStartActual);
@@ -808,7 +803,7 @@ export const JobScheduling = () => {
 
     }
 
-    const editTask = () => {
+    const editTaskRepair = () => {
         let fieldmanData = [];
         editFieldman.map((x) => 
             fieldmanData.push({field_man: x.fullname})
@@ -824,7 +819,7 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + editJobNo + '/', {
             job_order: {
-                type: editJobType.val
+                type: true
             },
             fieldman: fieldmanData,
             desc: "",
@@ -861,7 +856,7 @@ export const JobScheduling = () => {
         })
     }
 
-    const editTaskFieldman = () => {
+    const editTaskRepairFieldman = () => {
         let actualStart = editDateStartActual === null ? null : format(editDateStartActual, 'yyyy-MM-dd');
         let actualEnd = editDateEndActual === null ? null : format(editDateEndActual, 'yyyy-MM-dd');
         let token = localStorage.getItem("token");
@@ -960,18 +955,11 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/status_mn/', "", config)
         .then((res) => {
-
-            // axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + jobOrderID + '/approved/' , "", config)
-            // .then((res) => {
                 getTaskList();
                 onHide('displayJobDetails');
                 onHide('displayConfirmMN');
                 setMessage({title:"APPROVE", content:"Task approve."});
                 onClick('displayMessage');
-            // })
-            // .catch((err) => {
-            //     toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
-            // });
         })
         .catch((err) => {
             toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
@@ -1029,7 +1017,6 @@ export const JobScheduling = () => {
         dialogFuncMap[`${name}`](false);
         setFieldman([{id: 0 , val: "", fullname: ""}]);
         setBodyNo([]);
-        setJobType([]);
         setDateStart(null);
         setDateEnd(null);
         setScheduleDate(null);
@@ -1075,24 +1062,24 @@ export const JobScheduling = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12">
+                                <div className="p-col-12 p-xl-7 p-lg-6 p-md-5 p-sm-12">
                                     <div style={{float: 'left'}}>
                                         <b style={{fontSize: '20px', color:'gray'}}>Task List</b>
                                     </div>
-                                    <div style={{float: 'right'}}>
-                                        {
-                                            localStorage.getItem("viewUsers") === "true" ? 
-                                                <div className="p-formgroup-inline">
-                                                    <div className="p-field" style={{marginRight:'5px'}}>
-                                                    <Button className="p-button-success p-button-sm" label="CREATE" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
+                                </div>
+                                <div className="p-col-12 p-xl-5 p-lg-6 p-md-7 p-sm-12">
+                                    {
+                                        localStorage.getItem("viewUsers") === "true" ? 
+                                                <div className="p-grid p-fluid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
+                                                        <Button style={{minWidth:'max-content'}} className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
                                                     </div>
-                                                    <div className="p-field" style={{marginRight:'0px'}}>
-                                                    <Button className="p-button-sm" label="CREATE" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/>
+                                                    <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
+                                                        <Button label="CREATE REPAIR" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/>
                                                     </div>
                                                 </div>
-                                            : ''
-                                        }
-                                    </div>
+                                        : ''
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -1116,7 +1103,7 @@ export const JobScheduling = () => {
                             <Dropdown value={searchJobType} options={searchJobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setSearchJobType(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
-                            <Button label="SEARCH" onClick={() => submitSearch(searchFieldman)}/>
+                            <Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch(searchFieldman)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 job-datatable">
                             {
@@ -1165,7 +1152,7 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE:</b></h6>
-                            <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setJobType(event.target.value)} />
+                            <InputText placeholder="REPAIR" disabled/>
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>
@@ -1268,7 +1255,7 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE: </b></h6>
-                            <Dropdown value={editJobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setEditJobType(event.target.value)} disabled/>
+                            <InputText placeholder="REPAIR" disabled/>
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>
@@ -1299,8 +1286,8 @@ export const JobScheduling = () => {
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
                             {
                                 localStorage.getItem("viewUsers") === "true" ? 
-                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTask()}/> :
-                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskFieldman()}/>
+                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskRepair()}/> :
+                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskRepairFieldman()}/>
                             }
                         </div>
                     </div>

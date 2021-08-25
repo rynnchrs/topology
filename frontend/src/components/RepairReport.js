@@ -1,4 +1,4 @@
-import React, {useState, useRef } from 'react';
+import React, {useState, useEffect, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -14,13 +14,9 @@ import { format } from 'date-fns';
 
 export default function RepairReport() {
 
-    const jobTypeOptions = [{ name: 'REPAIR', val: 'Repair' }, { name: 'INSPECTION', val: 'Inspection' }];
     const statusRepairOptions = [{ name: 'OPERATIONAL', val: "Operational" }, { name: 'NON-OPERATIONAL', val: "Non-Operational" }];
     const [jobNotCreatedList, setJobNotCreatedList] = useState([]);
-    // const [suggestionsJobNotCreatedList, setSuggestionsJobNotCreatedList] = useState(null);
 
-    // const [reportDetails, setReportDetails] = useState([]);
-    const [jobType, setJobType] = useState([]);
     const [scheduleDate, setScheduleDate] = useState('');
     const [bodyNo, setBodyNo] = useState('');
     const [make, setMake] = useState('');
@@ -78,19 +74,34 @@ export default function RepairReport() {
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
 
-    // const searchListJobNotCreated = (event) => {
-    //     setTimeout(() => {
-    //         if (!event.query.trim().length) {
+    useEffect(() => {
+        getRepairNotCreated();
+    }, []);
 
-    //         } else {
-    //             try {
-    //                 setSuggestionsJobNotCreatedList(jobNotCreatedList.filter(item => item.job_id.toString().startsWith(event.query)));
-    //             } catch (err){
+    const getRepairNotCreated = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
 
-    //             }
-    //         }
-    //     }, 100);
-    // };
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/repair_not_created/', config)
+            .then((res) => {
+                setJobNotCreatedList(res.data);
+                console.log(res.data)
+                // setBodyNoList(res.data.results);
+                // if (res.data.next === null){
+                
+                // } else {
+                //     nextPageBodyNo(res.data.next);
+                // }
+            })
+            .catch((err) => {
+                
+            });
+    }
 
     const partsData = (index, column, value) => {
         if (column === "p") {
@@ -272,7 +283,6 @@ export default function RepairReport() {
     const submitRepairReportAfter = () => {
         setMessage({title:"CREATE", content:"Successfully created."});
         setScheduleDate('');
-        setJobType([]);
         setBodyNo('');
         setMake('');
         setStatus('');
@@ -305,31 +315,7 @@ export default function RepairReport() {
         refImageUpload.current.clear();
         setIsLoading(false);
         onClick('displayMessage');
-    }
-
-    const handleChangeJobType = (value) => {
-        setJobType(value);
-        let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/' + value.val.toLowerCase() + '_not_created/', config)
-            .then((res) => {
-                setJobNotCreatedList(res.data);
-                // setBodyNoList(res.data.results);
-                // if (res.data.next === null){
-                
-                // } else {
-                //     nextPageBodyNo(res.data.next);
-                // }
-            })
-            .catch((err) => {
-                
-            });
+        getRepairNotCreated();
     }
 
     const handleSelectReportNo = (value) =>{
@@ -385,15 +371,12 @@ export default function RepairReport() {
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>JOB TYPE:</b></h6>
-                                    <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" 
-                                    onChange={event => handleChangeJobType(event.target.value)} />
+                                    <InputText placeholder="REPAIR" disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
                                     <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
-                                    onChange={event => {setJobID(event.target.value); handleSelectReportNo(event)}} disabled={jobType.length === 0}/>
-                                    {/* <AutoComplete forceSelection field="job_id" placeholder="Input Report No." suggestions={suggestionsJobNotCreatedList} 
-                                    value={jobOrder} completeMethod={searchListJobNotCreated} onSelect={event => handleSelectReportNo(event)} onChange={(e) => setJobOrder(e.target.value)} disabled={jobType.length === 0}/> */}
+                                    onChange={event => {setJobID(event.target.value); handleSelectReportNo(event)}}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>SCHEDULE DATE:</b></h6>
