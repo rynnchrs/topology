@@ -376,7 +376,7 @@ export default function DriverRecordForms() {
         return (
             <div>
                 <center>
-                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt=""/>
+                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
                 </center>
                 <center>
                     { localStorage.getItem("editInspectionReport") === "true" ?

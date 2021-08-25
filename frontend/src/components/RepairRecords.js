@@ -370,7 +370,7 @@ export default function RepairRecords() {
         return (
             <div>
                 <center>
-                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt=""/>
+                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
                 </center>
                 <center>
                     <Button style={{width: '37px', height: '37px'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={(e) => {setHoldImageID(reportImage.id); onClick('displayConfirmDeleteImage');}}/>

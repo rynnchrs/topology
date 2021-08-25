@@ -221,7 +221,7 @@ export class Vehicles extends Component {
         return (
             <div>
                 <center>
-                    <img src={process.env.REACT_APP_SERVER_NAME + vehicleImage.image.substring(1)} alt=""/>
+                    <img src={process.env.REACT_APP_SERVER_NAME + vehicleImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
                 </center>
                 <center>
                     {
