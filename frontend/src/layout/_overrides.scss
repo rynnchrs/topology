@@ -288,60 +288,6 @@
 }
 /* end css for task list datatable */
 
-.task-list-table {
-  table {
-    width: 100%;
-    
-  }
-  td {
-    vertical-align: top;
-  }
-
-  td:first-child {
-    width: 40px;
-  }
-
-  td:nth-child(2) {
-    min-width: 120px;
-    border: 1px solid red;
-  }
-
-  td:nth-child(3) {
-    min-width: 250px;
-    border: 1px solid red;
-  }
-
-  td:nth-child(4) {
-    min-width: 180px;
-    border: 1px solid red;
-  }
-
-  td:nth-child(5) {
-    min-width: 108px;
-    border: 1px solid yellow;
-  }
-
-
-  @media only screen and (min-width : 100px) and (max-width : 767px) {
-    td:first-child {
-      width: 40px;
-      border: 1px solid gray;
-    }
-
-    td ~ td {
-      display:table-row;
-    }
-
-    
-  }
-  // td:first-child + td {
-  //   width: 15%;
-  // }
-  // td:first-child + td + td {
-  //   width: 33%;
-  // }
-}
-
 /* css for careta report */
 .report-title {
   h4 {
