@@ -6,6 +6,7 @@ from wsgiref.util import FileWrapper
 from car.models import Car
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import query
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
@@ -21,10 +22,12 @@ from task.models import JobOrder
 from .export import export, repair_export
 from .filters import CheckListFilter, InspectionFilter, RepairFilter
 from .models import CheckList, CheckListParts, Cost, Inspection, Repair
-from .serializers import (CheckListListSerializer, CheckListPartsSerializer, CheckListSerializer, CostSerializer, InspectionLastFourListSerializer,
+from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
+                          CheckListSerializer, CostSerializer,
+                          InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
-from .utils import repair_reversion, reversion, user_permission
+from .utils import checklist_reversion, repair_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
@@ -301,6 +304,40 @@ class RepairView(viewsets.ModelViewSet):  # add this
         file = remove(file_path)
         return response
 
+class CheckListPartsView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = CheckListParts.objects.all()
+    serializer_class = CheckListPartsSerializer
+
+    def list(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_repair_reports'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = CheckListPartsSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+
+
+    def create(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_repair_reports'): 
+            serializer = CheckListPartsSerializer(data=request.data, many=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_201_CREATED)  
+            return Response(serializer.errors)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+
+    def destroy(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_add_repair_reports'): 
+            queryset = self.filter_queryset(self.get_queryset().filter(pk=pk))
+            queryset.delete()
+            return Response("deleted", status=status.HTTP_200_OK)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
 
 
 class CheckListView(viewsets.ModelViewSet):  # add this
@@ -324,26 +361,11 @@ class CheckListView(viewsets.ModelViewSet):  # add this
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    action(detail=False, methods=['post'])
-    def create_parts(self, request):
-        user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
-            serializer = CheckListPartsSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data,status=status.HTTP_201_CREATED)  
-            return Response(serializer.errors)        
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)  
             
-
     def create(self, request):
         user = self.request.user
         if user_permission(user, 'can_add_repair_reports'): 
             serializer = CheckListSerializer(data=request.data)
-            if request.data['parts_name']:
-                for part_name in request.data['parts_name']:
-                    CheckListParts.objects.create(**part_name)
             if serializer.is_valid(raise_exception=True):
                 car = Car.objects.get(body_no=request.data['body_no'])
                 if request.data['status'] == "Operational":
@@ -360,38 +382,34 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     def retrieve(self, request, pk=None):  
         user = self.request.user
         if user_permission(user,'can_view_repair_reports'): 
-            queryset = CheckList.objects.all()
+            queryset = self.filter_queryset(self.get_queryset())
             check_list = get_object_or_404(queryset, pk=pk) 
             serializer = CheckListSerializer(check_list,many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)          
+            serializer_data = serializer.data
+            serializer_data['revised'] = checklist_reversion(check_list)
+            return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    # def update(self, request, pk=None):
-    #     user = self.request.user
-    #     if user_permission(user, 'can_edit_repair_reports'): 
-    #         request.data['diagnosed_by'] = user.id 
-    #         request.data['generated_by'] = user.id 
-    #         request.data['repair_by'] = user.id 
-    #         request.data['noted_by'] = "" 
-    #         cost = request.data['parts'] + request.data['labor']
-    #         request.data['cost'] = cost
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, pk=pk)   
-    #         serializer = RepairSerializer(instance=repair, data=request.data)
-    #         if serializer.is_valid(raise_exception=True):
-    #             job = JobOrder.objects.get(pk=request.data['job_order'])
-    #             car = Car.objects.get(body_no=job.task.body_no.body_no)
-    #             if request.data['status_repair'] == "Operational":
-    #                 car.operational = True
-    #             else:
-    #                 car.operational = False
-    #             car.save()
-    #             serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_200_OK)       
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    def update(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_edit_repair_reports'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            check_list = get_object_or_404(queryset, pk=pk) 
+            serializer = CheckListSerializer(instance=check_list, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['body_no'])
+                if request.data['status'] == "Operational":
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)       
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
             
+        
     # def destroy(self, request, pk=None):      
     #     user = self.request.user
     #     if user_permission(user, 'can_delete_repair_reports'): 

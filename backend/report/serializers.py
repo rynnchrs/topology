@@ -2,9 +2,11 @@ from car.models import Car
 from car.serializers import CarInfoSerializer
 from django.contrib.auth.models import User
 from rest_framework import fields, serializers
+from task.models import IR
 from task.serializers import RepairJobSerializer
 
-from .models import CheckList, CheckListParts, CheckListReportParts, Cost, Inspection, Repair
+from .models import (CheckList, CheckListParts, CheckListReportParts, Cost,
+                     Inspection, Repair)
 
 
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
@@ -83,18 +85,30 @@ class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
         model = Cost
         fields = ['cost_type','particulars','cost','quantity','total_cost']
     
+    
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['particulars'] = serializers.SerializerMethodField(read_only=True)
+        return super(CostSerializer, self).to_representation(instance)
+
+    def get_particulars(self, obj):
+        if obj.particulars is None:
+            return ""
+        else:
+            return obj.particulars
+
 
 class RepairSerializer(serializers.ModelSerializer): # repair serializer
     cost = CostSerializer(many=True, write_only=True)
     noted_by = serializers.CharField(required=False, allow_blank=True)
+    body_no = serializers.CharField()
+    ir_no = serializers.CharField()
     class Meta:
         model = Repair
-        fields = ['repair_id','job_order','cost','total_parts_cost','total_labor_cost','total_estimate_cost',
-                'ir_no','incident_date','date_receive','site_poc','contact_no','incident_details','diagnosed_by',
-                'perform_date','actual_findings','actual_remarks','generated_by','noted_by','repair_by',
-                'repair_date','action_taken','date_done','status_repair','remarks','date_updated','date_created']
+        fields = '__all__'
         extra_kwargs = {
-            'job_order': {'required': False}
+            'job_order': {'required': False},
+            'ir_no': {'required': False},
+            'check_list': {'required': False},
         }
     def validate(self, obj): # validate input in foreign keys
         errors = []
@@ -103,6 +117,15 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 obj['noted_by'] = None
         except:
             errors.append({"noted_by": 'Invalid Noted By'})
+        if obj['ir_no'] != "":
+            try:
+                obj['ir_no'] = IR.objects.get(ir_no=obj['ir_no'])
+            except:
+                errors.append({"ir_no": 'Invalid IR No.'})
+        try:
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+        except:
+           errors.append({"body_no": 'Invalid Body No.'})
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
@@ -150,7 +173,6 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 obj.quantity = 0
                 obj.save()
 
-        instance.ir_no = validated_data.get('ir_no', instance.ir_no)
         instance.incident_date = validated_data.get('incident_date', instance.incident_date)
         instance.date_receive = validated_data.get('date_receive', instance.date_receive)
         instance.site_poc = validated_data.get('site_poc', instance.site_poc)
@@ -215,6 +237,16 @@ class CheckListReportPartsSerializer(serializers.ModelSerializer): # cost info i
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
+    
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['check_list_parts'] = serializers.SerializerMethodField(read_only=True)
+        return super(CheckListReportPartsSerializer, self).to_representation(instance)
+
+    def get_check_list_parts(self, obj):
+        if obj.check_list_parts is None:
+            return ""
+        else:
+            return obj.check_list_parts
 
 
 class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer 
@@ -240,7 +272,54 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
             raise serializers.ValidationError({'errors':errors})
         return obj
 
-    # def update(self, instance, validated_data):
+    
+    def update(self, instance, validated_data):     
+        parts_data = validated_data.get('parts')
+
+        parts = (instance.parts).all()
+        part = [x for x in parts_data]
+
+        if parts:
+            if len(parts) > len(part):
+                for i in range(len(parts)):
+                    if i < len(part):
+                        CheckListReportParts.objects.filter(pk=parts[i].pk).update(**part[i])
+                    else:
+                        obj = CheckListReportParts.objects.get(pk=parts[i].pk)
+                        obj.check_list_parts = None
+                        obj.quantity = 0
+                        obj.save()
+            else:
+                for i in range(len(part)):
+                    if i < len(parts):
+                        CheckListReportParts.objects.filter(pk=parts[i].pk).update(**part[i])
+                    else:
+                        CheckListReportParts.objects.create(check_list=instance, **part[i])
+                        
+        else:
+            for part_data in parts_data:
+                CheckListReportParts.objects.create(check_list=instance, **part_data)
+        
+        instance.parts_included = validated_data.get('parts_included', instance.parts_included)
+        instance.odometer = validated_data.get('odometer', instance.odometer)
+        instance.job_desc = validated_data.get('job_desc', instance.job_desc)
+        instance.pair_ewd = validated_data.get('pair_ewd', instance.pair_ewd)
+        instance.color_ewd = validated_data.get('color_ewd', instance.color_ewd)
+        instance.body_no_ewd = validated_data.get('body_no_ewd', instance.body_no_ewd)
+        instance.body_no_fl_tire = validated_data.get('body_no_fl_tire', instance.body_no_fl_tire)
+        instance.body_no_fr_tire = validated_data.get('body_no_fr_tire', instance.body_no_fr_tire)
+        instance.body_no_rl_tire = validated_data.get('body_no_rl_tire', instance.body_no_rl_tire)
+        instance.body_no_rr_tire = validated_data.get('body_no_rr_tire', instance.body_no_rr_tire)
+        instance.spare_tire = validated_data.get('spare_tire', instance.spare_tire)
+        instance.body_no_batt = validated_data.get('body_no_batt', instance.body_no_batt)
+        instance.vehicle_wt = validated_data.get('vehicle_wt', instance.vehicle_wt)
+        instance.color_ewd = validated_data.get('color_ewd', instance.color_ewd)
+        instance.remarks = validated_data.get('remarks', instance.remarks)
+        instance.status = validated_data.get('status', instance.status)
+        
+        instance.save()
+
+        return instance
 
     def create(self, validated_data):       # Creating report
         parts_data = validated_data.pop('parts') 
@@ -253,7 +332,8 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         self.fields['email'] =  serializers.CharField(source="email.email",read_only=True)
         self.fields['parts_included'] = serializers.SerializerMethodField(read_only=True)
-        self.fields['job_desc'] = serializers.CharField(source='get_job_desc_display',read_only=True)
+        self.fields['job_desc'] = serializers.CharField(source='get_job_desc_display', read_only=True)
+        self.fields['color_ewd'] = serializers.CharField(source='get_color_ewd_display', read_only=True)
         return super(CheckListSerializer, self).to_representation(instance)
     
     def get_parts_included(self, obj):

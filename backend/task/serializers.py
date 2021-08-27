@@ -14,6 +14,7 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
         model = Car
         fields = ['vin_no','body_no','plate_no','make','current_loc']
 
+
 class JobOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -29,6 +30,7 @@ class JobOrderSerializer(serializers.ModelSerializer):
             representation['type'] = "Repair"
             return representation
             
+
 class FieldmanSerializer(serializers.ModelSerializer):
     field_man = serializers.CharField()
     class Meta:
@@ -150,7 +152,6 @@ class WarningTaskSerializer(serializers.ModelSerializer):
         fields =  ['job_order','fieldman','start_date','end_date','schedule_date','task_status_fm','task_status_mn']
 
 
-
 class RepairCarInfoSerializer(serializers.ModelSerializer):
     make = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
@@ -209,6 +210,7 @@ class IRListSerializers(serializers.ModelSerializer):
         model= IR
         fields =  ['ir_id','ir_no','date','body_no','project_name']
 
+
 class IRSerializers(serializers.ModelSerializer): # Inspection serializer 
     repair_type = fields.MultipleChoiceField(choices=IR.Repair_List)
     body_no = serializers.CharField()
@@ -235,4 +237,14 @@ class IRSerializers(serializers.ModelSerializer): # Inspection serializer
 
     def to_representation(self, instance): # instance of vin_no
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+        self.fields['repair_type'] =  serializers.SerializerMethodField(read_only=True)
         return super(IRSerializers, self).to_representation(instance)
+
+    
+    def get_repair_type(self, obj):
+        repair_list = []
+        repair_type = str(obj.repair_type)
+        repairs = repair_type.split(', ')
+        for repair in repairs:
+            repair_list.append(repair)
+        return repair_list
