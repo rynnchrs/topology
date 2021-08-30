@@ -6,7 +6,7 @@ from careta.serializers import UserListSerializer
 from django.contrib.auth.models import User
 from django_filters import filters
 from django_filters import rest_framework as filter
-from report.models import Repair
+from report.models import CheckList, Repair
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -15,9 +15,9 @@ from rest_framework.response import Response
 
 from .filters import IRFilter, TaskFilter
 from .models import IR, Fieldman, JobOrder, Task
-from .serializers import (IRSerializers, RepairJobSerializer, TaskSerializer,
+from .serializers import (IRListSerializers, IRSerializers, RepairJobSerializer, TaskSerializer,
                           WarningTaskSerializer)
-from .utils import user_permission
+from .utils import ir_reversion, user_permission
 
 
 class LocationListView(generics.ListAPIView):
@@ -74,13 +74,21 @@ class TaskView(viewsets.ModelViewSet):
     def list(self, request):    
         user = self.request.user
         if user_permission(user, 'can_view_task'):  
-            queryset = Task.objects.all().order_by('task_id')
-            serializer = TaskSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)      
+            queryset = Task.objects.all().order_by('-task_id')
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = WarningTaskSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)      
+            serializer = WarningTaskSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK) 
         else:
-            queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('task_id')
-            serializer = TaskSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)     
+            queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('-task_id')
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = WarningTaskSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)      
+            serializer = WarningTaskSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK) 
 
     def create(self, request):  # create user
         user = self.request.user
@@ -188,18 +196,20 @@ class TaskView(viewsets.ModelViewSet):
         if user_permission(user, 'can_edit_task'): 
             queryset = Task.objects.all()
             task = get_object_or_404(queryset, pk=pk)    # get user
-            queryset = Repair.objects.all()
-            repair = get_object_or_404(queryset, job_order__task=pk) 
-            print(repair.noted_by)
-            print(task.task_status_mn)
-            if task.task_status_mn == False and repair.noted_by is None:
+            if task.checklist:
+                queryset = CheckList.objects.all()
+                report = get_object_or_404(queryset, task=pk) 
+            else:
+                queryset = Repair.objects.all()
+                report = get_object_or_404(queryset, task=pk) 
+            if task.task_status_mn == False and report.noted_by is None:
                 task.task_status_mn = True;
-                repair.noted_by = user
+                report.noted_by = user
                 car = Car.objects.get(body_no=task.body_no.body_no)
                 car.status = "A"
                 car.save()
                 task.save()
-                repair.save()
+                report.save()
                 return Response("Success",status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -296,13 +306,13 @@ class JobOrderView(viewsets.ViewSet):
         user = self.request.user
         if user_permission(user, 'can_add_task'):
             # filter the used job order in inspection table
-            inspection = Repair.objects.values_list('job_order', flat=False)
+            inspection = CheckList.objects.values_list('job_order', flat=False)
             # filter True(inspection) and used job order
             queryset = JobOrder.objects.filter(type=False).filter(job_no__in=inspection) 
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
-            repair = Repair.objects.all().values_list('job_order', flat=True)
+            repair = CheckList.objects.all().values_list('job_order', flat=True)
             queryset = JobOrder.objects.filter(type=False).filter(job_id__in=repair)
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
@@ -315,13 +325,13 @@ class JobOrderView(viewsets.ViewSet):
         user = self.request.user
         if user_permission(user, 'can_add_task'):
             # filter the used job order in inspection table
-            inspection = Repair.objects.all().values_list('job_order', flat=True)
+            inspection = CheckList.objects.all().values_list('job_order', flat=True)
             # filter True(inspection) and remove all used job order
             queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=inspection)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
-            repair = Repair.objects.all().values_list('job_order', flat=True)
+            repair = CheckList.objects.all().values_list('job_order', flat=True)
             queryset = JobOrder.objects.filter(type=False).exclude(job_id__in=repair)
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
@@ -388,9 +398,9 @@ class IRView(viewsets.ModelViewSet):  # add this
             queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
-                serializer = IRSerializers(page, many=True)
+                serializer = IRListSerializers(page, many=True)
                 return self.get_paginated_response(serializer.data)      
-            serializer = IRSerializers(queryset, many=True)
+            serializer = IRListSerializers(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -406,24 +416,17 @@ class IRView(viewsets.ModelViewSet):  # add this
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)    
 
-    # def retrieve(self, request, pk=None):  
-    #     user = self.request.user
-    #     if user_permission(user,'can_view_repair_reports'): 
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, pk=pk) 
-    #         serializer = RepairSerializer(repair,many=False)
-
-    #         parts = Cost.objects.filter(ro_no=repair, cost_type="P")
-    #         labor = Cost.objects.filter(ro_no=repair, cost_type="L")
-    #         serializer_data = serializer.data
-    #         parts = CostSerializer(parts, many=True)
-    #         serializer_data['parts'] = parts.data
-    #         labor = CostSerializer(labor, many=True)
-    #         serializer_data['labor'] = labor.data
-    #         serializer_data['revised'] = repair_reversion(repair)
-    #         return Response(serializer_data, status=status.HTTP_200_OK)          
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    def retrieve(self, request, pk=None):  
+        user = self.request.user
+        if user_permission(user,'can_view_repair_reports'): 
+            queryset = queryset = self.filter_queryset(self.get_queryset())
+            ir = get_object_or_404(queryset, pk=pk) 
+            serializer = IRSerializers(ir,many=False)
+            serializer_data = serializer.data
+            serializer_data['revised'] = ir_reversion(ir)
+            return Response(serializer_data, status=status.HTTP_200_OK)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # def update(self, request, pk=None):
     #     user = self.request.user

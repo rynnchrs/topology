@@ -132,7 +132,7 @@ class CheckList(models.Model):
         (9, 'Worn out drive belt'),
         (10, 'Others'),
     ]
-    parts_included = MultiSelectField(choices=Parts_List, null=True, blank=True)
+    parts_included = MultiSelectField(choices=Parts_List, default='10')
     remarks = models.TextField(max_length=200, null=True, blank=True)
     
     noted_by = models.ForeignKey(User, related_name='check_noted', on_delete=models.CASCADE, null=True, blank=True)
@@ -145,7 +145,7 @@ class CheckList(models.Model):
 
 
 class CheckListParts(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(unique=True, max_length=30)
 
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
@@ -156,7 +156,7 @@ class CheckListParts(models.Model):
 
 class CheckListReportParts(models.Model):
     quantity = models.IntegerField(default=0)
-    check_list_parts = models.ForeignKey(CheckListParts, related_name='parts', on_delete=models.CASCADE)
+    check_list_parts = models.ForeignKey(CheckListParts, related_name='parts', null=True, blank=True, on_delete=models.CASCADE)
     check_list = models.ForeignKey(CheckList, related_name='parts', on_delete=models.CASCADE)
 
     date_updated = models.DateField(auto_now=True)
@@ -171,7 +171,7 @@ class Repair(models.Model):
     job_order = models.OneToOneField(JobOrder, related_name='repair', on_delete=models.CASCADE)
     ir_no = models.OneToOneField(IR, null=True, blank=True, related_name='repair', on_delete=models.CASCADE)
     check_list = models.OneToOneField(CheckList, null=True, blank=True, related_name='repair', on_delete=models.CASCADE)
-    body_no = models.ForeignKey(IR, null=True, blank=True, related_name='b_repair', on_delete=models.CASCADE)
+    body_no = models.ForeignKey(Car, null=True, blank=True, related_name='b_repair', on_delete=models.CASCADE)
     incident_date = models.DateField(default=datetime.date.today)
     date_receive = models.DateField(default=datetime.date.today)
     site_poc = models.CharField(max_length=30, null=True, blank=True)  

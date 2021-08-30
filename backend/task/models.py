@@ -39,7 +39,7 @@ class IR(models.Model):
         ('ac', 'Accident'),
         ('ot', 'Others'),
     ]
-    repair_type = MultiSelectField(choices=Repair_List, null=True, blank=True)
+    repair_type = MultiSelectField(choices=Repair_List, default='ot')
     damaged_parts = models.TextField(max_length=200, null=True, blank=True)
     incedent_loc = models.CharField(max_length=20, null=True, blank=True)
     problem_obs = models.TextField(max_length=200, null=True, blank=True)
