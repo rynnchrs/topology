@@ -2,7 +2,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
 
-from .models import CheckList, CheckListParts, Cost, Inspection, Repair
+from .models import CheckList, CheckListParts, CheckListReportParts, Cost, Inspection, Repair
 
 # Register your models here.
 
@@ -25,5 +25,19 @@ class CostAdmin(admin.ModelAdmin):
     list_display = ['cost_id','ro_no']
 
 admin.site.register(Cost, CostAdmin) 
-admin.site.register(CheckList)
-admin.site.register(CheckListParts)
+
+
+class CheckListReportPartsAdmin(admin.TabularInline):
+    model = CheckListReportParts
+    extra = 1
+
+class CheckListAdmin(VersionAdmin):
+    inlines = [CheckListReportPartsAdmin]
+    list_display = ['check_list_id','job_order','task']
+
+admin.site.register(CheckList, CheckListAdmin) 
+
+class CheckListReportPartsAdmin(admin.ModelAdmin):
+    list_display = ['id','check_list_parts','quantity']
+
+admin.site.register(CheckListReportParts, CheckListReportPartsAdmin)
