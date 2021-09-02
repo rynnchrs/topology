@@ -119,6 +119,9 @@
     width: 28px;
     height: 28px;
   }
+  .p-toast {
+    width: 320px;
+  }
 }
 
 .gray-out {
@@ -135,7 +138,6 @@
 
 /* css for driver inspection records checklist  */
 .report-checklist{
-
   .none .p-checkbox .p-checkbox-box {
     background-color: none; 
   }
@@ -189,7 +191,6 @@
       width: 27px;
       height: 27px;
     }
-
     .p-checkbox .p-checkbox-box {
       width: 27px;
       height: 27px;

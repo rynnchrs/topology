@@ -911,7 +911,7 @@ export const EditDeleteUser = () => {
                         <div className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                                 <h6><b>PROFILE PICTURE:</b></h6>
-                                <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                                <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt=""/>
                             </div>
                         </div>
 
