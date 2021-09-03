@@ -94,7 +94,7 @@ class InspectiontImage(models.Model):
 class CheckList(models.Model):
     check_list_id = models.AutoField(primary_key=True)
     job_order = models.OneToOneField(JobOrder, null=True, related_name='checklist', on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, related_name='checklist', on_delete=models.CASCADE)
+    task = models.OneToOneField(Task, related_name='checklist', on_delete=models.PROTECT)
     email = models.ForeignKey(User, related_name='checklist', on_delete=models.CASCADE)
     body_no = models.ForeignKey(Car, related_name='checklist', on_delete=models.CASCADE)
     odometer = models.IntegerField(default=0, null=True, blank=True)
@@ -117,7 +117,13 @@ class CheckList(models.Model):
     body_no_rl_tire = models.BooleanField(default=False)
     body_no_rr_tire = models.BooleanField(default=False)
     spare_tire = models.BooleanField(default=False)
-    body_no_batt = models.BooleanField(default=False)
+    body_no_spare = models.BooleanField(default=False)
+    Battery_List = [
+        (0, 'Yes'),
+        (1, 'No'),
+        (2, 'Other'),
+    ]
+    body_no_batt = models.IntegerField(choices=Color_List, default=0)
     vehicle_wt = models.BooleanField(default=False)
     Parts_List = [
         (0, 'Unit is in good condition'),
@@ -169,8 +175,8 @@ class CheckListReportParts(models.Model):
 class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
     job_order = models.OneToOneField(JobOrder, related_name='repair', on_delete=models.CASCADE)
-    ir_no = models.OneToOneField(IR, null=True, blank=True, related_name='repair', on_delete=models.CASCADE)
-    check_list = models.OneToOneField(CheckList, null=True, blank=True, related_name='repair', on_delete=models.CASCADE)
+    ir_no = models.OneToOneField(IR, null=True, blank=True, related_name='repair', on_delete=models.PROTECT)
+    check_list = models.OneToOneField(CheckList, null=True, blank=True, related_name='repair', on_delete=models.PROTECT)
     body_no = models.ForeignKey(Car, null=True, blank=True, related_name='b_repair', on_delete=models.CASCADE)
     incident_date = models.DateField(default=datetime.date.today)
     date_receive = models.DateField(default=datetime.date.today)

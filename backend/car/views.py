@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
+from image.models import Image
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -45,6 +46,13 @@ class CarView(viewsets.ModelViewSet):  # add this
         queryset = Car.objects.all()
         car = get_object_or_404(queryset, slug=slug)  
         car.delete()
+        queryset = Image.objects.filter(image_name=slug ,mode="ci")
+        for image in queryset:
+            try:
+                image.image.delete(save=False)
+                image.delete()
+            except:
+                pass
         subprocess.Popen(["python","car-export.py"], shell=True)
         return Response(status=status.HTTP_200_OK)         
 

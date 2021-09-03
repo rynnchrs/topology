@@ -6,6 +6,7 @@ from careta.serializers import UserListSerializer
 from django.contrib.auth.models import User
 from django_filters import filters
 from django_filters import rest_framework as filter
+from image.models import Image
 from report.models import CheckList, Repair
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
@@ -15,7 +16,8 @@ from rest_framework.response import Response
 
 from .filters import IRFilter, TaskFilter
 from .models import IR, Fieldman, JobOrder, Task
-from .serializers import (IRListSerializers, IRSerializers, RepairJobSerializer, TaskSerializer,
+from .serializers import (IRListSerializers, IRSerializers,
+                          RepairJobSerializer, TaskSerializer,
                           WarningTaskSerializer)
 from .utils import ir_reversion, user_permission
 
@@ -427,7 +429,24 @@ class IRView(viewsets.ModelViewSet):  # add this
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-
+    
+    
+    def destroy(self, request, pk=None):      
+        user = self.request.user
+        if user_permission(user, 'can_delete_repair_reports'): 
+            queryset = IR.objects.all()
+            repair = get_object_or_404(queryset, pk=pk)
+            repair.delete()
+            queryset = Image.objects.filter(image_name=pk ,mode="ir")
+            for image in queryset:
+                try:
+                    image.image.delete(save=False)
+                    image.delete()
+                except:
+                    pass
+            return Response(status=status.HTTP_200_OK)        
+        else: 
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
     # def update(self, request, pk=None):
     #     user = self.request.user
     #     if user_permission(user, 'can_edit_repair_reports'): 
