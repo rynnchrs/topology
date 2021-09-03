@@ -1,11 +1,11 @@
-from car.models import TPL, Contract, Insurance
+from car.models import TPL, Car, Contract, Insurance
 from car.serializers import CarInfoSerializer
 from rest_framework import serializers
 
 
 class TotalCarSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CarInfoSerializer
+        model = Car
         fields = ['get_total','plate_with_date','decals_with_date','userManual_with_date','warrantyBook_with_date','unitKey_with_date',
                     'bodyKey_with_date','fan_date_with_date','ewd_date_with_date','tools_with_date','cigarettePlug_with_date','tools_with_date',
                     
