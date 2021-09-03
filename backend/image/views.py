@@ -24,13 +24,16 @@ class UserImageView(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         queryset = self.filter_queryset(self.get_queryset()).filter(mode="cu")
-        image = queryset.filter(image_name=pk) 
-        serializer = ImageInfoSerializer(image, many=False)
-        return Response(serializer.data,status=status.HTTP_200_OK)  
+        try:
+            image = queryset.get(image_name=pk)
+            serializer = ImageInfoSerializer(image, many=False)
+            return Response(serializer.data,status=status.HTTP_200_OK)  
+        except:
+            return Response("No image",status=status.HTTP_200_OK)  
     
     def destroy(self, request, pk=None):
         queryset = self.filter_queryset(self.get_queryset())
-        image = queryset.filter(pk=pk)
+        image = queryset.get(pk=pk)
         try:
             image.image.delete(save=False)
             image.delete()

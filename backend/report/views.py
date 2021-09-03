@@ -249,10 +249,14 @@ class RepairView(viewsets.ModelViewSet):  # add this
         if user_permission(user, 'can_delete_repair_reports'): 
             queryset = Repair.objects.all()
             repair = get_object_or_404(queryset, pk=pk)
-            queryset = Image.objects.all()
-            image = get_object_or_404(queryset, image_name=pk)
             repair.delete()
-            image.delete()
+            queryset = Image.objects.filter(image_name=pk ,mode="cr")
+            for image in queryset:
+                try:
+                    image.image.delete(save=False)
+                    image.delete()
+                except:
+                    pass
             return Response(status=status.HTTP_200_OK)        
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -409,7 +413,24 @@ class CheckListView(viewsets.ModelViewSet):  # add this
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
             
-        
+    
+    def destroy(self, request, pk=None):      
+        user = self.request.user
+        if user_permission(user, 'can_delete_repair_reports'): 
+            queryset = CheckList.objects.all()
+            repair = get_object_or_404(queryset, pk=pk)
+            repair.delete()
+            queryset = Image.objects.filter(image_name=pk ,mode="cl")
+            for image in queryset:
+                try:
+                    image.image.delete(save=False)
+                    image.delete()
+                except:
+                    pass
+            return Response(status=status.HTTP_200_OK)        
+        else: 
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
     # def destroy(self, request, pk=None):      
     #     user = self.request.user
     #     if user_permission(user, 'can_delete_repair_reports'): 
