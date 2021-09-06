@@ -59,7 +59,7 @@ export const EditDeleteUser = () => {
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
     const refImageUpload = useRef(null);
-    const [reportImage, setReportImage] = useState({ id: "", image: "" });
+    const [userImage, setUserImage] = useState({ id: "", image: "" });
 
     const dt = useRef(null);
 
@@ -235,7 +235,7 @@ export const EditDeleteUser = () => {
                             formData.append("image_name", usernames);
                             return null;
                         })
-                        axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/user-image/'+ reportImage.id +'/',  config)
+                        axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/user-image/'+ userImage.id +'/',  config)
                         .then((res) => {
                             axios.post(process.env.REACT_APP_SERVER_NAME + 'image/user-image/', formData,  config)
                             .then((res) => {
@@ -300,7 +300,7 @@ export const EditDeleteUser = () => {
                         if (res.data === "No image") {
                             getPermission();
                         } else {
-                            setReportImage(res.data);
+                            setUserImage(res.data);
                             getPermission();
                         }
                         
@@ -765,6 +765,7 @@ export const EditDeleteUser = () => {
         } else {
             
         }
+        setUserImage({ id: "", image: "" });
     }
 
     const onHideDelete = (name) => {
@@ -916,7 +917,7 @@ export const EditDeleteUser = () => {
                         <div className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                                 <h6><b>PROFILE PICTURE:</b></h6>
-                                <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                                <img src={process.env.REACT_APP_SERVER_NAME + userImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
                             </div>
                         </div>
 
