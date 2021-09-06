@@ -205,7 +205,7 @@ export const JobScheduling = () => {
                 + '&page=' + sentPage, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
-                    setJobList(res.data.results.reverse());
+                    setJobList(res.data.results);
                     fullCalendarDisplay(res.data.results);
                 })
                 .catch((err) => {
@@ -358,9 +358,8 @@ export const JobScheduling = () => {
             + '&job_type=' + jt
             + '&page=' + sentPage, config)
             .then((res) => {
-                console.log(res.data)
                 setTotalCount(res.data.count);
-                setJobList(res.data.results.reverse());
+                setJobList(res.data.results);
                 fullCalendarDisplay(res.data.results);
             })
             .catch((err) => {
@@ -373,7 +372,7 @@ export const JobScheduling = () => {
                     + '&page=1', config)
                     .then((res) => {
                         setTotalCount(res.data.count);
-                        setJobList(res.data.results.reverse());
+                        setJobList(res.data.results);
                         fullCalendarDisplay(res.data.results);
                         setFirst(0);
                         setFlagPages(1);
@@ -647,7 +646,7 @@ export const JobScheduling = () => {
             + '&page=1', config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results.reverse());
+                setJobList(res.data.results);
                 fullCalendarDisplay(res.data.results);
                 setFirst(0);
                 setFlagPages(1);
