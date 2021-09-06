@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from image.models import Image
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -156,6 +157,12 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
             queryset = Permission.objects.all()
             user = get_object_or_404(queryset, user__username=pk) # get user
             user.delete()
+            try:
+                image = Image.objects.get(pk=pk)
+                image.image.delete(save=False)
+                image.delete()
+            except:
+                pass
             return Response(status=status.HTTP_200_OK)        
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
