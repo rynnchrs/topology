@@ -35,6 +35,8 @@ import  RepairReport from './components/RepairReport';
 import  RepairRecords from './components/RepairRecords';
 import  ChecklistReport from './components/ChecklistReport';
 import  IncidentReport from './components/IncidentReport';
+import  IncidentRecord from './components/IncidentRecord';
+
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
@@ -171,6 +173,7 @@ const App = () => {
     sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-th-large', to: '/repairrecords'});
     sidebarSubMenu4.push({label: 'Checklist Report', icon: 'pi pi-th-large', to: '/checklistreport'});
     sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
+    sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
     sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
 
     const onInputStyleChange = (inputStyle) => {
@@ -256,7 +259,7 @@ const App = () => {
         return true;
     }
 
-    const logo =  'assets/layout/images/careta-logo.png' ;
+    // const logo =  'assets/layout/images/careta-logo.png' ;
 
     const wrapperClass = classNames('layout-wrapper', {
         'layout-overlay': layoutMode === 'overlay',
@@ -305,6 +308,7 @@ const App = () => {
                 <Route path="/repairrecords" exact component={RepairRecords} />
                 <Route path="/checklistreport" exact component={ChecklistReport} />
                 <Route path="/incidentreport" exact component={IncidentReport} />
+                <Route path="/incidentrecord" exact component={IncidentRecord} />
             </div>
 
             <AppFooter />
