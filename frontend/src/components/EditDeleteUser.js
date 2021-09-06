@@ -297,8 +297,13 @@ export const EditDeleteUser = () => {
                     setBirthday(res.data.user_info.birthday);
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/user-image/' + username +'/', config)
                     .then((res) => {
-                        setReportImage(res.data);
-                        getPermission();
+                        if (res.data === "No image") {
+                            getPermission();
+                        } else {
+                            setReportImage(res.data);
+                            getPermission();
+                        }
+                        
                     })
                     .catch((err) => {
                         

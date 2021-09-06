@@ -71,8 +71,6 @@ export const Register = () => {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 5000 });
         } else if (birthday === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
-        } else if (refImageUpload.current.state.files.length <= 0) {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Image is required.', life: 5000 });
         } else {
             let token = localStorage.getItem("token");
             
@@ -94,6 +92,13 @@ export const Register = () => {
                 .then((res) => {
                     if (refImageUpload.current.state.files.length <= 0) {
                         submitPermission();
+                        axios.post(process.env.REACT_APP_SERVER_NAME + 'image/user-image/',  config)
+                        .then((res) => {
+                            submitPermission();
+                        })
+                        .catch((err) => {
+    
+                        });
                     } else {
                         let formData = new FormData();
                         refImageUpload.current.state.files.map((f, index) => {
