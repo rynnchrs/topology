@@ -67,6 +67,10 @@ export const JobScheduling = () => {
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
+    const reportTypeOptions = [/* { name: 'CHECKLIST', val: 'checklist' }, */ { name: 'INCIDENT', val: 'incident' }];
+    const [reportType, setReportType] = useState([]);
+    const [reportList, setReportList] = useState([]);
+    const [reportNo, setReportNo] = useState({});
 
     const [searchFieldman, setSearchFieldman] = useState("");
     const [searchStartDate, setSearchStartDate] = useState(null);
@@ -82,7 +86,7 @@ export const JobScheduling = () => {
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 
-    //create task form
+    //create repair task form
     const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState([]);
     const [dateStart, setDateStart] = useState(null);
@@ -205,7 +209,7 @@ export const JobScheduling = () => {
                 + '&page=' + sentPage, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
-                    setJobList(res.data.results);
+                    setJobList(res.data.results.reverse());
                     fullCalendarDisplay(res.data.results);
                 })
                 .catch((err) => {
@@ -359,7 +363,7 @@ export const JobScheduling = () => {
             + '&page=' + sentPage, config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results);
+                setJobList(res.data.results.reverse());
                 fullCalendarDisplay(res.data.results);
             })
             .catch((err) => {
@@ -372,7 +376,7 @@ export const JobScheduling = () => {
                     + '&page=1', config)
                     .then((res) => {
                         setTotalCount(res.data.count);
-                        setJobList(res.data.results);
+                        setJobList(res.data.results.reverse());
                         fullCalendarDisplay(res.data.results);
                         setFirst(0);
                         setFlagPages(1);
@@ -646,7 +650,7 @@ export const JobScheduling = () => {
             + '&page=1', config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results);
+                setJobList(res.data.results.reverse());
                 fullCalendarDisplay(res.data.results);
                 setFirst(0);
                 setFlagPages(1);
@@ -665,12 +669,21 @@ export const JobScheduling = () => {
             },
         };
 
-        if (dateStart === null) {
+        if (fieldman[0].val === "") { 
+            toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
+        } else if (bodyNo === "" || bodyNo.length <= 0) {
+            toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
+        } else if (reportType.length <= 0) {
+            toast.current.show({ severity: 'error', summary: 'REPORT TYPE', detail: 'This field is required.', life: 3000 });
+        } else if (Object.keys(reportNo).length <= 0) {
+            toast.current.show({ severity: 'error', summary: 'REPORT No.', detail: 'This field is required.', life: 3000 });
+        } else if (dateStart === null) {
             toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
         } else if (dateEnd === null) {
             toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+        } else if (scheduleDate === null) {
+            toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
         } else {
-
             let fieldmanData = "";
             fieldman.map((x) =>
                 fieldmanData += x.val + ","
@@ -694,70 +707,60 @@ export const JobScheduling = () => {
     }
 
     const submitTaskRepair = () => {
-        if (fieldman[0].val === "") { 
-            toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
-        } else if (bodyNo === "" || bodyNo.length <= 0) {
-            toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
-        } else if (dateStart === null) {
-            toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateEnd === null) {
-            toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
-        } else if (scheduleDate === null) {
-            toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
-        } else {
-            let fieldmanData = [];
-            fieldman.map((x) =>
-                fieldmanData.push({field_man: x.fullname})
-            )
+        let fieldmanData = [];
+        fieldman.map((x) =>
+            fieldmanData.push({field_man: x.val})
+        )
 
-            let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
 
-            axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', {
-                job_order: {
-                    type: true
-                },
-                fieldman: fieldmanData,
-                desc:"",
-                body_no: bodyNo.body_no,
-                start_date: format(dateStart, 'yyyy-MM-dd'),
-                end_date: format(dateEnd, 'yyyy-MM-dd'),
-                schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
-                remarks: remarks
-            }, config)
-            .then((res) => {
-                getTaskList();
-                onHide('displayJobCreate');
-                setMessage({title:"CREATE", content:"Successfully created."});
-                onClick('displayMessage');
-            })
-            .catch((err) => {
-                if (err.toJSON().message === 'Network Error'){
-                    toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
-                } else if (err.response.data.fieldman) {
-                    toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
-                } else if (err.response.data.body_no) {
-                    toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
-                } else if (err.response.data.start_date) {
-                    toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
-                } else if (err.response.data.end_date) {
-                    toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
-                } else if (err.response.data.errors) {
-                    if (err.response.data.errors[0].body_no) {
-                        toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Invalid Body No.', life: 3000 });
-                    } else if (err.response.data.errors[0].manager) {
-                        toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
-                    } else if (err.response.data.errors[0].field_man) {
-                        toast.current.show({ severity: 'error', summary: 'Duplicate Fieldman', detail: 'Please check fieldman input.', life: 3000 });
-                    }
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', {
+            job_order: {
+                type: true
+            },
+            fieldman: fieldmanData,
+            desc:"",
+            body_no: bodyNo.body_no,
+            ir_no: reportNo.ir_no,
+            checklist: "",
+            start_date: format(dateStart, 'yyyy-MM-dd'),
+            end_date: format(dateEnd, 'yyyy-MM-dd'),
+            schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
+            remarks: remarks
+        }, config)
+        .then((res) => {
+            getTaskList();
+            onHide('displayJobCreate');
+            setMessage({title:"CREATE", content:"Successfully created."});
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            if (err.toJSON().message === 'Network Error'){
+                toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+            } else if (err.response.data.fieldman) {
+                toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
+            } else if (err.response.data.body_no) {
+                toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
+            } else if (err.response.data.start_date) {
+                toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.end_date) {
+                toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.errors) {
+                if (err.response.data.errors[0].body_no) {
+                    toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Invalid Body No.', life: 3000 });
+                } else if (err.response.data.errors[0].manager) {
+                    toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
+                } else if (err.response.data.errors[0].field_man) {
+                    toast.current.show({ severity: 'error', summary: 'Duplicate Fieldman', detail: 'Please check fieldman input.', life: 3000 });
                 }
-            })
-        }
+            }
+        })
     }
 
     const editAssignData = (value) => {
@@ -965,6 +968,67 @@ export const JobScheduling = () => {
         });
     }
 
+    const onChangeReportType = (value) => {
+        setReportType(value);
+        let apiValue = "";
+        if (value.val === "incident") {
+            apiValue = "task/ir-report/";
+        } else {
+            apiValue = "task/ir-report/"; //will update soon for checklist
+        }
+
+        let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + apiValue, config)
+            .then((res) => {
+                setReportList(res.data.results);
+                if (res.data.next === null) {
+                
+                } else {
+                    nextPageReportList(res.data.next);
+                }
+            })
+            .catch((err) => {
+                
+            });
+    }
+
+    const nextPageReportList = (valueURL) => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios
+            .get(valueURL, config)
+            .then((res) => {
+                appendReportList(res.data.results, res.data.next);
+            })
+            .catch((err) => {
+                
+            });
+    };
+
+    const appendReportList = (valueResults, valueURL) => {
+        valueResults.map((i) => {
+            return setReportList(reportNoList => [...reportList, i]);
+        });
+        if (valueURL === null){
+                
+        } else {
+            nextPageReportList(valueURL);
+        }
+    }
+
     const addFieldman = () => {
         setFieldman(fieldman => [...fieldman, {id: fieldman.length, val: ""}]);
     }
@@ -1016,6 +1080,9 @@ export const JobScheduling = () => {
         dialogFuncMap[`${name}`](false);
         setFieldman([{id: 0 , val: "", fullname: ""}]);
         setBodyNo([]);
+        setReportType([]);
+        setReportList([]);
+        setReportNo({});
         setDateStart(null);
         setDateEnd(null);
         setScheduleDate(null);
@@ -1152,6 +1219,16 @@ export const JobScheduling = () => {
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE:</b></h6>
                             <InputText placeholder="REPAIR" disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REPORT TYPE:</b></h6>
+                            <Dropdown value={reportType} options={reportTypeOptions} optionLabel="name" placeholder="Select Report Type"
+                            onChange={event => onChangeReportType(event.target.value)}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REPORT No.:</b></h6>
+                            <Dropdown value={reportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No."
+                            onChange={event => setReportNo(event.target.value)} disabled={reportList.length === 0}/>
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>
