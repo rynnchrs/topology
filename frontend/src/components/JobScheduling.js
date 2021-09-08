@@ -61,6 +61,7 @@ export const JobScheduling = () => {
     });
 
     const [holdData, setHoldData] = useState([]);
+    const [holdTaskType, setHoldTaskType] = useState('');
     const [disabledData, setDisabledData] = useState(false);
     const [disabledApproval, setDisabledApproval] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
@@ -68,10 +69,9 @@ export const JobScheduling = () => {
     const [suggestions, setSuggestions] = useState(null);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
     const reportTypeOptions = [/* { name: 'CHECKLIST', val: 'checklist' }, */ { name: 'INCIDENT', val: 'incident' }];
-    const [reportType, setReportType] = useState([]);
     const [reportList, setReportList] = useState([]);
-    const [reportNo, setReportNo] = useState({});
-
+    const [locationList, setLocationList] = useState([]);
+    
     const [searchFieldman, setSearchFieldman] = useState("");
     const [searchStartDate, setSearchStartDate] = useState(null);
     const [searchEndDate, setSearchEndDate] = useState(null);
@@ -86,9 +86,13 @@ export const JobScheduling = () => {
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 
-    //create repair task form
+    //create repair/inspection task form
     const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState([]);
+    const [location, setLocation] = useState('');
+    const [reportType, setReportType] = useState([]);
+    const [reportNo, setReportNo] = useState({});
+    
     const [dateStart, setDateStart] = useState(null);
     const [dateEnd, setDateEnd] = useState(null);
     const [scheduleDate, setScheduleDate] = useState(null);
@@ -124,6 +128,28 @@ export const JobScheduling = () => {
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
     const [displayJobCreateInspection, setDisplayJobCreateInspection] = useState(false);
+
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/location-list/', config)
+            .then((res) => {
+                let loc = [...locationList];
+                for (var i = 0; i < Object.keys(res.data).length; i++) {
+                    loc.push({"location": res.data[i]})
+                }
+                setLocationList(loc);
+            })
+            .catch((err) => {
+                
+            });
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -209,7 +235,7 @@ export const JobScheduling = () => {
                 + '&page=' + sentPage, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
-                    setJobList(res.data.results.reverse());
+                    setJobList(res.data.results);
                     fullCalendarDisplay(res.data.results);
                 })
                 .catch((err) => {
@@ -363,7 +389,7 @@ export const JobScheduling = () => {
             + '&page=' + sentPage, config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results.reverse());
+                setJobList(res.data.results);
                 fullCalendarDisplay(res.data.results);
             })
             .catch((err) => {
@@ -376,7 +402,7 @@ export const JobScheduling = () => {
                     + '&page=1', config)
                     .then((res) => {
                         setTotalCount(res.data.count);
-                        setJobList(res.data.results.reverse());
+                        setJobList(res.data.results);
                         fullCalendarDisplay(res.data.results);
                         setFirst(0);
                         setFlagPages(1);
@@ -476,7 +502,7 @@ export const JobScheduling = () => {
                         </div>
                         <div style={{float: 'right', width:'27px'}}>
                             <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '27px', height: '27px', color: 'black'}}
-                            onClick={(event) => holdJobData(event, jobList.job_order.job_id)} />
+                            onClick={(event) => holdJobData(event, jobList.job_order.job_id, jobList.job_order.type)} />
                         </div>
                         <div className="p-grid p-fluid p-nogutter">
                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
@@ -523,11 +549,12 @@ export const JobScheduling = () => {
         );
     }
 
-    const holdJobData = (event, value) => {
+    const holdJobData = (event, value, taskType) => {
         menu.current.toggle(event);
         event.stopPropagation();
         setHoldData(value);
         getTaskScheduling1(value);
+        setHoldTaskType(taskType);
     }
 
     const getTaskScheduling = (value, type) => {
@@ -650,7 +677,7 @@ export const JobScheduling = () => {
             + '&page=1', config)
             .then((res) => {
                 setTotalCount(res.data.count);
-                setJobList(res.data.results.reverse());
+                setJobList(res.data.results);
                 fullCalendarDisplay(res.data.results);
                 setFirst(0);
                 setFlagPages(1);
@@ -660,7 +687,7 @@ export const JobScheduling = () => {
             });
     }
 
-    const taskWarningList = () => {
+    const taskWarningList = (taskType) => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -669,41 +696,76 @@ export const JobScheduling = () => {
             },
         };
 
-        if (fieldman[0].val === "") { 
-            toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
-        } else if (bodyNo === "" || bodyNo.length <= 0) {
-            toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
-        } else if (reportType.length <= 0) {
-            toast.current.show({ severity: 'error', summary: 'REPORT TYPE', detail: 'This field is required.', life: 3000 });
-        } else if (Object.keys(reportNo).length <= 0) {
-            toast.current.show({ severity: 'error', summary: 'REPORT No.', detail: 'This field is required.', life: 3000 });
-        } else if (dateStart === null) {
-            toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateEnd === null) {
-            toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
-        } else if (scheduleDate === null) {
-            toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
+        if (taskType === "repair") {
+            if (fieldman[0].val === "") { 
+                toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
+            } else if (bodyNo === "" || bodyNo.length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
+            } else if (reportType.length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'REPORT TYPE', detail: 'This field is required.', life: 3000 });
+            } else if (Object.keys(reportNo).length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'REPORT No.', detail: 'This field is required.', life: 3000 });
+            } else if (dateStart === null) {
+                toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
+            } else if (dateEnd === null) {
+                toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+            } else if (scheduleDate === null) {
+                toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
+            } else {
+                let fieldmanData = "";
+                fieldman.map((x) =>
+                    fieldmanData += x.val + ","
+                )
+    
+                axios
+                    .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
+                    + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
+                    .then((res) => {
+                        if (res.data.length <= 0){
+                            submitTaskRepair();
+                        } else {
+                            toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
+                            submitTaskRepair();
+                        }
+                    })
+                    .catch((err) => {
+                        
+                    });
+            }
         } else {
-            let fieldmanData = "";
-            fieldman.map((x) =>
-                fieldmanData += x.val + ","
-            )
-
-            axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
-                + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
-                .then((res) => {
-                    if (res.data.length <= 0){
-                        submitTaskRepair();
-                    } else {
-                        toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
-                        submitTaskRepair();
-                    }
-                })
-                .catch((err) => {
-                    
-                });
+            if (fieldman[0].val === "") { 
+                toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
+            } else if (location === "" || location.length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'LOCATION', detail: 'This field is required.', life: 3000 });
+            } else if (dateStart === null) {
+                toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
+            } else if (dateEnd === null) {
+                toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+            } else if (scheduleDate === null) {
+                toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
+            } else {
+                let fieldmanData = "";
+                fieldman.map((x) =>
+                    fieldmanData += x.val + ","
+                )
+    
+                axios
+                    .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
+                    + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
+                    .then((res) => {
+                        if (res.data.length <= 0){
+                            submitTaskInspection();
+                        } else {
+                            toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
+                            submitTaskInspection();
+                        }
+                    })
+                    .catch((err) => {
+                        
+                    });
+            }
         }
+        
     }
 
     const submitTaskRepair = () => {
@@ -741,6 +803,7 @@ export const JobScheduling = () => {
             onClick('displayMessage');
         })
         .catch((err) => {
+            console.log(err)
             if (err.toJSON().message === 'Network Error'){
                 toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
             } else if (err.response.data.fieldman) {
@@ -763,7 +826,64 @@ export const JobScheduling = () => {
         })
     }
 
-    const editAssignData = (value) => {
+    const submitTaskInspection = () => {
+        let fieldmanData = [];
+        fieldman.map((x) =>
+            fieldmanData.push({field_man: x.val})
+        )
+
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-inspection/', {
+            job_order: {
+                type: false
+            },
+            fieldman: fieldmanData,
+            desc:"",
+            location: location.location,
+            body_no: "",
+            ir_no: "",
+            checklist: "",
+            start_date: format(dateStart, 'yyyy-MM-dd'),
+            end_date: format(dateEnd, 'yyyy-MM-dd'),
+            schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
+            remarks: remarks
+        }, config)
+        .then((res) => {
+            getTaskList();
+            onHide('displayJobCreateInspection');
+            setMessage({title:"CREATE", content:"Successfully created."});
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            console.log(err)
+            if (err.toJSON().message === 'Network Error'){
+                toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+            } else if (err.response.data.fieldman) {
+                toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
+            } else if (err.response.data.body_no) {
+                toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
+            } else if (err.response.data.start_date) {
+                toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.end_date) {
+                toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.errors) {
+                if (err.response.data.errors[0].manager) {
+                    toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
+                } else if (err.response.data.errors[0].field_man) {
+                    toast.current.show({ severity: 'error', summary: 'Duplicate Fieldman', detail: 'Please check fieldman input.', life: 3000 });
+                }
+            }
+        })
+    }
+
+    const editAssignData = () => {
         setEditFieldman([]);
         jobData.fieldman.map((x, index) =>
             setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
@@ -902,7 +1022,7 @@ export const JobScheduling = () => {
         })
     }
 
-    const deleteTask = (value) => {
+    const deleteTask = (value, taskType) => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -911,12 +1031,14 @@ export const JobScheduling = () => {
             },
         };
 
-        axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
+        let apiValue = taskType === "Repair" ? 'task/task-scheduling/' : 'task/task-inspection/';
+
+        axios.delete(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
         .then((res) => {;
             getTaskList();
             onHide('displayConfirmDelete');
             onHide('displayJobEdit');
-            setMessage({title:"DELETE", content:"Successfully delete."});
+            setMessage({title:"DELETE", content:"Successfully deleted."});
             onClick('displayMessage');
         })
         .catch((err) => {
@@ -1078,10 +1200,12 @@ export const JobScheduling = () => {
 
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
+        setReportList([]);
+
         setFieldman([{id: 0 , val: "", fullname: ""}]);
         setBodyNo([]);
+        setLocation('');
         setReportType([]);
-        setReportList([]);
         setReportNo({});
         setDateStart(null);
         setDateEnd(null);
@@ -1114,7 +1238,7 @@ export const JobScheduling = () => {
             return (
                 <div>
                     <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
-                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => deleteTask(holdData)}/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => deleteTask(holdData, holdTaskType)}/>
                 </div>
             );
         }
@@ -1249,7 +1373,7 @@ export const JobScheduling = () => {
 
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
-                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()}/>
+                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList("repair")}/>
                         </div>
                     </div>
                 </Dialog>
@@ -1273,7 +1397,7 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>LOCATION:</b></h6>
-                            <Dropdown /* value={jobType} options={jobTypeOptions} */ optionLabel="name" placeholder="Select Location" /* onChange={event => setJobType(event.target.value)} */ />
+                            <Dropdown value={location} options={locationList} optionLabel="location" placeholder="Select Location" onChange={event => setLocation(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE:</b></h6>
@@ -1298,7 +1422,7 @@ export const JobScheduling = () => {
 
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
-                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()} disabled/>
+                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList("inspection")}/>
                         </div>
                     </div>
                 </Dialog>
