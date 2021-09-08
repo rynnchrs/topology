@@ -131,7 +131,7 @@ def checklist_reversion(checklist):
             for key, value in parts_revised.items():
                 if "check_list_parts_id" in key:
                     parts_name = CheckListParts.objects.get(id=value)
-                    if parts_revised[key] is None:
+                    if parts_revised[key] is not None:
                         parts_revised[key] = parts_name.name
             parts.append(parts_revised)
 

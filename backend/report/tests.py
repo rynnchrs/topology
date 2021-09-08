@@ -1,5 +1,6 @@
 import json
 from datetime import date
+
 import reversion
 from car.models import Car
 from careta.models import Permission, UserInfo
@@ -7,9 +8,9 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
-from task.models import JobOrder, Task
+from task.models import IR, JobOrder, Task
 
-from .models import Inspection, Repair
+from .models import CheckList, CheckListParts, Inspection, Repair
 
 # Create your tests here.
 
@@ -185,26 +186,9 @@ class InspectionReportTestCase(APITestCase):
 
 
 class RepairReportTestCase(APITestCase):
-    TEST_REPORT1 = {
-            "parts": [
-                {
-                    "cost_type": "P",
-                    "particulars": "parts1",
-                    "cost": 100,
-                    "quantity": 2,
-                    "total_cost": 200
-                }
-            ],
-            "labor": [
-                {
-                    "cost_type": "L",
-                    "particulars": "labor",
-                    "cost": 100,
-                    "quantity": 1,
-                    "total_cost": 100
-                }
-            ],
-            "ir_no": "testing",
+    TEST_REPORT = {
+            "parts": [],
+            "labor": [],
             "site_poc": "makati",
             "contact_no": "12345",
             "incident_details": "",
@@ -213,8 +197,66 @@ class RepairReportTestCase(APITestCase):
             "action_taken": "",
             "status_repair": "Non-Operational",
             "remarks": "321",
-            "job_order": "1"
+            "job_order": 2,
+            "ir_no": "",
+            "check_list": "",
+            "body_no": "18-1654",
         }
+
+    
+    TEST_REPORT_IR = {
+            "parts": [],
+            "labor": [],
+            "site_poc": "makati",
+            "contact_no": "12345",
+            "incident_details": "",
+            "actual_findings": "",
+            "actual_remarks": "",
+            "action_taken": "",
+            "status_repair": "Non-Operational",
+            "remarks": "321",
+            "job_order": 2,
+            "ir_no": "0001",
+            "check_list": "",
+            "body_no": "18-1654",
+        }
+
+    
+    TEST_REPORT_CL = {
+            "parts": [],
+            "labor": [],
+            "site_poc": "makati",
+            "contact_no": "12345",
+            "incident_details": "",
+            "actual_findings": "",
+            "actual_remarks": "",
+            "action_taken": "",
+            "status_repair": "Non-Operational",
+            "remarks": "321",
+            "job_order": 3,
+            "ir_no": "",
+            "check_list": 1,
+            "body_no": "18-1654",
+        }
+
+    
+    TEST_REPORT = {
+            "parts": [],
+            "labor": [],
+            "site_poc": "makati",
+            "contact_no": "12345",
+            "incident_details": "",
+            "actual_findings": "",
+            "actual_remarks": "",
+            "action_taken": "",
+            "status_repair": "Non-Operational",
+            "remarks": "321",
+            "job_order": 2,
+            "ir_no": "",
+            "check_list": "",
+            "body_no": "18-1654",
+        }
+
     TEST_UPDATE = {
             "parts": [
                 {
@@ -234,16 +276,14 @@ class RepairReportTestCase(APITestCase):
                     "total_cost": 100
                 }
             ],
-            "ir_no": "testing",
             "site_poc": "makati",
             "contact_no": "12345",
-            "incident_details": "",
-            "actual_findings": "",
-            "actual_remarks": "",
-            "action_taken": "",
             "status_repair": "Non-Operational",
             "remarks": "321",
-            "job_order": "1"
+            "job_order": 1,
+            "ir_no": "",
+            "check_list": "",
+            "body_no": "18-1654"
         }
     INVALID_REPORT1 = {  
             "parts": [
@@ -306,6 +346,7 @@ class RepairReportTestCase(APITestCase):
             "manager": "sample",
             "body_no": "18-1654"
         } 
+        
 
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) #create user
@@ -314,13 +355,20 @@ class RepairReportTestCase(APITestCase):
         self.car = Car.objects.create(**self.TEST_CAR) # create car instance
         self.job_order = JobOrder.objects.create()
         self.job = JobOrder.objects.create()
+        self.job_cl = JobOrder.objects.create()
+        self.ir = IR.objects.create(ir_no="0001", body_no=self.car)
         self.task = Task.objects.create(body_no=self.car, job_order=self.job_order, manager=self.user) 
-        self.task2 = Task.objects.create(body_no=self.car, job_order=self.job, manager=self.user) 
+        self.task_ir = Task.objects.create(body_no=self.car, job_order=self.job_cl, manager=self.user, ir_no=self.ir) 
+
+        
+        self.check_list = CheckList.objects.create(task=self.task, body_no=self.car, job_order=self.job_order, email=self.user)
+        self.task_cl = Task.objects.create(body_no=self.car, job_order=self.job, manager=self.user, check_list=self.check_list) 
         self.repair = Repair.objects.create(
                 job_order=self.job_order,
                 diagnosed_by = self.user,   
                 generated_by = self.user,
                 repair_by = self.user,
+                body_no = self.car
             ) # create repair
         with reversion.create_revision(): # create reversion for careta report
             self.repair.save()
@@ -333,9 +381,17 @@ class RepairReportTestCase(APITestCase):
         response = self.client.get('/report/repair/1/') # retrieve repair report
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_repair_report_create(self):
-    #     response = self.client.post('/report/repair/', self.TEST_REPORT1, format='json') # create repair report
-    #     self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+    def test_repair_report_create(self):
+        response = self.client.post('/report/repair/', self.TEST_REPORT, format='json') # create repair report
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    def test_repair_report_IR_create(self):
+        response = self.client.post('/report/repair/', self.TEST_REPORT_IR, format='json') # create repair report
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    def test_repair_report_CheckList_create(self):
+        response = self.client.post('/report/repair/', self.TEST_REPORT_CL, format='json') # create repair report
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
     def test_repair_report_create_invalid(self):
         # invalid job_order
@@ -351,6 +407,142 @@ class RepairReportTestCase(APITestCase):
 
     def test_repair_report_update_invalid(self): # invalid update 
         response = self.client.put('/report/repair/1/',
+            json.dumps(self.INVALID_REPORT1),
+            content_type = 'application/json'
+            )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+
+class CheckListReportTestCase(APITestCase):
+    TEST_REPORT = {
+            "contact_no": "09123456789",
+            "status": "Operational",
+            "parts_included": [
+                0,
+                1,
+                2
+            ],
+            "parts":[
+                {
+                    "quantity": 1,
+                    "check_list_parts": "sample part 1"
+                }
+            ],
+            "body_no":"18-1654",
+            "email":"sample@email.com",
+            "job_order": 2,
+            "task": 2
+        }
+
+    CHECK_LIST_PARTS =[
+            {"name": "parts 1"}
+        ]
+
+    INVALID_REPORT1 = {
+            "contact_no": "09123456789",
+            "status": "Operational",
+            "parts_included": [
+                0,
+                1,
+                2
+            ],
+            "parts":[
+                {
+                    "quantity": 1,
+                    "check_list_parts": "invalid part 1"  #invalid parts
+                }
+            ],
+            "body_no":"18-16541",  # invalid body_no
+            "email":"invalid@email.com",  # invalid emamil
+            "job_order": 3,  #invalid job_order
+            "task": 3  #invalid task
+        }
+     
+
+    TEST_USER = {
+                "username": "sample",
+                "email": "sample@email.com",
+                "first_name": "sample",
+                "last_name": "sample",
+                "password": "sample!23"
+            }
+    TEST_PERMISSION = {
+                "slug": "sample",
+                "can_view_repair_reports": True,
+                "can_add_repair_reports": True,
+                "can_edit_repair_reports": True,
+                "can_delete_repair_reports": True,
+            }
+    TEST_CAR = {
+            "vin_no": "PAEL65NYHJB005043",
+            "body_no": "18-1654",
+            "plate_no": "NCT4511",
+            "make": "L30",
+            "current_loc": "Marikina"
+            }
+    TEST_TASK = {
+            "job_order": {
+                "type": True
+            },
+            "fieldman": [
+                {"field_man": "sample"}
+            ],
+            "desc": "",
+            "remarks": "",
+            "start_date": str(date.today()),
+            "end_date": str(date.today()),
+            "manager": "sample",
+            "body_no": "18-1654"
+        } 
+        
+
+    def setUp(self):
+        self.user = User.objects.create_user(**self.TEST_USER) #create user
+        self.client.force_authenticate(self.user) # authenticate user
+        self.permission = Permission.objects.create(user = self.user,**self.TEST_PERMISSION) # create permission
+        self.car = Car.objects.create(**self.TEST_CAR) # create car instance
+        self.job_order = JobOrder.objects.create()
+        self.job_cl = JobOrder.objects.create()
+        self.task = Task.objects.create(body_no=self.car, job_order=self.job_order, manager=self.user) 
+        self.task_cl = Task.objects.create(body_no=self.car, job_order=self.job_cl, manager=self.user,) 
+        
+        self.check_list = CheckList.objects.create(task=self.task, body_no=self.car, job_order=self.job_order, email=self.user)
+        self.parts = CheckListParts.objects.create(name="sample part 1")
+        with reversion.create_revision(): # create reversion for careta report
+            self.check_list.save()
+            
+    def test_checklist_report_list(self):
+        response = self.client.get('/report/checklist/') # list of maintenanc report
+        self.assertEqual( response.status_code, status.HTTP_200_OK)
+
+    
+    def test_check_list_parts_create(self):
+        response = self.client.post('/report/checklist-parts/', self.CHECK_LIST_PARTS, format='json') # create repair report
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    def test_check_list_report_retrieve(self):
+        response = self.client.get('/report/checklist/1/') # retrieve repair report
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_check_list_report_create(self):
+        response = self.client.post('/report/checklist/', self.TEST_REPORT, format='json') # create repair report
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    def test_check_list_report_create_invalid(self):
+        # invalid job_order
+        response1 = self.client.post('/report/checklist/', self.INVALID_REPORT1, format='json')
+        self.assertEquals(response1.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_check_list_report_update(self):
+        response = self.client.put('/report/checklist/1/', # update repair report
+            json.dumps(self.TEST_REPORT),
+            content_type = 'application/json'
+            )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_repair_report_update_invalid(self): # invalid update 
+        response = self.client.put('/report/checklist/1/',
             json.dumps(self.INVALID_REPORT1),
             content_type = 'application/json'
             )

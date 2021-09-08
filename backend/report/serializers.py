@@ -101,7 +101,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
     cost = CostSerializer(many=True, write_only=True)
     noted_by = serializers.CharField(required=False, allow_blank=True)
     body_no = serializers.CharField()
-    ir_no = serializers.CharField()
+    ir_no = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model = Repair
         fields = '__all__'
@@ -122,6 +122,8 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 obj['ir_no'] = IR.objects.get(ir_no=obj['ir_no'])
             except:
                 errors.append({"ir_no": 'Invalid IR No.'})
+        else:
+            obj['ir_no'] = None
         try:
             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:
@@ -193,6 +195,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
     def to_representation(self, instance): 
         self.fields['job_order'] = RepairJobSerializer(read_only=True)
         self.fields['diagnosed_by'] = serializers.CharField(source='diagnosed_by.user_info.full_name')
+        self.fields['body_no'] = serializers.CharField(source='body_no.body_no')
         self.fields['repair_by'] = serializers.CharField(source='repair_by.user_info.full_name')
         self.fields['generated_by'] = serializers.CharField(source='generated_by.user_info.full_name')
         if instance.noted_by is not None:
@@ -238,15 +241,6 @@ class CheckListReportPartsSerializer(serializers.ModelSerializer): # cost info i
             raise serializers.ValidationError({'errors':errors})
         return obj
     
-    def to_representation(self, instance): # instance of vin_no
-        self.fields['check_list_parts'] = serializers.SerializerMethodField(read_only=True)
-        return super(CheckListReportPartsSerializer, self).to_representation(instance)
-
-    def get_check_list_parts(self, obj):
-        if obj.check_list_parts is None:
-            return ""
-        else:
-            return obj.check_list_parts
 
 
 class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer 
