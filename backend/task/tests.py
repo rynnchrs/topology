@@ -31,8 +31,6 @@ class TaskTestCase(APITestCase):
             "ir_no": "",
             "check_list": ""
         } 
-    
-    
     TEST_TASK_IR = {
             "job_order": {
                 "type": True
@@ -48,24 +46,6 @@ class TaskTestCase(APITestCase):
             "ir_no": "0001",
             "check_list": ""
         } 
-
-    
-    TEST_TASK_CL = {
-            "job_order": {
-                "type": True
-            },
-            "fieldman": [
-                {"field_man": "sample"}
-            ],
-            "desc": "sample",
-            "remarks": "sample",
-            "start_date": str(date.today()),
-            "end_date": str(date.today()),
-            "body_no": "18-1654",
-            "ir_no": "",
-            "check_list": 1
-        } 
-            
     INVALID_TASK1 = {
             "job_order": {
                 "type": True
@@ -81,7 +61,6 @@ class TaskTestCase(APITestCase):
             "ir_no": "123123", #incalid IR
             "check_list": 5, #invalid checlist
         } 
-        
     TEST_USER = {
                 "username": "sample",
                 "email": "sample@email.com",
@@ -103,7 +82,6 @@ class TaskTestCase(APITestCase):
             "make": "L30",
             "current_loc": "Marikina"
                 }
-    
 
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
@@ -121,78 +99,92 @@ class TaskTestCase(APITestCase):
         self.check_list = CheckList.objects.create(task=self.task, body_no=self.car, job_order=self.job, email=self.user)
         #fieldman
         self.fieldman = Fieldman.objects.create(task=self.task, field_man=self.user)
+        #task id
+        self.id = str(self.task.pk)
 
     def test_task_list(self):
         response = self.client.get('/task/task-list/') # list of task
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
     def test_task_retrieve(self): # retrieve task
-        response = self.client.get('/task/task-scheduling/1/')
+        response = self.client.get('/task/task-scheduling/'+self.id+'/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_task_inspection_create(self): # create task inspection by location
         response = self.client.post('/task/task-inspection/', self.TEST_TASK_Location, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-
-    def test_task_IR_create(self): # create task inspection by location
+        
+    def test_task_IR_create(self): # create task inspection using IR
         response = self.client.post('/task/task-scheduling/', self.TEST_TASK_IR, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
     
-    
-    def test_task_CL_create(self): # create task inspection by location
+    def test_task_CL_create(self): # create task inspection using Check List
+        self.TEST_TASK_CL = {
+                "job_order": {
+                    "type": True
+                },
+                "fieldman": [
+                    {"field_man": "sample"}
+                ],
+                "desc": "sample",
+                "remarks": "sample",
+                "start_date": str(date.today()),
+                "end_date": str(date.today()),
+                "body_no": "18-1654",
+                "ir_no": "",
+                "check_list": str(self.check_list)
+            } 
         response = self.client.post('/task/task-scheduling/', self.TEST_TASK_CL, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-
-    def test_task_create_invalid(self): # try invalid task
+    def test_task_create_invalid(self): # try invalid task request
         # invalid body_no
         response = self.client.post('/task/task-scheduling/', self.INVALID_TASK1, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
-    def test_inspection_report_update(self): # update inspection report 
-        response = self.client.put('/task/task-scheduling/1/',
+    def test_inspection_report_update(self): # update task report 
+        response = self.client.put('/task/task-scheduling/'+self.id+'/',
             json.dumps(self.TEST_TASK_IR),
             content_type = 'application/json'
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_inspection_report_update_invalid(self): # update inspection report 
-        response = self.client.put('/task/task-scheduling/1/',
+    def test_inspection_report_update_invalid(self): # try invalid task put request report 
+        response = self.client.put('/task/task-scheduling/'+self.id+'/',
             json.dumps(self.INVALID_TASK1),
             content_type = 'application/json'
             )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
-    def test_warning_list(self):
+    def test_warning_list(self):  # test list of warned fieldman
         response = self.client.get('/task/task-scheduling/warning_list/?start_date='+str(date.today())+
                                     '&end_date='+str(date.today())+'&fieldman='+self.user.username)
         self.assertEqual(response.status_code , status.HTTP_200_OK)
 
-    def test_date_update(self): # update inspection report 
+    def test_date_update(self): # updating start and end date
         self.TEST_DATE = {
             "start_date_actual": str(date.today()),
             "end_date_actual": str(date.today())
             }
-        response = self.client.put('/task/task-scheduling/1/date_update/',
+        response = self.client.put('/task/task-scheduling/'+self.id+'/date_update/',
             json.dumps(self.TEST_DATE),
             content_type = 'application/json'
             )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-    def test_status_fm(self): # update inspection report 
-        response = self.client.put('/task/task-scheduling/1/status_fm/')
+    def test_status_fm(self):  # status fm
+        response = self.client.put('/task/task-scheduling/'+self.id+'/status_fm/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-    def test_status_mn(self): # update inspection report 
-        response = self.client.put('/task/task-scheduling/1/status_mn/')
+    def test_status_mn(self):  # status mn
+        response = self.client.put('/task/task-scheduling/'+self.id+'/status_mn/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-    def test_status_approval(self):
+    def test_status_approval(self):  # status approval list
         response = self.client.get('/task/task-scheduling/status_approval/')
         self.assertEqual(response.status_code , status.HTTP_200_OK)
 
-    def test_status_approved(self):
+    def test_status_approved(self):  # status approved list
         response = self.client.get('/task/task-scheduling/status_approval/')
         self.assertEqual(response.status_code , status.HTTP_200_OK) 
 
@@ -203,12 +195,10 @@ class IRTestCase(APITestCase):
             "body_no": "18-1654",
             "project_name": "Careta Projects",
             "repair_type":["me","el","ba"],
-        } 
-            
+        }
     INVALID_IR = {
             "body_no": "18-1655"  #invalid body_no
-        } 
-        
+        }
     TEST_USER = {
                 "username": "sample",
                 "email": "sample@email.com",
@@ -230,7 +220,6 @@ class IRTestCase(APITestCase):
             "make": "L30",
             "current_loc": "Marikina"
                 }
-    
 
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
@@ -238,43 +227,40 @@ class IRTestCase(APITestCase):
         self.client.force_authenticate(self.user) # authenticate user
         self.permission = Permission.objects.create(user = self.user,**self.TEST_PERMISSION) # create permission
         self.car = Car.objects.create(**self.TEST_CAR) # create car
+        # create initial IR object
         self.ir = IR.objects.create(ir_no="0001", body_no=self.car)
-
+        # add reversion
         with reversion.create_revision(): # create reversion for careta report
             self.ir.save()
+        # id of ir
+        self.id = str(self.ir.pk)
 
-    def test_ir_list(self):
+    def test_ir_list(self):  # list of ir
         response = self.client.get('/task/ir-report/') # list of ir
-        # print(response.content)
         self.assertEqual( response.status_code , status.HTTP_200_OK)
 
-    def test_ir_retrieve(self): # retrieve ir
-        response = self.client.get('/task/ir-report/1/')
+    def test_ir_retrieve(self):  # retrieve ir
+        response = self.client.get('/task/ir-report/'+self.id+'/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_ir_create(self): # create task
+    def test_ir_create(self):  # create ir
         response = self.client.post('/task/ir-report/', self.TEST_IR1, format='json')
-        print(response.content)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-
-    def test_ir_create_invalid(self): # try invalid task
+    def test_ir_create_invalid(self):  # try invalid ir request
         # invalid body_no
         response = self.client.post('/task/ir-report/', self.INVALID_IR, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
-    def test_ir_report_update(self): # update inspection report 
-        response = self.client.put('/task/ir-report/1/',
+    def test_ir_report_update(self):  # update ir 
+        response = self.client.put('/task/ir-report/'+self.id+'/',
             json.dumps(self.TEST_IR1),
             content_type = 'application/json'
             )
-        print(response.content)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
-    def test_ir_report_update_invalid(self): # update inspection report 
-        response = self.client.put('/task/ir-report/1/',
+    def test_ir_report_update_invalid(self):  # try invalid ir put request 
+        response = self.client.put('/task/ir-report/'+self.id+'/',
             json.dumps(self.INVALID_IR),
             content_type = 'application/json'
             )

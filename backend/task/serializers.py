@@ -150,7 +150,7 @@ class WarningTaskSerializer(serializers.ModelSerializer):
     current_loc = serializers.CharField(source='body_no.current_loc')
     class Meta:
         model= Task
-        fields =  ['job_order','fieldman','start_date','end_date','schedule_date','task_status_fm','task_status_mn','current_loc']
+        fields =  ['task_id','job_order','fieldman','start_date','end_date','schedule_date','task_status_fm','task_status_mn','current_loc']
 
 
 class RepairCarInfoSerializer(serializers.ModelSerializer):
