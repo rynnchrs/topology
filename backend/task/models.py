@@ -27,6 +27,7 @@ class IR(models.Model):
     project_name = models.CharField(max_length=30, null=True, blank=True)
     sub_project = models.CharField(max_length=30, null=True, blank=True)
     region = models.CharField(max_length=30, null=True, blank=True)
+    area = models.CharField(max_length=30, null=True, blank=True)
     exact_loc = models.CharField(max_length=70, null=True, blank=True)
     vehicle_supp = models.CharField(max_length=50, null=True, blank=True)
     odometer = models.CharField(max_length=20, null=True, blank=True)

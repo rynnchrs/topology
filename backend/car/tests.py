@@ -17,13 +17,13 @@ class CarTestCase(APITestCase):
                 "last_name": "sample",
                 "password": "sample!23",
             }
-    # TEST_PERMISSION = {
-    #             "slug": "sample",
-    #             "can_view_inventory": True,
-    #             "can_add_inventory": True,
-    #             "can_edit_inventory": True,
-    #             "can_delete_inventory": True,
-    #         }
+    TEST_PERMISSION = {
+                "slug": "sample",
+                "can_view_inventory": True,
+                "can_add_inventory": True,
+                "can_edit_inventory": True,
+                "can_delete_inventory": True,
+            }
     TEST_CAR = {
             "slug": "18-1654",
             "vin_no": "PAEL65NYHJB005043",
@@ -71,13 +71,13 @@ class ContractTestCase(APITestCase):
                 "last_name": "sample",
                 "password": "sample!23",
             }
-    # TEST_PERMISSION = {
-    #             "slug": "sample",
-    #             "can_view_inventory": True,
-    #             "can_add_inventory": True,
-    #             "can_edit_inventory": True,
-    #             "can_delete_inventory": True,
-    #         }
+    TEST_PERMISSION = {
+                "slug": "sample",
+                "can_view_inventory": True,
+                "can_add_inventory": True,
+                "can_edit_inventory": True,
+                "can_delete_inventory": True,
+            }
     
     TEST_CAR = {
             "slug": "18-1654",
@@ -87,11 +87,7 @@ class ContractTestCase(APITestCase):
             "make": "L30",
             "current_loc": "Marikina"
                 }
-          
-    TEST_CONTRACT = {
-            "slug": "18-1654",
-            "car": 2
-                }      
+
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
         UserInfo.objects.create(user=self.user)
@@ -118,11 +114,19 @@ class ContractTestCase(APITestCase):
         response = self.client.get('/car/careta-contract/18-1655/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-    def test_contract_create(self):
+    def test_contract_create(self):          
+        self.TEST_CONTRACT = {
+                "slug": "18-1654",
+                "car": str(self.car2.pk)
+                    }    
         response = self.client.post('/car/careta-contract/', self.TEST_CONTRACT, format='json')
         self.assertEqual( response.status_code , status.HTTP_201_CREATED)
 
-    def test_contract_update(self):
+    def test_contract_update(self):   
+        self.TEST_CONTRACT = {
+                "slug": "18-1654",
+                "car": str(self.car2.pk)
+                    }    
         response = self.client.put('/car/careta-contract/18-1655/', self.TEST_CONTRACT, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -151,11 +155,7 @@ class TPLTestCase(APITestCase):
             "make": "L30",
             "current_loc": "Marikina"
                 }
-          
-    TEST_TPL = {
-            "slug": "18-1654",
-            "car": 2
-                }      
+               
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
         UserInfo.objects.create(user=self.user)
@@ -183,10 +183,18 @@ class TPLTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_tpl_create(self):
+        self.TEST_TPL = {
+                "slug": "18-1654",
+                "car": str(self.car2.pk)
+                    } 
         response = self.client.post('/car/careta-tpl/', self.TEST_TPL, format='json')
         self.assertEqual( response.status_code , status.HTTP_201_CREATED)
 
     def test_tpl_update(self):
+        self.TEST_TPL = {
+                "slug": "18-1654",
+                "car": str(self.car2.pk)
+                    } 
         response = self.client.put('/car/careta-tpl/18-1655/', self.TEST_TPL, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -216,13 +224,6 @@ class InsuranceTestCase(APITestCase):
             "current_loc": "Marikina"
                 }
           
-    TEST_INSURANCE = {
-            "slug": "18-1654-2",
-            "car": 2,
-            "insurance_no": 2
-                }  
-                
-
     def setUp(self):
         self.user = User.objects.create_user(**self.TEST_USER) # create user
         UserInfo.objects.create(user=self.user)
@@ -251,9 +252,19 @@ class InsuranceTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_insurance_create(self):
+        self.TEST_INSURANCE = {
+                "slug": "18-1654-2",
+                "car": str(self.car2.pk),
+                "insurance_no": str(self.insurance.pk)
+                    }  
         response = self.client.post('/car/careta-insurance/', self.TEST_INSURANCE, format='json')
         self.assertEqual( response.status_code , status.HTTP_201_CREATED)
         
     def test_insurance_update(self):
+        self.TEST_INSURANCE = {
+                "slug": "18-1654-2",
+                "car": str(self.car2.pk),
+                "insurance_no": str(self.insurance.pk)
+                    }  
         response = self.client.put('/car/careta-insurance/18-1655-1/', self.TEST_INSURANCE, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
