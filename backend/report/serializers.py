@@ -124,6 +124,15 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 errors.append({"ir_no": 'Invalid IR No.'})
         else:
             obj['ir_no'] = None
+            
+        if obj['check_list'] != "":
+            try:
+                obj['check_list'] = CheckList.objects.get(check_list_no=obj['check_list'])
+            except:
+                errors.append({"check_list": 'Invalid Check List.'})
+        else:
+            obj['check_list'] = None
+            
         try:
             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:
@@ -251,6 +260,9 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
     class Meta:
         model = CheckList
         fields = '__all__'
+        extra_kwargs = {
+            'check_list_no': {'required': False},
+        }
 
     def validate(self, obj): # validate if vin_no input is vin_no
         errors = []
@@ -316,8 +328,10 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
         return instance
 
     def create(self, validated_data):       # Creating report
-        parts_data = validated_data.pop('parts') 
-        check_list = CheckList.objects.create(**validated_data)
+        parts_data = validated_data.pop('parts')
+        checklist_count = CheckList.objects.all().count()
+        print(type(checklist_count))
+        check_list = CheckList.objects.create(check_list_no=checklist_count, **validated_data, )
         for part_data in parts_data:
             CheckListReportParts.objects.create(check_list=check_list, **part_data)
         return check_list
@@ -345,7 +359,7 @@ class CheckListListSerializer(serializers.ModelSerializer): # list of all repair
     type = serializers.SerializerMethodField()
     class Meta:
         model = CheckList
-        fields = [  'check_list_id','body_no','job_order','type','date_created']
+        fields = ['check_list_id','check_list_no','body_no','job_order','type','date_created']
     
     def get_type(self, obj):
         if obj.job_order.type == False:

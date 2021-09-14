@@ -119,7 +119,7 @@ class Car(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def _str_(self):
-        return self.vin_no
+        return self.body_no
 
     @property
     def get_total(self):
