@@ -270,7 +270,7 @@ class TaskListView(generics.ListAPIView):
         if user_permission(user, 'can_view_task'):  
             queryset = Task.objects.all().order_by('-task_id')
         else:
-            queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('task_id')
+            queryset = Task.objects.filter(fieldman__field_man__username=user.username).order_by('-task_id')
         return queryset
 
 
