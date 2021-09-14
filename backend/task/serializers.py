@@ -194,7 +194,7 @@ class RepairCarInfoSerializer(serializers.ModelSerializer):
 class IRTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = IR
-        fields = ['ir_no','date_time','date','problem_obs','contact_number','area']
+        fields = ['ir_no','date_time','date','problem_obs','contact_number','admin_name']
 
 
 class RepairTaskSerializer(serializers.ModelSerializer):
