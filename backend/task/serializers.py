@@ -1,8 +1,11 @@
-from rest_framework.fields import CharField, SerializerMethodField
 from car.models import Car
 from django.contrib.auth.models import User
+from report.models import CheckList
 from rest_framework import fields, serializers
-from .models import Fieldman, IR, JobOrder, Task
+from rest_framework.fields import CharField, SerializerMethodField
+
+from .models import IR, Fieldman, JobOrder, Task
+
 
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
     make = serializers.SerializerMethodField()
@@ -58,6 +61,7 @@ class TaskSerializer(serializers.ModelSerializer):
     fieldman = FieldmanSerializer(many=True)
     body_no = serializers.CharField()
     ir_no = serializers.CharField(required=False, allow_blank=True)
+    check_list = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model= Task
         fields =  '__all__'
@@ -84,6 +88,15 @@ class TaskSerializer(serializers.ModelSerializer):
                 errors.append({"ir_no": 'Invalid IR No.'})
         else:
             obj['ir_no'] = None
+
+        if obj['check_list'] != "":
+            try:
+                obj['check_list'] = CheckList.objects.get(check_list_no=obj['check_list'])
+            except:
+                errors.append({"check_list": 'Invalid Check List.'})
+        else:
+            obj['check_list'] = None
+
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
@@ -177,19 +190,27 @@ class RepairCarInfoSerializer(serializers.ModelSerializer):
             return representation
 
 
+
+class IRTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IR
+        fields = ['ir_no','date_time','date','problem_obs','contact_number','admin_name']
+
+
 class RepairTaskSerializer(serializers.ModelSerializer):
+    # check_list = serializers.CharField(source='check_list.check_list_no', read_only=True)
     class Meta:
         model = Task
-        fields = ['task_id','schedule_date','body_no']
+        fields = ['task_id','schedule_date',]#'body_no','ir_no','check_list']
 
-    def to_representation(self, instance): 
-        self.fields['body_no'] = RepairCarInfoSerializer(read_only=True)
-        return super(RepairTaskSerializer, self).to_representation(instance)
- 
- 
+    # def to_representation(self, instance): 
+    #     # self.fields['body_no'] = RepairCarInfoSerializer(read_only=True)
+    #     # self.fields['ir_no'] = IRTaskSerializer(read_only=True)
+    #     return super(RepairTaskSerializer, self).to_representation(instance)
+
+
 class RepairJobSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
-
     class Meta:
         model = JobOrder
         fields = '__all__'
@@ -202,6 +223,9 @@ class RepairJobSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance): 
         self.fields['task'] = RepairTaskSerializer(read_only=True)
+        self.fields['body_no'] = RepairCarInfoSerializer(source='task.body_no')
+        self.fields['ir_no'] = IRTaskSerializer(source='task.ir_no')
+        self.fields['check_list'] = serializers.CharField(source='task.check_list')
         return super(RepairJobSerializer, self).to_representation(instance)   
 
 
