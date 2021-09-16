@@ -90,9 +90,9 @@ class InspectiontImage(models.Model):
    images = models.ImageField(upload_to = 'images/')
 
 
-
 class CheckList(models.Model):
     check_list_id = models.AutoField(primary_key=True)
+    check_list_no = models.IntegerField(unique=True, default=0)
     job_order = models.OneToOneField(JobOrder, null=True, related_name='checklist', on_delete=models.CASCADE)
     task = models.OneToOneField(Task, related_name='checklist', on_delete=models.PROTECT)
     email = models.ForeignKey(User, related_name='checklist', on_delete=models.CASCADE)
@@ -147,7 +147,7 @@ class CheckList(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.check_list_id)
+        return str(self.check_list_no)
 
 
 class CheckListParts(models.Model):
@@ -178,11 +178,6 @@ class Repair(models.Model):
     ir_no = models.OneToOneField(IR, null=True, blank=True, related_name='repair', on_delete=models.PROTECT)
     check_list = models.OneToOneField(CheckList, null=True, blank=True, related_name='repair', on_delete=models.PROTECT)
     body_no = models.ForeignKey(Car, null=True, blank=True, related_name='b_repair', on_delete=models.CASCADE)
-    incident_date = models.DateField(default=datetime.date.today)
-    date_receive = models.DateField(default=datetime.date.today)
-    site_poc = models.CharField(max_length=30, null=True, blank=True)  
-    contact_no = models.CharField(max_length=12, null=True, blank=True) 
-    incident_details = models.TextField(max_length=200, null=True, blank=True)
     #actual findings    
     diagnosed_by = models.ForeignKey(User, related_name='diagnosed', on_delete=models.CASCADE)
     perform_date = models.DateField(default=datetime.date.today)

@@ -2,9 +2,20 @@ import datetime
 import json
 from datetime import datetime, timedelta
 
+from car.models import TPL, Car, Insurance
+from careta.models import Permission
+from django.contrib.auth.models import User
 from report.models import Inspection
 
-from car.models import TPL, Car, Insurance
+
+def user_permission(user, permission):
+    perm = Permission.objects.get(user__username=user.username) # get users permission
+    user = User.objects.get(username=user) 
+    result = getattr(perm, permission)
+    if result is True:
+        return True
+    else:
+        return False
 
 
 def check_or_date(year,data):
@@ -28,6 +39,7 @@ def check_or_date(year,data):
         }
     return (or_date)
 
+
 def check_cr_date(year,data):
     jan = data.filter(cr_date__month='1',cr_date__year=year).count()
     feb = data.filter(cr_date__month='2',cr_date__year=year).count()
@@ -48,6 +60,7 @@ def check_cr_date(year,data):
        'Total': total
         }
     return (cr_date)
+
 
 def check_TPL_date(year,data):
     jan = data.filter(end_date__month='1',end_date__year=year).count()
@@ -70,6 +83,7 @@ def check_TPL_date(year,data):
         }
     return (end_date)
 
+
 def check_Com_date(year,data):
     jan = data.filter(end_date__month='1',end_date__year=year).count()
     feb = data.filter(end_date__month='2',end_date__year=year).count()
@@ -91,17 +105,20 @@ def check_Com_date(year,data):
         }
     return (end_date)
 
+
 def close_to_expire(datas):
     today = datetime.today()
     months = datetime(today.year + int(today.month / 12), ((today.month % 12) + 3), 1)
     count = datas.filter(end_date__range=[today,months]).count()
     return count
 
+
 def expiry_body_no(datas):
     today = datetime.today()
     months = datetime(today.year + int(today.month / 12), ((today.month % 12) + 3), 1)
     expiry = datas.filter(end_date__range=[today,months])
     return expiry
+  
     
 def inspection(first_day, last_day):
 
