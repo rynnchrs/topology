@@ -39,6 +39,26 @@
     height: 35px;
 }
 
+.p-field > label {
+  font-size: 20px;
+  margin-bottom: 0px;
+}
+  
+.p-radiobutton {
+  width: 28px;
+  height: 28px;
+}
+
+.p-radiobutton .p-radiobutton-box {
+  width: 28px;
+  height: 28px;
+}
+
+.p-field-radiobutton > label {
+  font-size: 17px;
+  margin-bottom: 0px;
+}
+
 /* css for profile picture  */
 .img-profile{
   img {
@@ -119,6 +139,27 @@
     width: 28px;
     height: 28px;
   }
+
+  .p-field > label {
+    font-size: 17px;
+    letter-spacing: -1px;
+  }
+
+  .p-radiobutton {
+    width: 27px;
+    height: 27px;
+  }
+
+  .p-radiobutton .p-radiobutton-box {
+    width: 27px;
+    height: 27px;
+  }
+
+  .p-field-radiobutton > label {
+    font-size: 15px;
+    letter-spacing: 0px;
+  }
+
   .p-toast {
     width: 320px;
   }

@@ -123,7 +123,7 @@ class CheckList(models.Model):
         (1, 'No'),
         (2, 'Other'),
     ]
-    body_no_batt = models.IntegerField(choices=Color_List, default=0)
+    body_no_batt = models.IntegerField(choices=Battery_List, default=0)
     vehicle_wt = models.BooleanField(default=False)
     Parts_List = [
         (0, 'Unit is in good condition'),
