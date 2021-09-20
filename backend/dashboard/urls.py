@@ -13,5 +13,7 @@ urlpatterns = [
     path('total-expiry/', views.TotalExpiryView.as_view(), name='total-expiry'),
     path('total-inspection/', views.TotalInspectionView.as_view(), name='total-inspection'),
     path('expiry-body-no/', views.ExpiryBodyNoView.as_view(), name='expiry-body-no'),
-    path('expiry-status/', views.ExpiryStatusView.as_view(), name='expiry-status')
+    path('expiry-status/', views.ExpiryStatusView.as_view(), name='expiry-status'),
+    path('total-ir/', views.TotalIRView.as_view(), name='total-ir'),
+    path('total-task/', views.TotalTaskView.as_view(), name='total-task'),
 ]

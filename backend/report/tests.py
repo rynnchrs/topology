@@ -265,7 +265,7 @@ class RepairReportTestCase(APITestCase):
         # create task for ir
         self.task_ir = Task.objects.create(body_no=self.car, job_order=self.job_cl, manager=self.user, ir_no=self.ir) 
         # create initial checklist 
-        self.check_list = CheckList.objects.create(task=self.task, body_no=self.car, job_order=self.job_order, email=self.user)
+        self.check_list = CheckList.objects.create(task=self.task, check_list_no=0, body_no=self.car, job_order=self.job_order, email=self.user)
         # create  task for checklist
         self.task_cl = Task.objects.create(body_no=self.car, job_order=self.job, manager=self.user, check_list=self.check_list) 
         # create initial repair object
@@ -343,7 +343,7 @@ class RepairReportTestCase(APITestCase):
                 "remarks": "321",
                 "job_order": str(self.job_cl),
                 "ir_no": "",
-                "check_list": str(self.check_list),
+                "check_list": 0,
                 "body_no": "18-1654",
             }
         response = self.client.post('/report/repair/', self.TEST_REPORT_CL, format='json') # create repair report
