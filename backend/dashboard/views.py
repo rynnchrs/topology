@@ -15,7 +15,6 @@ from .utils import (check_Com_date, check_cr_date, check_or_date,
                     check_TPL_date, close_to_expire, expiry_body_no,
                     inspection, user_permission)
 
-
 # total of all Recieved Items
 class TotalView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -102,7 +101,7 @@ class ExpiryBodyNoView(generics.ListAPIView):
             return Response(serializer.data) 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)   
-    
+          
 
 class ExpiryStatusView(APIView):
     def get(self, request):
