@@ -102,6 +102,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
     noted_by = serializers.CharField(required=False, allow_blank=True)
     body_no = serializers.CharField()
     ir_no = serializers.CharField(required=False, allow_blank=True)
+    check_list = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model = Repair
         fields = '__all__'
@@ -184,11 +185,6 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 obj.quantity = 0
                 obj.save()
 
-        instance.incident_date = validated_data.get('incident_date', instance.incident_date)
-        instance.date_receive = validated_data.get('date_receive', instance.date_receive)
-        instance.site_poc = validated_data.get('site_poc', instance.site_poc)
-        instance.contact_no = validated_data.get('contact_no', instance.contact_no)
-        instance.incident_details = validated_data.get('incident_details', instance.incident_details)
         instance.perform_date = validated_data.get('perform_date', instance.perform_date)
         instance.actual_findings = validated_data.get('actual_findings', instance.actual_findings)
         instance.actual_remarks = validated_data.get('actual_remarks', instance.actual_remarks)

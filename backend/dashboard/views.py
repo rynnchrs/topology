@@ -7,6 +7,7 @@ from rest_framework import generics, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from task.models import IR, Task
 
 from .serializers import (ExpiryContractSerializer, ExpiryInsuranceSerializer,
                           ExpiryTPLSerializer, TotalCarSerializer)
@@ -100,7 +101,7 @@ class ExpiryBodyNoView(generics.ListAPIView):
             return Response(serializer.data) 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)   
-
+          
 
 class ExpiryStatusView(APIView):
     def get(self, request):
@@ -159,5 +160,46 @@ class TotalInspectionView(APIView): # driver inspection
                 month=(day.month + 1) % 12, day=1) - timedelta(days=1)
 
             return Response(inspection(first_day, last_day))
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED) 
+
+# total IR
+class TotalIRView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_view_repair_reports'):
+            context = {}
+            ir = IR.objects.all().count()
+            ir_report = Repair.objects.all().exclude(ir_no=None).count()
+            ir_no_report = ir - ir_report
+            print(ir_report)
+            context = {
+                'ir': ir,
+                'ir_no_report': ir_no_report,
+            }
+            return Response(context)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED) 
+
+# total Task
+class TotalTaskView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_view_repair_reports'):
+            context = {}
+            
+            task = Task.objects.all().count()
+            task_pending = Task.objects.filter(task_status_fm=False, task_status_mn=False).count()
+            task_approval = Task.objects.filter(task_status_fm=True, task_status_mn=False).count()
+            task_approved = Task.objects.filter(task_status_fm=True, task_status_mn=True).count()
+            context = {
+                'task': task,
+                'task_pending': task_pending,
+                'task_approval': task_approval,
+                'task_approved': task_approved,
+            }
+            return Response(context)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED) 
