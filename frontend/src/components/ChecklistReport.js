@@ -3,6 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Calendar } from 'primereact/calendar';
+import { Checkbox } from 'primereact/checkbox';
 import { AutoComplete } from 'primereact/autocomplete';
 import { RadioButton } from 'primereact/radiobutton';
 import { InputNumber } from 'primereact/inputnumber';
@@ -40,9 +41,11 @@ export default function ChecklistReport() {
     const [bodyNoRLTire, setBodyNoRLTire] = useState(null);
     const [bodyNoRRTire, setBodyNoRRTire] = useState(null);
     const [spareTire, setSpareTire] = useState(null);
+    const [bodyNoSpareTire, setBodyNoSpareTire] = useState(null);
     const [bodyNoBattery, setBodyNoBattery] = useState(4);
     const [vehicleWeight, setVehicleWeight] = useState(null);
     const [vehicleStatus, setVehicleStatus] = useState('');
+    const [partsIncluded, setPartsIncluded] = useState([]);
     const [remarks, setRemarks] = useState('');
 
     // const [checklistParts, setChecklistParts] = useState([
@@ -240,9 +243,10 @@ export default function ChecklistReport() {
     }
 
     const submitChecklist = () => {
-        console.log(jobDescription)
-        console.log(bodyNo)
-        console.log(reportNo)
+        // console.log(jobDescription)
+        // console.log(bodyNo)
+        // console.log(reportNo)
+        console.log(partsIncluded)
 
         if (email === '') {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'EMAIL', life: 3000 });
@@ -274,14 +278,16 @@ export default function ChecklistReport() {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'Rear left hand tire marked with body number?', life: 3000 });
         } else if (spareTire === null) { 
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'Is there a reserve or spare tire?', life: 3000 });
+        } else if (bodyNoSpareTire === null) { 
+            toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'Reserve or spare tire marked with body number?', life: 3000 });
         } else if (bodyNoBattery >= 4) { 
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'Battery marked with body number?', life: 3000 });
         } else if (vehicleWeight === null) { 
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'Correct vehicle weight & capacity labels?', life: 3000 });
         } else if (vehicleStatus === '') { 
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'Vehicle status', life: 3000 });
-        } else if (remarks === '') { 
-            toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'REMARKS', life: 3000 });
+        } else if (partsIncluded.length <= 0) { 
+            toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'PLEASE INCLUDE REMARKS', life: 3000 });
         } else if (checklistParts.length <= 0) { 
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'checklistpasrts', life: 3000 });
         } else {
@@ -295,10 +301,8 @@ export default function ChecklistReport() {
 
 
             let partsSubmit = [];
-            let partsIncluded = [];
             checklistParts.map((x) => {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
-                partsIncluded.push(x.partsId)
             })
             
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/checklist/', {
@@ -318,6 +322,7 @@ export default function ChecklistReport() {
                 body_no_rl_tire: bodyNoRLTire,
                 body_no_rr_tire: bodyNoRRTire,
                 spare_tire: spareTire,
+                body_no_spare: bodyNoSpareTire,
                 body_no_batt: bodyNoBattery,
                 vehicle_wt: vehicleWeight,
                 remarks: remarks,
@@ -363,9 +368,19 @@ export default function ChecklistReport() {
         setReportNo(value);
         setTask(value.task.task_id);
         setScheduleDate(value.task.schedule_date);
-        setLocation(value.task.body_no.current_loc);
-        setBodyNo(value.task.body_no.body_no);
-        setMake(value.task.body_no.make);
+        setLocation(value.body_no.current_loc);
+        setBodyNo(value.body_no.body_no);
+        setMake(value.body_no.make);
+    }
+
+    const onChangePartsIncluded = (e) => {
+        let selectedPartsIncluded = [...partsIncluded];
+        if (e.checked) {
+            selectedPartsIncluded.push(e.value);
+        } else {
+            selectedPartsIncluded.splice(selectedPartsIncluded.indexOf(e.value), 1);
+        }
+        setPartsIncluded(selectedPartsIncluded);
     }
 
     const dialogFuncMap = {
@@ -432,7 +447,7 @@ export default function ChecklistReport() {
                                     onChange={event => setJobDescription(event.target.value)} />
                                 </div>
 
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Is there a pair of Early Warning Device?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -445,7 +460,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>What color of Early Warning Device is available?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -462,7 +477,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Early Warning Device marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -475,7 +490,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Front left hand tire marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -488,7 +503,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Front right hand tire marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -501,7 +516,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Rear right hand tire marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -514,7 +529,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Rear left hand tire marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -527,7 +542,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Is there a reserve or spare tire?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -540,20 +555,20 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Reserve or spare tire marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
-                                            <RadioButton inputId="cewd1"/>
+                                            <RadioButton inputId="cewd1" onChange={(e) => setBodyNoSpareTire(true)} checked={bodyNoSpareTire === true}/>
                                             <label htmlFor="cewd1">Yes</label>
                                         </div>
                                         <div className="p-field-radiobutton">
-                                            <RadioButton inputId="cewd2"/>
+                                            <RadioButton inputId="cewd2" onChange={(e) => setBodyNoSpareTire(true)} checked={bodyNoSpareTire === false}/>
                                             <label htmlFor="cewd2">No</label>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Battery marked with body number?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -570,7 +585,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Correct vehicle weight & capacity labels?</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -583,7 +598,7 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>Vehicle status</b></h6>
                                     <div className="p-formgroup-inline">
                                         <div className="p-field-radiobutton">
@@ -596,11 +611,72 @@ export default function ChecklistReport() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>PLEASE INCLUDE REMARKS:</b></h6>
                                     <small><i>*If upon inspection concern is not related or out of scope, kindly put "Unit is in good condition"</i></small>
-                                    <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
-                                        value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
+                                    {/* <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                        value={remarks} onChange={(e) => setRemarks(e.target.value)}/> */}
+                                    <div className="p-field-checkbox" style={{paddingTop:'10px'}}>
+                                        <Checkbox inputId="cb1" value={0} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(0) !== -1}/>
+                                        <label htmlFor="cb1">Unit is in good condition, no concern and defect found.</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={1} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(1) !== -1}/>
+                                        <label htmlFor="cb1">For pullout to check with the dealership</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={2} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(2) !== -1}/>
+                                        <label htmlFor="cb1">For warranty checking with the dealership</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={3} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(3) !== -1}/>
+                                        <label htmlFor="cb1">For body repair and insurance claim</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={4} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(4) !== -1}/>
+                                        <label htmlFor="cb1">For further technical diagnosis</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={5} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(5) !== -1}/>
+                                        <label htmlFor="cb1">Not onsite</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={6} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(6) !== -1}/>
+                                        <label htmlFor="cb1">Keys not available</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={7} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(7) !== -1}/>
+                                        <label htmlFor="cb1">Cracked windshield</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={8} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(8) !== -1}/>
+                                        <label htmlFor="cb1">Rough idling, Cleaned and adjust throttle valve</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={9} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(9) !== -1}/>
+                                        <label htmlFor="cb1">Worn out brake pads</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={10} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(10) !== -1}/>
+                                        <label htmlFor="cb1">Worn out brake shoe</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={11} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(11) !== -1}/>
+                                        <label htmlFor="cb1">Low engine oil</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={12} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(12) !== -1}/>
+                                        <label htmlFor="cb1">Worn out drive belt component</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={13} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(13) !== -1}/>
+                                        <label htmlFor="cb1">Concern out of scope</label>
+                                    </div>
+                                    <div className="p-field-checkbox">
+                                        <Checkbox inputId="cb1" value={14} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(14) !== -1}/>
+                                        <label htmlFor="cb1">Other</label>
+                                    </div>
+                                    
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
                                     <h6><b>WHERE THERE PARTS REPLACED?</b></h6>
@@ -624,7 +700,7 @@ export default function ChecklistReport() {
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>HOW MANY PARTS WERE REPLACED?</b></h6>
                                     <small><i>*Kindly indicate the variety of replaced parts. If none, kindly type NA</i></small>
-                                    <InputText placeholder="Input Number" value={checklistParts.length} disabled/>
+                                    <InputText placeholder="Input Number" value={checklistParts.reduce((prev,next) => prev + next.quantity,0)} disabled/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 image-upload">

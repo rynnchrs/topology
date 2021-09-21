@@ -29,34 +29,36 @@
     right: 0;
 }
 
-.p-checkbox {
+.resize-label {
+  .p-checkbox {
     width: 35px;
     height: 35px;
-}
+  }
 
-.p-checkbox .p-checkbox-box {
-    width: 35px;
-    height: 35px;
-}
+  .p-checkbox .p-checkbox-box {
+      width: 35px;
+      height: 35px;
+  }
 
-.p-field > label {
-  font-size: 20px;
-  margin-bottom: 0px;
-}
+  .p-field > label {
+    font-size: 20px;
+    margin-bottom: 0px;
+  }
   
-.p-radiobutton {
-  width: 28px;
-  height: 28px;
-}
+  .p-radiobutton {
+    width: 28px;
+    height: 28px;
+  }
 
-.p-radiobutton .p-radiobutton-box {
-  width: 28px;
-  height: 28px;
-}
+  .p-radiobutton .p-radiobutton-box {
+    width: 28px;
+    height: 28px;
+  }
 
-.p-field-radiobutton > label {
-  font-size: 17px;
-  margin-bottom: 0px;
+  .p-field-radiobutton > label {
+    font-size: 17px;
+    margin-bottom: 0px;
+  }
 }
 
 /* css for profile picture  */
@@ -130,34 +132,36 @@
     min-Width: 30px;
     /* border: 1px solid red; */
   }
-  .p-checkbox {
-    width: 28px;
-    height: 28px;
-  }
-
-  .p-checkbox .p-checkbox-box {
-    width: 28px;
-    height: 28px;
-  }
-
-  .p-field > label {
-    font-size: 17px;
-    letter-spacing: -1px;
-  }
-
-  .p-radiobutton {
-    width: 27px;
-    height: 27px;
-  }
-
-  .p-radiobutton .p-radiobutton-box {
-    width: 27px;
-    height: 27px;
-  }
-
-  .p-field-radiobutton > label {
-    font-size: 15px;
-    letter-spacing: 0px;
+  .resize-label {
+    .p-checkbox {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .p-checkbox .p-checkbox-box {
+        width: 35px;
+        height: 35px;
+    }
+  
+    .p-field > label {
+      font-size: 20px;
+      margin-bottom: 0px;
+    }
+    
+    .p-radiobutton {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .p-radiobutton .p-radiobutton-box {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .p-field-radiobutton > label {
+      font-size: 17px;
+      margin-bottom: 0px;
+    }
   }
 
   .p-toast {

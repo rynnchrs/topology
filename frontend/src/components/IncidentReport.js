@@ -395,7 +395,7 @@ export default function IncidentReport() {
                                     <h6><b>CURRENT ODOMETER:</b></h6>
                                     <InputText placeholder="Input Odometer" value={odometer} onChange={(e) => setOdometer(e.target.value)}/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk resize-label">
                                     <h6><b>WAIVER:</b></h6>
                                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-field-checkbox">
                                         <Checkbox inputId="cb" checked={waiver} onChange={e => setWaiver(e.checked)} />
@@ -403,7 +403,7 @@ export default function IncidentReport() {
                                     </div>
                                 </div>
 
-                                <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12 resize-label">
                                     <div className="p-grid p-fluid">
                                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox">
                                             <Checkbox inputId="cb" value="me" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('me') !== -1}/>
