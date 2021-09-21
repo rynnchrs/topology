@@ -140,9 +140,9 @@ class TaskView(viewsets.ModelViewSet):
         if user_permission(user, 'can_delete_task'): 
             queryset = Task.objects.all()
             task = get_object_or_404(queryset, pk=pk)    # get user
-            task.delete()
             queryset = JobOrder.objects.all()
             job_order = get_object_or_404(queryset, pk=task.job_order.job_id)
+            task.delete()
             job_order.delete()
             return Response("Successfully Deleted",status=status.HTTP_200_OK)        
         else: 
