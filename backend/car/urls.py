@@ -9,6 +9,7 @@ router.register(r'careta-contract', views.ContractView, 'careta-contract')     #
 router.register(r'careta-tpl', views.TPLView, 'careta-tpl')     # add this
 router.register(r'careta-insurance', views.InsuranceView, 'careta-insurance') # add this
 router.register(r'search-field', views.SearchInventoryView, 'search-field')  # list of can add repair report
+router.register(r'pdf', views.PDFView, 'pdf')  
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -142,3 +142,55 @@ def checklist_reversion(checklist):
         del revised['noted_by_id']
         
     return revised
+
+def analysis(checklist):
+    odometer=""
+    
+    if checklist['odometer'] >= 10000:
+        odometer = "Need to change the oil."
+        
+    fields = ['pair_ewd',
+            'body_no_ewd',
+            'body_no_fl_tire',
+            'body_no_fr_tire',
+            'body_no_rl_tire',
+            'body_no_rr_tire',
+            'spare_tire',
+            'body_no_spare',
+            'body_no_batt',
+            'vehicle_wt'
+            ]
+    booleans = 0
+    for field in checklist:
+        for item in fields:
+            if field == item:
+                if field is True:
+                    booleans+=1
+    
+    if booleans >= 1:
+        if checklist['parts']:
+            if checklist['status'] == "Operational":
+                analize = "Not in critical condition but need to check."
+            else:
+                analize = "Critical condition prior to repair."
+        else:
+            if checklist['status'] == "Operational":
+                analize = "Not in critical condition but need to check."
+            else:
+                analize = "Critical condition prior to repair."
+    else:
+        if checklist['parts']:
+            if checklist['status'] == "Operational":
+                analize = "Not in critical condition but need to check."
+            else:
+                analize = "Critical condition prior to repair."
+        else:
+            if checklist['status'] == "Operational":
+                analize = "The vehicle is in good condition"
+            else:
+                analize = "Not in critical condition but need to check."
+        
+    if odometer:
+        return (odometer, analize)
+    else:
+        return (odometer, analize)

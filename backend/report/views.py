@@ -27,7 +27,7 @@ from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
                           InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
-from .utils import checklist_reversion, repair_reversion, reversion, user_permission
+from .utils import analysis, checklist_reversion, repair_reversion, reversion, user_permission
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
@@ -308,6 +308,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
         file = remove(file_path)
         return response
 
+
 class CheckListPartsView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = CheckListParts.objects.all()
@@ -390,6 +391,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
             check_list = get_object_or_404(queryset, pk=pk) 
             serializer = CheckListSerializer(check_list,many=False)
             serializer_data = serializer.data
+            serializer_data['analysis'] = analysis(serializer_data)
             serializer_data['revised'] = checklist_reversion(check_list)
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
