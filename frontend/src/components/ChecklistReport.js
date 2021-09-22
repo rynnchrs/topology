@@ -1,14 +1,12 @@
 import React, {useEffect, useState, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Calendar } from 'primereact/calendar';
 import { Checkbox } from 'primereact/checkbox';
-import { AutoComplete } from 'primereact/autocomplete';
 import { RadioButton } from 'primereact/radiobutton';
 import { InputNumber } from 'primereact/inputnumber';
 import { FileUpload } from 'primereact/fileupload';
 import { Dialog } from 'primereact/dialog';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 
@@ -19,8 +17,6 @@ export default function ChecklistReport() {
     const jobDescriptionOptions = [{name: 'REPAIR', val: 're'}, {name: 'INSPECTION', val: 'in'}, {name: 'PMS', val: 'pm'}];
 
     const [inspectionNotCreatedList, setInspectionNotCreatedList] = useState([]);
-    const [bodyNoList, setBodyNoList] = useState([]);
-    const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
     const [locationList, setLocationList] = useState([]);
 
     //variables to be save
@@ -46,20 +42,16 @@ export default function ChecklistReport() {
     const [vehicleWeight, setVehicleWeight] = useState(null);
     const [vehicleStatus, setVehicleStatus] = useState('');
     const [partsIncluded, setPartsIncluded] = useState([]);
-    const [remarks, setRemarks] = useState('');
-
-    // const [checklistParts, setChecklistParts] = useState([
-    //     {id: 0, name: "NS40 battery", quantity: 0},
-    //     {id: 1, name: "NS60 battery", quantity: 0}
-    // ]);
     const [checklistParts, setChecklistParts] = useState([]);
     const [partsName, setPartsName] = useState('');
-
     const refImageUpload = useRef(null);
 
     const toast = useRef(null);
 
     const [displayPartsName, setDisplayPartsName] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [displayMessage, setDisplayMessage] = useState(false);
+    const [message, setMessage] = useState({title:"", content:""});
 
     useEffect(() => {
         getInspectionNotCreated();
@@ -90,77 +82,6 @@ export default function ChecklistReport() {
     useEffect(() => {
         getChecklistParts();
     }, []); 
-
-    useEffect(() => {
-        let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'car/car-list/', config)
-            .then((res) => {
-                setBodyNoList(res.data.results);
-                if (res.data.next === null) {
-                
-                } else {
-                    nextPageBodyNo(res.data.next);
-                }
-            })
-            .catch((err) => {
-                
-            });
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const nextPageBodyNo = (valueURL) => {
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
-
-        axios
-            .get(valueURL, config)
-            .then((res) => {
-                appendBodyNo(res.data.results, res.data.next);
-            })
-            .catch((err) => {
-                
-            });
-    };
-
-    const appendBodyNo = (valueResults, valueURL) => {
-        valueResults.map((i) => {
-            return setBodyNoList(bodyNoList => [...bodyNoList, i]);
-        });
-        if (valueURL === null){
-                
-        } else {
-            nextPageBodyNo(valueURL);
-        }
-    }
-
-    const searchListBodyNo = (event) => {
-        setTimeout(() => {
-            if (!event.query.trim().length) {
-
-            } else {
-                try {
-                    setSuggestionsBodyNo(bodyNoList.filter(item => item.body_no.startsWith(event.query)));
-                } catch (err){
-
-                }
-            }
-        }, 100);
-    };
-
-    const onSelectBodyNo = (value) => {
-        setMake(value.make = value.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.make === 'SUV' ? 'Super Carry UV' : value.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
-    }
 
     const getInspectionNotCreated = () => {
         let token = localStorage.getItem("token");
@@ -245,12 +166,12 @@ export default function ChecklistReport() {
     const submitChecklist = () => {
         // console.log(jobDescription)
         // console.log(bodyNo)
-        // console.log(reportNo)
-        console.log(partsIncluded)
+        console.log(reportNo)
+        // console.log(partsIncluded)
 
-        if (email === '') {
-            toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'EMAIL', life: 3000 });
-        } if (email === '') {
+        if (reportNo === '') {
+            toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'REPORT No.', life: 3000 });
+        } else if (email === '') {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'EMAIL', life: 3000 });
         } else if (scheduleDate === null) {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'SCHEDULE DATE', life: 3000 });
@@ -291,6 +212,7 @@ export default function ChecklistReport() {
         } else if (checklistParts.length <= 0) { 
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'checklistpasrts', life: 3000 });
         } else {
+            setIsLoading(true);
             let token = localStorage.getItem("token");
             const config = {
                 headers: {
@@ -298,7 +220,6 @@ export default function ChecklistReport() {
                     'Authorization': 'Bearer ' + token,
                 },
             };
-
 
             let partsSubmit = [];
             checklistParts.map((x) => {
@@ -308,9 +229,7 @@ export default function ChecklistReport() {
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/checklist/', {
                 body_no: bodyNo,
                 parts: partsSubmit,
-                
                 parts_included: partsIncluded,
-                
                 email: email,
                 odometer: actualOdometer,
                 job_desc: jobDescription.val,
@@ -325,19 +244,73 @@ export default function ChecklistReport() {
                 body_no_spare: bodyNoSpareTire,
                 body_no_batt: bodyNoBattery,
                 vehicle_wt: vehicleWeight,
-                remarks: remarks,
+                remarks: "",
                 status: vehicleStatus,
                 job_order: reportNo.job_no,
                 task: task,
                 noted_by: null
             }, config)
             .then((res) => {
-                toast.current.show({ severity: 'success', summary: 'CREATE', detail: 'Done', life: 3000 });
+                console.log(res.data)
+                if (refImageUpload.current.state.files.length <= 0) {
+                    submitChecklistAfter();
+                } else {
+                    let formData = new FormData();
+                    refImageUpload.current.state.files.map((f, index) => {
+                        formData.append("images[" + index + "]image", f);
+                        formData.append("images[" + index + "]mode", "cl");
+                        formData.append("images[" + index + "]image_name", res.data.check_list_id);
+                        return null;
+                    })
+                    axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData, config)
+                    .then((res) => {
+                        submitChecklistAfter();
+                    })
+                    .catch((err) => {
+                        setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong.', life: 3000 });
+                    });
+                }
             })
             .catch((err) => {
                 
             });
         }
+    }
+
+    const submitChecklistAfter = () => {
+        setIsLoading(false);
+        setReportNo('');
+        setTask('');
+        setEmail('');
+        setScheduleDate('');
+        setLocation('');
+        setBodyNo('');
+        setMake('');
+        setActualOdometer('');
+        setJobDescription('');
+        setPairEWD(null);
+        setColorEWD('');
+        setBodyNoEWD(null);
+        setBodyNoFLTire(null);
+        setBodyNoFRTire(null);
+        setBodyNoRLTire(null);
+        setBodyNoRRTire(null);
+        setSpareTire(null);
+        setBodyNoSpareTire(null);
+        setBodyNoBattery(4);
+        setVehicleWeight(null);
+        setVehicleStatus('');
+        setPartsIncluded([]);
+        setChecklistParts([]);
+        setPartsName('');
+        window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+        refImageUpload.current.clear();
+        setIsLoading(false);
+        setMessage({title:"CREATE", content:"Successfully created."});
+        onClick('displayMessage');
+        getInspectionNotCreated();
+        getChecklistParts();
     }
 
     const deleteChecklistParts = (value) => {
@@ -359,12 +332,7 @@ export default function ChecklistReport() {
             });
     }
 
-    // const onChangeJobType = (value) => {
-    //     setJobDescription(value);
-    // }
-
     const onChangeReportNo = (value) => {
-        console.log(value);
         setReportNo(value);
         setTask(value.task.task_id);
         setScheduleDate(value.task.schedule_date);
@@ -385,6 +353,7 @@ export default function ChecklistReport() {
 
     const dialogFuncMap = {
         'displayPartsName': setDisplayPartsName,
+        'displayMessage': setDisplayMessage,
     }
 
     const onClick = (name) => {
@@ -395,9 +364,24 @@ export default function ChecklistReport() {
         dialogFuncMap[`${name}`](false);
     }
 
+    const renderFooter = (name) => {
+        return (
+            <div>
+                <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus/>
+            </div>
+        );
+    }
+
+    const onClearImageFile = () => {
+        //empty
+    }
+
     return(
         <div>
             <Toast ref={toast}/>
+            <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                <ProgressSpinner />
+            </div>
             <div className="p-grid p-fluid">
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
@@ -417,19 +401,15 @@ export default function ChecklistReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>SCHEDULE DATE:</b></h6>
-                                    {/* <Calendar placeholder="Select Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon readOnlyInput/> */}
                                     <InputText placeholder="Input Schedule Date" value={scheduleDate} disabled/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>LOCATION:</b></h6>
-                                    {/* <Dropdown value={location} options={locationList} optionLabel="location" placeholder="Select Location" onChange={event => setLocation(event.target.value)}/> */}
                                     <InputText placeholder="Input Location" value={location} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>BODY No.:</b></h6>
-                                    {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
-                                    value={bodyNo} onSelect={(e) => onSelectBodyNo(e.value)} onChange={(e) => setBodyNo(e.target.value)}/> */}
                                     <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
@@ -563,7 +543,7 @@ export default function ChecklistReport() {
                                             <label htmlFor="cewd1">Yes</label>
                                         </div>
                                         <div className="p-field-radiobutton">
-                                            <RadioButton inputId="cewd2" onChange={(e) => setBodyNoSpareTire(true)} checked={bodyNoSpareTire === false}/>
+                                            <RadioButton inputId="cewd2" onChange={(e) => setBodyNoSpareTire(false)} checked={bodyNoSpareTire === false}/>
                                             <label htmlFor="cewd2">No</label>
                                         </div>
                                     </div>
@@ -581,7 +561,7 @@ export default function ChecklistReport() {
                                         </div>
                                         <div className="p-field-radiobutton">
                                             <RadioButton inputId="cewd3" onChange={(e) => setBodyNoBattery(2)} checked={bodyNoBattery === 2}/>
-                                            <label htmlFor="cewd3">No</label>
+                                            <label htmlFor="cewd3">Other</label>
                                         </div>
                                     </div>
                                 </div>
@@ -614,8 +594,6 @@ export default function ChecklistReport() {
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>PLEASE INCLUDE REMARKS:</b></h6>
                                     <small><i>*If upon inspection concern is not related or out of scope, kindly put "Unit is in good condition"</i></small>
-                                    {/* <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
-                                        value={remarks} onChange={(e) => setRemarks(e.target.value)}/> */}
                                     <div className="p-field-checkbox" style={{paddingTop:'10px'}}>
                                         <Checkbox inputId="cb1" value={0} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(0) !== -1}/>
                                         <label htmlFor="cb1">Unit is in good condition, no concern and defect found.</label>
@@ -705,7 +683,7 @@ export default function ChecklistReport() {
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 image-upload">
                                     <h6><b>ACTUAL VEHICLE (include photos of interior and exterior defects, vehicle capacity sticker, EWD, tire marks):</b></h6>
-                                    <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                                    <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000} onClear={onClearImageFile}
                                         emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
                                 </div>
                                 <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
@@ -730,6 +708,18 @@ export default function ChecklistReport() {
                         </div>
                     </div>
                 </Dialog>
+
+                <Dialog header={message.title} visible={displayMessage} style={{ width: '310px' }} footer={renderFooter('displayMessage')} onHide={() => onHide('displayMessage')} closable={false}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-exclamation-circle" style={{fontSize: '28px', color: 'gray'}}/>
+                        </div>
+                        <div className="p-col">
+                            <div style={{fontSize: '16px'}}>{message.content}</div>
+                        </div>
+                    </div>
+                </Dialog>
+
             </div>
 
         </div>
