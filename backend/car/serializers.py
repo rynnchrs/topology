@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import TPL, Car, Contract, Insurance
+from .models import PDF, TPL, Car, Contract, Insurance
 
 
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
@@ -62,3 +62,13 @@ class InsuranceSerializer(serializers.ModelSerializer):
         model = Insurance
         fields = '__all__'
         lookup_field = 'slug'
+
+
+class PDFSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PDF
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        self.fields['car'] = serializers.CharField(read_only=True, source='car.body_no')
+        return super(PDFSerializer, self).to_representation(instance)

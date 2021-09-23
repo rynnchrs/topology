@@ -119,7 +119,7 @@ class Car(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def _str_(self):
-        return self.vin_no
+        return self.body_no
 
     @property
     def get_total(self):
@@ -346,3 +346,17 @@ class Insurance(models.Model):
 
     def __str__(self):
         return self.company
+
+def upload_path(instance, filename):
+    return '/'.join(['Car-PDF/',filename])
+
+class PDF(models.Model):
+    pdf_id = models.AutoField(primary_key=True)
+    car = models.OneToOneField(Car, related_name='pdf', on_delete=models.PROTECT)
+    pdf = models.FileField(upload_to=upload_path, null=True, blank=True)
+
+    date_updated = models.DateField(auto_now=True, null=True, blank=True)
+    date_created = models.DateField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.car.body_no)

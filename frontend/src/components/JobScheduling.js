@@ -61,14 +61,17 @@ export const JobScheduling = () => {
     });
 
     const [holdData, setHoldData] = useState([]);
-    const jobTypeOptions = [{ name: 'REPAIR', val: true }, { name: 'INSPECTION', val: false }];
+    const [holdTaskType, setHoldTaskType] = useState('');
     const [disabledData, setDisabledData] = useState(false);
     const [disabledApproval, setDisabledApproval] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
-
+    const reportTypeOptions = [/* { name: 'CHECKLIST', val: 'checklist' }, */ { name: 'INCIDENT', val: 'incident' }];
+    const [reportList, setReportList] = useState([]);
+    const [locationList, setLocationList] = useState([]);
+    
     const [searchFieldman, setSearchFieldman] = useState("");
     const [searchStartDate, setSearchStartDate] = useState(null);
     const [searchEndDate, setSearchEndDate] = useState(null);
@@ -83,20 +86,26 @@ export const JobScheduling = () => {
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 
-    //create task form
+    //create repair/inspection task form
     const [fieldman, setFieldman] = useState([{id: 0 , val: "", fullname: ""}]);
     const [bodyNo, setBodyNo] = useState([]);
-    const [jobType, setJobType] = useState([]);
+    const [location, setLocation] = useState('');
+    const [reportType, setReportType] = useState([]);
+    const [reportNo, setReportNo] = useState({});
+    
     const [dateStart, setDateStart] = useState(null);
     const [dateEnd, setDateEnd] = useState(null);
     const [scheduleDate, setScheduleDate] = useState(null);
     const [remarks, setRemarks] = useState('');
 
-    //edit task form
+    //edit repair/inspection task form
     const [editJobNo, setEditJobNo] = useState('');
     const [editFieldman, setEditFieldman] = useState([]);
     const [editBodyNo, setEditBodyNo] = useState([]);
-    const [editJobType, setEditJobType] = useState([]);
+    const [editLocation, setEditLocation] = useState('');
+    const [editReportType, setEditReportType] = useState([]);
+    const [editReportNo, setEditReportNo] = useState({});
+
     const [editDateStart, setEditDateStart] = useState(null);
     const [editDateEnd, setEditDateEnd] = useState(null);
     const [editDateStartActual, setEditDateStartActual] = useState(null);
@@ -122,6 +131,30 @@ export const JobScheduling = () => {
     const [displayMessage, setDisplayMessage] = useState(false);
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
+    const [displayJobCreateInspection, setDisplayJobCreateInspection] = useState(false);
+    const [displayJobEditInspection, setDisplayJobEditInspection] = useState(false);
+
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/location-list/', config)
+            .then((res) => {
+                let loc = [...locationList];
+                for (var i = 0; i < Object.keys(res.data).length; i++) {
+                    loc.push({"location": res.data[i]})
+                }
+                setLocationList(loc);
+            })
+            .catch((err) => {
+                
+            });
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -133,16 +166,13 @@ export const JobScheduling = () => {
         };
 
         Promise.all([
-            axios.get(process.env.REACT_APP_SERVER_NAME + 'task/task-list/', config),
             localStorage.getItem("viewUsers") === "true" ? axios.get(process.env.REACT_APP_SERVER_NAME + 'task/fieldman-list/', config) : '',
-        ]).then(([res1, res2]) => {
-            setTotalCount(res1.data.count);
-            setJobList(res1.data.results);
-            setFieldmanList(res2.data.results);
-            if (res2.data.next === null){
+        ]).then(([res1]) => {
+            setFieldmanList(res1.data.results);
+            if (res1.data.next === null){
                 
             } else {
-                nextPageFieldman(res2.data.next);
+                nextPageFieldman(res1.data.next);
             }
         }).catch((err) => {
 
@@ -299,7 +329,7 @@ export const JobScheduling = () => {
 
             } else {
                 try {
-                    setSuggestions(fieldmanList.filter(item => item.username.startsWith(event.query)));
+                    setSuggestions(fieldmanList.filter(item => item.full_name.toLowerCase().startsWith(event.query)));
                 } catch (err){
 
                 }
@@ -326,7 +356,7 @@ export const JobScheduling = () => {
     }
 
     const autoCompleteSelectEdit = (id, event) => {
-        updateEditFieldman(id, event.value.full_name);
+        updateEditFieldman(id, event.value.username, event.value.full_name);
     }
 
     const getTaskList = () => {
@@ -408,7 +438,7 @@ export const JobScheduling = () => {
             let f = v.fieldman.map((x) =>
                 x.field_man
             )
-            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFieldman: " + f,
+            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFIELDMAN: " + f + "\nLOCATION: Sample",
             "start": v.start_date, "end": String(endDate)}]);
         });
     }
@@ -472,14 +502,18 @@ export const JobScheduling = () => {
             <div className="p-grid p-fluid p-nogutter" role="button" style={{cursor: 'pointer'}} onClick={(event) => getTaskScheduling(jobList.job_order.job_id, jobList.job_order.type)}>
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                     <div className="job-datatable-item" style={{borderLeft: '5px solid ' + jobTypeColor}}>
+                        <div style={{float: 'left', width:'40px'}}>
+                            <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_id}</b></p>
+                        </div>
+                        <div style={{float: 'right', width:'27px'}}>
+                            <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '27px', height: '27px', color: 'black'}}
+                            onClick={(event) => holdJobData(event, jobList.job_order.job_id, jobList.job_order.type)} />
+                        </div>
                         <div className="p-grid p-fluid p-nogutter">
-                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                <div className="p-grid p-fluid p-nogutter">
-                                    <div className="p-col" style={{maxWidth: '70px'}}>
-                                        <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_id}</b></p>
-                                    </div>
-                                    <div className="p-col">
-                                        <p style={{fontSize: '14px'}}><i className="pi pi-user"></i>
+                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-grid p-fluid">
+                                    <div className="p-col-12 p-lg-6 p-md-12 p-sm-12">
+                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-user"></i>
                                             {
                                                 jobList.fieldman.map((x, index) =>
                                                     <b key={index}> {x.field_man + ","}</b>
@@ -487,10 +521,13 @@ export const JobScheduling = () => {
                                             }
                                         </p>
                                     </div>
+                                    <div className="p-col-12 p-lg-6 p-md-12 p-sm-12">
+                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-map-marker"></i> Metro manila makata quezon city </p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">
-                                <div className="p-grid p-fluid p-nogutter">
+                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-grid p-fluid">
                                     <div className="p-col" style={{minWidth:'150px'}}>
                                         <p style={{fontSize: '14px'}}>
                                             <i className="pi pi-calendar"></i> {monthNames[gmtScheduleDate.getUTCMonth()] + " " + (gmtScheduleDate.getUTCDate()) + ", " + gmtScheduleDate.getUTCFullYear()} <br></br>
@@ -499,14 +536,14 @@ export const JobScheduling = () => {
                                         </p>
                                     </div>
                                     <div className="p-col" style={{minWidth:'115px'}}>
-                                        <small style={{fontSize: '13px', backgroundColor: statusColor1, color: 'white', padding:'2px 5px 3px', borderRadius: '5px'}}>{status1} </small>
-                                    </div>
-                                    <div className="p-col" style={{minWidth:'75px'}}>
-                                        <b style={{fontSize: '14px', color: jobTypeColor, textTransform: 'uppercase'}}>{jobList.job_order.type} </b>
-                                    </div>
-                                    <div className="p-col">
-                                        <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '35px', height: '27px', color: 'black'}}
-                                        onClick={(event) => holdJobData(event, jobList.job_order.job_id)} />
+                                        <div className="p-grid p-fluid">
+                                            <div className="p-col-12 p-lg-12">
+                                                <small style={{fontSize: '13px', backgroundColor: statusColor1, color: 'white', padding:'2px 5px 3px', borderRadius: '5px'}}>{status1} </small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12">
+                                                <b style={{fontSize: '14px', color: jobTypeColor, textTransform: 'uppercase'}}>{jobList.job_order.type} </b>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -517,14 +554,16 @@ export const JobScheduling = () => {
         );
     }
 
-    const holdJobData = (event, value) => {
+    const holdJobData = (event, value, taskType) => {
         menu.current.toggle(event);
         event.stopPropagation();
         setHoldData(value);
-        getTaskScheduling1(value);
+        getTaskScheduling1(value, taskType);
+        setHoldTaskType(taskType);
     }
 
     const getTaskScheduling = (value, type) => {
+        setHoldTaskType(type);
         if (value !== null) {
             let token = localStorage.getItem("token");
             const config = {
@@ -557,7 +596,7 @@ export const JobScheduling = () => {
         }
     }
 
-    const getTaskScheduling1 = (value) => {
+    const getTaskScheduling1 = (value, taskType) => {
         if (value !== null) {
             let token = localStorage.getItem("token");
             const config = {
@@ -567,8 +606,10 @@ export const JobScheduling = () => {
                 },
             };
 
+            let apiValue = taskType === "Repair" ? 'task/task-scheduling/' : 'task/task-inspection/';
+
             axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
                 .then((res) => {
                     setJobData(res.data);
                 })
@@ -654,7 +695,10 @@ export const JobScheduling = () => {
             });
     }
 
-    const taskWarningList = () => {
+    const taskWarningList = (taskType) => {
+        console.log(reportList)
+        console.log(reportType)
+        console.log(reportNo)
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -663,154 +707,292 @@ export const JobScheduling = () => {
             },
         };
 
-        if (dateStart === null) {
-            toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateEnd === null) {
-            toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+        if (taskType === "repair") {
+            if (fieldman[0].val === "") { 
+                toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
+            } else if (bodyNo === "" || bodyNo.length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
+            } else if (reportType.length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'REPORT TYPE', detail: 'This field is required.', life: 3000 });
+            } else if (Object.keys(reportNo).length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'REPORT No.', detail: 'This field is required.', life: 3000 });
+            } else if (dateStart === null) {
+                toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
+            } else if (dateEnd === null) {
+                toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+            } else if (scheduleDate === null) {
+                toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
+            } else {
+                let fieldmanData = "";
+                fieldman.map((x) =>
+                    fieldmanData += x.val + ","
+                )
+    
+                axios
+                    .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
+                    + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
+                    .then((res) => {
+                        if (res.data.length <= 0){
+                            submitTaskRepair();
+                        } else {
+                            toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
+                            submitTaskRepair();
+                        }
+                    })
+                    .catch((err) => {
+                        
+                    });
+            }
         } else {
-
-            let fieldmanData = "";
-            fieldman.map((x) =>
-                fieldmanData += x.val + ","
-            )
-
-            axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
-                + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
-                .then((res) => {
-                    if (res.data.length <= 0){
-                        submitTask();
-                    } else {
-                        toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
-                        submitTask();
-                    }
-                })
-                .catch((err) => {
-                    
-                });
+            if (fieldman[0].val === "") { 
+                toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
+            } else if (location === "" || location.length <= 0) {
+                toast.current.show({ severity: 'error', summary: 'LOCATION', detail: 'This field is required.', life: 3000 });
+            } else if (dateStart === null) {
+                toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
+            } else if (dateEnd === null) {
+                toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
+            } else if (scheduleDate === null) {
+                toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
+            } else {
+                let fieldmanData = "";
+                fieldman.map((x) =>
+                    fieldmanData += x.val + ","
+                )
+    
+                axios
+                    .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/warning_list/?start_date=' + format(dateStart, 'yyyy-MM-dd')
+                    + '&end_date=' + format(dateEnd, 'yyyy-MM-dd') + '&fieldman=' + fieldmanData, config)
+                    .then((res) => {
+                        if (res.data.length <= 0){
+                            submitTaskInspection();
+                        } else {
+                            toast.current.show({ severity: 'warn', summary: 'Task', detail: 'Fieldman had already task.', life: 5000 });
+                            submitTaskInspection();
+                        }
+                    })
+                    .catch((err) => {
+                        
+                    });
+            }
         }
     }
 
-    const submitTask = () => {
-        if (fieldman[0].val === "") { 
-            toast.current.show({ severity: 'error', summary: 'FIELDMAN', detail: 'This field is required.', life: 3000 });
-        } else if (bodyNo === "" || bodyNo.length <= 0) {
-            toast.current.show({ severity: 'error', summary: 'BODY NO.', detail: 'This field is required.', life: 3000 });
-        } else if (jobType.length === 0) {
-            toast.current.show({ severity: 'error', summary: 'JOB TYPE', detail: 'This field is required.', life: 3000 });
-        } else if (dateStart === null) {
-            toast.current.show({ severity: 'error', summary: 'START DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateEnd === null) {
-            toast.current.show({ severity: 'error', summary: 'END DATE', detail: 'This field is required.', life: 3000 });
-        } else if (scheduleDate === null) {
-            toast.current.show({ severity: 'error', summary: 'SCHEDULE DATE', detail: 'This field is required.', life: 3000 });
-        } else {
-            let fieldmanData = [];
-            fieldman.map((x) =>
-                fieldmanData.push({field_man: x.fullname})
-            )
-
-            let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-
-            axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', {
-                job_order: {
-                    type: jobType.val
-                },
-                fieldman: fieldmanData,
-                desc:"",
-                body_no: bodyNo.body_no,
-                start_date: format(dateStart, 'yyyy-MM-dd'),
-                end_date: format(dateEnd, 'yyyy-MM-dd'),
-                schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
-                remarks: remarks
-            }, config)
-            .then((res) => {
-                getTaskList();
-                onHide('displayJobCreate');
-                setMessage({title:"CREATE", content:"Successfully created."});
-                onClick('displayMessage');
-            })
-            .catch((err) => {
-                if (err.toJSON().message === 'Network Error'){
-                    toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
-                } else if (err.response.data.fieldman) {
-                    toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
-                } else if (err.response.data.body_no) {
-                    toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
-                } else if (err.response.data.start_date) {
-                    toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
-                } else if (err.response.data.end_date) {
-                    toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
-                } else if (err.response.data.errors) {
-                    if (err.response.data.errors[0].body_no) {
-                        toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Invalid Body No.', life: 3000 });
-                    } else if (err.response.data.errors[0].manager) {
-                        toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
-                    } else if (err.response.data.errors[0].field_man) {
-                        toast.current.show({ severity: 'error', summary: 'Duplicate Fieldman', detail: 'Please check fieldman input.', life: 3000 });
-                    }
-                }
-            })
-        }
-    }
-
-    const editAssignData = (value) => {
-        setEditFieldman([]);
-        jobData.fieldman.map((x, index) =>
-            setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
+    const submitTaskRepair = () => {
+        let fieldmanData = [];
+        fieldman.map((x) =>
+            fieldmanData.push({field_man: x.val})
         )
 
-        localStorage.getItem("viewUsers") === "true" ? setDisabledData(false) : setDisabledData(true);
-        let splitDateStart = jobData.start_date.split("-");
-        let splitDateEnd = jobData.end_date.split("-");
-        let splitScheduleDate = jobData.schedule_date.split("-");
-        let gmtDateStart = new Date(+splitDateStart[0], splitDateStart[1] - 1, +splitDateStart[2]);
-        let gmtDateEnd = new Date(+splitDateEnd[0], splitDateEnd[1] - 1, +splitDateEnd[2]);
-        let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
 
-        let parseDateStartActual = null;
-        let parseDateEndActual = null;
-        if (jobData.start_date_actual === null) {
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/', {
+            job_order: {
+                type: true
+            },
+            fieldman: fieldmanData,
+            desc:"",
+            body_no: bodyNo.body_no,
+            ir_no: reportNo.ir_no,
+            check_list: "",
+            start_date: format(dateStart, 'yyyy-MM-dd'),
+            end_date: format(dateEnd, 'yyyy-MM-dd'),
+            schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
+            remarks: remarks
+        }, config)
+        .then((res) => {
+            getTaskList();
+            onHide('displayJobCreate');
+            setMessage({title:"CREATE", content:"Successfully created."});
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            if (err.toJSON().message === 'Network Error'){
+                toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+            } else if (err.response.data.fieldman) {
+                toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
+            } else if (err.response.data.body_no) {
+                toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
+            } else if (err.response.data.start_date) {
+                toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.end_date) {
+                toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.errors) {
+                if (err.response.data.errors[0].body_no) {
+                    toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Invalid Body No.', life: 3000 });
+                } else if (err.response.data.errors[0].manager) {
+                    toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
+                } else if (err.response.data.errors[0].field_man) {
+                    toast.current.show({ severity: 'error', summary: 'Duplicate Fieldman', detail: 'Please check fieldman input.', life: 3000 });
+                }
+            }
+        })
+    }
 
+    const submitTaskInspection = () => {
+        let fieldmanData = [];
+        fieldman.map((x) =>
+            fieldmanData.push({field_man: x.val})
+        )
+
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'task/task-inspection/', {
+            job_order: {
+                type: false
+            },
+            fieldman: fieldmanData,
+            desc:"",
+            location: location.location,
+            body_no: "",
+            ir_no: "",
+            check_list: "",
+            start_date: format(dateStart, 'yyyy-MM-dd'),
+            end_date: format(dateEnd, 'yyyy-MM-dd'),
+            schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
+            remarks: remarks
+        }, config)
+        .then((res) => {
+            getTaskList();
+            onHide('displayJobCreateInspection');
+            setMessage({title:"CREATE", content:"Successfully created."});
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            console.log(err)
+            if (err.toJSON().message === 'Network Error'){
+                toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+            } else if (err.response.data.fieldman) {
+                toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
+            } else if (err.response.data.body_no) {
+                toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
+            } else if (err.response.data.start_date) {
+                toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.end_date) {
+                toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.errors) {
+                if (err.response.data.errors[0].manager) {
+                    toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
+                } else if (err.response.data.errors[0].field_man) {
+                    toast.current.show({ severity: 'error', summary: 'Duplicate Fieldman', detail: 'Please check fieldman input.', life: 3000 });
+                }
+            }
+        })
+    }
+
+    const editAssignData = () => {
+        console.log(holdTaskType)
+        if (holdTaskType === "Repair") {
+            setEditFieldman([]);
+            console.log(jobData.fieldman)
+            jobData.fieldman.map((x, index) =>
+                // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
+                fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
+                    setEditFieldman(editFieldman => [...editFieldman, {id: index, val: i.username, fullname: i.full_name}])
+                })
+            )
+            
+            localStorage.getItem("viewUsers") === "true" ? setDisabledData(false) : setDisabledData(true);
+            let splitDateStart = jobData.start_date.split("-");
+            let splitDateEnd = jobData.end_date.split("-");
+            let splitScheduleDate = jobData.schedule_date.split("-");
+            let gmtDateStart = new Date(+splitDateStart[0], splitDateStart[1] - 1, +splitDateStart[2]);
+            let gmtDateEnd = new Date(+splitDateEnd[0], splitDateEnd[1] - 1, +splitDateEnd[2]);
+            let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
+
+            let parseDateStartActual = null;
+            let parseDateEndActual = null;
+            if (jobData.start_date_actual === null) {
+
+            } else {
+                parseDateStartActual = jobData.start_date_actual.split("-");
+                parseDateStartActual = new Date(+parseDateStartActual[0], parseDateStartActual[1] - 1, +parseDateStartActual[2]);
+            }
+            if (jobData.end_date_actual === null) {
+
+            } else {
+                parseDateEndActual = jobData.end_date_actual.split("-");
+                parseDateEndActual = new Date(+parseDateEndActual[0], parseDateEndActual[1] - 1, +parseDateEndActual[2]);
+            }
+
+            setEditJobNo(jobData.task_id);
+            setEditBodyNo(jobData.body_no.body_no);
+            onChangeReportType(reportTypeOptions.find(x => x.val === "incident"), 'edit', jobData.ir_no.ir_no);
+            
+            setEditDateStart(gmtDateStart);
+            setEditDateEnd(gmtDateEnd);
+            setEditDateStartActual(parseDateStartActual);
+            setEditDateEndActual(parseDateEndActual);
+            setEditScheduleDate(gmtScheduleDate);
+            setEditRemarks(jobData.remarks);
+            onHide('displayJobDetails'); 
+            onClick('displayJobEdit');
         } else {
-            parseDateStartActual = jobData.start_date_actual.split("-");
-            parseDateStartActual = new Date(+parseDateStartActual[0], parseDateStartActual[1] - 1, +parseDateStartActual[2]);
-        }
-        if (jobData.end_date_actual === null) {
+            setEditFieldman([]);
+            console.log(jobData.fieldman)
+            jobData.fieldman.map((x, index) =>
+                // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
+                fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
+                    setEditFieldman(editFieldman => [...editFieldman, {id: index, val: i.username, fullname: i.full_name}])
+                })
+            )
+            
+            localStorage.getItem("viewUsers") === "true" ? setDisabledData(false) : setDisabledData(true);
+            let splitDateStart = jobData.start_date.split("-");
+            let splitDateEnd = jobData.end_date.split("-");
+            let splitScheduleDate = jobData.schedule_date.split("-");
+            let gmtDateStart = new Date(+splitDateStart[0], splitDateStart[1] - 1, +splitDateStart[2]);
+            let gmtDateEnd = new Date(+splitDateEnd[0], splitDateEnd[1] - 1, +splitDateEnd[2]);
+            let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
 
-        } else {
-            parseDateEndActual = jobData.end_date_actual.split("-");
-            parseDateEndActual = new Date(+parseDateEndActual[0], parseDateEndActual[1] - 1, +parseDateEndActual[2]);
-        }
+            let parseDateStartActual = null;
+            let parseDateEndActual = null;
+            if (jobData.start_date_actual === null) {
 
-        setEditJobNo(jobData.task_id);
-        setEditBodyNo(jobData.body_no.body_no);
-        try {
-            setEditJobType(jobTypeOptions.find(x => x.name === jobData.job_order.type.toUpperCase()));
-        } catch(err){
+            } else {
+                parseDateStartActual = jobData.start_date_actual.split("-");
+                parseDateStartActual = new Date(+parseDateStartActual[0], parseDateStartActual[1] - 1, +parseDateStartActual[2]);
+            }
+            if (jobData.end_date_actual === null) {
+
+            } else {
+                parseDateEndActual = jobData.end_date_actual.split("-");
+                parseDateEndActual = new Date(+parseDateEndActual[0], parseDateEndActual[1] - 1, +parseDateEndActual[2]);
+            }
+
+            setEditJobNo(jobData.task_id);
+            setEditBodyNo(jobData.body_no.body_no);
+            setEditLocation(locationList.find(x => x.location === jobData.body_no.current_loc));
+
+            setEditDateStart(gmtDateStart);
+            setEditDateEnd(gmtDateEnd);
+            setEditDateStartActual(parseDateStartActual);
+            setEditDateEndActual(parseDateEndActual);
+            setEditScheduleDate(gmtScheduleDate);
+            setEditRemarks(jobData.remarks);
+            onHide('displayJobDetails'); 
+            onClick('displayJobEditInspection');
 
         }
-        setEditDateStart(gmtDateStart);
-        setEditDateEnd(gmtDateEnd);
-        setEditDateStartActual(parseDateStartActual);
-        setEditDateEndActual(parseDateEndActual);
-        setEditScheduleDate(gmtScheduleDate);
-        setEditRemarks(jobData.remarks);
-        onHide('displayJobDetails'); 
-        onClick('displayJobEdit');
 
     }
 
-    const editTask = () => {
+    const editTaskRepair = () => {
         let fieldmanData = [];
         editFieldman.map((x) => 
-            fieldmanData.push({field_man: x.fullname})
+            fieldmanData.push({field_man: x.val})
         )
 
         let token = localStorage.getItem("token");
@@ -823,11 +1005,13 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + editJobNo + '/', {
             job_order: {
-                type: editJobType.val
+                type: true
             },
             fieldman: fieldmanData,
             desc: "",
             body_no: editBodyNo,
+            ir_no: editReportNo.ir_no,
+            checklist: "",
             start_date: format(editDateStart, 'yyyy-MM-dd'),
             end_date: format(editDateEnd, 'yyyy-MM-dd'),
             schedule_date: format(editScheduleDate, 'yyyy-MM-dd'),
@@ -836,7 +1020,7 @@ export const JobScheduling = () => {
         .then((res) => {
             getTaskList();
             onHide('displayJobEdit');
-            setMessage({title:"UPDATE", content:"Successfully update."});
+            setMessage({title:"UPDATE", content:"Successfully updated."});
             onClick('displayMessage');
         })
         .catch((err) => {
@@ -860,7 +1044,65 @@ export const JobScheduling = () => {
         })
     }
 
-    const editTaskFieldman = () => {
+    const editTaskInspection = () => {
+        let fieldmanData = [];
+        editFieldman.map((x) => 
+            fieldmanData.push({field_man: x.val})
+        )
+
+        console.log(editLocation)
+        console.log(editJobNo)
+
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + editJobNo + '/', {
+            job_order: {
+                type: true
+            },
+            fieldman: fieldmanData,
+            desc: "",
+            body_no: editBodyNo,
+            ir_no: "",
+            checklist: "",
+            start_date: format(editDateStart, 'yyyy-MM-dd'),
+            end_date: format(editDateEnd, 'yyyy-MM-dd'),
+            schedule_date: format(editScheduleDate, 'yyyy-MM-dd'),
+            remarks: editRemarks
+        }, config)
+        .then((res) => {
+            getTaskList();
+            onHide('displayJobEditInspection');
+            setMessage({title:"UPDATE", content:"Successfully updated."});
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            if (err.toJSON().message === 'Network Error'){
+                toast.current.show({ severity: 'error', summary: 'Network Error', detail: 'Please check internet connection.', life: 3000 });
+            } else if (err.response.data.fieldman) {
+                toast.current.show({ severity: 'error', summary: 'Fieldman', detail: 'No Fielman found.', life: 3000 });
+            } else if (err.response.data.body_no) {
+                toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Body No. is required.', life: 3000 });
+            } else if (err.response.data.start_date) {
+                toast.current.show({ severity: 'error', summary: 'Start Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.end_date) {
+                toast.current.show({ severity: 'error', summary: 'End Date', detail: 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', life: 3000 });
+            } else if (err.response.data.errors) {
+                if (err.response.data.errors[0].body_no) {
+                    toast.current.show({ severity: 'error', summary: 'Vehicle Body No.', detail: 'Invalid Body No.', life: 3000 });
+                } else if (err.response.data.errors[0].manager) {
+                    toast.current.show({ severity: 'error', summary: 'Manager', detail: 'No Manager found.', life: 3000 });
+                }
+            }
+        })
+    }
+
+    const editTaskRepairFieldman = () => {
         let actualStart = editDateStartActual === null ? null : format(editDateStartActual, 'yyyy-MM-dd');
         let actualEnd = editDateEndActual === null ? null : format(editDateEndActual, 'yyyy-MM-dd');
         let token = localStorage.getItem("token");
@@ -878,7 +1120,8 @@ export const JobScheduling = () => {
         .then((res) => {
             getTaskList();
             onHide('displayJobEdit');
-            setMessage({title:"UPDATE", content:"Successfully update."});
+            onHide('displayJobEditInspection');
+            setMessage({title:"UPDATE", content:"Successfully updated."});
             onClick('displayMessage');
         })
         .catch((err) => {
@@ -904,7 +1147,7 @@ export const JobScheduling = () => {
         })
     }
 
-    const deleteTask = (value) => {
+    const deleteTask = (value, taskType) => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -913,12 +1156,14 @@ export const JobScheduling = () => {
             },
         };
 
-        axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
+        let apiValue = taskType === "Repair" ? 'task/task-scheduling/' : 'task/task-inspection/';
+
+        axios.delete(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
         .then((res) => {;
             getTaskList();
             onHide('displayConfirmDelete');
             onHide('displayJobEdit');
-            setMessage({title:"DELETE", content:"Successfully delete."});
+            setMessage({title:"DELETE", content:"Successfully deleted."});
             onClick('displayMessage');
         })
         .catch((err) => {
@@ -959,26 +1204,86 @@ export const JobScheduling = () => {
 
         axios.put(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/status_mn/', "", config)
         .then((res) => {
-
-            // axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + jobOrderID + '/approved/' , "", config)
-            // .then((res) => {
                 getTaskList();
                 onHide('displayJobDetails');
                 onHide('displayConfirmMN');
                 setMessage({title:"APPROVE", content:"Task approve."});
                 onClick('displayMessage');
-            // })
-            // .catch((err) => {
-            //     toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
-            // });
         })
         .catch((err) => {
             toast.current.show({ severity: 'error', summary: 'APPROVE ERROR', detail: 'Something went wrong.', life: 3000 });
         });
     }
 
+    const onChangeReportType = (value, method, ro) => {
+        method === "create" ? setReportType(value) : setEditReportType(value);
+        let apiValue = "";
+        if (value.val === "incident") {
+            apiValue = "task/ir-report/";
+        } else {
+            apiValue = "task/ir-report/"; //will update soon for checklist
+        }
+
+        let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + apiValue, config)
+            .then((res) => {
+                setReportList(res.data.results);
+                res.data.results.filter(i => i.ir_no === ro).map((i) => {
+                    setEditReportNo(i);
+                });
+                if (res.data.next === null) {
+                    
+                } else {
+                    nextPageReportList(res.data.next, ro);
+                }
+            })
+            .catch((err) => {
+                
+            });
+    }
+
+    const nextPageReportList = (valueURL, ro) => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios
+            .get(valueURL, config)
+            .then((res) => {
+                appendReportList(res.data.results, res.data.next, ro);
+                res.data.results.filter(i => i.ir_no === ro).map((i) => {
+                    setEditReportNo(i);
+                });
+            })
+            .catch((err) => {
+                
+            });
+    };
+
+    const appendReportList = (valueResults, valueURL, ro) => {
+        valueResults.map((i) => {
+            return setReportList(reportList => [...reportList, i]);
+        });
+        if (valueURL === null) {
+
+        } else {
+            nextPageReportList(valueURL, ro);
+        }
+    }
+
     const addFieldman = () => {
-        setFieldman(fieldman => [...fieldman, {id: fieldman.length, val: ""}]);
+        setFieldman(fieldman => [...fieldman, {id: fieldman.length, val: "", fullname: ""}]);
     }
 
     const removeFieldman = () => {
@@ -994,7 +1299,7 @@ export const JobScheduling = () => {
     }
 
     const editAddFieldman = () => {
-        setEditFieldman(editFieldman => [...editFieldman, {id: editFieldman.length, fullname: ""}]);
+        setEditFieldman(editFieldman => [...editFieldman, {id: editFieldman.length, val: "", fullname: ""}]);
     }
 
     const editRemoveFieldman = () => {
@@ -1003,9 +1308,11 @@ export const JobScheduling = () => {
         setEditFieldman(cols);
     }
 
-    const updateEditFieldman = (index, fn) => {
+    const updateEditFieldman = (index, value, fn) => {
+        console.log(value)
+        console.log(fn)
         let arr = editFieldman.slice();
-        arr[index] = {id: index, fullname: fn};
+        arr[index] = {id: index, val: value, fullname: fn};
         setEditFieldman(arr);
     }
 
@@ -1017,7 +1324,8 @@ export const JobScheduling = () => {
         'displayConfirmMN': setDisplayConfirmMN,
         'displayMessage': setDisplayMessage,
         'displayConfirmDelete': setDisplayConfirmDelete,
-
+        'displayJobCreateInspection': setDisplayJobCreateInspection,
+        'displayJobEditInspection': setDisplayJobEditInspection,
     }
 
     const onClick = (name) => {
@@ -1026,6 +1334,17 @@ export const JobScheduling = () => {
 
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
+        setReportList([]);
+
+        setFieldman([{id: 0 , val: "", fullname: ""}]);
+        setBodyNo([]);
+        setLocation('');
+        setReportType([]);
+        setReportNo({});
+        setDateStart(null);
+        setDateEnd(null);
+        setScheduleDate(null);
+        setRemarks('');
     }
 
     const renderFooter = (name) => {
@@ -1053,7 +1372,7 @@ export const JobScheduling = () => {
             return (
                 <div>
                     <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
-                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => deleteTask(holdData)}/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => deleteTask(holdData, holdTaskType)}/>
                 </div>
             );
         }
@@ -1067,20 +1386,31 @@ export const JobScheduling = () => {
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                             <div className="p-grid p-fluid">
-                                <div className="p-col">
-                                    <b style={{fontSize: '20px', color:'gray'}}>Task List</b>
+                                <div className="p-col-12 p-xl-7 p-lg-6 p-md-5 p-sm-12">
+                                    <div style={{float: 'left'}}>
+                                        <b style={{fontSize: '20px', color:'gray'}}>Task List</b>
+                                    </div>
                                 </div>
-                                <div className="p-col">
-                                {
-                                    localStorage.getItem("viewUsers") === "true" ? <Button label="CREATE" icon="pi pi-plus" onClick={() => onClick('displayJobCreate')} style={{ float: 'right', width:'130px'}}/> : ''
-                                }
+                                <div className="p-col-12 p-xl-5 p-lg-6 p-md-7 p-sm-12">
+                                    {
+                                        localStorage.getItem("viewUsers") === "true" ? 
+                                                <div className="p-grid p-fluid">
+                                                    <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
+                                                        <Button style={{minWidth:'max-content'}} className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
+                                                        <Button label="CREATE REPAIR" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/>
+                                                    </div>
+                                                </div>
+                                        : ''
+                                    }
                                 </div>
                             </div>
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText placeholder="Search" value={searchFieldman} onChange={(event) => bodySearch(event)}/>
+                                <InputText placeholder="Search Name" value={searchFieldman} onChange={(event) => bodySearch(event)}/>
                             </span>
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
@@ -1097,7 +1427,7 @@ export const JobScheduling = () => {
                             <Dropdown value={searchJobType} options={searchJobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setSearchJobType(event.target.value)} />
                         </div>
                         <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
-                            <Button label="SEARCH" onClick={() => submitSearch(searchFieldman)}/>
+                            <Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch(searchFieldman)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 job-datatable">
                             {
@@ -1122,7 +1452,7 @@ export const JobScheduling = () => {
             </div>
 
             <div className="dialog-display">
-                <Dialog header="CREATE TASK" visible={displayJobCreate} onHide={() => onHide('displayJobCreate')} blockScroll={true}>
+                <Dialog header="CREATE REPAIR TASK" visible={displayJobCreate} onHide={() => onHide('displayJobCreate')} blockScroll={true}>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>FIELDMAN:</b></h6>
@@ -1145,34 +1475,93 @@ export const JobScheduling = () => {
                             value={bodyNo} onChange={(e) => setBodyNo(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>JOB TYPE: </b></h6>
-                            <Dropdown value={jobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setJobType(event.target.value)} />
+                            <h6><b>JOB TYPE:</b></h6>
+                            <InputText placeholder="REPAIR" disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REPORT TYPE:</b></h6>
+                            <Dropdown value={reportType} options={reportTypeOptions} optionLabel="name" placeholder="Select Report Type"
+                            onChange={event => onChangeReportType(event.target.value, 'create')}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REPORT No.:</b></h6>
+                            <Dropdown value={reportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No."
+                            onChange={event => setReportNo(event.target.value)} disabled={reportList.length === 0}/>
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>
-                            <Calendar id="icon" placeholder="Input Date" value={dateStart} onChange={(e) => setDateStart(e.value)} showIcon />
+                            <Calendar id="icon" placeholder="Select Date" value={dateStart} onChange={(e) => setDateStart(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>END DATE:</b></h6>
-                            <Calendar id="icon" placeholder="Input Date" value={dateEnd} onChange={(e) => setDateEnd(e.value)} showIcon />
+                            <Calendar id="icon" placeholder="Select Date" value={dateEnd} onChange={(e) => setDateEnd(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>SCHEDULE DATE:</b></h6>
-                            <Calendar id="icon" placeholder="Input Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon />
+                            <Calendar id="icon" placeholder="Select Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon />
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>REMARKS:</b></h6>
-                            <InputText placeholder="Add other remarks here" value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
+                            <InputText placeholder="Add other remarks here." value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
                         </div>
 
                         <div className="p-col-12 p-md-9"> </div>
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
-                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList()}/>
+                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList("repair")}/>
                         </div>
                     </div>
                 </Dialog>
 
-                <Dialog header="EDIT TASK" visible={displayJobEdit} onHide={() => onHide('displayJobEdit')} blockScroll={true}>
+                <Dialog header="CREATE INSPECTION TASK" visible={displayJobCreateInspection} onHide={() => onHide('displayJobCreateInspection')} blockScroll={true}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>FIELDMAN:</b></h6>
+                            <div className="p-grid p-fluid">
+                                {
+                                    fieldman.map((x, index) =>
+                                        <div className="p-col-12 p-lg-12" key={index}>
+                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" suggestions={suggestions} completeMethod={searchList} 
+                                            value={x.fullname} onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)}/>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                            <Button label="+" onClick={() => addFieldman()} style={{ width: '50px', marginRight: '10px'}}/> 
+                            <Button label="-" onClick={() => removeFieldman()} style={{ width: '50px' }} disabled={fieldman.length === 1}/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>LOCATION:</b></h6>
+                            <Dropdown value={location} options={locationList} optionLabel="location" placeholder="Select Location" onChange={event => setLocation(event.target.value)}/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>JOB TYPE:</b></h6>
+                            <InputText value="INSPECTION" disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>START DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Select Date" value={dateStart} onChange={(e) => setDateStart(e.value)} showIcon />
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>END DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Select Date" value={dateEnd} onChange={(e) => setDateEnd(e.value)} showIcon />
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>SCHEDULE DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Select Date" value={scheduleDate} onChange={(e) => setScheduleDate(e.value)} showIcon />
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REMARKS:</b></h6>
+                            <InputText placeholder="Add other remarks here." value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
+                        </div>
+
+                        <div className="p-col-12 p-md-9"> </div>
+                        <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
+                            <Button label="CREATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => taskWarningList("inspection")}/>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="EDIT REPAIR TASK" visible={displayJobEdit} onHide={() => onHide('displayJobEdit')} blockScroll={true}>
                     <div className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB NO.:</b></h6>
@@ -1185,7 +1574,7 @@ export const JobScheduling = () => {
                                     editFieldman.map((x, index) =>
                                         <div className="p-col-12 p-lg-12" key={index}>
                                             <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" suggestions={suggestions} completeMethod={searchList} 
-                                            value={x.fullname} onSelect={event => autoCompleteSelectEdit(x.id, event)} onChange={(e) => updateEditFieldman(x.id, e.target.value)} disabled={disabledData}/>
+                                            value={x.fullname} onSelect={event => autoCompleteSelectEdit(x.id, event)} onChange={(e) => updateEditFieldman(x.id, e.target.value, e.target.value)} disabled={disabledData}/>
                                         </div>
                                     )
                                 }
@@ -1200,7 +1589,17 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE: </b></h6>
-                            <Dropdown value={editJobType} options={jobTypeOptions} optionLabel="name" placeholder="Select Job Type" onChange={event => setEditJobType(event.target.value)} disabled/>
+                            <InputText placeholder="REPAIR" disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REPORT TYPE:</b></h6>
+                            <Dropdown value={editReportType} options={reportTypeOptions} optionLabel="name" placeholder="Select Report Type"
+                            onChange={event => onChangeReportType(event.target.value, 'edit')} disabled={disabledData}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REPORT No.:</b></h6>
+                            <Dropdown value={editReportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No."
+                            onChange={event => setEditReportNo(event.target.value)} disabled={reportList.length === 0 || disabledData}/>
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>
@@ -1231,8 +1630,73 @@ export const JobScheduling = () => {
                         <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
                             {
                                 localStorage.getItem("viewUsers") === "true" ? 
-                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTask()}/> :
-                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskFieldman()}/>
+                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskRepair()}/> :
+                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskRepairFieldman()}/>
+                            }
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="EDIT INSPECTION TASK" visible={displayJobEditInspection} onHide={() => onHide('displayJobEditInspection')} blockScroll={true}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>JOB NO.:</b></h6>
+                            <InputText placeholder="Input Job No" value={editJobNo} disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>FIELDMAN:</b></h6>
+                            <div className="p-grid p-fluid">
+                                {
+                                    editFieldman.map((x, index) =>
+                                        <div className="p-col-12 p-lg-12" key={index}>
+                                            <AutoComplete forceSelection field="full_name" placeholder="Input Fieldman" suggestions={suggestions} completeMethod={searchList} 
+                                            value={x.fullname} onSelect={event => autoCompleteSelectEdit(x.id, event)} onChange={(e) => updateEditFieldman(x.id, e.target.value, e.target.value)} disabled={disabledData}/>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                            <Button label="+" onClick={() => editAddFieldman()} style={{ width: '50px', marginRight: '10px'}} disabled={disabledData}/> 
+                            <Button label="-" onClick={() => editRemoveFieldman()} style={{ width: '50px' }} disabled={editFieldman.length === 1 || disabledData}/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>LOCATION:</b></h6>
+                            <Dropdown value={editLocation} options={locationList} optionLabel="location" placeholder="Select Location" onChange={event => setEditLocation(event.target.value)} disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>JOB TYPE: </b></h6>
+                            <InputText placeholder="INSPECTION" disabled/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>START DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Input Date" value={editDateStart} onChange={(e) => setEditDateStart(e.value)} showIcon disabled={disabledData}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>END DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Input Date" value={editDateEnd} onChange={(e) => setEditDateEnd(e.value)} showIcon disabled={disabledData}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>START DATE(ACTUAL):</b></h6>
+                            <Calendar id="icon" placeholder="Input Date" value={editDateStartActual} onChange={(e) => setEditDateStartActual(e.value)} showIcon disabled={localStorage.getItem("viewUsers") === "true"}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>END DATE(ACTUAL):</b></h6>
+                            <Calendar id="icon" placeholder="Input Date" value={editDateEndActual} onChange={(e) => setEditDateEndActual(e.value)} showIcon disabled={localStorage.getItem("viewUsers") === "true"}/>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>SCHEDULE DATE:</b></h6>
+                            <Calendar id="icon" placeholder="Input Date" value={editScheduleDate} onChange={(e) => setEditScheduleDate(e.value)} showIcon disabled={disabledData}/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>REMARKS:</b></h6>
+                            <InputText placeholder="Add other remarks here" value={editRemarks} onChange={(e) => setEditRemarks(e.target.value)} disabled={disabledData}/>
+                        </div>
+
+                        <div className="p-col-12 p-md-9"> </div>
+                        <div className="p-col-12 p-md-3" style={{ marginTop: '2%', paddingRight: '5%' }}>
+                            {
+                                localStorage.getItem("viewUsers") === "true" ? 
+                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskInspection()}/> :
+                                <Button label="SAVE CHANGES" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => editTaskRepairFieldman()}/>
                             }
                         </div>
                     </div>

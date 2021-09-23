@@ -8,6 +8,8 @@ import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { FileUpload } from 'primereact/fileupload';
+import { Carousel } from 'primereact/carousel';
 import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Paginator } from 'primereact/paginator';
@@ -15,21 +17,13 @@ import { format } from 'date-fns';
 
 export default function DriverRecordForms() {
 
-    const [selectedCar, setSelectedCar] = useState(['']);
-    const [selectedBody, setSelectedBody] = useState(['']);
+    const [selectedCar, setSelectedCar] = useState([]);
+    const [selectedBody, setSelectedBody] = useState([]);
     const [carValues, setcarValues] = useState([]);
-    const [displayBasic, setDisplayBasic] = useState(false);
-    const [displayBasic2, setDisplayBasic2] = useState(false);
-    const [displayError, setDisplayError] = useState(false);
-    const [displaySuccess, setDisplaySuccess] = useState(false);
-    const [errorMessage, setErrorMessage] = useState({title:"", content:""});
-    const [isLoading, setIsLoading] = useState(false);
-    const [iconBtnSave, setIconBtnSave] = useState("");
-    const [labelBtnSave, setLabelBtnSave] = useState("SAVE CHANGES");
-    const [isBtnSave, setIsBtnSave] = useState(false);
+    
     const [bodyNo, setBodyNo] = useState("");
     const [date2, setDate2] = useState(null);
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selectedLocation, setSelectedLocation] = useState([]);
     const cities = [
     { name: 'All Location', code: '' },
     { name: 'Marikina', code: 'Marikina' },
@@ -49,13 +43,13 @@ export default function DriverRecordForms() {
     { name: 'Zambales', code: 'Zambales' },
     ];
 
-    const [makes, setMakes] = useState("");
-
-    const [selected, setSelected] = useState(null);
+    const [selected, setSelected] = useState([]);
     const dt = useRef(null);
     const toast = useRef(null);
 
+    const [makes, setMakes] = useState("");
     const [mil, setMileage] = useState("");
+    
 
     const [cleanlinessExterior, isCleanlinessExterior] = useState(false);
     const [conditionRust, isConditionRust] = useState(false);
@@ -107,6 +101,9 @@ export default function DriverRecordForms() {
 
     const [gasLevel, isGasLevel] = useState("");
     const [oilLevel, isOilLevel] = useState("");
+    const refImageUpload = useRef(null);
+    const [reportImage, setReportImage] = useState([{ id: "", image: "" }]);
+    const [holdImageID, setHoldImageID] = useState("");
     const emergency = "09465657944";
     const [GPSData, setGPSData] = useState("");
     const [notes, isNotes] = useState("");
@@ -129,6 +126,19 @@ export default function DriverRecordForms() {
     const [counter, setCounter] = useState(1);
     const [ids, setIds] = useState([]);
 
+    const [displayBasic, setDisplayBasic] = useState(false);
+    const [displayBasic2, setDisplayBasic2] = useState(false);
+    const [displayError, setDisplayError] = useState(false);
+    const [displaySuccess, setDisplaySuccess] = useState(false);
+    const [errorMessage, setErrorMessage] = useState({title:"", content:""});
+    const [isLoading, setIsLoading] = useState(false);
+    const [iconBtnSave, setIconBtnSave] = useState("");
+    const [labelBtnSave, setLabelBtnSave] = useState("SAVE CHANGES");
+    const [isBtnSave, setIsBtnSave] = useState(false);
+    const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
+    const [displayMessage, setDisplayMessage] = useState(false);
+    const [message, setMessage] = useState({title:"", content:""});
+
     useEffect(() => {
         try {
             revised();
@@ -150,8 +160,12 @@ export default function DriverRecordForms() {
                 },
             };
 
-            if((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 === null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id&page=' + sentPage, config)
+            let bn = bodyNo;
+            let curloc = selectedLocation.length <=0 ? "" : selectedLocation.code;
+            let d = date2 === null ? "" : format(date2, 'yyyy-MM-dd');
+
+            // fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
+            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bn + '&current_loc=' + curloc + '&date_created=' + d + '&ordering=-inspection_id&page=' + sentPage, config)
                 .then(response => response.json())
                 .then(data => {
                     setTotalCount(data.count);
@@ -160,84 +174,6 @@ export default function DriverRecordForms() {
                 .catch((err) => {
                     
                 });
-            }
-            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 === null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
-            else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 === null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
-            else if ((bodyNo === null || bodyNo === "") && selectedLocation === null && date2 !== null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
-            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 === null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
-            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation === null && date2 !== null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
-            else if ((bodyNo === null || bodyNo === "") && selectedLocation !== null && date2 !== null){
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
-            else if ((bodyNo !== null || bodyNo !== "") && selectedLocation !== null && date2 !== null){ //last
-                fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyNo + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id&page=' + sentPage, config)
-                .then(response => response.json())
-                .then(data => {
-                    setTotalCount(data.count);
-                    setcarValues(data.results);
-                })
-                .catch((err) => {
-                    
-                });
-            }
         } catch(err) {
             
         }
@@ -273,8 +209,11 @@ export default function DriverRecordForms() {
             },
         };
 
-        if((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?ordering=-inspection_id', config)
+        let bn = bodyValue;
+        let curloc = selectedLocation.length <=0 ? "" : selectedLocation.code;
+        let d = date2 === null ? "" : format(date2, 'yyyy-MM-dd');
+
+        fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bn + '&current_loc=' + curloc + '&date_created=' + d + '&ordering=-inspection_id&page=1', config)
             .then(response => response.json())
             .then(data => {
                 setTotalCount(data.count);
@@ -283,84 +222,6 @@ export default function DriverRecordForms() {
             .catch((err) => {
                 
             });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
-        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
-        else if ((bodyValue === null || bodyValue === "") && selectedLocation === null && date2 !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 === null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation === null && date2 !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
-        else if ((bodyValue === null || bodyValue === "") && selectedLocation !== null && date2 !== null){
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?current_loc=' +  selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
-        else if ((bodyValue !== null || bodyValue !== "") && selectedLocation !== null && date2 !== null){ //last
-            fetch(process.env.REACT_APP_SERVER_NAME + 'report/inspection-list/?body_no=' + bodyValue + '&current_loc=' + selectedLocation.code + '&date_created=' + format(date2, 'yyyy-MM-dd') + '&ordering=-inspection_id', config)
-            .then(response => response.json())
-            .then(data => {
-                setTotalCount(data.count);
-                setcarValues(data.results);
-            })
-            .catch((err) => {
-                
-            });
-        }
     }
 
     const dialogFuncMap = {
@@ -368,6 +229,8 @@ export default function DriverRecordForms() {
         'displayBasic2': setDisplayBasic2,
         'displayError': setDisplayError,
         'displaySuccess': setDisplaySuccess,
+        'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
+        'displayMessage': setDisplayMessage,
     }
 
     const onClick = (name) => {
@@ -381,12 +244,15 @@ export default function DriverRecordForms() {
             setLabelBtnSave("SAVE CHANGES");
             setIsBtnSave(false);
             setIsLoading(false);
-        } else {
+        } else if (name === "displayConfirmDeleteImage") {
+            setHoldImageID("");
+        } else if (name === "displayBasic" || name === "displayBasic2") {
             setSelectedCar([]);
-            setNotOkay([]);
-            setOkay([]);
-            setGas([]);
-            setOil([]);
+            setMileage("");
+            setNotOkay(Array(46).fill(""));
+            setOkay(Array(46).fill(""));
+            setGas(Array(5).fill(""));
+            setOil(Array(5).fill(""));
             setSmallMileage("");
             setEditMileage("");
             setGPSData("");
@@ -419,20 +285,32 @@ export default function DriverRecordForms() {
                     <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus />
                 </div>
             );
-        }
+        } else if (name === 'displayConfirmDeleteImage') {
+            return (
+                <div>
+                    <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => submitDeleteImage()}/>
+                </div>
+            );
+        } else if (name === 'displayMessage') {
+            return (
+                <div>
+                    <Button label="CLOSE" className="p-button-success" onClick={() => onHide(name)} autoFocus/>
+                </div>
+            );
+        } 
     }
 
     const actionBody = (rowData) => {
         return (
             localStorage.getItem("editInspectionReport") === "true" ? <center>
-            <Button label="Edit / Show" icon="pi pi-pencil" className="p-mr-2" onClick={() => getInspectionData(rowData)}/></center>
+            <Button label="Edit / Show" icon="pi pi-pencil" className="p-mr-2" onClick={() => {setSelected(rowData); getInspectionData(rowData.inspection_id)}}/></center>
             : <center>
-            <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => getInspectionData2(rowData)}/></center>
+            <Button label="Show" icon="pi pi-search" className="p-mr-2" onClick={() => {setSelected(rowData); getInspectionData2(rowData.inspection_id)}}/></center>
         );
     }
 
     const getInspectionData = (values) => {
-        setSelected(values);
         if (values != null) {
             let token = localStorage.getItem("token");
             const config = {
@@ -441,13 +319,19 @@ export default function DriverRecordForms() {
                     'Authorization': 'Bearer ' + token,
                 },
             };
-            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/'+ values.inspection_id + "/",config)
-            .then((res) => {  
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/'+ values + "/",config)
+            .then((res) => {
                 setSelectedCar(res.data);
                 setSelectedBody(res.data.body_no);
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
-                setSelected(values);
-                onClick('displayBasic');
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + values +'/?mode=dr', config)
+                    .then((res) => {
+                        setReportImage(res.data);
+                        onClick('displayBasic');
+                    })
+                    .catch((err) => {
+                        
+                    });
             })
             .catch((error) => {
                 
@@ -458,7 +342,6 @@ export default function DriverRecordForms() {
     }
 
     const getInspectionData2 = (values) => {
-        setSelected(values);
         if (values != null) {
             let token = localStorage.getItem("token");
             const config = {
@@ -467,13 +350,19 @@ export default function DriverRecordForms() {
                     'Authorization': 'Bearer ' + token,
                 },
             };
-            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/'+ values.inspection_id + "/",config)
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/inspection/'+ values + "/",config)
             .then((res) => {
                 setSelectedCar(res.data);
                 setSelectedBody(res.data.body_no);
                 setMakes(res.data.body_no.make = res.data.body_no.make === "L30" ? 'L300 Exceed 2.5D MT': res.data.body_no.make === "SUV" ? 'Super Carry UV': res.data.body_no.make ===  'G15'? 'Gratour midi truck 1.5L': res.data.body_no.make ===  'G12'? 'Gratour midi truck 1.2L' : '');
-                setSelected(values);
-                onClick('displayBasic2');
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + values +'/?mode=dr', config)
+                    .then((res) => {
+                        setReportImage(res.data);
+                        onClick('displayBasic2');
+                    })
+                    .catch((err) => {
+                        
+                    });
             })
             .catch((error) => {
                 
@@ -481,6 +370,45 @@ export default function DriverRecordForms() {
         } else {
             toast.current.show({ severity: 'error', summary: 'No Selected', detail: 'Please select a row in table first to edit.', life: 5000 });
         }
+    }
+
+    const reportImageTemplate = (reportImage) => {
+        return (
+            <div>
+                <center>
+                    <img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                </center>
+                <center>
+                    { localStorage.getItem("editInspectionReport") === "true" ?
+                    <Button style={{width: '37px', height: '37px'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={(e) => {setHoldImageID(reportImage.id); onClick('displayConfirmDeleteImage');}}/> : ''
+                    }
+                </center>
+            </div>
+        );
+    }
+
+    const submitDeleteImage = () => {
+        console.log(holdImageID);
+        console.log(selected);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        axios
+            .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ selected.inspection_id +'/?mode=dr&id=' + holdImageID, config)
+            .then((res) => {
+                getInspectionData(selected.inspection_id);
+                setMessage({title:"DELETE", content:"Successfully deleted."});
+                onHide('displayConfirmDeleteImage');
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                toast.current.show({ severity: 'error', summary: 'Delete Image Error', detail: 'Something went wrong.', life: 5000 });
+            });
     }
 
     const revised = () => {
@@ -615,7 +543,6 @@ export default function DriverRecordForms() {
                 },
             };
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/inspection/'+ selected.inspection_id + "/", {
-                //car: this.state.bn.car_id,
                 body_no: selectedBody.body_no,
                 make: selectedBody.make,
                 mileage: mil,
@@ -670,12 +597,34 @@ export default function DriverRecordForms() {
                 edited_by: accfullname,
             }, config)
             .then((res) => {
-                onClick('displaySuccess');
-                onHide('displayBasic')
-                setIconBtnSave("");
-                setLabelBtnSave("SAVE CHANGES");
-                setIsBtnSave(false);
-                setIsLoading(false);
+                if (refImageUpload.current.state.files.length <= 0) {
+                    onClick('displaySuccess');
+                    onHide('displayBasic')
+                    setIconBtnSave("");
+                    setLabelBtnSave("SAVE CHANGES");
+                    setIsBtnSave(false);
+                    setIsLoading(false);
+                } else {
+                    let formData = new FormData();
+                    refImageUpload.current.state.files.map((f, index) => {
+                        formData.append("images[" + index + "]image", f);
+                        formData.append("images[" + index + "]mode", "dr");
+                        formData.append("images[" + index + "]image_name", selected.inspection_id);
+                        return null;
+                    })
+                    axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
+                    .then((res) => {
+                        onClick('displaySuccess');
+                        onHide('displayBasic')
+                        setIconBtnSave("");
+                        setLabelBtnSave("SAVE CHANGES");
+                        setIsBtnSave(false);
+                        setIsLoading(false);
+                    })
+                    .catch((err) => {
+    
+                    });
+                }
             })
             .catch((err) => {
                 if (err.toJSON().message === 'Network Error'){
@@ -1571,7 +1520,7 @@ export default function DriverRecordForms() {
                 <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
             </div>
             
-            <Dialog header="Fleet Vehicle Inspection Checklist Record" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
+            <Dialog header="FLEET VEHICLE INSPECTION CHECKLIST RECORD" visible={displayBasic} style={{ width: '85vw' }} onHide={() => onHide('displayBasic')}>
                 <div className="p-grid p-fluid">
                     <div className="p-col-12 p-lg-8 report-checklist">
                         <div className="card card">
@@ -1589,7 +1538,7 @@ export default function DriverRecordForms() {
                                 <div className="p-col-12 p-md-6">
                                     <label>Mileage:</label>
                                     <div className="p-inputgroup">
-                                        <InputText id="mil" className={editMileage} placeholder="Mileage" value={mil} keyfilter="int"
+                                        <InputText id="mil" className={editMileage} placeholder="Mileage" value={mil || ""} keyfilter="int"
                                         onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
                                         <span className="p-inputgroup-addon">KM.</span>
                                     </div>
@@ -2105,6 +2054,21 @@ export default function DriverRecordForms() {
                         </div>
                     </div>
 
+                    <div className="p-col-12 p-lg-12">
+                        <div className="card card-w-title image-upload">
+                            <h1>Image Upload</h1>
+                            <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                                emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
+                        </div>
+                    </div>
+
+                    <div className="p-col-12 p-lg-12">
+                        <div className="card card-w-title image-upload">
+                            <h6><b>IMAGES:</b></h6>
+                            <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
+                        </div>
+                    </div>
+
                     <div className="p-col-12 p-lg-12 report-checklist">
                         <div className="card card-w-title">
                         <h1>Checklist Report</h1>
@@ -2115,11 +2079,11 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>GPS:</label>
-                                    <InputText value={GPSData} disabled/>
+                                    <InputText value={GPSData || ""} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Remarks:</label>
-                                    <InputText id="n" className={editNotes} placeholder="Add other remarks here" value={notes} 
+                                    <InputText id="n" className={editNotes} placeholder="Add other remarks here" value={notes || ""} 
                                     onChange={event => onCheckboxChange(event.target.value, event.target.id)}/>
                                     <small className="p-invalid p-d-block">{smallNotes}</small>
                                 </div>
@@ -2129,15 +2093,15 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Driver/ Operator:</label>
-                                    <InputText placeholder="Inspected by" value={selectedCar.driver} disabled/>
+                                    <InputText placeholder="Inspected by" value={selectedCar.driver || ""} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Date Created:</label>
-                                    <InputText placeholder="Date Created" value={selectedCar.date_created} disabled/>
+                                    <InputText placeholder="Date Created" value={selectedCar.date_created || ""} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Date Updated:</label>
-                                    <InputText placeholder="Date Updated" value={dateUpdated} disabled/>
+                                    <InputText placeholder="Date Updated" value={dateUpdated || ""} disabled/>
                                 </div>
                                 <div className="p-col-12 p-md-5"> </div>
                                 <div className="p-col-12 p-md-3">
@@ -2171,7 +2135,7 @@ export default function DriverRecordForms() {
                                 <div className="p-col-12 p-md-6">
                                     <label htmlFor="mileage">Mileage:</label>
                                     <div className="p-inputgroup">
-                                        <InputText id="mileage" value={mil} />
+                                        <InputText id="mileage" value={mil || ""} />
                                         <span className="p-inputgroup-addon">KM.</span>
                                     </div>
                                 </div>
@@ -2685,6 +2649,13 @@ export default function DriverRecordForms() {
                         </div>
                     </div>
 
+                    <div className="p-col-12 p-lg-12">
+                        <div className="card card-w-title image-upload">
+                            <h6><b>IMAGES:</b></h6>
+                            <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
+                        </div>
+                    </div>
+
                     <div className="p-col-12 p-lg-12 report-checklist">
                         <div className="card card-w-title">
                         <h1>Checklist Report</h1>
@@ -2695,11 +2666,11 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>GPS:</label>
-                                    <InputText value={GPSData}/>
+                                    <InputText value={GPSData || ""}/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Comments:</label>
-                                    <InputText placeholder="Comments" value={notes}/>
+                                    <InputText placeholder="Comments" value={notes || ""}/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Edited by:</label>
@@ -2707,15 +2678,15 @@ export default function DriverRecordForms() {
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Driver/ Operator:</label>
-                                    <InputText placeholder="Inspected by" value={selectedCar.driver}/>
+                                    <InputText placeholder="Inspected by" value={selectedCar.driver || ""}/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Date Created:</label>
-                                    <InputText placeholder="Date Created" value={selectedCar.date_created}/>
+                                    <InputText placeholder="Date Created" value={selectedCar.date_created || ""}/>
                                 </div>
                                 <div className="p-col-12 p-md-8">
                                     <label>Date Updated:</label>
-                                    <InputText placeholder="Date Updated" value={dateUpdated}/>
+                                    <InputText placeholder="Date Updated" value={dateUpdated || ""}/>
                                 </div>
                             </div>
                         </div>
@@ -2746,6 +2717,30 @@ export default function DriverRecordForms() {
                     </div>
                 </div>
             </Dialog>
+
+            <Dialog header="CONFIRMATION" visible={displayConfirmDeleteImage} style={{ width: '310px' }} footer={renderFooter('displayConfirmDeleteImage')} onHide={() => onHide('displayConfirmDeleteImage')}>
+                <div className="p-grid">
+                    <div className="p-col-2">
+                        <i className="pi pi-trash" style={{fontSize: '25px', color: 'red'}}/>
+                    </div>
+                    <div className="p-col">
+                        <h5><b>Delete Image</b></h5>
+                        <div style={{fontSize: '16px'}}>Are you sure to delete this image ?</div>
+                    </div>
+                </div>
+            </Dialog>
+
+            <Dialog header={message.title} visible={displayMessage} style={{ width: '310px' }} footer={renderFooter('displayMessage')} onHide={() => onHide('displayMessage')} closable={false}>
+                <div className="p-grid">
+                    <div className="p-col-2">
+                        <i className="pi pi-exclamation-circle" style={{fontSize: '28px', color: 'gray'}}/>
+                    </div>
+                    <div className="p-col">
+                        <div style={{fontSize: '16px'}}>{message.content}</div>
+                    </div>
+                </div>
+            </Dialog>
+
         </div>
     )
 }

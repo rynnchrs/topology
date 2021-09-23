@@ -29,15 +29,48 @@
     right: 0;
 }
 
-.p-checkbox {
+.resize-label {
+  .p-checkbox {
     width: 35px;
     height: 35px;
+  }
+
+  .p-checkbox .p-checkbox-box {
+      width: 35px;
+      height: 35px;
+  }
+
+  .p-field > label {
+    font-size: 20px;
+    margin-bottom: 0px;
+  }
+  
+  .p-radiobutton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .p-radiobutton .p-radiobutton-box {
+    width: 28px;
+    height: 28px;
+  }
+
+  .p-field-radiobutton > label {
+    font-size: 17px;
+    margin-bottom: 0px;
+  }
 }
 
-.p-checkbox .p-checkbox-box {
-    width: 35px;
-    height: 35px;
+/* css for profile picture  */
+.img-profile{
+  img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    border: 1px solid gray;
+  }
 }
+/* end css for profile picture  */
 
 //driver inspection report badge
 .driver-insp-rep {
@@ -99,32 +132,45 @@
     min-Width: 30px;
     /* border: 1px solid red; */
   }
-  .p-checkbox {
-    width: 28px;
-    height: 28px;
+  .resize-label {
+    .p-checkbox {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .p-checkbox .p-checkbox-box {
+        width: 35px;
+        height: 35px;
+    }
+  
+    .p-field > label {
+      font-size: 20px;
+      margin-bottom: 0px;
+    }
+    
+    .p-radiobutton {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .p-radiobutton .p-radiobutton-box {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .p-field-radiobutton > label {
+      font-size: 17px;
+      margin-bottom: 0px;
+    }
   }
 
-  .p-checkbox .p-checkbox-box {
-    width: 28px;
-    height: 28px;
+  .p-toast {
+    width: 320px;
   }
-}
-
-.gray-out {
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  //justify-content: center;
-  align-items: center;
 }
 
 /* css for driver inspection records checklist  */
 .report-checklist{
-
   .none .p-checkbox .p-checkbox-box {
     background-color: none; 
   }
@@ -178,7 +224,6 @@
       width: 27px;
       height: 27px;
     }
-
     .p-checkbox .p-checkbox-box {
       width: 27px;
       height: 27px;
@@ -277,17 +322,17 @@
 /* end css for task list datatable */
 
 /* css for careta report */
-.repair-title {
+.report-title {
   h4 {
     color: white;
-    background-color: blue;
+    background-color: rgba(0, 0, 255, 0.897);
     border-radius: 5px 5px 0 0;
     display: inline;
     padding: 4px 20px;
     font-weight: 500;
   } 
   h5 {
-    color: rgb(16, 166, 253);
+    color: rgba(16, 99, 253, 0.945);
     background: linear-gradient(90deg, rgb(233, 232, 232) 0%, rgb(255, 255, 255) 100%);
     padding: 4px 10px;
     font-weight: 500;
@@ -313,12 +358,10 @@
     border: 1px solid red;
   }
 }
-/* end css for careta report */
 
-/* css for careta record */
-.red-field {
-  .red .p-inputtext {
-    border: 1px solid red;
+.image-upload {
+  .p-fileupload-buttonbar .p-button + .p-button {
+    display: none;
   }
 }
 /* end css for careta report */
@@ -351,6 +394,31 @@
     color: red;
     font-weight: 700;
     letter-spacing: -2px;
+  }
+}
+
+.gray-out {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  align-items: center;
+}
+
+.red-field {
+  .red {
+    .p-inputtext {
+      border: 1px solid red;
+    }
+    .p-checkbox .p-checkbox-box {
+      border: 2px solid rgb(255, 49, 49);
+      &:hover {
+        border: 2px solid rgb(255, 49, 49);
+       }
+    }
   }
 }
 /* end global */

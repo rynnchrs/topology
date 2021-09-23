@@ -60,6 +60,7 @@ export const AppProfile = () => {
                 localStorage.removeItem("username");
                 localStorage.removeItem("refreshToken");
                 localStorage.removeItem("myfirst");
+                localStorage.removeItem("myimage");
 
                 localStorage.removeItem("viewUsers"); localStorage.removeItem("addUsers");
                 localStorage.removeItem("editUsers"); localStorage.removeItem("deleteUsers");
@@ -79,7 +80,6 @@ export const AppProfile = () => {
                 }, 1500)
             })
             .catch((err) => {
-                console.log('logout error');
                 console.log(err.response);
             });
 
@@ -87,6 +87,7 @@ export const AppProfile = () => {
         localStorage.removeItem("username");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("myfirst");
+        localStorage.removeItem("myimage");
 
         localStorage.removeItem("viewUsers"); localStorage.removeItem("addUsers");
         localStorage.removeItem("editUsers"); localStorage.removeItem("deleteUsers");
@@ -110,14 +111,13 @@ export const AppProfile = () => {
     return (
         <div className="layout-profile">
             <Toast ref={toast} />
-            {/* <div>
-                <img src="assets/layout/images/avatar_4.png" alt="Profile" />
-            </div> */}
-            <button className="p-link layout-profile-link" onClick={onClick}>
-                {/*<span className="username">Ryann Ang</span>*/}
-                <span className="username">{userData}</span>
-                <i className="pi pi-fw pi-cog" />
-            </button>
+            <div className="img-profile">
+                <img src={localStorage.getItem("myimage")} alt="Profile" />
+            </div>
+            <div>
+                <h5 style={{color:'white'}}>{userData}</h5>
+            </div>
+            <button className="p-link layout-profile-link pi pi-fw pi-cog" onClick={onClick}></button>
             <CSSTransition classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
                 <ul className={classNames({ 'layout-profile-expanded': expanded })}>
                     <li><button type="button" className="p-link" onClick={logout}><i className="pi pi-fw pi-power-off" /><span>Logout</span></button></li>

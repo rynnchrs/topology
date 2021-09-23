@@ -11,6 +11,7 @@ import {InputMask} from 'primereact/inputmask';
 import {Calendar} from 'primereact/calendar';
 import {Toast} from 'primereact/toast'
 import { Carousel } from 'primereact/carousel';
+import { FileUpload } from 'primereact/fileupload';
 import axios from "axios";
 
 export class Vehicles extends Component {
@@ -21,21 +22,21 @@ export class Vehicles extends Component {
         this.state = {
 
             //vehicle data object
-            // vehicleData : {
-            //     car_id : 0, slug : '', vin_no : '', body_no : '', cs_no : '', plate_no : '', brand : '', release_year : 2020, make : '', series : '', 
-            //     body_type : '', color : '', dealer : '', dealer_phone : '', dealer_email : '', po_no : '', po_date : '', body_builder : '', fabricator : '',
-            //     sale_price : 0, vat_price : 0, engine_no : '', battery_no : '', fuel_type : '', transmission : '', denomination : '', piston : 0, cylinder : 0,
-            //     procuring_entity : '', capacity : 0, gross_weight : 0, net_weight : 0, shipping_weight : 0, net_capacity : 0, lto_cr : 0, cr_date : '', or_no : 0,
-            //     or_date : '', top_load : '', field_office : '', or_cr : '', permanent_loc : '', current_loc : '', vtf : '', permanent_status : '', delivery_location : '',
-            //     deliver_date : '', si_no : 0, dr_no : '', dr_codes : '', plate_date : '', decals_date : '', modified : '', ewd_date : '', tools_date : '',
-            //     userManual_date : '', warrantyBook_date : '', unitKey_date : '', bodyKey_date : '', cigarettePlug_date : '', keychain_date : '', fan_date : '',
-            //     remarks : '', operational : '', status : '', date_updated : '', date_created : '', fire_extinguisher:'',jack: '', wrench: '', c_client_name: '',
-            //     c_contract_no: '', c_start_date: '', c_end_date: '', c_bid_no: '', c_bid_name: '', c_bid_date: '', c_cost: 0, t_insurance_name: '', t_telephone_no: '',
-            //     t_email: '', t_po_no: '', t_date_issued: '', t_start_date: '', t_end_date: '', t_cost: 0, i1_insurance_company: '', i1_telephone_no: '', i1_email: '',
-            //     i1_po_no: '', i1_date_issued: '', i1_start_date: '', i1_end_date: '', i1_cost: 0, i2_insurance_company: '', i2_telephone_no: '', i2_email: '',
-            //     i2_po_no: '', i2_date_issued: '', i2_start_date: '', i2_end_date: '', i2_cost: 0,
-            // },
-            vehicleData: "",
+            vehicleData : {
+                car_id : 0, slug : '', vin_no : '', body_no : '', cs_no : '', plate_no : '', brand : '', release_year : 2020, make : '', series : '', 
+                body_type : '', color : '', dealer : '', dealer_phone : '', dealer_email : '', po_no : '', po_date : '', body_builder : '', fabricator : '',
+                sale_price : 0, vat_price : 0, engine_no : '', battery_no : '', fuel_type : '', transmission : '', denomination : '', piston : 0, cylinder : 0,
+                procuring_entity : '', capacity : 0, gross_weight : 0, net_weight : 0, shipping_weight : 0, net_capacity : 0, lto_cr : 0, cr_date : '', or_no : 0,
+                or_date : '', top_load : '', field_office : '', or_cr : '', permanent_loc : '', current_loc : '', vtf : '', permanent_status : '', delivery_location : '',
+                deliver_date : '', si_no : 0, dr_no : '', dr_codes : '', plate_date : '', decals_date : '', modified : '', ewd_date : '', tools_date : '',
+                userManual_date : '', warrantyBook_date : '', unitKey_date : '', bodyKey_date : '', cigarettePlug_date : '', keychain_date : '', fan_date : '',
+                remarks : '', operational : '', status : '', date_updated : '', date_created : '', fire_extinguisher:'',jack: '', wrench: '', c_client_name: '',
+                c_contract_no: '', c_start_date: '', c_end_date: '', c_bid_no: '', c_bid_name: '', c_bid_date: '', c_cost: 0, t_insurance_name: '', t_telephone_no: '',
+                t_email: '', t_po_no: '', t_date_issued: '', t_start_date: '', t_end_date: '', t_cost: 0, i1_insurance_company: '', i1_telephone_no: '', i1_email: '',
+                i1_po_no: '', i1_date_issued: '', i1_start_date: '', i1_end_date: '', i1_cost: 0, i2_insurance_company: '', i2_telephone_no: '', i2_email: '',
+                i2_po_no: '', i2_date_issued: '', i2_start_date: '', i2_end_date: '', i2_cost: 0,
+            },
+            // vehicleData: "",
 
             //vehicle data object for CRUD
             newvehicleData : {
@@ -90,7 +91,8 @@ export class Vehicles extends Component {
             vmVisibility: false, //modal form visibility
             vdModalMode: '',
             vdVisibility: false,
-            ddVisibility : false,
+            ddVisibility: false,
+            diVisibility: false,
 
             vBrandSelected: 'Mitsubishi', //test data only
 
@@ -114,17 +116,19 @@ export class Vehicles extends Component {
             bodyno: [],
             filteredSuggestions: [],
             searchBody: "",
-            images: [
-                {image: "samplecar.jpg", name: "samplecars"},
-                {image: "careta-logo.png", name: "careta"},
-            ],
-            //images: [],
+            // images: [
+            //     {image: "samplecar.jpg", name: "samplecars"},
+            //     {image: "careta-logo.png", name: "careta"},
+            // ],
+            initialVehicleImage: [{id: "", image: "/media/noimage.jpg"}],
+            vehicleImage: [{id: "", image: "/media/noimage.jpg"}],
+            holdImageID: "",
             counter: 0,
         };
 
-        this.toast = createRef(null)
+        this.toast = createRef(null) 
         this.radioChange = this.radioChange.bind(this);
-        //this.productTemplate = this.productTemplate.bind(this);
+        this.refImageUpload = createRef(null);
 
     }
 
@@ -205,12 +209,36 @@ export class Vehicles extends Component {
         }, 100);
     };
 
-    productTemplate(images) {
+    vehicleImageTemplate = (vehicleImage) => {
         return (
             <div>
-                <center><img src={`/assets/layout/images/${images.image}`} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+                <center><img src={process.env.REACT_APP_SERVER_NAME + vehicleImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
             </div>
         );
+    }
+
+    editVehicleImageTemplate = (vehicleImage) => {
+        return (
+            <div>
+                <center>
+                    <img src={process.env.REACT_APP_SERVER_NAME + vehicleImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/>
+                </center>
+                <center>
+                    {
+                        vehicleImage.id !== "" ? 
+                        <Button style={{width: '37px', height: '37px'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={(e) => this.showDeleteImage(vehicleImage.id)}/> : ''
+                    }
+                </center>
+            </div>
+           
+        );
+    }
+
+    showDeleteImage(value){
+        this.setState({
+            holdImageID: value,
+            diVisibility: true
+        });
     }
 
     exportData() {
@@ -219,7 +247,6 @@ export class Vehicles extends Component {
     }
 
     newTab() {
-        //console.log(this.state.vehicleData)
         let url = "http://128.199.92.107:59535/?map=" + this.state.vehicleData.body_no;
         window.open(url);
     }
@@ -246,6 +273,161 @@ export class Vehicles extends Component {
 
     //ADD VEHICLE ALGORITHM
     addVehicle = () => {
+        if (this.state.APIvehicleData.status === "") {
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Status)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.operational === "") {
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Operational)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.body_no === "") {
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Body No.)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.cs_no === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Identification (CS No.)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.plate_no === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Plate No.)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.brand === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Vehicle Info (Brand)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.make === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Vehicle Info (Make)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.series === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Vehicle Info (Series)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.dealer === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Supplier (Dealer)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.vin_no === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Engine and Body Info (Chassis Number)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.cr_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'LTO (LTO CR Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.or_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'LTO (OR Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.c_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Bidding/Contract (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.c_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Bidding/Contract (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.c_bid_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Bidding/Contract (Bid Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.t_date_issued === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'TPL (Date Issued)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.t_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'TPL (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.t_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'TPL (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i1_date_issued === "") { 
+            this.toast.current.show({ severity: 'error', summary: '1st Insurance (Date Issued)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i1_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '1st Insurance (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i1_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '1st Insurance (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i2_date_issued === "") { 
+            this.toast.current.show({ severity: 'error', summary: '2nd Insurance (Date Issued)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i2_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '2nd Insurance (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i2_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '2nd Insurance (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.refImageUpload.current !== null && this.refImageUpload.current.state.files.length >= 11) {
+            this.toast.current.show({ severity: 'error', summary: 'Image Maximum File', detail: 'Max upload of 10 image only.', life: 3000 });
+        } else {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            const data = {
+                slug: this.state.APIvehicleData.slug,
+                vin_no: this.state.APIvehicleData.vin_no,
+                body_no: this.state.APIvehicleData.body_no,
+                cs_no: this.state.APIvehicleData.cs_no,
+                plate_no: this.state.APIvehicleData.plate_no,
+                brand: this.state.APIvehicleData.brand,
+                release_year: this.state.APIvehicleData.release_year,
+                make: this.state.APIvehicleData.make,
+                series: this.state.APIvehicleData.series,
+                body_type: this.state.APIvehicleData.body_type,
+                color: this.state.APIvehicleData.color,
+                dealer: this.state.APIvehicleData.dealer,
+                dealer_phone: this.state.APIvehicleData.dealer_phone,
+                dealer_email: this.state.APIvehicleData.dealer_email,
+                po_no: this.state.APIvehicleData.po_no,
+                po_date: this.state.APIvehicleData.po_date,
+                body_builder: this.state.APIvehicleData.body_builder,
+                fabricator: this.state.APIvehicleData.fabricator,
+                engine_no: this.state.APIvehicleData.engine_no,
+                battery_no: this.state.APIvehicleData.battery_no,
+                fuel_type: this.state.APIvehicleData.fuel_type,
+                transmission: this.state.APIvehicleData.transmission,
+                denomination: this.state.APIvehicleData.denomination,
+                piston: this.state.APIvehicleData.piston,
+                cylinder: this.state.APIvehicleData.cylinder,
+                procuring_entity: this.state.APIvehicleData.procuring_entity,
+                capacity: this.state.APIvehicleData.capacity,
+                gross_weight: this.state.APIvehicleData.gross_weight,
+                net_weight: this.state.APIvehicleData.net_weight,
+                shipping_weight: this.state.APIvehicleData.shipping_weight,
+                net_capacity: this.state.APIvehicleData.net_capacity,
+                lto_cr: this.state.APIvehicleData.lto_cr,
+                cr_date: this.state.APIvehicleData.cr_date,
+                or_no: this.state.APIvehicleData.or_no,
+                or_date: this.state.APIvehicleData.or_date,
+                top_load: this.state.APIvehicleData.top_load,
+                field_office: this.state.APIvehicleData.field_office,
+                or_cr: this.state.APIvehicleData.or_cr,
+                permanent_loc: this.state.APIvehicleData.permanent_loc,
+                current_loc: this.state.APIvehicleData.current_loc,
+                vtf: this.state.APIvehicleData.vtf,
+                permanent_status: this.state.APIvehicleData.permanent_status,
+                delivery_location: this.state.APIvehicleData.delivery_location,
+                deliver_date: this.state.APIvehicleData.deliver_date,
+                si_no: this.state.APIvehicleData.si_no,
+                dr_no: this.state.APIvehicleData.dr_no,
+                dr_codes: this.state.APIvehicleData.dr_codes,
+                plate_date: this.state.APIvehicleData.plate_date,
+                decals_date: this.state.APIvehicleData.decals_date,
+                modified: this.state.APIvehicleData.modified,
+                ewd_date: this.state.APIvehicleData.ewd_date,
+                tools_date: this.state.APIvehicleData.tools_date,
+                userManual_date: this.state.APIvehicleData.userManual_date,
+                warrantyBook_date: this.state.APIvehicleData.warrantyBook_date,
+                unitKey_date: this.state.APIvehicleData.unitKey_date,
+                bodyKey_date: this.state.APIvehicleData.bodyKey_date,
+                cigarettePlug_date: this.state.APIvehicleData.cigarettePlug_date,
+                keychain_date: this.state.APIvehicleData.keychain_date,
+                fan_date: this.state.APIvehicleData.fan_date,
+                jack: this.state.APIvehicleData.jack,
+                wrench: this.state.APIvehicleData.wrench,
+                fire_extinguisher: this.state.APIvehicleData.fire_extinguisher,
+                remarks: this.state.APIvehicleData.remarks,
+                operational: this.state.APIvehicleData.operational,
+                status: this.state.APIvehicleData.status,
+            };
+            axios
+                .post(process.env.REACT_APP_SERVER_NAME + "car/careta/", data, config)
+                .then((res) => {
+                    this.setState({ 
+                        todoList: res.data 
+                    })
+                    this.addImage(res.data.car_id);
+                })
+                .catch((err) => {
+                    let error = err.response.data;
+                    if (error.slug && error.slug.join() === "This field may not be blank.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: "Body No. is required.", life: 3000 });
+                    } else if (error.vin_no && error.vin_no.join() === "This field may not be blank.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                    } else if (error.body_no && error.body_no.join() === "car with this body no already exists.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Body No. already exist.', life: 3000 });
+                    } else if (error.vin_no && error.vin_no.join() === "car with this vin no already exists.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. already exist.', life: 3000 });
+                    } else if (error.cs_no && error.cs_no.join() === "car with this cs no already exists.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'CS Number already exist.', life: 3000 });
+                    } else if (error.cr_date) {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                    } else if (error.or_date) {
+                        this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                    }
+                });
+        }
+    }
+
+    addImage = (value) => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -253,91 +435,26 @@ export class Vehicles extends Component {
                 'Authorization': 'Bearer ' + token,
             },
         };
-        const data = {
-            slug: this.state.APIvehicleData.slug,
-            vin_no: this.state.APIvehicleData.vin_no,
-            body_no: this.state.APIvehicleData.body_no,
-            cs_no: this.state.APIvehicleData.cs_no,
-            plate_no: this.state.APIvehicleData.plate_no,
-            brand: this.state.APIvehicleData.brand,
-            release_year: this.state.APIvehicleData.release_year,
-            make: this.state.APIvehicleData.make,
-            series: this.state.APIvehicleData.series,
-            body_type: this.state.APIvehicleData.body_type,
-            color: this.state.APIvehicleData.color,
-            dealer: this.state.APIvehicleData.dealer,
-            dealer_phone: this.state.APIvehicleData.dealer_phone,
-            dealer_email: this.state.APIvehicleData.dealer_email,
-            po_no: this.state.APIvehicleData.po_no,
-            po_date: this.state.APIvehicleData.po_date,
-            body_builder: this.state.APIvehicleData.body_builder,
-            fabricator: this.state.APIvehicleData.fabricator,
-            engine_no: this.state.APIvehicleData.engine_no,
-            battery_no: this.state.APIvehicleData.battery_no,
-            fuel_type: this.state.APIvehicleData.fuel_type,
-            transmission: this.state.APIvehicleData.transmission,
-            denomination: this.state.APIvehicleData.denomination,
-            piston: this.state.APIvehicleData.piston,
-            cylinder: this.state.APIvehicleData.cylinder,
-            procuring_entity: this.state.APIvehicleData.procuring_entity,
-            capacity: this.state.APIvehicleData.capacity,
-            gross_weight: this.state.APIvehicleData.gross_weight,
-            net_weight: this.state.APIvehicleData.net_weight,
-            shipping_weight: this.state.APIvehicleData.shipping_weight,
-            net_capacity: this.state.APIvehicleData.net_capacity,
-            lto_cr: this.state.APIvehicleData.lto_cr,
-            cr_date: this.state.APIvehicleData.cr_date,
-            or_no: this.state.APIvehicleData.or_no,
-            or_date: this.state.APIvehicleData.or_date,
-            top_load: this.state.APIvehicleData.top_load,
-            field_office: this.state.APIvehicleData.field_office,
-            or_cr: this.state.APIvehicleData.or_cr,
-            permanent_loc: this.state.APIvehicleData.permanent_loc,
-            current_loc: this.state.APIvehicleData.current_loc,
-            vtf: this.state.APIvehicleData.vtf,
-            permanent_status: this.state.APIvehicleData.permanent_status,
-            delivery_location: this.state.APIvehicleData.delivery_location,
-            deliver_date: this.state.APIvehicleData.deliver_date,
-            si_no: this.state.APIvehicleData.si_no,
-            dr_no: this.state.APIvehicleData.dr_no,
-            dr_codes: this.state.APIvehicleData.dr_codes,
-            plate_date: this.state.APIvehicleData.plate_date,
-            decals_date: this.state.APIvehicleData.decals_date,
-            modified: this.state.APIvehicleData.modified,
-            ewd_date: this.state.APIvehicleData.ewd_date,
-            tools_date: this.state.APIvehicleData.tools_date,
-            userManual_date: this.state.APIvehicleData.userManual_date,
-            warrantyBook_date: this.state.APIvehicleData.warrantyBook_date,
-            unitKey_date: this.state.APIvehicleData.unitKey_date,
-            bodyKey_date: this.state.APIvehicleData.bodyKey_date,
-            cigarettePlug_date: this.state.APIvehicleData.cigarettePlug_date,
-            keychain_date: this.state.APIvehicleData.keychain_date,
-            fan_date: this.state.APIvehicleData.fan_date,
-            jack: this.state.APIvehicleData.jack,
-            wrench: this.state.APIvehicleData.wrench,
-            fire_extinguisher: this.state.APIvehicleData.fire_extinguisher,
-            remarks: this.state.APIvehicleData.remarks,
-            operational: this.state.APIvehicleData.operational,
-            status: this.state.APIvehicleData.status,
-        };
-        axios
-            .post(process.env.REACT_APP_SERVER_NAME + "car/careta/", data, config)
-            .then(res => this.setState({ todoList: res.data },this.addContract))
+        if (this.refImageUpload.current === null) {
+            this.addContract();
+        } else if (this.refImageUpload.current.state.files.length <= 0) {
+            this.addContract();
+        } else {
+            let formData = new FormData();
+            this.refImageUpload.current.state.files.map((f, index) => {
+                formData.append("images[" + index + "]image", f);
+                formData.append("images[" + index + "]mode", "ci");
+                formData.append("images[" + index + "]image_name", value);
+                return null;
+            })
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
+            .then((res) => {
+                this.addContract();
+            })
             .catch((err) => {
-                console.log(err.response);
-                let error = err.response.data;
-                if (error.slug && error.slug.join() === "This field may not be blank.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: "Body No. is required.", life: 3000 });
-                } else if (error.vin_no && error.vin_no.join() === "This field may not be blank.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
-                } else if (error.body_no && error.body_no.join() === "car with this body no already exists.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Body No. already exist.', life: 3000 });
-                } else if (error.vin_no && error.vin_no.join() === "car with this vin no already exists.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Chassis No./Vin No. already exist.', life: 3000 });
-                } else if (error.cs_no && error.cs_no.join() === "car with this cs no already exists.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'CS Number already exist.', life: 3000 });
-                }
+
             });
+        }
     }
 
     addContract = () => {
@@ -363,7 +480,16 @@ export class Vehicles extends Component {
         axios
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta-contract/", data_contract, config)
             .then(res => this.setState({ todoList_contract: res.data },this.addTPL))
-            .catch(err => console.log("cont", err));
+            .catch((err) => {
+                let error = err.response.data;
+                if (error.start_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.end_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.bid_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                }
+            });
     }
 
     addTPL = () =>{
@@ -390,7 +516,16 @@ export class Vehicles extends Component {
         axios
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta-tpl/", data_tpl, config)
             .then(res => this.setState({ todoList_tpl: res.data },this.addInsurance1))
-            .catch(err => console.log("tpl: ", err));
+            .catch((err) => {
+                let error = err.response.data;
+                if (error.cr_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.or_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.date_issued) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                }
+            });
     }
 
     addInsurance1 = () => {
@@ -417,7 +552,16 @@ export class Vehicles extends Component {
         axios
             .post(process.env.REACT_APP_SERVER_NAME + "car/careta-insurance/", data_insurance1, config)
             .then(res => this.setState({ todoList_insurance1: res.data },this.addInsurance2))
-            .catch(err => console.log("ins1: ", err));
+            .catch((err) => {
+                let error = err.response.data;
+                if (error.start_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.end_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.date_issued) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                }
+            });
     }
 
     addInsurance2 = () => {
@@ -448,15 +592,171 @@ export class Vehicles extends Component {
                     todoList_insurance2: res.data,
                     vmVisibility: false,
                     vehicleData: this.state.emptyvehicleData,
-                    searchBody: ""
+                    searchBody: "",
+                    vehicleImage: this.state.initialVehicleImage
                 }),
                 this.toast.current.show({severity:'success', summary: 'Add Successfully', detail:'New vehicle added.', life: 3000}),
                 this.getCarList())
-            .catch(err => console.log("ins2: ",err));
+            .catch((err) => {
+                let error = err.response.data;
+                if (error.start_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.end_date) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                } else if (error.date_issued) {
+                    this.toast.current.show({ severity: 'error', summary: 'Save Error', detail: 'Date has wrong format.', life: 3000 });
+                }
+            });
     }
 
     //MODIFY VEHICLE INFO ALGORITHM
     editVehicle = () => {
+        console.log("aw", this.refImageUpload.current)
+        if (this.state.APIvehicleData.status === "") {
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Status)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.operational === "") {
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Operational)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.body_no === "") {
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Body No.)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.cs_no === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Identification (CS No.)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.plate_no === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Identification (Plate No.)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.brand === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Vehicle Info (Brand)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.make === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Vehicle Info (Make)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.series === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Vehicle Info (Series)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.dealer === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Supplier (Dealer)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.vin_no === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Engine and Body Info (Chassis Number)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.cr_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'LTO (LTO CR Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.or_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'LTO (OR Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.c_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Bidding/Contract (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.c_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Bidding/Contract (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.c_bid_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'Bidding/Contract (Bid Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.t_date_issued === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'TPL (Date Issued)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.t_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'TPL (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.t_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: 'TPL (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i1_date_issued === "") { 
+            this.toast.current.show({ severity: 'error', summary: '1st Insurance (Date Issued)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i1_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '1st Insurance (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i1_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '1st Insurance (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i2_date_issued === "") { 
+            this.toast.current.show({ severity: 'error', summary: '2nd Insurance (Date Issued)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i2_start_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '2nd Insurance (Start Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.state.APIvehicleData.i2_end_date === "") { 
+            this.toast.current.show({ severity: 'error', summary: '2nd Insurance (End Date)', detail: 'This field is required.', life: 3000 });
+        } else if (this.refImageUpload.current !== null && this.refImageUpload.current.state.files.length >= 11) {
+            this.toast.current.show({ severity: 'error', summary: 'Image Maximum File', detail: 'Max upload of 10 image only.', life: 3000 });
+        } else {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            };
+            const data = {
+                slug: this.state.APIvehicleData.slug,
+                vin_no: this.state.APIvehicleData.vin_no,
+                body_no: this.state.APIvehicleData.body_no,
+                cs_no: this.state.APIvehicleData.cs_no,
+                plate_no: this.state.APIvehicleData.plate_no,
+                brand: this.state.APIvehicleData.brand,
+                release_year: this.state.APIvehicleData.release_year,
+                make: this.state.APIvehicleData.make,
+                series: this.state.APIvehicleData.series,
+                body_type: this.state.APIvehicleData.body_type,
+                color: this.state.APIvehicleData.color,
+                dealer: this.state.APIvehicleData.dealer,
+                dealer_phone: this.state.APIvehicleData.dealer_phone,
+                dealer_email: this.state.APIvehicleData.dealer_email,
+                po_no: this.state.APIvehicleData.po_no,
+                po_date: this.state.APIvehicleData.po_date,
+                body_builder: this.state.APIvehicleData.body_builder,
+                fabricator: this.state.APIvehicleData.fabricator,
+                engine_no: this.state.APIvehicleData.engine_no,
+                battery_no: this.state.APIvehicleData.battery_no,
+                fuel_type: this.state.APIvehicleData.fuel_type,
+                transmission: this.state.APIvehicleData.transmission,
+                denomination: this.state.APIvehicleData.denomination,
+                piston: this.state.APIvehicleData.piston,
+                cylinder: this.state.APIvehicleData.cylinder,
+                procuring_entity: this.state.APIvehicleData.procuring_entity,
+                capacity: this.state.APIvehicleData.capacity,
+                gross_weight: this.state.APIvehicleData.gross_weight,
+                net_weight: this.state.APIvehicleData.net_weight,
+                shipping_weight: this.state.APIvehicleData.shipping_weight,
+                net_capacity: this.state.APIvehicleData.net_capacity,
+                lto_cr: this.state.APIvehicleData.lto_cr,
+                cr_date: this.state.APIvehicleData.cr_date,
+                or_no: this.state.APIvehicleData.or_no,
+                or_date: this.state.APIvehicleData.or_date,
+                top_load: this.state.APIvehicleData.top_load,
+                field_office: this.state.APIvehicleData.field_office,
+                or_cr: this.state.APIvehicleData.or_cr,
+                permanent_loc: this.state.APIvehicleData.permanent_loc,
+                current_loc: this.state.APIvehicleData.current_loc,
+                vtf: this.state.APIvehicleData.vtf,
+                permanent_status: this.state.APIvehicleData.permanent_status,
+                delivery_location: this.state.APIvehicleData.delivery_location,
+                deliver_date: this.state.APIvehicleData.deliver_date,
+                si_no: this.state.APIvehicleData.si_no,
+                dr_no: this.state.APIvehicleData.dr_no,
+                dr_codes: this.state.APIvehicleData.dr_codes,
+                plate_date: this.state.APIvehicleData.plate_date,
+                decals_date: this.state.APIvehicleData.decals_date,
+                modified: this.state.APIvehicleData.modified,
+                ewd_date: this.state.APIvehicleData.ewd_date,
+                tools_date: this.state.APIvehicleData.tools_date,
+                userManual_date: this.state.APIvehicleData.userManual_date,
+                warrantyBook_date: this.state.APIvehicleData.warrantyBook_date,
+                unitKey_date: this.state.APIvehicleData.unitKey_date,
+                bodyKey_date: this.state.APIvehicleData.bodyKey_date,
+                cigarettePlug_date: this.state.APIvehicleData.cigarettePlug_date,
+                keychain_date: this.state.APIvehicleData.keychain_date,
+                fan_date: this.state.APIvehicleData.fan_date,
+                jack: this.state.APIvehicleData.jack,
+                wrench: this.state.APIvehicleData.wrench,
+                fire_extinguisher: this.state.APIvehicleData.fire_extinguisher,
+                remarks: this.state.APIvehicleData.remarks,
+                operational: this.state.APIvehicleData.operational,
+                status: this.state.APIvehicleData.status,
+            };
+            axios
+                .put(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.newvehicleData.body_no + "/", data, config)
+                .then((res) => {
+                    console.log(res.data)
+                    this.setState({ 
+                        todoList: res.data 
+                    })
+                    this.editImage(res.data.car_id);
+                })
+                .catch((err) => {
+                    if (err.response.data.vin_no.join() === "car with this vin no already exists.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: "Chassis No./Vin No. already exist.", life: 3000 });
+                    } else if (err.response.data.vin_no.join() === "This field may not be blank.") {
+                        this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
+                    }   
+                });
+        }
+    }
+
+    editImage = (value) => {
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -464,85 +764,26 @@ export class Vehicles extends Component {
                 'Authorization': 'Bearer ' + token,
             },
         };
-        const data = {
-            slug: this.state.APIvehicleData.slug,
-            vin_no: this.state.APIvehicleData.vin_no,
-            body_no: this.state.APIvehicleData.body_no,
-            cs_no: this.state.APIvehicleData.cs_no,
-            plate_no: this.state.APIvehicleData.plate_no,
-            brand: this.state.APIvehicleData.brand,
-            release_year: this.state.APIvehicleData.release_year,
-            make: this.state.APIvehicleData.make,
-            series: this.state.APIvehicleData.series,
-            body_type: this.state.APIvehicleData.body_type,
-            color: this.state.APIvehicleData.color,
-            dealer: this.state.APIvehicleData.dealer,
-            dealer_phone: this.state.APIvehicleData.dealer_phone,
-            dealer_email: this.state.APIvehicleData.dealer_email,
-            po_no: this.state.APIvehicleData.po_no,
-            po_date: this.state.APIvehicleData.po_date,
-            body_builder: this.state.APIvehicleData.body_builder,
-            fabricator: this.state.APIvehicleData.fabricator,
-            engine_no: this.state.APIvehicleData.engine_no,
-            battery_no: this.state.APIvehicleData.battery_no,
-            fuel_type: this.state.APIvehicleData.fuel_type,
-            transmission: this.state.APIvehicleData.transmission,
-            denomination: this.state.APIvehicleData.denomination,
-            piston: this.state.APIvehicleData.piston,
-            cylinder: this.state.APIvehicleData.cylinder,
-            procuring_entity: this.state.APIvehicleData.procuring_entity,
-            capacity: this.state.APIvehicleData.capacity,
-            gross_weight: this.state.APIvehicleData.gross_weight,
-            net_weight: this.state.APIvehicleData.net_weight,
-            shipping_weight: this.state.APIvehicleData.shipping_weight,
-            net_capacity: this.state.APIvehicleData.net_capacity,
-            lto_cr: this.state.APIvehicleData.lto_cr,
-            cr_date: this.state.APIvehicleData.cr_date,
-            or_no: this.state.APIvehicleData.or_no,
-            or_date: this.state.APIvehicleData.or_date,
-            top_load: this.state.APIvehicleData.top_load,
-            field_office: this.state.APIvehicleData.field_office,
-            or_cr: this.state.APIvehicleData.or_cr,
-            permanent_loc: this.state.APIvehicleData.permanent_loc,
-            current_loc: this.state.APIvehicleData.current_loc,
-            vtf: this.state.APIvehicleData.vtf,
-            permanent_status: this.state.APIvehicleData.permanent_status,
-            delivery_location: this.state.APIvehicleData.delivery_location,
-            deliver_date: this.state.APIvehicleData.deliver_date,
-            si_no: this.state.APIvehicleData.si_no,
-            dr_no: this.state.APIvehicleData.dr_no,
-            dr_codes: this.state.APIvehicleData.dr_codes,
-            plate_date: this.state.APIvehicleData.plate_date,
-            decals_date: this.state.APIvehicleData.decals_date,
-            modified: this.state.APIvehicleData.modified,
-            ewd_date: this.state.APIvehicleData.ewd_date,
-            tools_date: this.state.APIvehicleData.tools_date,
-            userManual_date: this.state.APIvehicleData.userManual_date,
-            warrantyBook_date: this.state.APIvehicleData.warrantyBook_date,
-            unitKey_date: this.state.APIvehicleData.unitKey_date,
-            bodyKey_date: this.state.APIvehicleData.bodyKey_date,
-            cigarettePlug_date: this.state.APIvehicleData.cigarettePlug_date,
-            keychain_date: this.state.APIvehicleData.keychain_date,
-            fan_date: this.state.APIvehicleData.fan_date,
-            jack: this.state.APIvehicleData.jack,
-            wrench: this.state.APIvehicleData.wrench,
-            fire_extinguisher: this.state.APIvehicleData.fire_extinguisher,
-            remarks: this.state.APIvehicleData.remarks,
-            operational: this.state.APIvehicleData.operational,
-            status: this.state.APIvehicleData.status,
-        };
-        axios
-            .put(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.newvehicleData.body_no + "/", data, config)
-            .then(res => this.setState({ todoList: res.data },this.editContract))
+        if (this.refImageUpload.current === null) {
+            this.editContract();
+        } else if (this.refImageUpload.current.state.files.length <= 0) {
+            this.editContract();
+        } else {
+            let formData = new FormData();
+            this.refImageUpload.current.state.files.map((f, index) => {
+                formData.append("images[" + index + "]image", f);
+                formData.append("images[" + index + "]mode", "ci");
+                formData.append("images[" + index + "]image_name", value);
+                return null;
+            })
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData,  config)
+            .then((res) => {
+                this.editContract();
+            })
             .catch((err) => {
-                console.log(err.response)
-                if (err.response.data.vin_no.join() === "car with this vin no already exists.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: "Chassis No./Vin No. already exist.", life: 3000 });
-                } else if (err.response.data.vin_no.join() === "This field may not be blank.") {
-                    this.toast.current.show({ severity: 'error', summary: 'Modify Error', detail: 'Chassis No./Vin No. is required.', life: 3000 });
-                }   
-            });
 
+            });
+        }
     }
 
     editContract = () => {
@@ -654,7 +895,8 @@ export class Vehicles extends Component {
                     todoList_insurance2: res.data,
                     vmVisibility: false,
                     vehicleData: this.state.emptyvehicleData,
-                    searchBody: ""
+                    searchBody: "",
+                    vehicleImage: this.state.initialVehicleImage
                 }),
                 this.toast.current.show({severity:'success', summary: 'Modify Successfully', detail:'All changes applied.', life: 3000}),
                 this.getCarList())
@@ -662,24 +904,28 @@ export class Vehicles extends Component {
     }
 
     modifyCarDB = (mode) => {
-        var vBrand = this.state.newvehicleData.brand === "Mitsubishi" ? "M"
-            : this.state.newvehicleData.brand === "Suzuki" ? "S" : "F";
+        var vBrand = this.state.newvehicleData.brand === "Mitsubishi" ? "M" : this.state.newvehicleData.brand === "Suzuki" ? "S" 
+            : this.state.newvehicleData.brand === "Foton" ? "F" : "";
         var vMake = this.state.newvehicleData.make === "L300 Exceed 2.5D MT" ? "L30"
             : this.state.newvehicleData.make === "Super Carry UV" ? "SUV"
-            : this.state.newvehicleData.make === "Gratour midi truck 1.5L" ? "G15": "G12";
+            : this.state.newvehicleData.make === "Gratour midi truck 1.5L" ? "G15" 
+            : this.state.newvehicleData.make === "Gratour midi truck 1.2L" ? "G12" : "";
         var vSeries = this.state.newvehicleData.series === "L300 Exceed C/C" ? "L3"
-            : this.state.newvehicleData.series === "Suzuki CAB CHAS" ? "SC" : "GR";
+            : this.state.newvehicleData.series === "Suzuki CAB CHAS" ? "SC" 
+            : this.state.newvehicleData.series === "Gratour midi" ? "GR" : "";
         var vDealer = this.state.newvehicleData.dealer === "Diamond Motor Corporation" ? "DMC"
             : this.state.newvehicleData.dealer === "Grand Canyon Multi Holdings, INC." ? "GCM"
-            : this.state.newvehicleData.dealer === "Cebu Autocentrale Corporation" ? "CAC": "CAI";
+            : this.state.newvehicleData.dealer === "Cebu Autocentrale Corporation" ? "CAC"
+            : this.state.newvehicleData.dealer === "Cherub Autodealer Inc." ? "CAI" : "";
         var vFuelType = this.state.newvehicleData.fuel_type === "Diesel" ? "D" : "G";
         var vTransmissionType = this.state.newvehicleData.transmission === "Automatic" ? "A" : "M";
         var vTopLoading = this.state.newvehicleData.top_load ==="Yes" ? true : false;
         var vVTF = this.state.newvehicleData.vtf ==="Yes" ? true : false;
         var vPermanentStatus = this.state.newvehicleData.permanent_status ==="Yes" ? true : false;
         var vModified = this.state.newvehicleData.modified ==="Yes" ? true : false;
-        var vOperational = this.state.newvehicleData.operational ==="Yes" ? true : false;
-        var vStatus = this.state.newvehicleData.status ==="Active" ? "A" : this.state.newvehicleData.status ==="Maintenance" ? "M" : "R";
+        var vOperational = this.state.newvehicleData.operational === "Yes" ? true : this.state.newvehicleData.operational === "No" ? false : '';
+        var vStatus = this.state.newvehicleData.status === "Active" ? "A" : this.state.newvehicleData.status === "Maintenance" ? "M" 
+            : this.state.newvehicleData.status === "Repair" ? "R " : "";
         var vPlateNumberDelivery = this.state.newvehicleData.plate_date === 'No Recieving Copy' ? 'NRC'
             : this.state.newvehicleData.plate_date === 'Not Yet Released' ? 'NYR'
             : this.state.newvehicleData.plate_date ===  'Not Applicable'? 'NA'
@@ -833,18 +1079,46 @@ export class Vehicles extends Component {
             };
             axios
                 .delete(process.env.REACT_APP_SERVER_NAME + "car/careta/" + this.state.vehicleData.body_no + "/", config)
-                .then(res => this.setState({ todoList: res.data }, this.toast.current.show({severity:'success', summary: 'Remove Successfully', detail:'Vehicle removed.', life: 3000}), this.getCarList(), 
-                    this.setState({
-                        vehicleData: this.state.emptyvehicleData,
-                        searchBody: ""
-                    })
-                ))
-                .catch(err => console.log(err));
+                .then((res) => {
+                    axios
+                        .get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + this.state.vehicleData.car_id +'/?mode=ci', config)
+                        .then((res) => {
+                            let imageIDs = "";
+                            res.data.map((x) => {
+                                imageIDs += x.id;
+                                imageIDs += ",";
+                            })
+                            axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ this.state.vehicleData.car_id +'/?mode=cr&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
+                            .then((res) => {
+                                this.setState({ 
+                                    todoList: res.data,
+                                    vehicleData: this.state.emptyvehicleData,
+                                    vehicleImage: this.state.initialVehicleImage,
+                                    searchBody: ""
+                                })
+                                this.toast.current.show({severity:'success', summary: 'Remove Successfully', detail:'Vehicle removed.', life: 3000});
+                                this.getCarList();
+                            })
+                            .catch((err) => {
+        
+                            });
+                        })
+                        .catch((err) => {
+                            
+                        });
+                })
+                .catch((err) => {
+                            
+                });
         }
     }
 
     showErrorSave = () => {
         this.toast.current.show({severity:'error', summary: 'Saving Failed', detail:'Please check all your input data.', life: 3000});
+    }
+
+    onClearImageFile = () => {
+        //empty
     }
 
     render() {
@@ -915,13 +1189,16 @@ export class Vehicles extends Component {
                     vmModalMode: vm,
                     newvehicleData:this.state.emptyvehicleData
                 });
-            }
-            else if (vm === 'Modify'){
-                this.setState({
-                    vmVisibility: true,
-                    vmModalMode: vm,
-                    newvehicleData:this.state.vehicleData
-                });
+            } else if (vm === 'Modify'){
+                if(this.state.vehicleData.car_id === 0) {
+                    showError();
+                } else {
+                    this.setState({
+                        vmVisibility: true,
+                        vmModalMode: vm,
+                        newvehicleData:this.state.vehicleData
+                    });
+                }
             }
         }
 
@@ -932,6 +1209,64 @@ export class Vehicles extends Component {
                     <Button label="Cancel" icon="pi pi-times" onClick={(e) => mainModalDialogCancelButtonhandler(e)} className="p-button-text" />
                 </div>
             );
+        }
+
+        const renderFooterDeleteImage = (name) => {
+            return (
+                <div>
+                    <Button label="No" icon="pi pi-times" onClick={() => this.setState({diVisibility: false})} autoFocus/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => submitDeleteImage()}/>
+                </div>
+            );
+        }
+
+        const submitDeleteImage = () => {
+            let token = localStorage.getItem("token");
+            const config = {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                },
+            };
+    
+            axios
+                .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ this.state.vehicleData.car_id +'/?mode=ci&id=' + this.state.holdImageID, config)
+                .then((res) => {
+                    axios
+                        .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + this.state.vehicleData.body_no + '/', config)
+                        .then(res =>  {
+                            // console.log("di:", res.data)
+                            // this.setState({ 
+                            //     vehicleData: res.data,
+                            //     newvehicleData: res.data
+                            // });
+                            axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.car_id +'/?mode=ci', config)
+                            .then((res) => {
+                                if (res.data.length <= 0) {
+                                    this.setState({ 
+                                        vehicleImage: this.state.initialVehicleImage
+                                    });
+                                } else {
+                                    this.setState({ 
+                                        vehicleImage: res.data
+                                    });
+                                }
+                                this.toast.current.show({ severity: 'success', summary: 'Delete Successfully', detail: 'Image removed.', life: 3000 });
+                                this.setState({
+                                    diVisibility: false
+                                })
+                            })
+                            .catch((err) => {
+                                this.toast.current.show({ severity: 'error', summary: 'Delete Image Error', detail: 'Something went wrong.', life: 3000 });
+                            });
+                        })
+                        .catch((error) => {
+                            this.toast.current.show({ severity: 'error', summary: 'Delete Image Error', detail: 'Something went wrong.', life: 3000 });
+                        });
+                })
+                .catch((err) => {
+                    this.toast.current.show({ severity: 'error', summary: 'Delete Image Error', detail: 'Something went wrong.', life: 3000 });
+                });
         }
 
         //selectbutton behavior on vehicle data: recieved items modal dialog
@@ -1524,12 +1859,25 @@ export class Vehicles extends Component {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + event.value.body_no + '/', config)
                 .then(res =>  {
-                    this.setState({ vehicleData: res.data},getContract);
-                    // const isDataAvailable = res.data && res.data.length;
-                    // if(isDataAvailable)
-                    //     this.setState({ vehicleData: res.data[0]},getContract);
-                    // else
-                    //     showNoResult();
+                    this.setState({ 
+                        vehicleData: res.data
+                    });
+                    axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.car_id +'/?mode=ci', config)
+                    .then((res) => {
+                        if (res.data.length <= 0) {
+                            this.setState({ 
+                                vehicleImage: this.state.initialVehicleImage
+                            });
+                        } else {
+                            this.setState({ 
+                                vehicleImage: res.data
+                            });
+                        }
+                        getContract();
+                    })
+                    .catch((err) => {
+                        
+                    });
                 })
                 .catch((error) => {
                     showNoResult();
@@ -1830,7 +2178,9 @@ export class Vehicles extends Component {
         }
 
         const ConfirmDeleteCancelHandler = () => {
-
+            this.setState({
+                ddVisibility: false
+            })
         }
 
         const RemoveButtonHandler = () => {
@@ -1857,16 +2207,16 @@ export class Vehicles extends Component {
 
         return (
             <div className="p-grid p-fluid">
-                <Toast ref={this.toast} />
+                <Toast ref={this.toast}/>
                 <div className="p-col-12">
-                    <Dialog header={"Delete Data"} visible={this.state.ddVisibility} onHide={() => ConfirmDeleteDialogHide()}>
+                    <Dialog header={"Delete Vechicle"} visible={this.state.ddVisibility} onHide={() => ConfirmDeleteDialogHide()}>
                         <div className="card">
                             <p>Are you sure you want to delete this vehicle?</p>
-                            <p><center>Body No.: <b>{this.state.vehicleData.body_no ? this.state.vehicleData.body_no : 'None Selected'}</b></center></p>
+                            <center><p>Body No.: <b>{this.state.vehicleData.body_no ? this.state.vehicleData.body_no : 'None Selected'}</b></p></center>
                         <div>
                         </div>
-                            <Button label="Yes" icon="pi pi-check" onClick={() => ConfirmDeleteProceedHandler()} autoFocus />
-                            <Button label="No" icon="pi pi-times" onClick={() => ConfirmDeleteCancelHandler()} className="p-button-text" />
+                            <Button label="No" icon="pi pi-times" onClick={() => ConfirmDeleteCancelHandler()} className="p-button-text" autoFocus/>
+                            <Button label="Yes" icon="pi pi-check" onClick={() => ConfirmDeleteProceedHandler()}/>
                         </div>
                     </Dialog>
 
@@ -1876,8 +2226,20 @@ export class Vehicles extends Component {
                         </div>
                     </Dialog>
 
+                    <Dialog header="CONFIRMATION" visible={this.state.diVisibility} style={{ width: '310px' }} footer={renderFooterDeleteImage('deleteImage')} onHide={() => this.setState({diVisibility: false})}>
+                        <div className="p-grid">
+                            <div className="p-col-2">
+                                <i className="pi pi-trash" style={{fontSize: '25px', color: 'red'}}/>
+                            </div>
+                            <div className="p-col">
+                                <h5><b>Delete Image</b></h5>
+                                <div style={{fontSize: '16px'}}>Are you sure to delete this image ?</div>
+                            </div>
+                        </div>
+                    </Dialog>
+
                     <div className="dialog-display">
-                        <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} footer={renderFooter(this.state.vmModalMode)} onHide={() => onHide(this.state.vmModalMode)} closable={false}>
+                        <Dialog header={this.state.vmModalMode + " Vehicle Data"} visible={this.state.vmVisibility} footer={renderFooter(this.state.vmModalMode)} onHide={() => onHide(this.state.vmModalMode)} closable={false} blockScroll={false}>
                             <div className="card">
                                 <Accordion multiple activeAccordion={0}>
                                     <AccordionTab header={<label><span><b>Identification </b></span><i className="pi pi-user"></i></label>}>
@@ -1976,7 +2338,7 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                     </AccordionTab>
-                                    <AccordionTab header={<label><span><b>Suppliers </b></span><i className="pi pi-briefcase"></i></label>}>
+                                    <AccordionTab header={<label><span><b>Supplier </b></span><i className="pi pi-briefcase"></i></label>}>
                                         <div className="p-fluid">
                                             <div className="p-grid p-col-12">
                                                 <label htmlFor="vDealer" className="p-col-12 p-lg-2 p-md-12 p-sm-12">Dealer:</label>
@@ -2677,6 +3039,30 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                     </AccordionTab>
+                                    <AccordionTab header={<label><span><b>Image </b></span><i className="pi pi-image"></i></label>}>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dImage" className="p-col-12 p-md-2">Image Upload:</label>
+                                                <div className="p-col-12 p-md-10 image-upload">
+                                                    <FileUpload id="dImage" ref={this.refImageUpload} multiple accept="image/*" maxFileSize={1000000} onClear={this.onClearImageFile}
+                                                    emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
+                                                </div>
+                                            </div>
+                                            {
+                                                this.state.vmModalMode === 'Modify' ?
+                                                <div className="p-field p-grid">
+                                                    <label htmlFor="dImageFiles" className="p-col-12 p-md-2">Image Files:</label>
+                                                    <div className="p-col-12 p-md-10">
+                                                        <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={this.state.vehicleImage} numVisible={1} numScroll={1} itemTemplate={this.editVehicleImageTemplate}/>
+                                                    </div>
+                                                </div>
+                                                : ''
+                                            }
+                                        </div>
+                                    </AccordionTab>
+                                    {/* {
+                                        console.log(this.state.vmModalMode)
+                                    } */}
                                 </Accordion>
                             </div>
                         </Dialog>
@@ -2686,7 +3072,6 @@ export class Vehicles extends Component {
                         <div className="p-col-12" name="searchbox"> 
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">
-                                    {/* <InputText placeholder={"Search by " + this.state.filterOption + " No."}  style={{width: '100%'}} onKeyUp={(e) => onSearchBarOnKeyUp(e)} /> */}
                                     <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
                                     completeMethod={this.searchList} onSelect={selectItem}
                                     onChange={event => this.setState({searchBody: event.target.value})}/>
@@ -2727,14 +3112,9 @@ export class Vehicles extends Component {
                             </div>
                         </div>
                         <div className="p-grid">
-                            {/* <div className="p-col-12 p-lg-4 p-md-4"> </div> */}
                             <div className="p-col-12 p-shadow-1" style={{borderRadius: '90% 90% 90% 90%/5% 5% 5% 5%', boxShadow: '0px 1px 5px 1px rgba(175, 175, 175, 0.3)'}}> 
                                 <center><h5><b>Vehicle Image</b></h5></center>
-                                {/* <div class="p-d-flex p-jc-center"
-                                    <img src={process.env.PUBLIC_URL+ "/assets/layout/images/samplecar.jpg"} width="100%" alt="car"></img>
-                                </div> */}
-                                <Carousel value={this.state.images} numVisible={1} numScroll={1} 
-                                itemTemplate={this.productTemplate}/>
+                                <Carousel value={this.state.vehicleImage} numVisible={1} numScroll={1} itemTemplate={this.vehicleImageTemplate}/>
                             </div>
                         </div>
 
@@ -2821,7 +3201,7 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                     </AccordionTab>
-                                    <AccordionTab header={<label><span><b>Suppliers </b></span><i className="pi pi-briefcase"></i></label>}>
+                                    <AccordionTab header={<label><span><b>Supplier </b></span><i className="pi pi-briefcase"></i></label>}>
                                         <div className="p-fluid">
                                             <div className="p-field p-grid">
                                                 <label htmlFor="dDealer" className="p-col-12 p-md-2">Dealer:</label>

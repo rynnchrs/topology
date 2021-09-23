@@ -1,9 +1,11 @@
-from rest_framework.fields import CharField, SerializerMethodField
 from car.models import Car
 from django.contrib.auth.models import User
-from rest_framework import serializers
+from report.models import CheckList
+from rest_framework import fields, serializers
+from rest_framework.fields import CharField, SerializerMethodField
 
-from .models import Fieldman, JobOrder, Task
+from .models import IR, Fieldman, JobOrder, Task
+
 
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
     make = serializers.SerializerMethodField()
@@ -14,6 +16,7 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
     class Meta:
         model = Car
         fields = ['vin_no','body_no','plate_no','make','current_loc']
+
 
 class JobOrderSerializer(serializers.ModelSerializer):
 
@@ -30,6 +33,7 @@ class JobOrderSerializer(serializers.ModelSerializer):
             representation['type'] = "Repair"
             return representation
             
+
 class FieldmanSerializer(serializers.ModelSerializer):
     field_man = serializers.CharField()
     class Meta:
@@ -39,8 +43,8 @@ class FieldmanSerializer(serializers.ModelSerializer):
     def validate(self, obj): # validate input in foreign keys
         errors = []
         try:
-            fieldman = obj['field_man'].split()
-            obj['field_man'] = User.objects.get(first_name=fieldman[0], last_name=fieldman[1])
+            fieldman = obj['field_man']
+            obj['field_man'] = User.objects.get(username=fieldman)
         except:
             errors.append({"field_man": 'Invalid Fieldman.'})
         if errors:
@@ -56,6 +60,8 @@ class TaskSerializer(serializers.ModelSerializer):
     job_order = JobOrderSerializer()
     fieldman = FieldmanSerializer(many=True)
     body_no = serializers.CharField()
+    ir_no = serializers.CharField(required=False, allow_blank=True)
+    check_list = serializers.CharField(required=False, allow_blank=True)
     class Meta:
         model= Task
         fields =  '__all__'
@@ -74,6 +80,23 @@ class TaskSerializer(serializers.ModelSerializer):
             obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:
             errors.append({"body_no": 'Invalid Body number.'})
+        
+        if obj['ir_no'] != "":
+            try:
+                obj['ir_no'] = IR.objects.get(ir_no=obj['ir_no'])
+            except:
+                errors.append({"ir_no": 'Invalid IR No.'})
+        else:
+            obj['ir_no'] = None
+
+        if obj['check_list'] != "":
+            try:
+                obj['check_list'] = CheckList.objects.get(check_list_no=obj['check_list'])
+            except:
+                errors.append({"check_list": 'Invalid Check List.'})
+        else:
+            obj['check_list'] = None
+
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
@@ -130,16 +153,17 @@ class TaskSerializer(serializers.ModelSerializer):
     def to_representation(self, instance): # instances
         self.fields['body_no'] =  CarInfoSerializer(read_only=True)
         self.fields['manager'] =  serializers.CharField(source='manager.user_info.full_name')
+        self.fields['ir_no'] =  IRListSerializers(read_only=True)
         return super(TaskSerializer, self).to_representation(instance)
 
 
 class WarningTaskSerializer(serializers.ModelSerializer):
     fieldman = FieldmanSerializer(many=True)
     job_order = JobOrderSerializer()
+    current_loc = serializers.CharField(source='body_no.current_loc')
     class Meta:
         model= Task
-        fields =  ['job_order','fieldman','start_date','end_date','schedule_date','task_status_fm','task_status_mn']
-
+        fields =  ['task_id','job_order','fieldman','start_date','end_date','schedule_date','task_status_fm','task_status_mn','current_loc']
 
 
 class RepairCarInfoSerializer(serializers.ModelSerializer):
@@ -166,19 +190,27 @@ class RepairCarInfoSerializer(serializers.ModelSerializer):
             return representation
 
 
+
+class IRTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IR
+        fields = ['ir_no','date_time','date','problem_obs','contact_number','admin_name']
+
+
 class RepairTaskSerializer(serializers.ModelSerializer):
+    # check_list = serializers.CharField(source='check_list.check_list_no', read_only=True)
     class Meta:
         model = Task
-        fields = ['task_id','schedule_date','body_no']
+        fields = ['task_id','schedule_date',]#'body_no','ir_no','check_list']
 
-    def to_representation(self, instance): 
-        self.fields['body_no'] = RepairCarInfoSerializer(read_only=True)
-        return super(RepairTaskSerializer, self).to_representation(instance)
- 
- 
+    # def to_representation(self, instance): 
+    #     # self.fields['body_no'] = RepairCarInfoSerializer(read_only=True)
+    #     # self.fields['ir_no'] = IRTaskSerializer(read_only=True)
+    #     return super(RepairTaskSerializer, self).to_representation(instance)
+
+
 class RepairJobSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
-
     class Meta:
         model = JobOrder
         fields = '__all__'
@@ -191,4 +223,53 @@ class RepairJobSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance): 
         self.fields['task'] = RepairTaskSerializer(read_only=True)
+        self.fields['body_no'] = RepairCarInfoSerializer(source='task.body_no')
+        self.fields['ir_no'] = IRTaskSerializer(source='task.ir_no')
+        self.fields['check_list'] = serializers.CharField(source='task.check_list')
         return super(RepairJobSerializer, self).to_representation(instance)   
+
+
+class IRListSerializers(serializers.ModelSerializer):
+    body_no = serializers.CharField(source='body_no.body_no')
+    class Meta:
+        model= IR
+        fields =  ['ir_id','ir_no','date','body_no','project_name']
+
+
+class IRSerializers(serializers.ModelSerializer): # Inspection serializer 
+    repair_type = fields.MultipleChoiceField(choices=IR.Repair_List)
+    body_no = serializers.CharField()
+    class Meta:
+        model = IR
+        fields = '__all__'
+
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+        except:
+           errors.append({"body_no": 'Invalid Body No.'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+
+    # def update(self, instance, validated_data):
+
+    # def create(self, validated_data):       # Creating report
+    #     validated_data.pop('edited_by', None) 
+    #     report = Inspection.objects.create(**validated_data)
+    #     return report
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+        self.fields['repair_type'] =  serializers.SerializerMethodField(read_only=True)
+        return super(IRSerializers, self).to_representation(instance)
+
+    
+    def get_repair_type(self, obj):
+        repair_list = []
+        repair_type = str(obj.repair_type)
+        repairs = repair_type.split(', ')
+        for repair in repairs:
+            repair_list.append(repair)
+        return repair_list

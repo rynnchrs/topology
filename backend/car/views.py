@@ -5,16 +5,18 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
+from image.models import Image
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .filters import CarFilter
-from .models import TPL, Car, Contract, Insurance
+from .models import PDF, TPL, Car, Contract, Insurance
 from .serializers import (CarInfoSerializer, CarSerializer, ContractSerializer,
-                          InsuranceSerializer, SearchInventorySerializer,
-                          TPLSerializer)
+                          InsuranceSerializer, PDFSerializer,
+                          SearchInventorySerializer, TPLSerializer)
 
 
 class CarView(viewsets.ModelViewSet):  # add this
@@ -45,6 +47,13 @@ class CarView(viewsets.ModelViewSet):  # add this
         queryset = Car.objects.all()
         car = get_object_or_404(queryset, slug=slug)  
         car.delete()
+        queryset = Image.objects.filter(image_name=slug ,mode="ci")
+        for image in queryset:
+            try:
+                image.image.delete(save=False)
+                image.delete()
+            except:
+                pass
         subprocess.Popen(["python","car-export.py"], shell=True)
         return Response(status=status.HTTP_200_OK)         
 
@@ -176,3 +185,37 @@ class InsuranceList(generics.ListAPIView):
         return Insurance.objects.filter(car=username)
 
 
+
+class PDFView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
+    queryset = PDF.objects.all()  # add this
+    serializer_class = PDFSerializer  # add this
+    parser_classes = [MultiPartParser, FormParser]
+
+    def create(self, request):
+        serializer = PDFSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response("successfully Created",status=status.HTTP_201_CREATED)
+        
+    def retrieve(self, request, pk=None):
+        queryset = PDF.objects.all()
+        pdf = get_object_or_404(queryset, car__body_no=pk) 
+        serializer = PDFSerializer(pdf, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+
+    def update(self, request, pk=None):
+        queryset = PDF.objects.all()
+        pdf = get_object_or_404(queryset, car__body_no=pk) 
+        serializer = PDFSerializer(instance=pdf, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            pdf.pdf.delete(save=False)
+            serializer.save()
+        return Response("successfully Edited", status=status.HTTP_200_OK)     
+    
+    def destroy(self, request, pk=None):       
+        queryset = PDF.objects.all()
+        pdf = get_object_or_404(queryset, car__body_no=pk)  
+        pdf.pdf.delete(save=False)
+        pdf.delete()
+        return Response("successfully Deleted",status=status.HTTP_200_OK)   
