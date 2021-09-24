@@ -332,8 +332,8 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
             CheckListReportParts.objects.create(check_list=check_list, **part_data)
         return check_list
 
-    def to_representation(self, instance): # instance of vin_no
-        self.fields['body_no'] =  CarInfoSerializer(read_only=True)
+    def to_representation(self, instance):
+        self.fields['job_order'] = RepairJobSerializer(read_only=True)
         self.fields['email'] =  serializers.CharField(source="email.email",read_only=True)
         self.fields['parts_included'] = serializers.SerializerMethodField(read_only=True)
         self.fields['job_desc'] = serializers.CharField(source='get_job_desc_display', read_only=True)
