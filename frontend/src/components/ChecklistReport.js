@@ -656,7 +656,7 @@ export default function ChecklistReport() {
                                     </div>
                                     
                                 </div>
-                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                     <h6><b>WHERE THERE PARTS REPLACED?</b></h6>
                                     <small><i>*If yes, KINDLY INDICATE the PARTS REPLACED and the QUANTITY. If no, kindly tick NA.</i></small>
                                     <div style={{paddingBottom:'10px'}}></div>
