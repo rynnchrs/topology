@@ -31,6 +31,7 @@ class IR(models.Model):
     exact_loc = models.CharField(max_length=70, null=True, blank=True)
     vehicle_supp = models.CharField(max_length=50, null=True, blank=True)
     odometer = models.CharField(max_length=20, null=True, blank=True)
+    operational = models.BooleanField(default=True)
     Repair_List = [
         ('me', 'Mehcanical'),
         ('el', 'Electrical'),

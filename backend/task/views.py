@@ -1,6 +1,8 @@
 import json
 from datetime import datetime as date
 
+from django.db.models.deletion import ProtectedError
+
 from car.models import Car
 from careta.serializers import UserListSerializer
 from django.contrib.auth.models import User
@@ -138,13 +140,17 @@ class TaskView(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):  
         user = self.request.user
         if user_permission(user, 'can_delete_task'): 
-            queryset = Task.objects.all()
-            task = get_object_or_404(queryset, pk=pk)    # get user
-            queryset = JobOrder.objects.all()
-            job_order = get_object_or_404(queryset, pk=task.job_order.job_id)
-            task.delete()
-            job_order.delete()
-            return Response("Successfully Deleted",status=status.HTTP_200_OK)        
+            try :
+                queryset = Task.objects.all()
+                task = get_object_or_404(queryset, pk=pk)    # get user
+                queryset = JobOrder.objects.all()
+                job_order = get_object_or_404(queryset, pk=task.job_order.job_id)
+                task.delete()
+                job_order.delete()
+                return Response("Successfully Deleted",status=status.HTTP_200_OK)   
+            except ProtectedError:
+                return Response("Can't delete this because it's being use by Careta Reports",status=status.HTTP_200_OK)   
+                     
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED) 
 
@@ -412,6 +418,12 @@ class IRView(viewsets.ModelViewSet):  # add this
         if user_permission(user, 'can_add_repair_reports'): 
             serializer = IRSerializers(data=request.data)
             if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['body_no'])
+                if request.data['operational'] is True:
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
@@ -429,22 +441,42 @@ class IRView(viewsets.ModelViewSet):  # add this
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
+
+    def update(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_edit_repair_reports'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            ir = get_object_or_404(queryset, pk=pk) 
+            serializer = IRSerializers(instance=ir, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['body_no'])
+                if request.data['operational'] is True:
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)       
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)    
     
     def destroy(self, request, pk=None):      
         user = self.request.user
         if user_permission(user, 'can_delete_repair_reports'): 
-            queryset = IR.objects.all()
-            repair = get_object_or_404(queryset, pk=pk)
-            repair.delete()
-            queryset = Image.objects.filter(image_name=pk ,mode="ir")
-            for image in queryset:
-                try:
-                    image.image.delete(save=False)
-                    image.delete()
-                except:
-                    pass
-            return Response(status=status.HTTP_200_OK)        
+            try:
+                queryset = IR.objects.all()
+                repair = get_object_or_404(queryset, pk=pk)
+                repair.delete()
+                queryset = Image.objects.filter(image_name=pk ,mode="ir")
+                for image in queryset:
+                    try:
+                        image.image.delete(save=False)
+                        image.delete()
+                    except:
+                        pass
+                return Response("Successfully Deleted", status=status.HTTP_200_OK)      
+            except ProtectedError:
+                return Response("Can't delete this because it's being use by Task Scheduling", status=status.HTTP_200_OK)  
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
     # def update(self, request, pk=None):

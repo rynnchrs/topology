@@ -429,7 +429,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
                     image.delete()
                 except:
                     pass
-            return Response(status=status.HTTP_200_OK)        
+            return Response("Successfully Deleted",status=status.HTTP_200_OK)        
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
