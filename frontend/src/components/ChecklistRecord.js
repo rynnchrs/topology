@@ -174,13 +174,13 @@ export default function ChecklistRecord() {
     const assignChecklistRecordEdit = (value) => {
         console.log(value);
         setChecklistID(value.check_list_id)
-        setReportNo(value.job_order);
+        setReportNo(value.job_order.job_id);
         setTask(value.task);
         setEmail(value.email);
         setScheduleDate('');
-        setLocation(value.body_no.current_loc);
-        setBodyNo(value.body_no.body_no);
-        setMake(value.body_no.make = value.body_no.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.body_no.make === 'SUV' ? 'Super Carry UV' : value.body_no.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.body_no.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
+        setLocation(value.job_order.body_no.current_loc);
+        setBodyNo(value.job_order.body_no.body_no);
+        setMake(value.job_order.body_no.make = value.job_order.body_no.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.job_order.body_no.make === 'SUV' ? 'Super Carry UV' : value.job_order.body_no.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.job_order.body_no.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
         setActualOdometer(value.odometer);
         setJobDescription(jobDescriptionOptions.find(x => x.name === value.job_desc.toUpperCase()));
         setPairEWD(value.pair_ewd);
@@ -200,16 +200,15 @@ export default function ChecklistRecord() {
         if (value.parts_included.includes('Unit is in good condition')) {
             getPartsIncluded.push(0);
         }
-        if (value.parts_included.includes('For warranty')) {
-            getPartsIncluded.push(2);
-        }
         if (value.parts_included.includes('Cracked windshield')) {
-            getPartsIncluded.push(7);
+            getPartsIncluded.push(1);
         }
         if (value.parts_included.includes('Rough idling. Cleaned and adjust throttle valve')) {
-            getPartsIncluded.push(8);
+            getPartsIncluded.push(2);
         }
-        
+        if (value.parts_included.includes('For warranty')) {
+            getPartsIncluded.push(3);
+        }
         if (value.parts_included === 'For body repair') {
             getPartsIncluded.push(4);
         }
@@ -806,61 +805,44 @@ export default function ChecklistRecord() {
                                                 </div>
                                                 <div className="p-field-checkbox">
                                                     <Checkbox inputId="cb1" value={1} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(1) !== -1}/>
-                                                    <label htmlFor="cb1">For pullout to check with the dealership</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={2} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(2) !== -1}/>
-                                                    <label htmlFor="cb1">For warranty checking with the dealership</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={3} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(3) !== -1}/>
-                                                    <label htmlFor="cb1">For body repair and insurance claim</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={4} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(4) !== -1}/>
-                                                    <label htmlFor="cb1">For further technical diagnosis</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={5} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(5) !== -1}/>
-                                                    <label htmlFor="cb1">Not onsite</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={6} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(6) !== -1}/>
-                                                    <label htmlFor="cb1">Keys not available</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={7} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(7) !== -1}/>
                                                     <label htmlFor="cb1">Cracked windshield</label>
                                                 </div>
                                                 <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={8} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(8) !== -1}/>
+                                                    <Checkbox inputId="cb1" value={2} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(2) !== -1}/>
                                                     <label htmlFor="cb1">Rough idling, Cleaned and adjust throttle valve</label>
                                                 </div>
                                                 <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={9} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(9) !== -1}/>
-                                                    <label htmlFor="cb1">Worn out brake pads</label>
+                                                    <Checkbox inputId="cb1" value={3} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(3) !== -1}/>
+                                                    <label htmlFor="cb1">For warranty checking with the dealership</label>
                                                 </div>
                                                 <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={10} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(10) !== -1}/>
-                                                    <label htmlFor="cb1">Worn out brake shoe</label>
+                                                    <Checkbox inputId="cb1" value={4} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(4) !== -1}/>
+                                                    <label htmlFor="cb1">For body repair and insurance claim</label>
                                                 </div>
                                                 <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={11} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(11) !== -1}/>
-                                                    <label htmlFor="cb1">Low engine oil</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={12} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(12) !== -1}/>
-                                                    <label htmlFor="cb1">Worn out drive belt component</label>
-                                                </div>
-                                                <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={13} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(13) !== -1}/>
+                                                    <Checkbox inputId="cb1" value={5} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(5) !== -1}/>
                                                     <label htmlFor="cb1">Concern out of scope</label>
                                                 </div>
                                                 <div className="p-field-checkbox">
-                                                    <Checkbox inputId="cb1" value={14} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(14) !== -1}/>
+                                                    <Checkbox inputId="cb1" value={6} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(6) !== -1}/>
+                                                    <label htmlFor="cb1">Worn out brake pads</label>
+                                                </div>
+                                                <div className="p-field-checkbox">
+                                                    <Checkbox inputId="cb1" value={7} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(7) !== -1}/>
+                                                    <label htmlFor="cb1">Worn out brake shoe</label>
+                                                </div>
+                                                <div className="p-field-checkbox">
+                                                    <Checkbox inputId="cb1" value={8} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(8) !== -1}/>
+                                                    <label htmlFor="cb1">Low engine oil</label>
+                                                </div>
+                                                <div className="p-field-checkbox">
+                                                    <Checkbox inputId="cb1" value={9} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(9) !== -1}/>
+                                                    <label htmlFor="cb1">Worn out drive belt component</label>
+                                                </div>
+                                                <div className="p-field-checkbox">
+                                                    <Checkbox inputId="cb1" value={10} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(10) !== -1}/>
                                                     <label htmlFor="cb1">Other</label>
                                                 </div>
-                                                
                                             </div>
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>WHERE THERE PARTS REPLACED?</b></h6>

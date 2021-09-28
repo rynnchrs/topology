@@ -26,7 +26,7 @@ export default function RepairRecords() {
     // const [searchJobType, setSearchJobType] = useState([]);
     // const [searchDateCreated, setSearchDateCreated] = useState(null);
 
-    // const statusOperationalOptions = [{ name: 'YES', val: "Yes" }, { name: 'NO', val: "No" }];
+    const statusOperationalOptions = [{ name: 'YES', val: "Yes" }, { name: 'NO', val: "No" }];
     
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
@@ -255,6 +255,7 @@ export default function RepairRecords() {
     }
 
     const assignIncidentRecordDetails = (value) => {
+        console.log(value)
         setIRNo(value.ir_no);
         onChangeValue('f0', convertDatetoGMT(value.date));
         onChangeValue('f1', value.req_name);
@@ -316,8 +317,10 @@ export default function RepairRecords() {
             .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value.body_no.body_no + '/', config)
             .then((res) => {
                 setCSNumber(res.data.cs_no);
-                onChangeValue('f7', res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
-                setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
+                setVehicleSupplier(res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
+                // setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
+                let op = res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '';
+                onChangeValue('f7', statusOperationalOptions.find(x => x.name === op.toUpperCase()));
                 setEngineNumber(res.data.engine_no);
                 setIsLoading(false);
                 onClick('displayIncidentRecordEdit');
@@ -594,12 +597,12 @@ export default function RepairRecords() {
                 }
                 break;
             case 'f7':
-                setVehicleSupplier(value);
-                if (typeof(ird.revised.vehicle_supp) === "undefined") {
-                    value !== ird.vehicle_supp ? updateRevise(arrIndex, r, ird.vehicle_supp) : updateRevise(arrIndex, e, e);
-                } else {
-                    value !== ird.revised.vehicle_supp ? updateRevise(arrIndex, r, ird.revised.vehicle_supp) : updateRevise(arrIndex, e, e);
-                }
+                setOperational(value);
+                // if (typeof(ird.revised.vehicle_supp) === "undefined") {
+                //     value !== ird.vehicle_supp ? updateRevise(arrIndex, r, ird.vehicle_supp) : updateRevise(arrIndex, e, e);
+                // } else {
+                //     value !== ird.revised.vehicle_supp ? updateRevise(arrIndex, r, ird.revised.vehicle_supp) : updateRevise(arrIndex, e, e);
+                // }
                 break;
             case 'f8':
                 setOdometer(value);
@@ -931,27 +934,27 @@ export default function RepairRecords() {
                                                 <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => onChangeValue('f6', e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{reviseText[6]}</small>
                                             </div>
-                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[7]}>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <h6><b>VEHICLE SUPPLIER:</b></h6>
-                                                <InputText placeholder="Input Vehicle Supplier" value={vehicleSupplier} onChange={(e) => onChangeValue('f7', e.target.value)}/>
-                                                <small className="p-invalid p-d-block">{reviseText[7]}</small>
+                                                <InputText placeholder="Input Vehicle Supplier" value={vehicleSupplier} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <h6><b>VEHICLE TYPE/MAKE:</b></h6>
                                                 <InputText placeholder="Input Type/Make" value={vehicleTypeMake} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[7]}>
                                                 <h6><b>OPERATIONAL (YES/NO):</b></h6>
-                                                {/* <Dropdown value={operational} options={statusOperationalOptions} optionLabel="name" placeholder="Select" 
-                                                onChange={event => setOperational(event.target.value)} disabled/> */}
-                                                <InputText placeholder="Input Operational" value={operational} disabled/>
+                                                <Dropdown value={operational} options={statusOperationalOptions} optionLabel="name" placeholder="Select" 
+                                                onChange={event => onChangeValue('f7', event.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[7]}</small>
+                                                {/* <InputText placeholder="Input Operational" value={operational} disabled/> */}
                                             </div>
                                             <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[8]}>
                                                 <h6><b>CURRENT ODOMETER:</b></h6>
                                                 <InputText placeholder="Input Odometer" value={odometer} onChange={(e) => onChangeValue('f8', e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{reviseText[8]}</small>
                                             </div>
-                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[9]}>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk resize-label " + reviseColor[9]}>
                                                 <h6><b>WAIVER:</b></h6>
                                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-field-checkbox">
                                                     <Checkbox inputId="cb" checked={waiver} onChange={e => onChangeValue('f9', e.checked)} />
@@ -959,7 +962,7 @@ export default function RepairRecords() {
                                                 </div>
                                             </div>
                                             
-                                            <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                            <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12 resize-label">
                                                 <div className="p-grid p-fluid">
                                                     <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[0]}>
                                                         <Checkbox inputId="cb" value="me" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('me') !== -1}/>
@@ -1019,16 +1022,16 @@ export default function RepairRecords() {
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                                 <div className="p-grid p-fluid">
                                                     <div className={"p-col-12 p-lg-8 p-md-8 p-sm-12 required-asterisk " + reviseColor[13]}>
-                                                        <h6><b>DATE:</b></h6>
+                                                        <h6><b>INCIDENT DATE:</b></h6>
                                                         <Calendar placeholder="Select Date" value={dateDetails} onChange={(e) => onChangeValue('f13', e.value)} showIcon readOnlyInput/>
                                                         <small className="p-invalid p-d-block">{reviseText[13]}</small>
                                                     </div>
-                                                    <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[14]}>
-                                                        <h6><b>TIME:</b></h6>
+                                                    {/* <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[14]}>
+                                                        <h6><b>TIME:</b></h6> */}
                                                         {/* <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => setTimeDetails(e.value)} timeOnly hourFormat="12" showIcon readOnlyInput/> */}
-                                                        <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => onChangeValue('f14', e.value)} timeOnly showIcon readOnlyInput/>
+                                                        {/* <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => onChangeValue('f14', e.value)} timeOnly showIcon readOnlyInput/>
                                                         <small className="p-invalid p-d-block">{reviseText[14]}</small>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             </div>
                                             <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[15]}>
