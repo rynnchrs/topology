@@ -6,7 +6,7 @@ from .models import PDF, TPL, Car, Contract, Insurance
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
     class Meta:
         model = Car
-        fields = ['vin_no','body_no','plate_no','make','current_loc']
+        fields = ['vin_no','body_no','plate_no','make','current_loc','permanent_loc','dealer']
 
 
 class CarSerializer(serializers.ModelSerializer):
