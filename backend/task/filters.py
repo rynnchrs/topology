@@ -31,15 +31,10 @@ class TaskFilter(filters.FilterSet):
 class IRFilter(filters.FilterSet):
     task_id = filters.NumberFilter(field_name="task_id", lookup_expr='exact')
     body_no = filters.CharFilter(field_name="body_no__body_no", lookup_expr='startswith')
-    fieldman = filters.CharFilter(method="custom_fieldman_filter")
-    start_date = filters.CharFilter(field_name="start_date", lookup_expr='exact')
-    end_date = filters.CharFilter(field_name="end_date", lookup_expr='exact')
-    job_type = filters.CharFilter(field_name="job_order__type", lookup_expr='exact')
-    status_fm = filters.CharFilter(field_name="task_status_fm", lookup_expr='exact')
-    status_mn = filters.CharFilter(field_name="task_status_mn", lookup_expr='exact')
+    ir_no = filters.CharFilter(field_name="ir_no", lookup_expr='startswith')
+    date = filters.CharFilter(field_name="date", lookup_expr='exact')
   
     class Meta:
         models = IR
-        fields = ['task_id','body_no','fieldman','start_date','end_date','job_type'
-                    'status_fm','status_mn']
+        fields = ['task_id','body_no','ir_no','date']
 
