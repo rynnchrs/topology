@@ -31,6 +31,7 @@ export default function ChecklistRecord() {
     const [checklistRecordList, setChecklistRecordList] = useState([]);
     const [flagChecklistRecordList, setFlagChecklistRecordList] = useState(false);
     const [checklistRecordDetails, setCheckListRecordDetails] = useState([]);
+    const [delChecklistID, setDelChecklistID] = useState('');
 
     //variables to be save
     const [checklistID, setChecklistID] =  useState('');
@@ -57,6 +58,7 @@ export default function ChecklistRecord() {
     const [vehicleStatus, setVehicleStatus] = useState('');
     const [partsIncluded, setPartsIncluded] = useState([]);
     const [checklistParts, setChecklistParts] = useState([]);
+    const [saveChecklistParts, setSaveChecklistParts] = useState([]);
     const [partsName, setPartsName] = useState('');
     const refImageUpload = useRef(null);
     const [reportImage, setReportImage] = useState([{ id: "", image: "" }]);
@@ -77,6 +79,7 @@ export default function ChecklistRecord() {
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
     const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
+    const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -172,7 +175,7 @@ export default function ChecklistRecord() {
     }
 
     const assignChecklistRecordEdit = (value) => {
-        console.log(value);
+        // console.log(value);
         setChecklistID(value.check_list_id)
         setReportNo(value.job_order.job_id);
         setTask(value.task);
@@ -234,7 +237,9 @@ export default function ChecklistRecord() {
         value.parts.map((i) => {
             getParts.push({partsId: i.id, name: i.check_list_parts, quantity: i.quantity});
         })
-        setChecklistParts(getParts);
+        console.log("gparts: ", getParts)
+        setSaveChecklistParts(getParts);
+        getChecklistParts();
         onClick('displayChecklistRecordEdit')
     }
 
@@ -315,6 +320,8 @@ export default function ChecklistRecord() {
     }
 
     const submitEditChecklist = () => {
+        console.log("s: ", saveChecklistParts)
+        console.log("c: ", checklistParts)
         if (reportNo === '') {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'REPORT No.', life: 3000 });
         } else if (email === '') {
@@ -368,9 +375,14 @@ export default function ChecklistRecord() {
             };
 
             let partsSubmit = [];
-            checklistParts.map((x) => {
+            // checklistParts.map((x) => {
+            //     partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
+            // })
+            checklistParts.filter(f => f.quantity !== 0).map((x) => {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
             })
+
+            console.log("p: ", partsSubmit)
             
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/checklist/' + checklistID + '/', {
                 body_no: bodyNo,
@@ -460,6 +472,51 @@ export default function ChecklistRecord() {
         // getChecklistParts();
     }
 
+    const submitDeleteChecklist = () => {
+        setIsLoading(true);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        axios
+            .delete(process.env.REACT_APP_SERVER_NAME + 'report/checklist/' + delChecklistID + '/', config)
+            .then((res) => {
+                getChecklistRecord();
+                setIsLoading(false);
+                setMessage({title:"DELETE", content:"Successfully deleted."});
+                onHide('displayConfirmDelete');
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
+                setIsLoading(false);
+            });
+    }
+
+    const getChecklistRecord = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios
+            .get(process.env.REACT_APP_SERVER_NAME + 'report/checklist/', config)
+            .then((res) => {
+                setTotalCount(res.data.count);
+                setChecklistRecordList(res.data.results);
+            })
+            .catch((err) => {
+                
+            });
+    }
+
     const deleteChecklistParts = (value) => {
         let token = localStorage.getItem("token");
         const config = {
@@ -493,6 +550,7 @@ export default function ChecklistRecord() {
         'displayChecklistRecordEdit': setDisplayChecklistRecordEdit,
         'displayMessage': setDisplayMessage,
         'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
+        'displayConfirmDelete': setDisplayConfirmDelete,
     }
 
     const onClick = (name) => {
@@ -523,6 +581,13 @@ export default function ChecklistRecord() {
                     <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => submitDeleteImage()}/>
                 </div>
             );
+        } else if (name === 'displayConfirmDelete') {
+            return (
+                <div>
+                    <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} autoFocus/>
+                    <Button label="Yes" icon="pi pi-check" className="p-button-success" onClick={() => submitDeleteChecklist()}/>
+                </div>
+            );
         }
     }
 
@@ -537,7 +602,7 @@ export default function ChecklistRecord() {
             <div>
                 <center>
                 <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getCheckListRecordDetails(rowData.check_list_id)}/>
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger"/>
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelChecklistID(rowData.check_list_id); onClick('displayConfirmDelete')}}/>
                 </center>
             </div>
         );
@@ -915,6 +980,18 @@ export default function ChecklistRecord() {
                         <div className="p-col">
                             <h5><b>Delete Image</b></h5>
                             <div style={{fontSize: '16px'}}>Are you sure to delete this image ?</div>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="CONFIRMATION" visible={displayConfirmDelete} style={{ width: '310px' }} footer={renderFooter('displayConfirmDelete')} onHide={() => onHide('displayConfirmDelete')}>
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <i className="pi pi-trash" style={{fontSize: '25px', color: 'red'}}/>
+                        </div>
+                        <div className="p-col">
+                            <h5><b>Delete Record</b></h5>
+                            <div style={{fontSize: '16px'}}>Are you sure to delete this record no. {delChecklistID}?</div>
                         </div>
                     </div>
                 </Dialog>

@@ -166,7 +166,7 @@ export default function ChecklistReport() {
     const submitChecklist = () => {
         // console.log(jobDescription)
         // console.log(bodyNo)
-        console.log(reportNo)
+        // console.log(reportNo)
         // console.log(partsIncluded)
 
         if (reportNo === '') {
@@ -222,9 +222,14 @@ export default function ChecklistReport() {
             };
 
             let partsSubmit = [];
-            checklistParts.map((x) => {
+            // checklistParts.map((x) => {
+            //     partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
+            // })
+            checklistParts.filter(f => f.quantity !== 0).map((x) => {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
             })
+
+            // console.log(partsSubmit)
             
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/checklist/', {
                 body_no: bodyNo,
