@@ -18,10 +18,14 @@ import { Toast } from 'primereact/toast';
 import axios from "axios";
 import { format } from 'date-fns';
 
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+// import * as jsPDF from 'jspdf';
+
 export default function RepairRecords() {
 
     //search fields
-    // const [searchJobNumber, setSearchJobNumber] = useState("");
+    // const [searchIRNumber, setSearchIRNumber] = useState("");
     // const searchJobTypeOptions = [{ name: "SHOW ALL", val: "" }, { name: "REPAIR", val: "True" }, { name: "INSPECTION", val: "False" }];
     // const [searchJobType, setSearchJobType] = useState([]);
     // const [searchDateCreated, setSearchDateCreated] = useState(null);
@@ -35,6 +39,7 @@ export default function RepairRecords() {
     const [flagIRRecordDetails, setFlagIRRecordDetails] = useState(false);
     const [IRRecordID, setIRRecordID] = useState('');
     const [IRRecordNo, setIRRecordNo] = useState('');
+    const [flagIRRecordMethod, setFlagIRRecordMethod] = useState('');
 
     const [reviseColor, setReviseColor] = useState(Array(29).fill(""));
     const [reviseText, setReviseText] = useState(Array(29).fill(""));
@@ -87,6 +92,7 @@ export default function RepairRecords() {
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
+    const [displayPDF, setDisplayPDF] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -323,7 +329,14 @@ export default function RepairRecords() {
                 onChangeValue('f7', statusOperationalOptions.find(x => x.name === op.toUpperCase()));
                 setEngineNumber(res.data.engine_no);
                 setIsLoading(false);
-                onClick('displayIncidentRecordEdit');
+                if (flagIRRecordMethod === 'pdf') {
+                    setIsLoading(true);
+                    onClick('displayPDF');
+                    convertPDF();
+                } else {
+                    onClick('displayIncidentRecordEdit');
+                }
+                
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Display Error', detail: 'Something went wrong.', life: 5000 });
@@ -495,6 +508,46 @@ export default function RepairRecords() {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
                 setIsLoading(false);
             });
+    }
+
+    const convertPDF = () => {
+        // const input = document.getElementById('toPdf');
+
+        // let doc = new jsPDF.default();
+        // doc.html(input);
+        // doc.save("myDocument.pdf");
+
+        // window.open(doc.output('bloburl'));
+
+
+        // let pdf = new jsPDF();
+        // pdf.html(document.getElementById('toPdf'), 80, 40, {
+        //     callback: function () {
+        //         pdf.save('myDocument.pdf');
+        //         window.open(pdf.output('bloburl')); // To debug.
+        //     }, margins
+        // });
+
+        const input = document.getElementById('toPdf');
+
+        html2canvas(input)
+        .then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+
+            const pdf = new jsPDF();
+
+            var width = pdf.internal.pageSize.getWidth();
+            var height = pdf.internal.pageSize.getHeight();
+
+            // pdf.addImage(imgData, 'JPEG', 0, 0);
+            pdf.addImage(imgData, 'JPEG', 8, 8, width-18, height-18);
+            // pdf.output('dataurlnewwindow');
+            window.open(pdf.output('bloburl'));
+            onHide('displayPDF');
+            setIsLoading(false);
+            // pdf.save("download.pdf");
+        });
+    
     }
 
     const getIncidentRecord = () => {
@@ -746,6 +799,7 @@ export default function RepairRecords() {
         'displayIncidentRecordEdit': setDisplayIncidentRecordEdit,
         'displayMessage': setDisplayMessage,
         'displayConfirmDelete': setDisplayConfirmDelete,
+        'displayPDF': setDisplayPDF,
     }
 
     const onClick = (name) => {
@@ -755,6 +809,7 @@ export default function RepairRecords() {
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
         setFlagIRRecordDetails(false);
+        setFlagIRRecordMethod('');
         setIRRecordID('');
         setIRRecordNo('');
         setReviseColor(Array(29).fill(""));
@@ -820,8 +875,9 @@ export default function RepairRecords() {
         return (
             <div>
                 <center>
-                    <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getIncidentRecordDetails(rowData.ir_id)}/>
-                    <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setIRRecordID(rowData.ir_id); setIRRecordNo(rowData.ir_no); onClick('displayConfirmDelete')}}/>
+                    <Button style={{marginRight: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getIncidentRecordDetails(rowData.ir_id)}/>
+                    <Button style={{marginRight: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setIRRecordID(rowData.ir_id); setIRRecordNo(rowData.ir_no); onClick('displayConfirmDelete')}}/>
+                    <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagIRRecordMethod('pdf'); getIncidentRecordDetails(rowData.ir_id)}}/>
                 </center>
             </div>
         );
@@ -866,6 +922,212 @@ export default function RepairRecords() {
                     <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
                 </div>
             </div>
+
+            {/* <div id="toPdf" className="p-grid p-fluid" style={{opacity: '1'}}>
+                <div>
+                    <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                    <h4>INCIDENT REPORT</h4>
+                                </div>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                    <div className="card card-w-title red-field">
+                                        <div className="p-grid p-fluid">
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                                <h6><b>IR #:</b></h6>
+                                                <InputText placeholder="Input IR No." value={IRNo} onChange={(e) => setIRNo(e.target.value)} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[0]}>
+                                                <h6><b>DATE:</b></h6>
+                                                <Calendar placeholder="Select Date" value={dateIR} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
+                                                <small className="p-invalid p-d-block">{reviseText[0]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[1]}>
+                                                <h6><b>REQUESTOR'S NAME:</b></h6>
+                                                <InputText placeholder="Input Requestor's Name" value={requestorName} onChange={(e) => onChangeValue('f1', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[1]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <div className="p-grid p-fluid">
+                                                    <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[2]}>
+                                                        <h6><b>PROJECT NAME:</b></h6>
+                                                        <InputText placeholder="Input Project Name" value={projectName} onChange={(e) => onChangeValue('f2', e.target.value)}/>
+                                                        <small className="p-invalid p-d-block">{reviseText[2]}</small>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[3]}>
+                                                        <h6><b>SUB PROJECT:</b></h6>
+                                                        <InputText placeholder="Input Sub Project" value={subProject} onChange={(e) => onChangeValue('f3', e.target.value)}/>
+                                                        <small className="p-invalid p-d-block">{reviseText[3]}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[4]}>
+                                                <h6><b>BODY No.:</b></h6>
+                                                <AutoComplete forceSelection field="body_no" placeholder="Body No." suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
+                                                value={bodyNo} onSelect={(e) => onSelectBodyNo(e.value)} onChange={(e) => onChangeValue('f4', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[4]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>CS NUMBER:</b></h6>
+                                                <InputText placeholder="Input CS Number" value={CSNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>PLATE NUMBER:</b></h6>
+                                                <InputText placeholder="Input Plate Number" value={plateNumber} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[5]}>
+                                                <h6><b>REGION:</b></h6>
+                                                <InputText placeholder="Input Region" value={region} onChange={(e) => onChangeValue('f5', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[5]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                                <h6><b>AREA:</b></h6>
+                                                <InputText placeholder="Input Area" value={area} onChange={(e) => setArea(e.target.value)} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[6]}>
+                                                <h6><b>EXACT LOCATION:</b></h6>
+                                                <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => onChangeValue('f6', e.target.value)} disabled/>
+                                                <small className="p-invalid p-d-block">{reviseText[6]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>VEHICLE SUPPLIER:</b></h6>
+                                                <InputText placeholder="Input Vehicle Supplier" value={vehicleSupplier} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>VEHICLE TYPE/MAKE:</b></h6>
+                                                <InputText placeholder="Input Type/Make" value={vehicleTypeMake} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[7]}>
+                                                <h6><b>OPERATIONAL (YES/NO):</b></h6>
+                                                <Dropdown value={operational} options={statusOperationalOptions} optionLabel="name" placeholder="Select" 
+                                                onChange={event => onChangeValue('f7', event.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[7]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[8]}>
+                                                <h6><b>CURRENT ODOMETER:</b></h6>
+                                                <InputText placeholder="Input Odometer" value={odometer} onChange={(e) => onChangeValue('f8', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[8]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk resize-label " + reviseColor[9]}>
+                                                <h6><b>WAIVER:</b></h6>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-field-checkbox">
+                                                    <Checkbox inputId="cb" checked={waiver} onChange={e => onChangeValue('f9', e.checked)} />
+                                                    <label htmlFor="cb"><b>Check (<i className="pi pi-check"></i>) if under waiver</b></label>
+                                                </div>
+                                            </div>
+                                            
+                                            <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12 resize-label">
+                                                <div className="p-grid p-fluid">
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[0]}>
+                                                        <Checkbox inputId="cb" value="me" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('me') !== -1}/>
+                                                        <label htmlFor="cb">MECHANICAL</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[1]}>
+                                                        <Checkbox inputId="cb" value="el" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('el') !== -1}/>
+                                                        <label htmlFor="cb">ELECTRICAL</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[2]}>
+                                                        <Checkbox inputId="cb" value="ba" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ba') !== -1}/>
+                                                        <label htmlFor="cb">BATTERY</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[3]}>
+                                                        <Checkbox inputId="cb" value="ti" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ti') !== -1}/>
+                                                        <label htmlFor="cb">TIRES</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[4]}>
+                                                        <Checkbox inputId="cb" value="pm" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('pm') !== -1}/>
+                                                        <label htmlFor="cb">PMS</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[5]}>
+                                                        <Checkbox inputId="cb" value="ac" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ac') !== -1}/>
+                                                        <label htmlFor="cb">ACCIDENT</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[6]}>
+                                                        <Checkbox inputId="cb" value="ot" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ot') !== -1}/>
+                                                        <label htmlFor="cb">OTHERS</label>
+                                                    </div>
+                                                </div>
+                                            </Panel>
+
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                <h5>REPAIR/INCIDENT DETAILS</h5>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <h6><b><center>OBSERVATION (Problem encountered during use) / INCIDENT</center></b></h6>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>ENGINE NUMBER:</b></h6>
+                                                <InputText placeholder="Input Engine Number" value={engineNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>CHASSIS NUMBER:</b></h6>
+                                                <InputText placeholder="Input Chassis Number" value={chassisNumber} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[11]}>
+                                                <h6><b>DAMAGED PARTS:</b></h6>
+                                                <InputText placeholder="Input Damaged Parts" value={damagedParts} onChange={(e) => onChangeValue('f11', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[11]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[12]}>
+                                                <h6><b>LOCATION OF INCIDENT:</b></h6>
+                                                <InputText placeholder="Input Location" value={locationIncident} onChange={(e) => onChangeValue('f12', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[12]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <div className="p-grid p-fluid">
+                                                    <div className={"p-col-12 p-lg-8 p-md-8 p-sm-12 required-asterisk " + reviseColor[13]}>
+                                                        <h6><b>INCIDENT DATE:</b></h6>
+                                                        <Calendar placeholder="Select Date" value={dateDetails} onChange={(e) => onChangeValue('f13', e.value)} showIcon readOnlyInput/>
+                                                        <small className="p-invalid p-d-block">{reviseText[13]}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[15]}>
+                                                <h6><b>PROBLEM OBSERVED:</b></h6>
+                                                <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                                    value={problemObserved} onChange={(e) => onChangeValue('f15', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[15]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[16]}>
+                                                <h6><b>RECOMMENDATION/REQUEST:</b></h6>
+                                                <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                                    value={recommendation} onChange={(e) => onChangeValue('f16', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[16]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[17]}>
+                                                <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>
+                                                <InputText placeholder="Input Name" value={preparedBy} onChange={(e) => onChangeValue('f17', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[17]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[18]}>
+                                                <h6><b>ADMIN NAME:</b></h6>
+                                                <InputText placeholder="Input Name" value={adminName} onChange={(e) => onChangeValue('f18', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[18]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[19]}>
+                                                <h6><b>CONTACT NUMBER:</b></h6>
+                                                <InputText placeholder="Input Contact Number" value={contactNumber} onChange={(e) => onChangeValue('f19', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[19]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[20]}>
+                                                <h6><b>NOTED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={notedBy} onChange={(e) => onChangeValue('f20', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[20]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[21]}>
+                                                <h6><b>APPROVED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={approvedBy} onChange={(e) => onChangeValue('f21', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[21]}</small>
+                                            </div>
+
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div> */}
 
             <div className="p-grid p-fluid">
                 <div className="dialog-display">
@@ -931,7 +1193,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[6]}>
                                                 <h6><b>EXACT LOCATION:</b></h6>
-                                                <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => onChangeValue('f6', e.target.value)}/>
+                                                <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => onChangeValue('f6', e.target.value)} disabled/>
                                                 <small className="p-invalid p-d-block">{reviseText[6]}</small>
                                             </div>
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
@@ -1075,6 +1337,225 @@ export default function RepairRecords() {
                                             <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
                                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <Button label="SUBMIT" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitIncidentReportEdit()}/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <Button label="PDF" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => convertPDF()}/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                            aw
+                            <ProgressSpinner />
+                        </div>
+                    </Dialog>
+                </div>
+
+                <div className="dialog-display">
+                    <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
+                        <div id="toPdf" className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                    <h4>INCIDENT REPORT</h4>
+                                </div>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                    <div className="card card-w-title red-field">
+                                        <div className="p-grid p-fluid">
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                                <h6><b>IR #:</b></h6>
+                                                <InputText placeholder="Input IR No." value={IRNo} onChange={(e) => setIRNo(e.target.value)} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[0]}>
+                                                <h6><b>DATE:</b></h6>
+                                                <Calendar placeholder="Select Date" value={dateIR} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
+                                                <small className="p-invalid p-d-block">{reviseText[0]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[1]}>
+                                                <h6><b>REQUESTOR'S NAME:</b></h6>
+                                                <InputText placeholder="Input Requestor's Name" value={requestorName} onChange={(e) => onChangeValue('f1', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[1]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <div className="p-grid p-fluid">
+                                                    <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[2]}>
+                                                        <h6><b>PROJECT NAME:</b></h6>
+                                                        <InputText placeholder="Input Project Name" value={projectName} onChange={(e) => onChangeValue('f2', e.target.value)}/>
+                                                        <small className="p-invalid p-d-block">{reviseText[2]}</small>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[3]}>
+                                                        <h6><b>SUB PROJECT:</b></h6>
+                                                        <InputText placeholder="Input Sub Project" value={subProject} onChange={(e) => onChangeValue('f3', e.target.value)}/>
+                                                        <small className="p-invalid p-d-block">{reviseText[3]}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[4]}>
+                                                <h6><b>BODY No.:</b></h6>
+                                                <AutoComplete forceSelection field="body_no" placeholder="Body No." suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
+                                                value={bodyNo} onSelect={(e) => onSelectBodyNo(e.value)} onChange={(e) => onChangeValue('f4', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[4]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>CS NUMBER:</b></h6>
+                                                <InputText placeholder="Input CS Number" value={CSNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>PLATE NUMBER:</b></h6>
+                                                <InputText placeholder="Input Plate Number" value={plateNumber} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[5]}>
+                                                <h6><b>REGION:</b></h6>
+                                                <InputText placeholder="Input Region" value={region} onChange={(e) => onChangeValue('f5', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[5]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                                <h6><b>AREA:</b></h6>
+                                                <InputText placeholder="Input Area" value={area} onChange={(e) => setArea(e.target.value)} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[6]}>
+                                                <h6><b>EXACT LOCATION:</b></h6>
+                                                <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => onChangeValue('f6', e.target.value)} disabled/>
+                                                <small className="p-invalid p-d-block">{reviseText[6]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>VEHICLE SUPPLIER:</b></h6>
+                                                <InputText placeholder="Input Vehicle Supplier" value={vehicleSupplier} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>VEHICLE TYPE/MAKE:</b></h6>
+                                                <InputText placeholder="Input Type/Make" value={vehicleTypeMake} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[7]}>
+                                                <h6><b>OPERATIONAL (YES/NO):</b></h6>
+                                                <Dropdown value={operational} options={statusOperationalOptions} optionLabel="name" placeholder="Select" 
+                                                onChange={event => onChangeValue('f7', event.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[7]}</small>
+                                                {/* <InputText placeholder="Input Operational" value={operational} disabled/> */}
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[8]}>
+                                                <h6><b>CURRENT ODOMETER:</b></h6>
+                                                <InputText placeholder="Input Odometer" value={odometer} onChange={(e) => onChangeValue('f8', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[8]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk resize-label " + reviseColor[9]}>
+                                                <h6><b>WAIVER:</b></h6>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-field-checkbox">
+                                                    <Checkbox inputId="cb" checked={waiver} onChange={e => onChangeValue('f9', e.checked)} />
+                                                    <label htmlFor="cb"><b>Check (<i className="pi pi-check"></i>) if under waiver</b></label>
+                                                </div>
+                                            </div>
+                                            
+                                            <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12 resize-label">
+                                                <div className="p-grid p-fluid">
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[0]}>
+                                                        <Checkbox inputId="cb" value="me" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('me') !== -1}/>
+                                                        <label htmlFor="cb">MECHANICAL</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[1]}>
+                                                        <Checkbox inputId="cb" value="el" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('el') !== -1}/>
+                                                        <label htmlFor="cb">ELECTRICAL</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[2]}>
+                                                        <Checkbox inputId="cb" value="ba" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ba') !== -1}/>
+                                                        <label htmlFor="cb">BATTERY</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[3]}>
+                                                        <Checkbox inputId="cb" value="ti" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ti') !== -1}/>
+                                                        <label htmlFor="cb">TIRES</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[4]}>
+                                                        <Checkbox inputId="cb" value="pm" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('pm') !== -1}/>
+                                                        <label htmlFor="cb">PMS</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[5]}>
+                                                        <Checkbox inputId="cb" value="ac" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ac') !== -1}/>
+                                                        <label htmlFor="cb">ACCIDENT</label>
+                                                    </div>
+                                                    <div className={"p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox " + reviseColorRT[6]}>
+                                                        <Checkbox inputId="cb" value="ot" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('ot') !== -1}/>
+                                                        <label htmlFor="cb">OTHERS</label>
+                                                    </div>
+                                                </div>
+                                            </Panel>
+
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                <h5>REPAIR/INCIDENT DETAILS</h5>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <h6><b><center>OBSERVATION (Problem encountered during use) / INCIDENT</center></b></h6>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>ENGINE NUMBER:</b></h6>
+                                                <InputText placeholder="Input Engine Number" value={engineNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>CHASSIS NUMBER:</b></h6>
+                                                <InputText placeholder="Input Chassis Number" value={chassisNumber} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[11]}>
+                                                <h6><b>DAMAGED PARTS:</b></h6>
+                                                <InputText placeholder="Input Damaged Parts" value={damagedParts} onChange={(e) => onChangeValue('f11', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[11]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[12]}>
+                                                <h6><b>LOCATION OF INCIDENT:</b></h6>
+                                                <InputText placeholder="Input Location" value={locationIncident} onChange={(e) => onChangeValue('f12', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[12]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <div className="p-grid p-fluid">
+                                                    <div className={"p-col-12 p-lg-8 p-md-8 p-sm-12 required-asterisk " + reviseColor[13]}>
+                                                        <h6><b>INCIDENT DATE:</b></h6>
+                                                        <Calendar placeholder="Select Date" value={dateDetails} onChange={(e) => onChangeValue('f13', e.value)} showIcon readOnlyInput/>
+                                                        <small className="p-invalid p-d-block">{reviseText[13]}</small>
+                                                    </div>
+                                                    {/* <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[14]}>
+                                                        <h6><b>TIME:</b></h6> */}
+                                                        {/* <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => setTimeDetails(e.value)} timeOnly hourFormat="12" showIcon readOnlyInput/> */}
+                                                        {/* <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => onChangeValue('f14', e.value)} timeOnly showIcon readOnlyInput/>
+                                                        <small className="p-invalid p-d-block">{reviseText[14]}</small>
+                                                    </div> */}
+                                                </div>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[15]}>
+                                                <h6><b>PROBLEM OBSERVED:</b></h6>
+                                                <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                                    value={problemObserved} onChange={(e) => onChangeValue('f15', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[15]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[16]}>
+                                                <h6><b>RECOMMENDATION/REQUEST:</b></h6>
+                                                <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                                    value={recommendation} onChange={(e) => onChangeValue('f16', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[16]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[17]}>
+                                                <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>
+                                                <InputText placeholder="Input Name" value={preparedBy} onChange={(e) => onChangeValue('f17', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[17]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[18]}>
+                                                <h6><b>ADMIN NAME:</b></h6>
+                                                <InputText placeholder="Input Name" value={adminName} onChange={(e) => onChangeValue('f18', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[18]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[19]}>
+                                                <h6><b>CONTACT NUMBER:</b></h6>
+                                                <InputText placeholder="Input Contact Number" value={contactNumber} onChange={(e) => onChangeValue('f19', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[19]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[20]}>
+                                                <h6><b>NOTED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={notedBy} onChange={(e) => onChangeValue('f20', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[20]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[21]}>
+                                                <h6><b>APPROVED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={approvedBy} onChange={(e) => onChangeValue('f21', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[21]}</small>
                                             </div>
                                         </div>
                                     </div>
