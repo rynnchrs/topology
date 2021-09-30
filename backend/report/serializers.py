@@ -279,26 +279,11 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
         parts_data = validated_data.get('parts')
 
         parts = (instance.parts).all()
-        part = [x for x in parts_data]
-
+        
         if parts:
-            if len(parts) > len(part):
-                for i in range(len(parts)):
-                    if i < len(part):
-                        CheckListReportParts.objects.filter(pk=parts[i].pk).update(**part[i])
-                    else:
-                        obj = CheckListReportParts.objects.get(pk=parts[i].pk)
-                        obj.check_list_parts = None
-                        obj.quantity = 0
-                        obj.save()
-            else:
-                for i in range(len(part)):
-                    if i < len(parts):
-                        CheckListReportParts.objects.filter(pk=parts[i].pk).update(**part[i])
-                    else:
-                        CheckListReportParts.objects.create(check_list=instance, **part[i])
-                        
-        else:
+            for part in parts:
+                part.delete()
+        if parts_data:
             for part_data in parts_data:
                 CheckListReportParts.objects.create(check_list=instance, **part_data)
         

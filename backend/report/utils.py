@@ -96,47 +96,19 @@ def checklist_reversion(checklist):
     first = Version.objects.get_for_object(checklist).last() # get the oldest version
     latest = Version.objects.get_for_object(checklist)[0] # get the latest version
     revised = diff(latest.field_dict,first.field_dict) # get the old item only
-    
     parts_list = CheckList.Parts_List
-
     try:
         revised['parts_included']
         try:
             lists =[(values) for key, values in revised['parts_included'].items()]
-            print(lists)
-            parts_included = [(y) for k,v in lists[0] for x,y in parts_list if v==x]
-            print(parts_included)
+            parts_included = [(y) for v in lists[0] for x,y in parts_list if v==x]
             revised['parts_included'] = parts_included
         except:
             lists =[int(values) for values in revised['parts_included']]
-            print(lists)
             parts_included = [(y) for v in lists for x,y in parts_list if v==x]
             revised['parts_included'] = parts_included
     except:
         pass
-
-    parts = []
-    parts_data = CheckListReportParts.objects.filter(check_list=checklist)
-    
-    for part_data in parts_data:
-        lists =  Version.objects.get_for_object(part_data)
-        parts_first = Version.objects.get_for_object(part_data).last()
-        parts_name = CheckListParts.objects.get(id=parts_first.field_dict['check_list_parts_id'])
-        if parts_name is None and len(lists) > 1:
-            print(parts_first.field_dict)
-            parts_first.delete()
-        else:
-            parts_latest = Version.objects.get_for_object(part_data)[0] # get the latest version
-            parts_revised = diff(parts_latest.field_dict,parts_first.field_dict) # get the old item only
-            for key, value in parts_revised.items():
-                if "check_list_parts_id" in key:
-                    parts_name = CheckListParts.objects.get(id=value)
-                    if parts_revised[key] is not None:
-                        parts_revised[key] = parts_name.name
-            parts.append(parts_revised)
-
-    if parts:
-        revised['parts'] = parts
 
     if 'noted_by_id' in revised:
         del revised['noted_by_id']
