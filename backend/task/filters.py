@@ -32,9 +32,10 @@ class IRFilter(filters.FilterSet):
     task_id = filters.NumberFilter(field_name="task_id", lookup_expr='exact')
     body_no = filters.CharFilter(field_name="body_no__body_no", lookup_expr='startswith')
     ir_no = filters.CharFilter(field_name="ir_no", lookup_expr='startswith')
+    project_name = filters.CharFilter(field_name="project_name", lookup_expr='startswith')
     date = filters.CharFilter(field_name="date", lookup_expr='exact')
   
     class Meta:
         models = IR
-        fields = ['task_id','body_no','ir_no','date']
+        fields = ['task_id','body_no','ir_no','project_name','date']
 

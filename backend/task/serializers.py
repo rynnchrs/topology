@@ -8,14 +8,19 @@ from .models import IR, Fieldman, JobOrder, Task
 
 
 class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, car list
-    make = serializers.SerializerMethodField()
-    
+    make = serializers.SerializerMethodField()  
+    dealer = serializers.SerializerMethodField()
+
     def get_make(self, obj):
         return obj.get_make_display()
 
+    def get_dealer(self, obj):
+        return obj.get_dealer_display()
+        
     class Meta:
         model = Car
-        fields = ['vin_no','body_no','plate_no','make','current_loc']
+        fields = ['vin_no','body_no','plate_no','make','current_loc',
+                    'permanent_loc','dealer','cs_no','engine_no']
 
 
 class JobOrderSerializer(serializers.ModelSerializer):
