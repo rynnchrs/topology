@@ -277,8 +277,8 @@ export default function RepairRecords() {
         setVehicleTypeMake(value.body_no.make);
         setChassisNumber(value.body_no.vin_no);
         onChangeValue('f5', value.region);
-        setArea(value.permanent_loc);
-        setExactLocation(value.current_loc);
+        setArea(value.body_no.permanent_loc);
+        setExactLocation(value.body_no.current_loc);
         // onChangeValue('f6', value.exact_loc);
         onChangeValue('f8', value.odometer);
         onChangeValue('f9', value.weiver);
@@ -317,41 +317,23 @@ export default function RepairRecords() {
         onChangeValue('f19', value.contact_number)
         onChangeValue('f20', value.noted_by);
         onChangeValue('f21', value.approved_by);
-        
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value.body_no.body_no + '/', config)
-            .then((res) => {
-                console.log("bn: ", res.data)
-                setCSNumber(res.data.cs_no);
-                setVehicleSupplier(res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
-                // setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
-                let op = res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '';
-                onChangeValue('f7', statusOperationalOptions.find(x => x.name === op.toUpperCase()));
-                setEngineNumber(res.data.engine_no);
+        setCSNumber(value.body_no.cs_no);
+        setVehicleSupplier(value.body_no.dealer);
+        let op = value.operational = value.operational === false ? 'No' : value.operational === true ? 'Yes' : '';
+        onChangeValue('f7', statusOperationalOptions.find(x => x.name === op.toUpperCase()));
+        setEngineNumber(value.body_no.engine_no);
+
+
+        setTimeout(() => {
+            if (flagIRRecordMethod === 'pdf') {
+                onClick('displayPDF');
+                convertPDF();
+            } else {
                 setIsLoading(false);
-                if (flagIRRecordMethod === 'pdf') {
-                    setIsLoading(true);
-                    onClick('displayPDF');
-                    convertPDF();
-                } else {
-                    onClick('displayIncidentRecordEdit');
-                }
-                
-            })
-            .catch((err) => {
-                toast.current.show({ severity: 'error', summary: 'Display Error', detail: 'Something went wrong.', life: 5000 });
-                setIsLoading(false);
-                onHide('displayIncidentRecordEdit');
-            });
-        
+                onClick('displayIncidentRecordEdit');
+            }
+        }, 1500);
     }
 
     const convertDatetoGMT = (value) => {
@@ -565,6 +547,9 @@ export default function RepairRecords() {
     }
 
     const convertPDF = () => {
+        try {
+
+        
         const input = document.getElementById('toPdf');
 
         html2canvas(input)
@@ -581,6 +566,9 @@ export default function RepairRecords() {
             onHide('displayPDF');
             setIsLoading(false);
         });
+    }catch (err){
+        console.log(err)
+    }
     
     }
 

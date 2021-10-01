@@ -133,27 +133,10 @@ export default function IncidentReport() {
         setExactLocation(value.current_loc);
         setVehicleTypeMake(value.make = value.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.make === 'SUV' ? 'Super Carry UV' : value.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
         setChassisNumber(value.vin_no);
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value.body_no + '/', config)
-            .then((res) => {
-                setCSNumber(res.data.cs_no);
-                setVehicleSupplier(res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
-                // setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
-                // let op = res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '';
-                // setOperational(statusOperationalOptions.find(x => x.name === op.toUpperCase()));
-                setEngineNumber(res.data.engine_no);
-            })
-            .catch((err) => {
-                
-            });
+        setCSNumber(value.cs_no);
+        setVehicleSupplier(value.dealer = value.dealer === 'DMC' ? 'Diamond Motor Corporation' : value.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : value.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : value.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
+        setEngineNumber(value.engine_no);
     }
 
     const onChangeRepairType = (e) => {
