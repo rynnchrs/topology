@@ -29,7 +29,7 @@ export default function RepairRecords() {
     const [searchBodyNo, setSearchBodyNo] = useState('');
     const [searchDateCreated, setSearchDateCreated] = useState(null);
 
-    const statusOperationalOptions = [{ name: 'YES', val: "Yes" }, { name: 'NO', val: "No" }];
+    const statusOperationalOptions = [{ name: 'YES', val: true }, { name: 'NO', val: false }];
     
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
@@ -120,7 +120,6 @@ export default function RepairRecords() {
                 + '&body_no=' + sBodyNo
                 + '&date=' + sDateCreated, config)
                 .then((res) => {
-                    console.log(res.data)
                     setTotalCount(res.data.count);
                     setIRRecordList(res.data.results);
                 })
@@ -278,7 +277,9 @@ export default function RepairRecords() {
         setVehicleTypeMake(value.body_no.make);
         setChassisNumber(value.body_no.vin_no);
         onChangeValue('f5', value.region);
-        onChangeValue('f6', value.exact_loc);
+        setArea(value.permanent_loc);
+        setExactLocation(value.current_loc);
+        // onChangeValue('f6', value.exact_loc);
         onChangeValue('f8', value.odometer);
         onChangeValue('f9', value.weiver);
 
@@ -328,6 +329,7 @@ export default function RepairRecords() {
         axios
             .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value.body_no.body_no + '/', config)
             .then((res) => {
+                console.log("bn: ", res.data)
                 setCSNumber(res.data.cs_no);
                 setVehicleSupplier(res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
                 // setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
@@ -393,7 +395,6 @@ export default function RepairRecords() {
             + '&body_no=' + sBodyNo
             + '&date=' + sDateCreated, config)
             .then((res) => {
-                console.log(res.data)
                 setTotalCount(res.data.count);
                 setIRRecordList(res.data.results);
             })
@@ -421,6 +422,8 @@ export default function RepairRecords() {
             toast.current.show({ severity: 'error', summary: 'EXACT LOCATION', detail: 'This field is required.', life: 3000 });
         } else if (vehicleSupplier === "") {
             toast.current.show({ severity: 'error', summary: 'VEHICLE SUPPLIER', detail: 'This field is required.', life: 3000 });
+        } else if (operational.length <= 0) {
+            toast.current.show({ severity: 'error', summary: 'OPERATIONAL', detail: 'This field is required.', life: 3000 });
         } else if (odometer === "") {
             toast.current.show({ severity: 'error', summary: 'ODOMETER', detail: 'This field is required.', life: 3000 });
         } else if (repairType.length <= 0) {
@@ -472,6 +475,7 @@ export default function RepairRecords() {
                 region: region,
                 exact_loc: exactLocation,
                 vehicle_supp: vehicleSupplier,
+                operational: operational.val,
                 odometer: odometer,
                 damaged_parts: damagedParts,
                 incedent_loc: locationIncident,
@@ -1164,10 +1168,6 @@ export default function RepairRecords() {
                                             <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
                                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <Button label="SUBMIT" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitIncidentReportEdit()}/>
-                                            </div>
-                                            <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
-                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
-                                                <Button label="PDF" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => convertPDF()}/>
                                             </div>
                                         </div>
                                     </div>

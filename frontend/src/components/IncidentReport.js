@@ -16,7 +16,7 @@ import { format } from 'date-fns';
 
 export default function IncidentReport() {
 
-    const statusOperationalOptions = [{ name: 'YES', val: "Yes" }, { name: 'NO', val: "No" }];
+    const statusOperationalOptions = [{ name: 'YES', val: true }, { name: 'NO', val: false }];
 
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
@@ -35,7 +35,7 @@ export default function IncidentReport() {
     const [exactLocation, setExactLocation] = useState('');
     const [vehicleSupplier, setVehicleSupplier] = useState('');
     const [vehicleTypeMake, setVehicleTypeMake] = useState('');
-    const [operational, setOperational] = useState('');
+    const [operational, setOperational] = useState([]);
     const [odometer, setOdometer] = useState('');
     const [waiver, setWaiver] = useState(false);
     const [repairType, setRepairType] = useState([]);
@@ -129,8 +129,8 @@ export default function IncidentReport() {
     const onSelectBodyNo = (value) => {
         console.log(value)
         setPlateNumber(value.plate_no);
-        setArea(value.current_loc);
-        setExactLocation(value.permanent_loc)
+        setArea(value.permanent_loc);
+        setExactLocation(value.current_loc);
         setVehicleTypeMake(value.make = value.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.make === 'SUV' ? 'Super Carry UV' : value.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
         setChassisNumber(value.vin_no);
         let token = localStorage.getItem("token");
@@ -146,7 +146,9 @@ export default function IncidentReport() {
             .then((res) => {
                 setCSNumber(res.data.cs_no);
                 setVehicleSupplier(res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
-                setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
+                // setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
+                // let op = res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '';
+                // setOperational(statusOperationalOptions.find(x => x.name === op.toUpperCase()));
                 setEngineNumber(res.data.engine_no);
             })
             .catch((err) => {
@@ -165,6 +167,7 @@ export default function IncidentReport() {
     }
 
     const submitIncidentReport = () => {
+        console.log(operational)
         if (IRNo === "") {
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIR === null) {
@@ -183,6 +186,8 @@ export default function IncidentReport() {
             toast.current.show({ severity: 'error', summary: 'EXACT LOCATION', detail: 'This field is required.', life: 3000 });
         } else if (vehicleSupplier === "") {
             toast.current.show({ severity: 'error', summary: 'VEHICLE SUPPLIER', detail: 'This field is required.', life: 3000 });
+        } else if (operational.length <= 0) {
+            toast.current.show({ severity: 'error', summary: 'OPERATIONAL', detail: 'This field is required.', life: 3000 });
         } else if (odometer === "") {
             toast.current.show({ severity: 'error', summary: 'ODOMETER', detail: 'This field is required.', life: 3000 });
         } else if (repairType.length <= 0) {
@@ -223,7 +228,7 @@ export default function IncidentReport() {
 
             // let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), timeDetails.getHours(), timeDetails.getMinutes(), timeDetails.getSeconds());
             let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), 0, 0, 0);
-            console.log(newDateTimeGMT)
+            console.log("op: ", operational.val);
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'task/ir-report/', {
                 repair_type: repairType,
@@ -237,6 +242,7 @@ export default function IncidentReport() {
                 region: region,
                 exact_loc: exactLocation,
                 vehicle_supp: vehicleSupplier,
+                operational: operational.val,
                 odometer: odometer,
                 damaged_parts: damagedParts,
                 incedent_loc: locationIncident,
