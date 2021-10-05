@@ -47,12 +47,13 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'reversion',
     'multiselectfield',
+    'notifications',
 
     #app
     'careta',
     'car',
     'report',
-    'notifications',
+    'notification',
     'task',
     'dashboard',
     'image',
@@ -130,8 +131,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
-
+DJANGO_NOTIFICATIONS_CONFIG = { 'USE_JSONFIELD': True}
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
