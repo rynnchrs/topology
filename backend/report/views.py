@@ -3,6 +3,8 @@ from datetime import datetime as date
 from os import remove
 from wsgiref.util import FileWrapper
 
+from django.db.models.deletion import ProtectedError
+
 from car.models import Car
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -17,7 +19,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import serializer_helpers
 from reversion.models import Version
-from task.models import JobOrder
+from task.models import JobOrder, Task
 
 from .export import export, repair_export
 from .filters import CheckListFilter, InspectionFilter, RepairFilter
@@ -27,7 +29,8 @@ from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
                           InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
-from .utils import analysis, checklist_reversion, repair_reversion, reversion, user_permission
+from .utils import (analysis, checklist_reversion, repair_reversion, reversion,
+                    user_permission)
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
@@ -419,76 +422,33 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     def destroy(self, request, pk=None):      
         user = self.request.user
         if user_permission(user, 'can_delete_repair_reports'): 
-            queryset = CheckList.objects.all()
-            repair = get_object_or_404(queryset, pk=pk)
-            repair.delete()
-            queryset = Image.objects.filter(image_name=pk ,mode="cl")
-            for image in queryset:
-                try:
-                    image.image.delete(save=False)
-                    image.delete()
-                except:
-                    pass
-            return Response("Successfully Deleted",status=status.HTTP_200_OK)        
+            try:
+                queryset = CheckList.objects.all()
+                repair = get_object_or_404(queryset, pk=pk)
+                repair.delete()
+                queryset = Image.objects.filter(image_name=pk ,mode="cl")
+                for image in queryset:
+                    try:
+                        image.image.delete(save=False)
+                        image.delete()
+                    except:
+                        pass
+                return Response("Successfully Deleted",status=status.HTTP_200_OK)      
+            except ProtectedError:
+                return Response("Can't delete this because it's being use by Task Scheduling", status=status.HTTP_200_OK)    
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    # def destroy(self, request, pk=None):      
-    #     user = self.request.user
-    #     if user_permission(user, 'can_delete_repair_reports'): 
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, pk=pk)
-    #         queryset = Image.objects.all()
-    #         image = get_object_or_404(queryset, image_name=pk)
-    #         repair.delete()
-    #         image.delete()
-    #         return Response(status=status.HTTP_200_OK)        
-    #     else: 
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-    # @action(detail=True,  methods=['put'])  # edit the noted_by Field
-    # def approved(self, request, pk=None):
-    #     user = self.request.user
-    #     if user_permission(user, 'can_edit_task'): 
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, job_order=pk) 
-    #         if repair.noted_by is None:  
-    #             repair.noted_by = user
-    #             repair.save()    
-    #         else:
-    #             return Response("Already approved",status=status.HTTP_400_BAD_REQUEST)
-
-    #         return Response("Successfully Added", status=status.HTTP_200_OK)       
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-    # @action(detail=False, methods=['post'], permission_classes=[AllowAny])
-    # def export_post(self, request, pk=None):
-    #     repair_id = []
-    #     if len(request.data['repair_id']) == 0:
-    #         return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)            
-    #     for data in (request.data['repair_id']):
-    #         repair_id.append(data)
-    #         try:
-    #             repair = Repair.objects.get(repair_id=data)
-    #         except Repair.DoesNotExist:
-    #             return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
-    #     repair = Repair.objects.all().filter(repair_id__in=repair_id)
-    #     if repair_export(repair):
-    #         return Response("Excel generated",status=status.HTTP_200_OK)
-    #     else:
-    #         return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
-
-    # @action(detail=False,permission_classes=[AllowAny])
-    # def export_get(self, request):
-    #     filename = '{date}-Repair.xlsx'.format(
-    #     date=date.now().strftime('%Y-%m-%d'))
-
-    #     file_path = '.'+settings.MEDIA_URL+filename
-    #     file = open(file_path,"rb")
-    #     response = HttpResponse(FileWrapper(file),
-    #      content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    #     )
-    #     response['Content-Disposition'] = 'attachment; filename=' + filename
-    #     file = remove(file_path)
-    #     return response
+    @action(detail=False)
+    def task_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in inspection table
+            check_list = Task.objects.all().values_list('check_list', flat=True)
+            # filter True(inspection) and remove all used job order
+            check_list = [i for i in check_list if i is not None]
+            queryset = CheckList.objects.all().exclude(pk__in=check_list)
+            serializer = CheckListListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
