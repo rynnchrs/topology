@@ -316,7 +316,7 @@ class CheckListPartsView(viewsets.ModelViewSet):
 
     def list(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             serializer = CheckListPartsSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -326,7 +326,7 @@ class CheckListPartsView(viewsets.ModelViewSet):
 
     def create(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             serializer = CheckListPartsSerializer(data=request.data, many=True)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -337,7 +337,7 @@ class CheckListPartsView(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             queryset = self.filter_queryset(self.get_queryset().filter(pk=pk))
             queryset.delete()
             return Response("deleted", status=status.HTTP_200_OK)        
@@ -355,7 +355,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     
     def list(self, request): 
         user = self.request.user   
-        if user_permission(user, 'can_view_repair_reports'): 
+        if user_permission(user, 'can_view_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -369,7 +369,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
             
     def create(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             serializer = CheckListSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 car = Car.objects.get(body_no=request.data['body_no'])
@@ -386,7 +386,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
 
     def retrieve(self, request, pk=None):  
         user = self.request.user
-        if user_permission(user,'can_view_repair_reports'): 
+        if user_permission(user,'can_view_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             check_list = get_object_or_404(queryset, pk=pk) 
             serializer = CheckListSerializer(check_list,many=False)
@@ -399,7 +399,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
 
     def update(self, request, pk=None):
         user = self.request.user
-        if user_permission(user, 'can_edit_repair_reports'): 
+        if user_permission(user, 'can_edit_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             check_list = get_object_or_404(queryset, pk=pk) 
             serializer = CheckListSerializer(instance=check_list, data=request.data)
@@ -418,7 +418,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     
     def destroy(self, request, pk=None):      
         user = self.request.user
-        if user_permission(user, 'can_delete_repair_reports'): 
+        if user_permission(user, 'can_delete_checklist'): 
             queryset = CheckList.objects.all()
             repair = get_object_or_404(queryset, pk=pk)
             repair.delete()

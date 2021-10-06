@@ -402,7 +402,7 @@ class IRView(viewsets.ModelViewSet):  # add this
     
     def list(self, request): 
         user = self.request.user   
-        if user_permission(user, 'can_view_repair_reports'): 
+        if user_permission(user, 'can_view_ir'): 
             queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -415,7 +415,7 @@ class IRView(viewsets.ModelViewSet):  # add this
 
     def create(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_ir'): 
             serializer = IRSerializers(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 car = Car.objects.get(body_no=request.data['body_no'])
@@ -432,7 +432,7 @@ class IRView(viewsets.ModelViewSet):  # add this
 
     def retrieve(self, request, pk=None):  
         user = self.request.user
-        if user_permission(user,'can_view_repair_reports'): 
+        if user_permission(user,'can_view_ir'): 
             queryset = queryset = self.filter_queryset(self.get_queryset())
             ir = get_object_or_404(queryset, pk=pk) 
             serializer = IRSerializers(ir,many=False)
@@ -444,7 +444,7 @@ class IRView(viewsets.ModelViewSet):  # add this
 
     def update(self, request, pk=None):
         user = self.request.user
-        if user_permission(user, 'can_edit_repair_reports'): 
+        if user_permission(user, 'can_edit_ir'): 
             queryset = self.filter_queryset(self.get_queryset())
             ir = get_object_or_404(queryset, pk=pk) 
             serializer = IRSerializers(instance=ir, data=request.data)
@@ -462,7 +462,7 @@ class IRView(viewsets.ModelViewSet):  # add this
     
     def destroy(self, request, pk=None):      
         user = self.request.user
-        if user_permission(user, 'can_delete_repair_reports'): 
+        if user_permission(user, 'can_delete_ir'): 
             try:
                 queryset = IR.objects.all()
                 repair = get_object_or_404(queryset, pk=pk)

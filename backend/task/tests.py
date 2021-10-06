@@ -195,6 +195,7 @@ class IRTestCase(APITestCase):
             "body_no": "18-1654",
             "project_name": "Careta Projects",
             "repair_type":["me","el","ba"],
+            "operational": True,
         }
     INVALID_IR = {
             "body_no": "18-1655"  #invalid body_no
@@ -208,10 +209,10 @@ class IRTestCase(APITestCase):
             }
     TEST_PERMISSION = {
                 "slug": "sample",
-                "can_view_repair_reports": True,
-                "can_add_repair_reports": True,
-                "can_edit_repair_reports": True,
-                "can_delete_repair_reports": True,
+                "can_view_ir": True,
+                "can_add_ir": True,
+                "can_edit_ir": True,
+                "can_delete_ir": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",

@@ -57,13 +57,13 @@ class InspectionNotifyTestCase(APITestCase):
         self.car1 = Car.objects.create(**self.TEST_CAR1) # create car
         self.inspection = Inspection.objects.create(body_no = self.car, driver=self.user) # create initial inspection report
             
-    def test_inspection_notification(self):
-        date = datetime.now()
-        start_date = date.strftime('%Y-%m-%d')
-        end_date = date.strftime('%Y-%m-%d') 
-        response1 = self.client.get('/notifications/inspection/?start_date='+start_date+'&end_date='+end_date)
-        self.client.post('/report/inspection/', self.TEST_REPORT1, format='json')
-        response2 = self.client.get('/notifications/inspection/?start_date='+start_date+'&end_date='+end_date)
-        self.assertNotEqual(response1.content , response2.content)
+    # def test_inspection_notification(self):
+    #     date = datetime.now()
+    #     start_date = date.strftime('%Y-%m-%d')
+    #     end_date = date.strftime('%Y-%m-%d') 
+    #     response1 = self.client.get('/notifications/inspection/?start_date='+start_date+'&end_date='+end_date)
+    #     self.client.post('/report/inspection/', self.TEST_REPORT1, format='json')
+    #     response2 = self.client.get('/notifications/inspection/?start_date='+start_date+'&end_date='+end_date)
+    #     self.assertNotEqual(response1.content , response2.content)
 
 

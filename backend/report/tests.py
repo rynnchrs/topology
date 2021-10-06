@@ -429,10 +429,10 @@ class CheckListReportTestCase(APITestCase):
             }
     TEST_PERMISSION = {
                 "slug": "sample",
-                "can_view_repair_reports": True,
-                "can_add_repair_reports": True,
-                "can_edit_repair_reports": True,
-                "can_delete_repair_reports": True,
+                "can_view_checklist": True,
+                "can_add_checklist": True,
+                "can_edit_checklist": True,
+                "can_delete_checklist": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",
