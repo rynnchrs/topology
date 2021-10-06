@@ -479,87 +479,17 @@ class IRView(viewsets.ModelViewSet):  # add this
                 return Response("Can't delete this because it's being use by Task Scheduling", status=status.HTTP_200_OK)  
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-    # def update(self, request, pk=None):
-    #     user = self.request.user
-    #     if user_permission(user, 'can_edit_repair_reports'): 
-    #         request.data['diagnosed_by'] = user.id 
-    #         request.data['generated_by'] = user.id 
-    #         request.data['repair_by'] = user.id 
-    #         request.data['noted_by'] = "" 
-    #         cost = request.data['parts'] + request.data['labor']
-    #         request.data['cost'] = cost
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, pk=pk)   
-    #         serializer = RepairSerializer(instance=repair, data=request.data)
-    #         if serializer.is_valid(raise_exception=True):
-    #             job = JobOrder.objects.get(pk=request.data['job_order'])
-    #             car = Car.objects.get(body_no=job.task.body_no.body_no)
-    #             if request.data['status_repair'] == "Operational":
-    #                 car.operational = True
-    #             else:
-    #                 car.operational = False
-    #             car.save()
-    #             serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_200_OK)       
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
-            
-    # def destroy(self, request, pk=None):      
-    #     user = self.request.user
-    #     if user_permission(user, 'can_delete_repair_reports'): 
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, pk=pk)
-    #         queryset = Image.objects.all()
-    #         image = get_object_or_404(queryset, image_name=pk)
-    #         repair.delete()
-    #         image.delete()
-    #         return Response(status=status.HTTP_200_OK)        
-    #     else: 
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    # @action(detail=True,  methods=['put'])  # edit the noted_by Field
-    # def approved(self, request, pk=None):
-    #     user = self.request.user
-    #     if user_permission(user, 'can_edit_task'): 
-    #         queryset = Repair.objects.all()
-    #         repair = get_object_or_404(queryset, job_order=pk) 
-    #         if repair.noted_by is None:  
-    #             repair.noted_by = user
-    #             repair.save()    
-    #         else:
-    #             return Response("Already approved",status=status.HTTP_400_BAD_REQUEST)
-
-    #         return Response("Successfully Added", status=status.HTTP_200_OK)       
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-    # @action(detail=False, methods=['post'], permission_classes=[AllowAny])
-    # def export_post(self, request, pk=None):
-    #     repair_id = []
-    #     if len(request.data['repair_id']) == 0:
-    #         return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)            
-    #     for data in (request.data['repair_id']):
-    #         repair_id.append(data)
-    #         try:
-    #             repair = Repair.objects.get(repair_id=data)
-    #         except Repair.DoesNotExist:
-    #             return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
-    #     repair = Repair.objects.all().filter(repair_id__in=repair_id)
-    #     if repair_export(repair):
-    #         return Response("Excel generated",status=status.HTTP_200_OK)
-    #     else:
-    #         return Response("Failed to generate.",status=status.HTTP_400_BAD_REQUEST)
-
-    # @action(detail=False,permission_classes=[AllowAny])
-    # def export_get(self, request):
-    #     filename = '{date}-Repair.xlsx'.format(
-    #     date=date.now().strftime('%Y-%m-%d'))
-
-    #     file_path = '.'+settings.MEDIA_URL+filename
-    #     file = open(file_path,"rb")
-    #     response = HttpResponse(FileWrapper(file),
-    #      content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    #     )
-    #     response['Content-Disposition'] = 'attachment; filename=' + filename
-    #     file = remove(file_path)
-    #     return response
+    @action(detail=False)
+    def task_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in inspection table
+            ir = Task.objects.all().values_list('ir_no', flat=True)
+            # filter True(inspection) and remove all used job order
+            ir = [i for i in ir if i is not None]
+            queryset = IR.objects.all().exclude(pk__in=ir)
+            serializer = IRListSerializers(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
