@@ -334,6 +334,8 @@ export default function ChecklistRecord() {
     // }
 
     const submitEditChecklist = () => {
+        console.log("s: ", saveChecklistParts)
+        console.log("c: ", checklistParts)
         if (reportNo === '') {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'REPORT No.', life: 3000 });
         } else if (email === '') {
