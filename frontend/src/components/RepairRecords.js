@@ -226,29 +226,33 @@ export default function RepairRecords() {
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
+        console.log(value);
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
         let splitScheduleDate = value.job_order.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
-        setBodyNo(value.job_order.task.body_no.body_no);
-        setMake(value.job_order.task.body_no.make);
-        setStatus(value.job_order.task.body_no.operational);
-        setLocation(value.job_order.task.body_no.current_loc);
-        setPlateNumber(value.job_order.task.body_no.plate_no);
-        setCSNumber(value.job_order.task.body_no.vin_no);
-        setChassisNumber(value.job_order.task.body_no.vin_no);
+        setBodyNo(value.job_order.body_no.body_no);
+        setMake(value.job_order.body_no.make);
+        setStatus(value.job_order.body_no.operational);
+        setLocation(value.job_order.body_no.current_loc);
+        setPlateNumber(value.job_order.body_no.plate_no);
+        setCSNumber(value.job_order.body_no.vin_no);
+        setChassisNumber(value.job_order.body_no.vin_no);
 
-        setTotalPartsCost(value.total_parts_cost.toFixed(2));
-        setTotalLaborCost(value.total_labor_cost.toFixed(2));
-        setTotalEstimateCost(value.total_estimate_cost.toFixed(2));
+        // setTotalPartsCost(value.total_parts_cost.toFixed(2));
+        // setTotalLaborCost(value.total_labor_cost.toFixed(2));
+        // setTotalEstimateCost(value.total_estimate_cost.toFixed(2));
         
         try {
-            handleChange("f0", value.ir_no);
-            handleChange("f1", convertDatetoGMT(value.incident_date));
-            handleChange("f2", convertDatetoGMT(value.date_receive));
-            handleChange("f3", value.incident_details);
+            handleChange("f0", value.job_order.ir_no.ir_no);
+            let valueDateTime = new Date(value.job_order.ir_no.date_time);
+            let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+            console.log(valueDate);
+            handleChange("f1", valueDate);
+            handleChange("f2", convertDatetoGMT(value.job_order.ir_no.date));
+            handleChange("f3", value.job_order.ir_no.problem_obs);
             handleChange("f4", value.site_poc);
             handleChange("f5", value.contact_no);
             handleChange("f6", convertDatetoGMT(value.perform_date));
@@ -783,7 +787,7 @@ export default function RepairRecords() {
             case "f0":
                 setIRNumber(value);
                 if (typeof(rrd.revised.ir_no) === "undefined") {
-                    value !== rrd.ir_no ? updateRedFields(arrIndex, r, rrd.ir_no) : updateRedFields(arrIndex, e, e);
+                    value !== rrd.job_order.ir_no.ir_no ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.ir_no) : updateRedFields(arrIndex, e, e);
                 } else {
                     value !== rrd.revised.ir_no ? updateRedFields(arrIndex, r, rrd.revised.ir_no) : updateRedFields(arrIndex, e, e);
                 }
@@ -792,8 +796,10 @@ export default function RepairRecords() {
                 try {
                     setDateIncident(value);
                     dt = format(value, 'yyyy-MM-dd');
+                    let valueDateTime = new Date(rrd.job_order.ir_no.date_time);
+                    let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
                     if (typeof(rrd.revised.incident_date) === "undefined") {
-                        dt !== rrd.incident_date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.incident_date)) : updateRedFields(arrIndex, e, e);
+                        dt !== format(valueDate, 'yyyy-MM-dd') ? updateRedFields(arrIndex, r, reviseFormatDate(format(valueDate, 'yyyy-MM-dd'))) : updateRedFields(arrIndex, e, e);
                     } else {
                         dt !== rrd.revised.incident_date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.revised.incident_date)) : updateRedFields(arrIndex, e, e);
                     }
@@ -804,7 +810,7 @@ export default function RepairRecords() {
                     setDateReceive(value);
                     dt = format(value, 'yyyy-MM-dd');
                     if (typeof(rrd.revised.date_receive) === "undefined") {
-                        dt !== rrd.date_receive ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.date_receive)) : updateRedFields(arrIndex, e, e);
+                        dt !== rrd.job_order.ir_no.date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.job_order.ir_no.date)) : updateRedFields(arrIndex, e, e);
                     } else {
                         dt !== rrd.revised.date_receive ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.revised.date_receive)) : updateRedFields(arrIndex, e, e);
                     }
@@ -813,7 +819,7 @@ export default function RepairRecords() {
             case "f3":
                 setDetailsIncident(value);
                 if (typeof(rrd.revised.incident_details) === "undefined") {
-                    value !== rrd.incident_details ? updateRedFields(arrIndex, r, rrd.incident_details) : updateRedFields(arrIndex, e, e);
+                    value !== rrd.job_order.ir_no.problem_obs ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.problem_obs) : updateRedFields(arrIndex, e, e);
                 } else {
                     value !== rrd.revised.incident_details ? updateRedFields(arrIndex, r, rrd.revised.incident_details) : updateRedFields(arrIndex, e, e);
                 }
