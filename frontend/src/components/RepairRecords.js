@@ -48,6 +48,7 @@ export default function RepairRecords() {
 
     const [repairID, setRepairID] = useState("");
     const [jobOrder, setJobOrder] = useState("");
+    const [taskID, setTaskID] = useState('');
     const [jobType, setJobType] = useState("");
     const [scheduleDate, setScheduleDate] = useState("");
     const [bodyNo, setBodyNo] = useState("");
@@ -226,10 +227,11 @@ export default function RepairRecords() {
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
-        console.log(value);
+        console.log("val: ", value);
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
+        setTaskID(value.job_order.task.task_id);
         let splitScheduleDate = value.job_order.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
@@ -249,12 +251,11 @@ export default function RepairRecords() {
             handleChange("f0", value.job_order.ir_no.ir_no);
             let valueDateTime = new Date(value.job_order.ir_no.date_time);
             let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
-            console.log(valueDate);
             handleChange("f1", valueDate);
             handleChange("f2", convertDatetoGMT(value.job_order.ir_no.date));
             handleChange("f3", value.job_order.ir_no.problem_obs);
-            handleChange("f4", value.site_poc);
-            handleChange("f5", value.contact_no);
+            handleChange("f4", value.job_order.ir_no.admin_name);
+            handleChange("f5", value.job_order.ir_no.contact_number);
             handleChange("f6", convertDatetoGMT(value.perform_date));
             handleChange("f7", value.actual_findings);
             handleChange("f8", value.actual_remarks);
@@ -631,9 +632,11 @@ export default function RepairRecords() {
             };
 
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', {
+                body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
                 ir_no: IRNumber,
+                check_list: "",
                 incident_date: format(dateIncident, 'yyyy-MM-dd'),
                 date_receive: format(dateReceive, 'yyyy-MM-dd'),
                 incident_details: detailsIncident,
@@ -647,7 +650,8 @@ export default function RepairRecords() {
                 date_done: format(dateDone, 'yyyy-MM-dd'),
                 status_repair: statusRepair.val,
                 remarks: remarks,
-                job_order: jobOrder
+                job_order: jobOrder,
+                task: taskID,
             }, config)
             .then((res) => {
                 if (refImageUpload.current.state.files.length <= 0) {
@@ -827,7 +831,7 @@ export default function RepairRecords() {
             case "f4":
                 setSitePOC(value);
                 if (typeof(rrd.revised.site_poc) === "undefined") {
-                    value !== rrd.site_poc ? updateRedFields(arrIndex, r, rrd.site_poc) : updateRedFields(arrIndex, e, e);
+                    value !== rrd.job_order.ir_no.admin_name ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.admin_name) : updateRedFields(arrIndex, e, e);
                 } else {
                     value !== rrd.revised.site_poc ? updateRedFields(arrIndex, r, rrd.revised.site_poc) : updateRedFields(arrIndex, e, e);
                 }
@@ -835,7 +839,7 @@ export default function RepairRecords() {
             case "f5":
                 setContactNumber(value);
                 if (typeof(rrd.revised.contact_no) === "undefined") {
-                    value !== rrd.contact_no ? updateRedFields(arrIndex, r, rrd.contact_no) : updateRedFields(arrIndex, e, e);
+                    value !== rrd.job_order.ir_no.contact_number ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.contact_number) : updateRedFields(arrIndex, e, e);
                 } else {
                     value !== rrd.revised.contact_no ? updateRedFields(arrIndex, r, rrd.revised.contact_no) : updateRedFields(arrIndex, e, e);
                 }
@@ -1089,7 +1093,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[0]}>
                                                 <h6><b>IR NUMBER:</b></h6>
-                                                <InputText id="f0" placeholder="Input IR Number" value={IRNumber} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                                <InputText id="f0" placeholder="Input IR Number" value={IRNumber} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[0]}</small>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">

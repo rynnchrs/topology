@@ -323,7 +323,6 @@ export default function RepairReport() {
     }
 
     const handleSelectReportNo = (value) => {
-        console.log(value.value)
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
