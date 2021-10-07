@@ -23,6 +23,7 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
                     'permanent_loc','dealer','cs_no','engine_no']
 
 
+
 class JobOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
