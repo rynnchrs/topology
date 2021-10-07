@@ -142,7 +142,7 @@ export default function ChecklistReport() {
             .then((res) => {
                 setPartsName('');
                 onHide('displayPartsName');
-                setChecklistParts(checklistParts => [...checklistParts, {partsId: 0, name: res.data[0].name, quantity: 0}]);
+                setChecklistParts(checklistParts => [...checklistParts, {partsId: res.data[0].id, name: res.data[0].name, quantity: 0}]);
                 toast.current.show({ severity: 'success', summary: 'ADDED', detail: 'Add succesfully.', life: 3000 });
             })
             .catch((err) => {

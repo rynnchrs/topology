@@ -126,7 +126,8 @@ export default function ChecklistRecord() {
         }          
     }
 
-    const getChecklistParts = () => {
+    const getChecklistParts = (value) => {
+        console.log("v: ", value)
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -138,10 +139,17 @@ export default function ChecklistRecord() {
         axios.get(process.env.REACT_APP_SERVER_NAME + 'report/checklist-parts/', config)
             .then((res) => {
                 let p = [];
+                console.log("res: ",res.data)
                 res.data.map((i) => {
-                    p.push({partsId: i.id, name: i.name, quantity: 0});
+                    let chck = value.filter(item => item.name === i.name);
+                    if (chck.length <= 0) {
+                        p.push({partsId: i.id, name: i.name, quantity: 0});
+                    } else {
+                        p.push({partsId: i.id, name: i.name, quantity: chck[0].quantity});
+                    }
                 })
                 setChecklistParts(p);
+                onClick('displayChecklistRecordEdit');
             })
             .catch((err) => {
                 
@@ -175,7 +183,7 @@ export default function ChecklistRecord() {
     }
 
     const assignChecklistRecordEdit = (value) => {
-        // console.log(value);
+        console.log("rec: ", value);
         setChecklistID(value.check_list_id)
         setReportNo(value.job_order.job_id);
         setTask(value.task);
@@ -197,7 +205,8 @@ export default function ChecklistRecord() {
         setBodyNoSpareTire(value.body_no_spare);
         setBodyNoBattery(value.body_no_batt);
         setVehicleWeight(value.vehicle_wt);
-        value.vehicle_wt === 'Operational' ? setVehicleStatus('Operational') : setVehicleStatus('noperational');
+        // value.vehicle_wt === 'Operational' ? setVehicleStatus('Operational') : setVehicleStatus('noperational');
+        value.status === 'Operational' ? setVehicleStatus('Operational') : setVehicleStatus('noperational');
 
         let getPartsIncluded = [...partsIncluded];
         if (value.parts_included.includes('Unit is in good condition')) {
@@ -230,17 +239,16 @@ export default function ChecklistRecord() {
         if (value.parts_included === 'Worn out drive belt') {
             getPartsIncluded.push(9);
         }
-        console.log(getPartsIncluded);
         
         setPartsIncluded(getPartsIncluded);
         let getParts = [];
         value.parts.map((i) => {
             getParts.push({partsId: i.id, name: i.check_list_parts, quantity: i.quantity});
         })
-        console.log("gparts: ", getParts)
+        // console.log("gparts: ", getParts);
         setSaveChecklistParts(getParts);
-        getChecklistParts();
-        onClick('displayChecklistRecordEdit')
+        getChecklistParts(getParts);
+       
     }
 
     const reportImageTemplate = (reportImage) => {
@@ -298,7 +306,7 @@ export default function ChecklistRecord() {
             .then((res) => {
                 setPartsName('');
                 onHide('displayPartsName');
-                setChecklistParts(checklistParts => [...checklistParts, {partsId: 0, name: res.data[0].name, quantity: 0}]);
+                setChecklistParts(checklistParts => [...checklistParts, {partsId: res.data[0].id, name: res.data[0].name, quantity: 0}]);
                 toast.current.show({ severity: 'success', summary: 'ADDED', detail: 'Add succesfully.', life: 3000 });
             })
             .catch((err) => {
@@ -318,6 +326,12 @@ export default function ChecklistRecord() {
         tempArr[index] = {partsId: i, name: n, quantity: q};
         setChecklistParts(tempArr);
     }
+
+    // const showCurr = () => {
+    //     // console.log("s: ", saveChecklistParts)
+    //     // console.log("c: ", checklistParts)
+    //     console.log("op: ", vehicleStatus)
+    // }
 
     const submitEditChecklist = () => {
         console.log("s: ", saveChecklistParts)
@@ -409,7 +423,6 @@ export default function ChecklistRecord() {
                 noted_by: null
             }, config)
             .then((res) => {
-                console.log(res.data)
                 if (refImageUpload.current.state.files.length <= 0) {
                     submitEditChecklistAfter();
                 } else {
@@ -529,7 +542,7 @@ export default function ChecklistRecord() {
         axios.delete(process.env.REACT_APP_SERVER_NAME + 'report/checklist-parts/' + value + '/', config)
             .then((res) => {
                 toast.current.show({ severity: 'success', summary: 'DELETED', detail: 'Delete succesfully.', life: 3000 });
-                getChecklistParts();
+                getChecklistParts(checklistParts);
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Task Error', detail: 'Something went wrong.', life: 3000 });
@@ -548,6 +561,7 @@ export default function ChecklistRecord() {
 
     const dialogFuncMap = {
         'displayChecklistRecordEdit': setDisplayChecklistRecordEdit,
+        'displayPartsName': setDisplayPartsName,
         'displayMessage': setDisplayMessage,
         'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
         'displayConfirmDelete': setDisplayConfirmDelete,
@@ -926,6 +940,7 @@ export default function ChecklistRecord() {
                                                     )
                                                 }
                                                 <Button icon="pi pi-plus" onClick={() => onClick('displayPartsName')} style={{width: '50px'}}/>
+                                                {/* <Button label="CURR" onClick={() => showCurr()} style={{width: '50px'}}/> */}
                                             </div>
 
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">

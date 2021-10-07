@@ -201,6 +201,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
     def to_representation(self, instance): 
         self.fields['job_order'] = RepairJobSerializer(read_only=True)
         self.fields['diagnosed_by'] = serializers.CharField(source='diagnosed_by.user_info.full_name')
+        self.fields['body_no'] = serializers.CharField(source='body_no.body_no')
         self.fields['repair_by'] = serializers.CharField(source='repair_by.user_info.full_name')
         self.fields['generated_by'] = serializers.CharField(source='generated_by.user_info.full_name')
         if instance.noted_by is not None:

@@ -28,6 +28,7 @@ export default function RepairReport() {
 
     //variables to be saved
     const [jobID, setJobID] = useState([]);
+    const [taskID, setTaskID] = useState('');
     const [IRNumber, setIRNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
@@ -90,7 +91,6 @@ export default function RepairReport() {
         axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/repair_not_created/', config)
             .then((res) => {
                 setJobNotCreatedList(res.data);
-                console.log(res.data)
                 // setBodyNoList(res.data.results);
                 // if (res.data.next === null){
                 
@@ -225,9 +225,11 @@ export default function RepairReport() {
             };
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/repair/', {
+                body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
                 ir_no: IRNumber,
+                check_list: "",
                 incident_date: format(dateIncident, 'yyyy-MM-dd'),
                 date_receive: format(dateReceive, 'yyyy-MM-dd'),
                 incident_details: detailsIncident,
@@ -241,7 +243,8 @@ export default function RepairReport() {
                 date_done: format(dateDone, 'yyyy-MM-dd'),
                 status_repair: statusRepair.val,
                 remarks: remarks,
-                job_order: jobID.job_id
+                job_order: jobID.job_id, 
+                task: taskID
             }, config)
             .then((res) => {
                 if (refImageUpload.current.state.files.length <= 0) {
@@ -292,6 +295,7 @@ export default function RepairReport() {
         setChassisNumber('');
 
         setJobID([]);
+        setTaskID('');
         setIRNumber('');
         setDateIncident(null);
         setDateReceive(null);
@@ -318,7 +322,7 @@ export default function RepairReport() {
         getRepairNotCreated();
     }
 
-    const handleSelectReportNo = (value) =>{
+    const handleSelectReportNo = (value) => {
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
@@ -329,6 +333,20 @@ export default function RepairReport() {
         setPlateNumber(value.value.body_no.plate_no);
         setCSNumber(value.value.body_no.vin_no);
         setChassisNumber(value.value.body_no.vin_no);
+
+        setTaskID(value.value.task.task_id);
+        setIRNumber(value.value.ir_no.ir_no);
+        let valueDateTime = new Date(value.value.ir_no.date_time);
+        let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+        setDateIncident(valueDate);
+        setDateReceive(convertDatetoGMT(value.value.ir_no.date));
+        setDetailsIncident(value.value.ir_no.problem_obs);
+    }
+
+    const convertDatetoGMT = (value) => {
+        let theDate = value.split("-");
+        theDate = new Date(+theDate[0], theDate[1] - 1, +theDate[2]);
+        return theDate;
     }
 
     const dialogFuncMap = {

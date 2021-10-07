@@ -1158,7 +1158,8 @@ export const JobScheduling = () => {
 
         let apiValue = taskType === "Repair" ? 'task/task-scheduling/' : 'task/task-inspection/';
 
-        axios.delete(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
+        // axios.delete(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
+        axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
         .then((res) => {;
             getTaskList();
             onHide('displayConfirmDelete');
