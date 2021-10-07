@@ -800,7 +800,11 @@ export const JobScheduling = () => {
             desc:"",
             body_no: bodyNo.body_no,
             ir_no: reportNo.ir_no,
+<<<<<<< HEAD
             checklist: "",
+=======
+            check_list: "",
+>>>>>>> bdbf7d5ae8bc8686cfef655932a075b8f35b7caf
             start_date: format(dateStart, 'yyyy-MM-dd'),
             end_date: format(dateEnd, 'yyyy-MM-dd'),
             schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
@@ -858,7 +862,11 @@ export const JobScheduling = () => {
             location: location.location,
             body_no: "",
             ir_no: "",
+<<<<<<< HEAD
             checklist: "",
+=======
+            check_list: "",
+>>>>>>> bdbf7d5ae8bc8686cfef655932a075b8f35b7caf
             start_date: format(dateStart, 'yyyy-MM-dd'),
             end_date: format(dateEnd, 'yyyy-MM-dd'),
             schedule_date: format(scheduleDate, 'yyyy-MM-dd'),

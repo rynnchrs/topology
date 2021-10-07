@@ -29,15 +29,48 @@
     right: 0;
 }
 
-.p-checkbox {
+.resize-label {
+  .p-checkbox {
     width: 35px;
     height: 35px;
+  }
+
+  .p-checkbox .p-checkbox-box {
+      width: 35px;
+      height: 35px;
+  }
+
+  .p-field > label {
+    font-size: 20px;
+    margin-bottom: 0px;
+  }
+  
+  .p-radiobutton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .p-radiobutton .p-radiobutton-box {
+    width: 28px;
+    height: 28px;
+  }
+
+  .p-field-radiobutton > label {
+    font-size: 17px;
+    margin-bottom: 0px;
+  }
 }
 
-.p-checkbox .p-checkbox-box {
-    width: 35px;
-    height: 35px;
+/* css for profile picture  */
+.img-profile{
+  img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    border: 1px solid gray;
+  }
 }
+/* end css for profile picture  */
 
 /* css for profile picture  */
 .img-profile{
@@ -110,18 +143,47 @@
     min-Width: 30px;
     /* border: 1px solid red; */
   }
-  .p-checkbox {
-    width: 28px;
-    height: 28px;
+  .resize-label {
+    .p-checkbox {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .p-checkbox .p-checkbox-box {
+        width: 35px;
+        height: 35px;
+    }
+  
+    .p-field > label {
+      font-size: 20px;
+      margin-bottom: 0px;
+    }
+    
+    .p-radiobutton {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .p-radiobutton .p-radiobutton-box {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .p-field-radiobutton > label {
+      font-size: 17px;
+      margin-bottom: 0px;
+    }
   }
 
-  .p-checkbox .p-checkbox-box {
-    width: 28px;
-    height: 28px;
-  }
   .p-toast {
     width: 320px;
   }
+<<<<<<< HEAD
+  .p-toast {
+    width: 320px;
+  }
+=======
+>>>>>>> bdbf7d5ae8bc8686cfef655932a075b8f35b7caf
 }
 
 /* css for driver inspection records checklist  */

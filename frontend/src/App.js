@@ -34,6 +34,10 @@ import  VehiclesGPS from './components/VehiclesGPS';
 import  RepairReport from './components/RepairReport';
 import  RepairRecords from './components/RepairRecords';
 import  ChecklistReport from './components/ChecklistReport';
+<<<<<<< HEAD
+=======
+import  ChecklistRecord from './components/ChecklistRecord';
+>>>>>>> bdbf7d5ae8bc8686cfef655932a075b8f35b7caf
 import  IncidentReport from './components/IncidentReport';
 import  IncidentRecord from './components/IncidentRecord';
 
@@ -171,7 +175,12 @@ const App = () => {
 
     sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-th-large', to: '/repairreport' });
     sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-th-large', to: '/repairrecords'});
+<<<<<<< HEAD
     sidebarSubMenu4.push({label: 'Checklist Report', icon: 'pi pi-th-large', to: '/checklistreport'});
+=======
+    // sidebarSubMenu4.push({label: 'Checklist Report', icon: 'pi pi-th-large', to: '/checklistreport'});
+    // sidebarSubMenu4.push({label: 'Checklist Record', icon: 'pi pi-th-large', to: '/checklistrecord'});
+>>>>>>> bdbf7d5ae8bc8686cfef655932a075b8f35b7caf
     sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
     sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
     sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
@@ -307,6 +316,10 @@ const App = () => {
                 <Route path="/repairreport" exact component={RepairReport} />
                 <Route path="/repairrecords" exact component={RepairRecords} />
                 <Route path="/checklistreport" exact component={ChecklistReport} />
+<<<<<<< HEAD
+=======
+                <Route path="/checklistrecord" exact component={ChecklistRecord} />
+>>>>>>> bdbf7d5ae8bc8686cfef655932a075b8f35b7caf
                 <Route path="/incidentreport" exact component={IncidentReport} />
                 <Route path="/incidentrecord" exact component={IncidentRecord} />
             </div>
