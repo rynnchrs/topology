@@ -438,7 +438,7 @@ export const JobScheduling = () => {
             let f = v.fieldman.map((x) =>
                 x.field_man
             )
-            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFIELDMAN: " + f + "\nLOCATION: Sample",
+            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFIELDMAN: " + f + "\nLOCATION: " + v.current_loc,
             "start": v.start_date, "end": String(endDate)}]);
         });
     }
@@ -522,7 +522,7 @@ export const JobScheduling = () => {
                                         </p>
                                     </div>
                                     <div className="p-col-12 p-lg-6 p-md-12 p-sm-12">
-                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-map-marker"></i> Metro manila makata quezon city </p>
+                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-map-marker"></i> {jobList.current_loc}</p>
                                     </div>
                                 </div>
                             </div>
@@ -800,7 +800,7 @@ export const JobScheduling = () => {
             desc:"",
             body_no: bodyNo.body_no,
             ir_no: reportNo.ir_no,
-            checklist: "",
+            check_list: "",
             start_date: format(dateStart, 'yyyy-MM-dd'),
             end_date: format(dateEnd, 'yyyy-MM-dd'),
             schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
@@ -858,7 +858,7 @@ export const JobScheduling = () => {
             location: location.location,
             body_no: "",
             ir_no: "",
-            checklist: "",
+            check_list: "",
             start_date: format(dateStart, 'yyyy-MM-dd'),
             end_date: format(dateEnd, 'yyyy-MM-dd'),
             schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
@@ -1011,7 +1011,7 @@ export const JobScheduling = () => {
             desc: "",
             body_no: editBodyNo,
             ir_no: editReportNo.ir_no,
-            checklist: "",
+            check_list: "",
             start_date: format(editDateStart, 'yyyy-MM-dd'),
             end_date: format(editDateEnd, 'yyyy-MM-dd'),
             schedule_date: format(editScheduleDate, 'yyyy-MM-dd'),
@@ -1069,7 +1069,7 @@ export const JobScheduling = () => {
             desc: "",
             body_no: editBodyNo,
             ir_no: "",
-            checklist: "",
+            check_list: "",
             start_date: format(editDateStart, 'yyyy-MM-dd'),
             end_date: format(editDateEnd, 'yyyy-MM-dd'),
             schedule_date: format(editScheduleDate, 'yyyy-MM-dd'),

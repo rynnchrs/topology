@@ -322,13 +322,13 @@ export default function RepairReport() {
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
-        setBodyNo(value.value.task.body_no.body_no);
-        setMake(value.value.task.body_no.make);
-        setStatus(value.value.task.body_no.operational);
-        setLocation(value.value.task.body_no.current_loc);
-        setPlateNumber(value.value.task.body_no.plate_no);
-        setCSNumber(value.value.task.body_no.vin_no);
-        setChassisNumber(value.value.task.body_no.vin_no);
+        setBodyNo(value.value.body_no.body_no);
+        setMake(value.value.body_no.make);
+        setStatus(value.value.body_no.operational);
+        setLocation(value.value.body_no.current_loc);
+        setPlateNumber(value.value.body_no.plate_no);
+        setCSNumber(value.value.body_no.vin_no);
+        setChassisNumber(value.value.body_no.vin_no);
     }
 
     const dialogFuncMap = {
