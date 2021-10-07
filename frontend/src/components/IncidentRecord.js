@@ -534,11 +534,18 @@ export default function RepairRecords() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'task/ir-report/' + IRRecordID + '/', config)
             .then((res) => {
-                getIncidentRecord();
-                setIsLoading(false);
-                setMessage({title:"DELETE", content:"Successfully deleted."});
-                onHide('displayConfirmDelete');
-                onClick('displayMessage');
+                if (res.data === `Can't delete this because it's being use by Task Scheduling`) {
+                    setIsLoading(false);
+                    setMessage({title:"DELETE FAILED", content:"Can't delete this because it's being use by Task Scheduling."});
+                    onHide('displayConfirmDelete');
+                    onClick('displayMessage');
+                } else {
+                    getIncidentRecord();
+                    setIsLoading(false);
+                    setMessage({title:"DELETE", content:"Successfully deleted."});
+                    onHide('displayConfirmDelete');
+                    onClick('displayMessage');
+                }
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
