@@ -2,6 +2,7 @@ import os
 import subprocess
 
 import django
+from django.db.models.deletion import ProtectedError
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
@@ -290,117 +291,123 @@ def populate():
         ed3 = datetime.strptime(data[79], '%d-%b-%y')
         ed3 = ed3.strftime('%Y-%m-%d')
 
-        Car.objects.create( # initializing car data
-                slug = data[0],
-                body_no = data[0],
-                cs_no = data[1],
-                plate_no = plate,
-                brand = brand,
-                release_year = data[4],
-                make = make,
-                series = series,
-                body_type = data[7],
-                color = data[8],
-                dealer = dealer,
-                po_no = data[10],
-                po_date = data[11],
-                body_builder = data[12],
-                fabricator = data[13],
-                vin_no = data[14],
-                engine_no = data[15],
-                battery_no = data[16],
-                fuel_type = fuel,
-                transmission = transmission,
-                denomination = data[19],
-                piston = data[20],
-                cylinder = data[21],
-                procuring_entity = data[22],
-                capacity = data[23].split()[0],
-                gross_weight = data[24],
-                net_weight = data[25],
-                shipping_weight = data[26],
-                net_capacity = data[27],
-                lto_cr = data[28],
-                cr_date = cr_date,
-                or_no = data[30],
-                or_date = or_date,
-                top_load = top_load,
-                field_office = data[33],
-                or_cr = data[34],
-                permanent_loc = data[35],
-                current_loc = data[36],
-                vtf = vtf,
-                permanent_status = permanent_status,
-                delivery_location = data[39],
-                deliver_date = data[40],
-                si_no = data[41],
-                dr_no = data[42],
-                dr_codes = data[43],
+        try:
+            Car.objects.create( # initializing car data
+                    slug = data[0],
+                    body_no = data[0],
+                    cs_no = data[1],
+                    plate_no = plate,
+                    brand = brand,
+                    release_year = data[4],
+                    make = make,
+                    series = series,
+                    body_type = data[7],
+                    color = data[8],
+                    dealer = dealer,
+                    po_no = data[10],
+                    po_date = data[11],
+                    body_builder = data[12],
+                    fabricator = data[13],
+                    vin_no = data[14],
+                    engine_no = data[15],
+                    battery_no = data[16],
+                    fuel_type = fuel,
+                    transmission = transmission,
+                    denomination = data[19],
+                    piston = data[20],
+                    cylinder = data[21],
+                    procuring_entity = data[22],
+                    capacity = data[23].split()[0],
+                    gross_weight = data[24],
+                    net_weight = data[25],
+                    shipping_weight = data[26],
+                    net_capacity = data[27],
+                    lto_cr = data[28],
+                    cr_date = cr_date,
+                    or_no = data[30],
+                    or_date = or_date,
+                    top_load = top_load,
+                    field_office = data[33],
+                    or_cr = data[34],
+                    permanent_loc = data[35],
+                    current_loc = data[36],
+                    vtf = vtf,
+                    permanent_status = permanent_status,
+                    delivery_location = data[39],
+                    deliver_date = data[40],
+                    si_no = data[41],
+                    dr_no = data[42],
+                    dr_codes = data[43],
 
-                plate_date = plate_date,
-                decals_date = decals_date,
-                modified = modified,
-                tools_date = tools_date,
-                userManual_date = userManual_date,
-                warrantyBook_date = warrantyBook_date,
-                unitKey_date = unitKey_date,
-                bodyKey_date = bodyKey_date,
-                cigarettePlug_date = cigarettePlug_date,
-                keychain_date = keychain_date,
-                jack = jack,
-                wrench = wrench,
-                fire_extinguisher = fire_extinguisher,
-                ewd_date = ewd_date,
-                fan_date = fan_date
-        )
-        car = Car.objects.get(body_no=data[0])
+                    plate_date = plate_date,
+                    decals_date = decals_date,
+                    modified = modified,
+                    tools_date = tools_date,
+                    userManual_date = userManual_date,
+                    warrantyBook_date = warrantyBook_date,
+                    unitKey_date = unitKey_date,
+                    bodyKey_date = bodyKey_date,
+                    cigarettePlug_date = cigarettePlug_date,
+                    keychain_date = keychain_date,
+                    jack = jack,
+                    wrench = wrench,
+                    fire_extinguisher = fire_extinguisher,
+                    ewd_date = ewd_date,
+                    fan_date = fan_date
+            )
+            car = Car.objects.get(body_no=data[0])
 
-        Contract.objects.create(
-            car = car,
-            slug = car.body_no,
-            contract_no = data[47],
-            bid_no = data[46],
-            bid_name = data[45],
-            bid_date = bid_date,
-        )
+            Contract.objects.create(
+                car = car,
+                slug = car.body_no,
+                contract_no = data[47],
+                bid_no = data[46],
+                bid_name = data[45],
+                bid_date = bid_date,
+            )
 
-        TPL.objects.create(
-            car = car,
-            slug = car.body_no,
-            insurance_name = data[64],
-            po_no = data[65],
-            date_issued = di1,
-            start_date = sd1,
-            end_date = ed1,
-        )
+            TPL.objects.create(
+                car = car,
+                slug = car.body_no,
+                insurance_name = data[64],
+                po_no = data[65],
+                date_issued = di1,
+                start_date = sd1,
+                end_date = ed1,
+            )
 
-        Insurance.objects.create(
-            car = car,
-            slug = str(car.body_no)+"-1",
-            company = data[69],
-            po_no = data[70],
-            insurance_no = 1,
-            date_issued = di2,
-            start_date = sd2,
-            end_date = ed2,
-        )
+            Insurance.objects.create(
+                car = car,
+                slug = str(car.body_no)+"-1",
+                company = data[69],
+                po_no = data[70],
+                insurance_no = 1,
+                date_issued = di2,
+                start_date = sd2,
+                end_date = ed2,
+            )
 
-        Insurance.objects.create(
-            car = car,
-            slug = str(car.body_no)+"-2",
-            company = data[74],
-            po_no = data[75],
-            reference_no = data[76],
-            insurance_no = 2,
-            date_issued = di3,
-            start_date = sd3,
-            end_date = ed3,
-        )
+            Insurance.objects.create(
+                car = car,
+                slug = str(car.body_no)+"-2",
+                company = data[74],
+                po_no = data[75],
+                reference_no = data[76],
+                insurance_no = 2,
+                date_issued = di3,
+                start_date = sd3,
+                end_date = ed3,
+            )
+        except:
+            pass
     return "Success"
 
 for data in datas():
     car = Car.objects.filter(body_no=data[0])
-    car.delete()
+    try:
+        car.delete()
+    except ProtectedError:
+        pass
 print(populate())
 
 subprocess.Popen(["python","car-export.py"], shell=True)    
