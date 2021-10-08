@@ -103,6 +103,9 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
     body_no = serializers.CharField(write_only=True)
     ir_no = serializers.CharField(required=False, allow_blank=True, write_only=True)
     check_list = serializers.CharField(required=False, allow_blank=True,  write_only=True)
+    total_parts_cost = serializers.ReadOnlyField()
+    total_labor_cost = serializers.ReadOnlyField()
+    total_estimate_cost = serializers.ReadOnlyField()
     class Meta:
         model = Repair
         fields = '__all__'
