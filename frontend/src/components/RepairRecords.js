@@ -48,6 +48,7 @@ export default function RepairRecords() {
 
     const [repairID, setRepairID] = useState("");
     const [jobOrder, setJobOrder] = useState("");
+    const [taskID, setTaskID] = useState('');
     const [jobType, setJobType] = useState("");
     const [scheduleDate, setScheduleDate] = useState("");
     const [bodyNo, setBodyNo] = useState("");
@@ -226,31 +227,35 @@ export default function RepairRecords() {
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
+        console.log("val: ", value);
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
+        setTaskID(value.job_order.task.task_id);
         let splitScheduleDate = value.job_order.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
-        setBodyNo(value.job_order.task.body_no.body_no);
-        setMake(value.job_order.task.body_no.make);
-        setStatus(value.job_order.task.body_no.operational);
-        setLocation(value.job_order.task.body_no.current_loc);
-        setPlateNumber(value.job_order.task.body_no.plate_no);
-        setCSNumber(value.job_order.task.body_no.vin_no);
-        setChassisNumber(value.job_order.task.body_no.vin_no);
+        setBodyNo(value.job_order.body_no.body_no);
+        setMake(value.job_order.body_no.make);
+        setStatus(value.job_order.body_no.operational);
+        setLocation(value.job_order.body_no.current_loc);
+        setPlateNumber(value.job_order.body_no.plate_no);
+        setCSNumber(value.job_order.body_no.vin_no);
+        setChassisNumber(value.job_order.body_no.vin_no);
 
-        setTotalPartsCost(value.total_parts_cost.toFixed(2));
-        setTotalLaborCost(value.total_labor_cost.toFixed(2));
-        setTotalEstimateCost(value.total_estimate_cost.toFixed(2));
+        // setTotalPartsCost(value.total_parts_cost.toFixed(2));
+        // setTotalLaborCost(value.total_labor_cost.toFixed(2));
+        // setTotalEstimateCost(value.total_estimate_cost.toFixed(2));
         
         try {
-            handleChange("f0", value.ir_no);
-            handleChange("f1", convertDatetoGMT(value.incident_date));
-            handleChange("f2", convertDatetoGMT(value.date_receive));
-            handleChange("f3", value.incident_details);
-            handleChange("f4", value.site_poc);
-            handleChange("f5", value.contact_no);
+            handleChange("f0", value.job_order.ir_no.ir_no);
+            let valueDateTime = new Date(value.job_order.ir_no.date_time);
+            let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+            handleChange("f1", valueDate);
+            handleChange("f2", convertDatetoGMT(value.job_order.ir_no.date));
+            handleChange("f3", value.job_order.ir_no.problem_obs);
+            handleChange("f4", value.job_order.ir_no.admin_name);
+            handleChange("f5", value.job_order.ir_no.contact_number);
             handleChange("f6", convertDatetoGMT(value.perform_date));
             handleChange("f7", value.actual_findings);
             handleChange("f8", value.actual_remarks);
@@ -627,14 +632,16 @@ export default function RepairRecords() {
             };
 
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', {
+                body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
                 ir_no: IRNumber,
-                incident_date: format(dateIncident, 'yyyy-MM-dd'),
-                date_receive: format(dateReceive, 'yyyy-MM-dd'),
-                incident_details: detailsIncident,
-                site_poc: sitePOC,
-                contact_no: contactNumber,
+                check_list: "",
+                // incident_date: format(dateIncident, 'yyyy-MM-dd'),
+                // date_receive: format(dateReceive, 'yyyy-MM-dd'),
+                // incident_details: detailsIncident,
+                // site_poc: sitePOC,
+                // contact_no: contactNumber,
                 perform_date: format(datePerformed, 'yyyy-MM-dd'),
                 actual_findings: detailsActualFindings,
                 actual_remarks: detailsActualRemarks,
@@ -643,7 +650,8 @@ export default function RepairRecords() {
                 date_done: format(dateDone, 'yyyy-MM-dd'),
                 status_repair: statusRepair.val,
                 remarks: remarks,
-                job_order: jobOrder
+                job_order: jobOrder,
+                task: taskID,
             }, config)
             .then((res) => {
                 if (refImageUpload.current.state.files.length <= 0) {
@@ -694,27 +702,30 @@ export default function RepairRecords() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', config)
             .then((res) => {
-                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + repairID +'/?mode=cr', config)
-                .then((res) => {
-                    let imageIDs = "";
-                    res.data.map((x) => {
-                        imageIDs += x.id;
-                        imageIDs += ",";
-                    })
-                    axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=cr&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
-                    .then((res) => {
+                // axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + repairID +'/?mode=cr', config)
+                // .then((res) => {
+                //     console.log("getimage: ", res.data);
+                //     let imageIDs = "";
+                //     res.data.map((x) => {
+                //         imageIDs += x.id;
+                //         imageIDs += ",";
+                //     })
+                //     console.log(imageIDs);
+                //     axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=cr&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
+                //     .then((res) => {
+                //         console.log("deleteimage: ", res.data);
                         getRepairRecord();
                         setMessage({title:"DELETE", content:"Successfully deleted."});
                         onHide('displayConfirmDelete');
                         onClick('displayMessage');
-                    })
-                    .catch((err) => {
+                //     })
+                //     .catch((err) => {
 
-                    });
-                })
-                .catch((err) => {
+                //     });
+                // })
+                // .catch((err) => {
                     
-                });
+                // });
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
@@ -782,57 +793,59 @@ export default function RepairRecords() {
         switch (id) {
             case "f0":
                 setIRNumber(value);
-                if (typeof(rrd.revised.ir_no) === "undefined") {
-                    value !== rrd.ir_no ? updateRedFields(arrIndex, r, rrd.ir_no) : updateRedFields(arrIndex, e, e);
-                } else {
-                    value !== rrd.revised.ir_no ? updateRedFields(arrIndex, r, rrd.revised.ir_no) : updateRedFields(arrIndex, e, e);
-                }
+                // if (typeof(rrd.revised.ir_no) === "undefined") {
+                //     value !== rrd.job_order.ir_no.ir_no ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.ir_no) : updateRedFields(arrIndex, e, e);
+                // } else {
+                //     value !== rrd.revised.ir_no ? updateRedFields(arrIndex, r, rrd.revised.ir_no) : updateRedFields(arrIndex, e, e);
+                // }
                 break;
             case "f1":
                 try {
                     setDateIncident(value);
-                    dt = format(value, 'yyyy-MM-dd');
-                    if (typeof(rrd.revised.incident_date) === "undefined") {
-                        dt !== rrd.incident_date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.incident_date)) : updateRedFields(arrIndex, e, e);
-                    } else {
-                        dt !== rrd.revised.incident_date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.revised.incident_date)) : updateRedFields(arrIndex, e, e);
-                    }
+                    // dt = format(value, 'yyyy-MM-dd');
+                    // let valueDateTime = new Date(rrd.job_order.ir_no.date_time);
+                    // let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+                    // if (typeof(rrd.revised.incident_date) === "undefined") {
+                    //     dt !== format(valueDate, 'yyyy-MM-dd') ? updateRedFields(arrIndex, r, reviseFormatDate(format(valueDate, 'yyyy-MM-dd'))) : updateRedFields(arrIndex, e, e);
+                    // } else {
+                    //     dt !== rrd.revised.incident_date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.revised.incident_date)) : updateRedFields(arrIndex, e, e);
+                    // }
                 } catch(err){}
                 break;
             case "f2":
                 try {
                     setDateReceive(value);
-                    dt = format(value, 'yyyy-MM-dd');
-                    if (typeof(rrd.revised.date_receive) === "undefined") {
-                        dt !== rrd.date_receive ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.date_receive)) : updateRedFields(arrIndex, e, e);
-                    } else {
-                        dt !== rrd.revised.date_receive ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.revised.date_receive)) : updateRedFields(arrIndex, e, e);
-                    }
+                    // dt = format(value, 'yyyy-MM-dd');
+                    // if (typeof(rrd.revised.date_receive) === "undefined") {
+                    //     dt !== rrd.job_order.ir_no.date ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.job_order.ir_no.date)) : updateRedFields(arrIndex, e, e);
+                    // } else {
+                    //     dt !== rrd.revised.date_receive ? updateRedFields(arrIndex, r, reviseFormatDate(rrd.revised.date_receive)) : updateRedFields(arrIndex, e, e);
+                    // }
                 } catch(err){}
                 break;
             case "f3":
                 setDetailsIncident(value);
-                if (typeof(rrd.revised.incident_details) === "undefined") {
-                    value !== rrd.incident_details ? updateRedFields(arrIndex, r, rrd.incident_details) : updateRedFields(arrIndex, e, e);
-                } else {
-                    value !== rrd.revised.incident_details ? updateRedFields(arrIndex, r, rrd.revised.incident_details) : updateRedFields(arrIndex, e, e);
-                }
+                // if (typeof(rrd.revised.incident_details) === "undefined") {
+                //     value !== rrd.job_order.ir_no.problem_obs ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.problem_obs) : updateRedFields(arrIndex, e, e);
+                // } else {
+                //     value !== rrd.revised.incident_details ? updateRedFields(arrIndex, r, rrd.revised.incident_details) : updateRedFields(arrIndex, e, e);
+                // }
                 break;
             case "f4":
                 setSitePOC(value);
-                if (typeof(rrd.revised.site_poc) === "undefined") {
-                    value !== rrd.site_poc ? updateRedFields(arrIndex, r, rrd.site_poc) : updateRedFields(arrIndex, e, e);
-                } else {
-                    value !== rrd.revised.site_poc ? updateRedFields(arrIndex, r, rrd.revised.site_poc) : updateRedFields(arrIndex, e, e);
-                }
+                // if (typeof(rrd.revised.site_poc) === "undefined") {
+                //     value !== rrd.job_order.ir_no.admin_name ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.admin_name) : updateRedFields(arrIndex, e, e);
+                // } else {
+                //     value !== rrd.revised.site_poc ? updateRedFields(arrIndex, r, rrd.revised.site_poc) : updateRedFields(arrIndex, e, e);
+                // }
                 break;
             case "f5":
                 setContactNumber(value);
-                if (typeof(rrd.revised.contact_no) === "undefined") {
-                    value !== rrd.contact_no ? updateRedFields(arrIndex, r, rrd.contact_no) : updateRedFields(arrIndex, e, e);
-                } else {
-                    value !== rrd.revised.contact_no ? updateRedFields(arrIndex, r, rrd.revised.contact_no) : updateRedFields(arrIndex, e, e);
-                }
+                // if (typeof(rrd.revised.contact_no) === "undefined") {
+                //     value !== rrd.job_order.ir_no.contact_number ? updateRedFields(arrIndex, r, rrd.job_order.ir_no.contact_number) : updateRedFields(arrIndex, e, e);
+                // } else {
+                //     value !== rrd.revised.contact_no ? updateRedFields(arrIndex, r, rrd.revised.contact_no) : updateRedFields(arrIndex, e, e);
+                // }
                 break;
             case "f6":
                 try {
@@ -1083,8 +1096,8 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[0]}>
                                                 <h6><b>IR NUMBER:</b></h6>
-                                                <InputText id="f0" placeholder="Input IR Number" value={IRNumber} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
-                                                <small className="p-invalid p-d-block">{redFieldRevise[0]}</small>
+                                                <InputText id="f0" placeholder="Input IR Number" value={IRNumber} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[0]}</small> */}
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>PLATE No.:</b></h6>
@@ -1096,13 +1109,13 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[1]}>
                                                 <h6><b>INCIDENT DATE:</b></h6>
-                                                <Calendar id="f1" placeholder="Select Date" value={dateIncident} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
-                                                <small className="p-invalid p-d-block">{redFieldRevise[1]}</small>
+                                                <Calendar id="f1" placeholder="Select Date" value={dateIncident} onChange={(e) => handleChange(e.target.id, e.value)} showIcon disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[1]}</small> */}
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[2]}>
                                                 <h6><b>DATE RECEIVE:</b></h6>
-                                                <Calendar id="f2" placeholder="Select Date" value={dateReceive} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
-                                                <small className="p-invalid p-d-block">{redFieldRevise[2]}</small>
+                                                <Calendar id="f2" placeholder="Select Date" value={dateReceive} onChange={(e) => handleChange(e.target.id, e.value)} showIcon disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[2]}</small> */}
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
@@ -1111,8 +1124,8 @@ export default function RepairRecords() {
                                             <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[3]}>
                                                 <h6><b>DETAILS:</b></h6>
                                                 <InputTextarea id="f3" placeholder="Discuss details here or leave it blank." rows={5} cols={30} autoResize
-                                                value={detailsIncident} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
-                                                <small className="p-invalid p-d-block">{redFieldRevise[3]}</small>
+                                                value={detailsIncident} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[3]}</small> */}
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>CHASSIS No.:</b></h6>
@@ -1120,13 +1133,13 @@ export default function RepairRecords() {
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[4]}>
                                                 <h6><b>SITE POC:</b></h6>
-                                                <InputText id="f4" placeholder="Input SITE POC" value={sitePOC} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
-                                                <small className="p-invalid p-d-block">{redFieldRevise[4]}</small>
+                                                <InputText id="f4" placeholder="Input SITE POC" value={sitePOC} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[4]}</small> */}
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[5]}>
                                                 <h6><b>CONTACT No.:</b></h6>
-                                                <InputText id="f5" placeholder="Input Contact Number" value={contactNumber} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
-                                                <small className="p-invalid p-d-block">{redFieldRevise[5]}</small>
+                                                <InputText id="f5" placeholder="Input Contact Number" value={contactNumber} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[5]}</small> */}
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">

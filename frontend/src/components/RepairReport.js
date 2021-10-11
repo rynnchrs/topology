@@ -28,6 +28,7 @@ export default function RepairReport() {
 
     //variables to be saved
     const [jobID, setJobID] = useState([]);
+    const [taskID, setTaskID] = useState('');
     const [IRNumber, setIRNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
@@ -90,7 +91,6 @@ export default function RepairReport() {
         axios.get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/repair_not_created/', config)
             .then((res) => {
                 setJobNotCreatedList(res.data);
-                console.log(res.data)
                 // setBodyNoList(res.data.results);
                 // if (res.data.next === null){
                 
@@ -225,9 +225,11 @@ export default function RepairReport() {
             };
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/repair/', {
+                body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
                 ir_no: IRNumber,
+                check_list: "",
                 incident_date: format(dateIncident, 'yyyy-MM-dd'),
                 date_receive: format(dateReceive, 'yyyy-MM-dd'),
                 incident_details: detailsIncident,
@@ -241,7 +243,8 @@ export default function RepairReport() {
                 date_done: format(dateDone, 'yyyy-MM-dd'),
                 status_repair: statusRepair.val,
                 remarks: remarks,
-                job_order: jobID.job_id
+                job_order: jobID.job_id, 
+                task: taskID
             }, config)
             .then((res) => {
                 if (refImageUpload.current.state.files.length <= 0) {
@@ -292,6 +295,7 @@ export default function RepairReport() {
         setChassisNumber('');
 
         setJobID([]);
+        setTaskID('');
         setIRNumber('');
         setDateIncident(null);
         setDateReceive(null);
@@ -318,17 +322,34 @@ export default function RepairReport() {
         getRepairNotCreated();
     }
 
-    const handleSelectReportNo = (value) =>{
+    const handleSelectReportNo = (value) => {
+        console.log(value.value)
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
-        setBodyNo(value.value.task.body_no.body_no);
-        setMake(value.value.task.body_no.make);
-        setStatus(value.value.task.body_no.operational);
-        setLocation(value.value.task.body_no.current_loc);
-        setPlateNumber(value.value.task.body_no.plate_no);
-        setCSNumber(value.value.task.body_no.vin_no);
-        setChassisNumber(value.value.task.body_no.vin_no);
+        setBodyNo(value.value.body_no.body_no);
+        setMake(value.value.body_no.make);
+        setStatus(value.value.body_no.operational);
+        setLocation(value.value.body_no.current_loc);
+        setPlateNumber(value.value.body_no.plate_no);
+        setCSNumber(value.value.body_no.vin_no);
+        setChassisNumber(value.value.body_no.vin_no);
+
+        setTaskID(value.value.task.task_id);
+        setIRNumber(value.value.ir_no.ir_no);
+        let valueDateTime = new Date(value.value.ir_no.date_time);
+        let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+        setDateIncident(valueDate);
+        setDateReceive(convertDatetoGMT(value.value.ir_no.date));
+        setDetailsIncident(value.value.ir_no.problem_obs);
+        setSitePOC(value.value.ir_no.admin_name);
+        setContactNumber(value.value.ir_no.contact_number);
+    }
+
+    const convertDatetoGMT = (value) => {
+        let theDate = value.split("-");
+        theDate = new Date(+theDate[0], theDate[1] - 1, +theDate[2]);
+        return theDate;
     }
 
     const dialogFuncMap = {
@@ -404,7 +425,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>IR NUMBER:</b></h6>
-                                    <InputText placeholder="Input IR Number" value={IRNumber} onChange={(e) => setIRNumber(e.target.value)}/>
+                                    <InputText placeholder="Input IR Number" value={IRNumber} onChange={(e) => setIRNumber(e.target.value)} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>PLATE No.:</b></h6>
@@ -416,11 +437,11 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>INCIDENT DATE:</b></h6>
-                                    <Calendar placeholder="Select Date" value={dateIncident} onChange={(e) => setDateIncident(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={dateIncident} onChange={(e) => setDateIncident(e.value)} showIcon disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>DATE RECEIVE:</b></h6>
-                                    <Calendar placeholder="Select Date" value={dateReceive} onChange={(e) => setDateReceive(e.value)} showIcon/>
+                                    <Calendar placeholder="Select Date" value={dateReceive} onChange={(e) => setDateReceive(e.value)} showIcon disabled/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
@@ -429,7 +450,7 @@ export default function RepairReport() {
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
                                     <h6><b>DETAILS:</b></h6>
                                     <InputTextarea placeholder="Discuss details here or leave it blank." rows={5} cols={30} autoResize
-                                    value={detailsIncident} onChange={(e) => setDetailsIncident(e.target.value)}/>
+                                    value={detailsIncident} onChange={(e) => setDetailsIncident(e.target.value)} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>CHASSIS No.:</b></h6>
@@ -437,11 +458,11 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>SITE POC:</b></h6>
-                                    <InputText placeholder="Input SITE POC" value={sitePOC} onChange={(e) => setSitePOC(e.target.value)}/>
+                                    <InputText placeholder="Input SITE POC" value={sitePOC} onChange={(e) => setSitePOC(e.target.value)} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>CONTACT No.:</b></h6>
-                                    <InputText placeholder="Input Contact Number" keyfilter="int" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)}/>
+                                    <InputText placeholder="Input Contact Number" keyfilter="int" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} disabled/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">

@@ -100,9 +100,12 @@ class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
 class RepairSerializer(serializers.ModelSerializer): # repair serializer
     cost = CostSerializer(many=True, write_only=True)
     noted_by = serializers.CharField(required=False, allow_blank=True)
-    body_no = serializers.CharField()
-    ir_no = serializers.CharField(required=False, allow_blank=True)
-    check_list = serializers.CharField(required=False, allow_blank=True)
+    body_no = serializers.CharField(write_only=True)
+    ir_no = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    check_list = serializers.CharField(required=False, allow_blank=True,  write_only=True)
+    total_parts_cost = serializers.ReadOnlyField()
+    total_labor_cost = serializers.ReadOnlyField()
+    total_estimate_cost = serializers.ReadOnlyField()
     class Meta:
         model = Repair
         fields = '__all__'
@@ -110,6 +113,7 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
             'job_order': {'required': False},
             'ir_no': {'required': False},
             'check_list': {'required': False},
+            'task': {'write_only': True},
         }
     def validate(self, obj): # validate input in foreign keys
         errors = []
@@ -251,13 +255,15 @@ class CheckListReportPartsSerializer(serializers.ModelSerializer): # cost info i
 class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer 
     parts = CheckListReportPartsSerializer(many=True, required=False)
     parts_included = fields.MultipleChoiceField(choices=CheckList.Parts_List)
-    body_no = serializers.CharField()
+    body_no = serializers.CharField(write_only=True)
     email = serializers.CharField()
     class Meta:
         model = CheckList
         fields = '__all__'
         extra_kwargs = {
             'check_list_no': {'required': False},
+            'task': {'write_only': True},
+
         }
 
     def validate(self, obj): # validate if vin_no input is vin_no

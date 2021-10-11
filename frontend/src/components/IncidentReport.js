@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { AutoComplete } from 'primereact/autocomplete';
+import { Dropdown } from 'primereact/dropdown';
 import { Panel } from 'primereact/panel';
 import { Calendar } from 'primereact/calendar';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -15,7 +16,7 @@ import { format } from 'date-fns';
 
 export default function IncidentReport() {
 
-    // const statusOperationalOptions = [{ name: 'YES', val: "Yes" }, { name: 'NO', val: "No" }];
+    const statusOperationalOptions = [{ name: 'YES', val: true }, { name: 'NO', val: false }];
 
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
@@ -34,7 +35,7 @@ export default function IncidentReport() {
     const [exactLocation, setExactLocation] = useState('');
     const [vehicleSupplier, setVehicleSupplier] = useState('');
     const [vehicleTypeMake, setVehicleTypeMake] = useState('');
-    const [operational, setOperational] = useState('');
+    const [operational, setOperational] = useState([]);
     const [odometer, setOdometer] = useState('');
     const [waiver, setWaiver] = useState(false);
     const [repairType, setRepairType] = useState([]);
@@ -126,28 +127,16 @@ export default function IncidentReport() {
     };
 
     const onSelectBodyNo = (value) => {
+        console.log(value)
         setPlateNumber(value.plate_no);
+        setArea(value.permanent_loc);
+        setExactLocation(value.current_loc);
         setVehicleTypeMake(value.make = value.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.make === 'SUV' ? 'Super Carry UV' : value.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
         setChassisNumber(value.vin_no);
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value.body_no + '/', config)
-            .then((res) => {
-                setCSNumber(res.data.cs_no);
-                setVehicleSupplier(res.data.dealer = res.data.dealer === 'DMC' ? 'Diamond Motor Corporation' : res.data.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : res.data.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : res.data.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
-                setOperational(res.data.operational = res.data.operational === false ? 'No' : res.data.operational === true ? 'Yes' : '');
-                setEngineNumber(res.data.engine_no);
-            })
-            .catch((err) => {
-                
-            });
+        setCSNumber(value.cs_no);
+        setVehicleSupplier(value.dealer = value.dealer === 'DMC' ? 'Diamond Motor Corporation' : value.dealer === 'GCM' ? 'Grand Canyon Multi Holdings, INC.' : value.dealer ===  'CAC' ? 'Cebu Autocentrale Corporation' : value.dealer ===  'CAI' ? 'Cherub Autodealer Inc.' : '');
+        setEngineNumber(value.engine_no);
     }
 
     const onChangeRepairType = (e) => {
@@ -161,6 +150,7 @@ export default function IncidentReport() {
     }
 
     const submitIncidentReport = () => {
+        console.log(operational)
         if (IRNo === "") {
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIR === null) {
@@ -179,6 +169,8 @@ export default function IncidentReport() {
             toast.current.show({ severity: 'error', summary: 'EXACT LOCATION', detail: 'This field is required.', life: 3000 });
         } else if (vehicleSupplier === "") {
             toast.current.show({ severity: 'error', summary: 'VEHICLE SUPPLIER', detail: 'This field is required.', life: 3000 });
+        } else if (operational.length <= 0) {
+            toast.current.show({ severity: 'error', summary: 'OPERATIONAL', detail: 'This field is required.', life: 3000 });
         } else if (odometer === "") {
             toast.current.show({ severity: 'error', summary: 'ODOMETER', detail: 'This field is required.', life: 3000 });
         } else if (repairType.length <= 0) {
@@ -189,9 +181,11 @@ export default function IncidentReport() {
             toast.current.show({ severity: 'error', summary: 'LOCATION OF INCIDENT', detail: 'This field is required.', life: 3000 });
         }  else if (dateDetails === null) {
             toast.current.show({ severity: 'error', summary: 'DATE', detail: 'This field is required.', life: 3000 });
-        } else if (timeDetails === null) {
-            toast.current.show({ severity: 'error', summary: 'TIME', detail: 'This field is required.', life: 3000 });
-        } else if (problemObserved === "") {
+        } 
+        // else if (timeDetails === null) {
+        //     toast.current.show({ severity: 'error', summary: 'TIME', detail: 'This field is required.', life: 3000 });
+        // } 
+        else if (problemObserved === "") {
             toast.current.show({ severity: 'error', summary: 'PROBLEM OBSERVED', detail: 'This field is required.', life: 3000 });
         } else if (recommendation === "") {
             toast.current.show({ severity: 'error', summary: 'RECOMMENDATION', detail: 'This field is required.', life: 3000 });
@@ -215,7 +209,9 @@ export default function IncidentReport() {
                 },
             };
 
-            let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), timeDetails.getHours(), timeDetails.getMinutes(), timeDetails.getSeconds());
+            // let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), timeDetails.getHours(), timeDetails.getMinutes(), timeDetails.getSeconds());
+            let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), 0, 0, 0);
+            console.log("op: ", operational.val);
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'task/ir-report/', {
                 repair_type: repairType,
@@ -229,12 +225,14 @@ export default function IncidentReport() {
                 region: region,
                 exact_loc: exactLocation,
                 vehicle_supp: vehicleSupplier,
+                operational: operational.val,
                 odometer: odometer,
                 damaged_parts: damagedParts,
                 incedent_loc: locationIncident,
                 problem_obs: problemObserved,
                 recommendation: recommendation,
                 date_time: newDateTimeGMT,
+                // date_time: format(dateDetails, 'yyyy-MM-dd'),
                 prepared_by: preparedBy,
                 noted_by: notedBy,
                 admin_name: adminName,
@@ -333,7 +331,7 @@ export default function IncidentReport() {
                                     <InputText placeholder="Input IR No." value={IRNo} onChange={(e) => setIRNo(e.target.value)}/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
-                                    <h6><b>DATE:</b></h6>
+                                    <h6><b>DATE CREATED:</b></h6>
                                     <Calendar placeholder="Select Date" value={dateIR} onChange={(e) => setDateIR(e.value)} showIcon readOnlyInput/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
@@ -375,11 +373,11 @@ export default function IncidentReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>EXACT LOCATION:</b></h6>
-                                    <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => setExactLocation(e.target.value)}/>
+                                    <InputText placeholder="Input Location" value={exactLocation} onChange={(e) => setExactLocation(e.target.value)} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>VEHICLE SUPPLIER:</b></h6>
-                                    <InputText placeholder="Input Vehicle Supplier" value={vehicleSupplier} onChange={(e) => setVehicleSupplier(e.target.value)}/>
+                                    <InputText placeholder="Input Vehicle Supplier" value={vehicleSupplier} onChange={(e) => setVehicleSupplier(e.target.value)} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <h6><b>VEHICLE TYPE/MAKE:</b></h6>
@@ -387,15 +385,15 @@ export default function IncidentReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>OPERATIONAL (YES/NO):</b></h6>
-                                    {/* <Dropdown value={operational} options={statusOperationalOptions} optionLabel="name" placeholder="Select" 
-                                    onChange={event => setOperational(event.target.value)} disabled/> */}
-                                    <InputText placeholder="Input Operational" value={operational} disabled/>
+                                    <Dropdown value={operational} options={statusOperationalOptions} optionLabel="name" placeholder="Select" 
+                                    onChange={event => setOperational(event.target.value)}/>
+                                    {/* <InputText placeholder="Input Operational" value={operational} disabled/> */}
                                 </div>
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
                                     <h6><b>CURRENT ODOMETER:</b></h6>
                                     <InputText placeholder="Input Odometer" value={odometer} onChange={(e) => setOdometer(e.target.value)}/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk resize-label">
                                     <h6><b>WAIVER:</b></h6>
                                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-field-checkbox">
                                         <Checkbox inputId="cb" checked={waiver} onChange={e => setWaiver(e.checked)} />
@@ -403,7 +401,7 @@ export default function IncidentReport() {
                                     </div>
                                 </div>
 
-                                <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                <Panel header="REPAIR TYPE" className="p-col-12 p-lg-12 p-md-12 p-sm-12 resize-label">
                                     <div className="p-grid p-fluid">
                                         <div className="p-col-12 p-lg-3 p-md-3 p-sm-12 p-field-checkbox">
                                             <Checkbox inputId="cb" value="me" onChange={(e) => onChangeRepairType(e)} checked={repairType.indexOf('me') !== -1}/>
@@ -461,14 +459,14 @@ export default function IncidentReport() {
                                 <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <div className="p-grid p-fluid">
                                         <div className="p-col-12 p-lg-8 p-md-8 p-sm-12 required-asterisk">
-                                            <h6><b>DATE:</b></h6>
+                                            <h6><b>INCIDENT DATE:</b></h6>
                                             <Calendar placeholder="Select Date" value={dateDetails} onChange={(e) => setDateDetails(e.value)} showIcon readOnlyInput/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
-                                            <h6><b>TIME:</b></h6>
+                                        {/* <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                            <h6><b>TIME:</b></h6> */}
                                             {/* <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => setTimeDetails(e.value)} timeOnly hourFormat="12" showIcon readOnlyInput/> */}
-                                            <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => setTimeDetails(e.value)} timeOnly showIcon readOnlyInput/>
-                                        </div>
+                                            {/* <Calendar placeholder="Select Time" value={timeDetails} onChange={(e) => setTimeDetails(e.value)} timeOnly showIcon readOnlyInput/> */}
+                                        {/* </div> */}
                                     </div>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">

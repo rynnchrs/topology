@@ -176,6 +176,7 @@ class Repair(models.Model):
     repair_id = models.AutoField(primary_key=True)
     job_order = models.OneToOneField(JobOrder, related_name='repair', on_delete=models.CASCADE)
     ir_no = models.OneToOneField(IR, null=True, blank=True, related_name='repair', on_delete=models.PROTECT)
+    task = models.OneToOneField(Task, related_name='repair', on_delete=models.PROTECT, default='1')
     check_list = models.OneToOneField(CheckList, null=True, blank=True, related_name='repair', on_delete=models.PROTECT)
     body_no = models.ForeignKey(Car, null=True, blank=True, related_name='b_repair', on_delete=models.CASCADE)
     #actual findings    
