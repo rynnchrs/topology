@@ -2,19 +2,8 @@ from notifications.models import Notification
 from rest_framework import fields, serializers
 
 
-class GenericNotificationRelatedField(serializers.RelatedField):
-
-    def to_representation(self, value):
-        if isinstance(value, Foo):
-            serializer = FooSerializer(value)
-        if isinstance(value, Bar):
-            serializer = BarSerializer(value)
-
-        return serializer.data
-
-
 class NotificationsSerializer(serializers.ModelSerializer):
+    recipient = serializers.ReadOnlyField(source='recipient.user_info.full_name')
     class Meta:
         model = Notification
-        fields = '__all__'
-        depth = 0
+        fields = '__all__' #['id','unread','verb','recipient','timestamp']

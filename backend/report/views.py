@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from image.models import Image
+from notifications.signals import notify
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -27,7 +28,8 @@ from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
                           InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
-from .utils import analysis, checklist_reversion, repair_reversion, reversion, user_permission
+from .utils import (analysis, checklist_reversion, repair_reversion, reversion,
+                    user_permission)
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
@@ -195,6 +197,11 @@ class RepairView(viewsets.ModelViewSet):  # add this
                     car.operational = False
                 car.save()
                 serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Repair Report for" + str(car.body_no) + "is created."
+                notify.send(sender, recipient=recipients, action_object=serializer, target=serializer, 
+                                level='info', verb='info', description=message)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
