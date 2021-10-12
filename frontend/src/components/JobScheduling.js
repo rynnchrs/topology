@@ -68,7 +68,7 @@ export const JobScheduling = () => {
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
-    const reportTypeOptions = [/* { name: 'CHECKLIST', val: 'checklist' }, */ { name: 'INCIDENT', val: 'incident' }];
+    const reportTypeOptions = [{ name: 'CHECKLIST', val: 'checklist' }, { name: 'INCIDENT', val: 'incident' }];
     const [reportList, setReportList] = useState([]);
     const [locationList, setLocationList] = useState([]);
     
@@ -696,9 +696,6 @@ export const JobScheduling = () => {
     }
 
     const taskWarningList = (taskType) => {
-        console.log(reportList)
-        console.log(reportType)
-        console.log(reportNo)
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -798,9 +795,9 @@ export const JobScheduling = () => {
             },
             fieldman: fieldmanData,
             desc:"",
-            body_no: bodyNo.body_no,
-            ir_no: reportNo.ir_no,
-            check_list: "",
+            body_no: bodyNo,
+            ir_no: reportType.val === "incident" ? reportNo.ir_no : "",
+            check_list: reportType.val === "checklist" ? reportNo.check_list_no : "",
             start_date: format(dateStart, 'yyyy-MM-dd'),
             end_date: format(dateEnd, 'yyyy-MM-dd'),
             schedule_date: format(scheduleDate, 'yyyy-MM-dd'),
@@ -871,7 +868,6 @@ export const JobScheduling = () => {
             onClick('displayMessage');
         })
         .catch((err) => {
-            console.log(err)
             if (err.toJSON().message === 'Network Error'){
                 toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
             } else if (err.response.data.fieldman) {
@@ -893,10 +889,8 @@ export const JobScheduling = () => {
     }
 
     const editAssignData = () => {
-        console.log(holdTaskType)
         if (holdTaskType === "Repair") {
             setEditFieldman([]);
-            console.log(jobData.fieldman)
             jobData.fieldman.map((x, index) =>
                 // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
                 fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
@@ -941,7 +935,6 @@ export const JobScheduling = () => {
             onClick('displayJobEdit');
         } else {
             setEditFieldman([]);
-            console.log(jobData.fieldman)
             jobData.fieldman.map((x, index) =>
                 // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
                 fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
@@ -1009,7 +1002,7 @@ export const JobScheduling = () => {
             },
             fieldman: fieldmanData,
             desc: "",
-            body_no: editBodyNo,
+            body_no: editBodyNo.bodyNo,
             ir_no: editReportNo.ir_no,
             check_list: "",
             start_date: format(editDateStart, 'yyyy-MM-dd'),
@@ -1049,9 +1042,6 @@ export const JobScheduling = () => {
         editFieldman.map((x) => 
             fieldmanData.push({field_man: x.val})
         )
-
-        console.log(editLocation)
-        console.log(editJobNo)
 
         let token = localStorage.getItem("token");
         const config = {
@@ -1156,9 +1146,6 @@ export const JobScheduling = () => {
             },
         };
 
-        let apiValue = taskType === "Repair" ? 'task/task-scheduling/' : 'task/task-inspection/';
-
-        // axios.delete(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
         axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
         .then((res) => {;
             getTaskList();
@@ -1218,36 +1205,48 @@ export const JobScheduling = () => {
 
     const onChangeReportType = (value, method, ro) => {
         method === "create" ? setReportType(value) : setEditReportType(value);
-        let apiValue = "";
-        if (value.val === "incident") {
-            apiValue = "task/ir-report/";
-        } else {
-            apiValue = "task/ir-report/"; //will update soon for checklist
-        }
 
         let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-
-        axios.get(process.env.REACT_APP_SERVER_NAME + apiValue, config)
-            .then((res) => {
-                setReportList(res.data.results);
-                res.data.results.filter(i => i.ir_no === ro).map((i) => {
-                    setEditReportNo(i);
-                });
-                if (res.data.next === null) {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        
+        if (value.val === "incident") {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'task/ir-report/task_not_created/', config)
+                .then((res) => {
+                    setReportList(res.data);
+                    res.data.filter(i => i.ir_no === ro).map((i) => {
+                        setEditReportNo(i);
+                    });
+                    // if (res.data.next === null) {
+                        
+                    // } else {
+                    //     nextPageReportList(res.data.next, ro);
+                    // }
+                })
+                .catch((err) => {
                     
-                } else {
-                    nextPageReportList(res.data.next, ro);
-                }
-            })
-            .catch((err) => {
-                
-            });
+                });
+        } else {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/checklist/task_not_created/', config)
+                .then((res) => {
+                    setReportList(res.data);
+                    res.data.results.filter(i => i.check_list_id === ro).map((i) => {
+                        setEditReportNo(i);
+                    });
+                    // if (res.data.next === null) {
+                        
+                    // } else {
+                    //     nextPageReportList(res.data.next, ro);
+                    // }
+                })
+                .catch((err) => {
+                    
+                });
+        }
     }
 
     const nextPageReportList = (valueURL, ro) => {
@@ -1283,6 +1282,11 @@ export const JobScheduling = () => {
         }
     }
 
+    const onChangeReportNo = (value) => {
+        setReportNo(value);
+        setBodyNo(value.body_no);
+    }
+
     const addFieldman = () => {
         setFieldman(fieldman => [...fieldman, {id: fieldman.length, val: "", fullname: ""}]);
     }
@@ -1310,8 +1314,6 @@ export const JobScheduling = () => {
     }
 
     const updateEditFieldman = (index, value, fn) => {
-        console.log(value)
-        console.log(fn)
         let arr = editFieldman.slice();
         arr[index] = {id: index, val: value, fullname: fn};
         setEditFieldman(arr);
@@ -1471,11 +1473,6 @@ export const JobScheduling = () => {
                             <Button label="-" onClick={() => removeFieldman()} style={{ width: '50px' }} disabled={fieldman.length === 1}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
-                            <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                            <AutoComplete forceSelection field="body_no" placeholder="Body No." suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
-                            value={bodyNo} onChange={(e) => setBodyNo(e.target.value)}/>
-                        </div>
-                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>JOB TYPE:</b></h6>
                             <InputText placeholder="REPAIR" disabled/>
                         </div>
@@ -1486,8 +1483,18 @@ export const JobScheduling = () => {
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>REPORT No.:</b></h6>
-                            <Dropdown value={reportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No."
-                            onChange={event => setReportNo(event.target.value)} disabled={reportList.length === 0}/>
+                            { reportType.val === "incident" ? 
+                                <Dropdown value={reportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No I."
+                                onChange={event => onChangeReportNo(event.target.value)} disabled={reportList.length === 0}/> :
+                                <Dropdown value={reportNo} options={reportList} optionLabel="check_list_id" placeholder="Select Report No."
+                                onChange={event => onChangeReportNo(event.target.value)} disabled={reportList.length === 0}/>
+                            }
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
+                            {/* <AutoComplete forceSelection field="body_no" placeholder="Body No." suggestions={suggestionsBodyNo} completeMethod={searchListBodyNo} 
+                            value={bodyNo} onChange={(e) => setBodyNo(e.target.value)}/> */}
+                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                         </div>
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>START DATE:</b></h6>

@@ -20,7 +20,6 @@ import { format } from 'date-fns';
 
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-// import * as jsPDF from 'jspdf';
 
 export default function RepairRecords() {
 
@@ -266,7 +265,7 @@ export default function RepairRecords() {
     }
 
     const assignIncidentRecordDetails = (value) => {
-        console.log(value)
+        console.log("iredit: ", value);
         setIRNo(value.ir_no);
         onChangeValue('f0', convertDatetoGMT(value.date));
         onChangeValue('f1', value.req_name);
@@ -555,28 +554,24 @@ export default function RepairRecords() {
 
     const convertPDF = () => {
         try {
+            const input = document.getElementById('toPdf');
+            html2canvas(input)
+            .then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
 
-        
-        const input = document.getElementById('toPdf');
+                const pdf = new jsPDF();
 
-        html2canvas(input)
-        .then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
+                var width = pdf.internal.pageSize.getWidth();
+                var height = pdf.internal.pageSize.getHeight();
 
-            const pdf = new jsPDF();
+                pdf.addImage(imgData, 'JPEG', 16, 8, width-36, height-18);
+                window.open(pdf.output('bloburl'));
+                onHide('displayPDF');
+                setIsLoading(false);
+            });
+        } catch (err){
 
-            var width = pdf.internal.pageSize.getWidth();
-            var height = pdf.internal.pageSize.getHeight();
-
-            pdf.addImage(imgData, 'JPEG', 8, 8, width-18, height-18);
-            window.open(pdf.output('bloburl'));
-            onHide('displayPDF');
-            setIsLoading(false);
-        });
-    }catch (err){
-        console.log(err)
-    }
-    
+        }
     }
 
     const getIncidentRecord = () => {
@@ -914,6 +909,9 @@ export default function RepairRecords() {
     
     return(
         <div>
+            <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                <ProgressSpinner />
+            </div>
             <Toast ref={toast}/>
             <div className="p-grid p-fluid">
                 <div className="p-col-12">
@@ -1170,7 +1168,6 @@ export default function RepairRecords() {
                             </div>
                         </div>
                         <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
-                            aw
                             <ProgressSpinner />
                         </div>
                     </Dialog>

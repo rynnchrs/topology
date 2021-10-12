@@ -25,11 +25,13 @@ export default function RepairReport() {
     const [plateNumber, setPlateNumber] = useState('');
     const [CSNumber, setCSNumber] = useState('');
     const [chassisNumber, setChassisNumber] = useState('');
+    const [reportType, setReportType] = useState('');
 
     //variables to be saved
     const [jobID, setJobID] = useState([]);
     const [taskID, setTaskID] = useState('');
     const [IRNumber, setIRNumber] = useState('');
+    const [checklistNumber, setChecklistNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
     const [detailsIncident, setDetailsIncident] = useState('');
@@ -166,19 +168,22 @@ export default function RepairReport() {
     const submitRepairReport = () => {
         if (typeof(jobID.job_id) === "undefined") {
             toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'Please select report no. first.', life: 3000 });
-        } else if (IRNumber === "") { 
-            toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
-        } else if (dateIncident === null) { 
-            toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateReceive === null) { 
-            toast.current.show({ severity: 'error', summary: 'DATE RECEIVE', detail: 'This field is required.', life: 3000 });
-        } else if (detailsIncident === "") { 
-            toast.current.show({ severity: 'error', summary: 'INCIDENT DETAILS', detail: 'This field is required.', life: 3000 });
-        } else if (sitePOC === "") { 
-            toast.current.show({ severity: 'error', summary: 'SITE POC', detail: 'This field is required.', life: 3000 });
-        } else if (contactNumber === "") { 
-            toast.current.show({ severity: 'error', summary: 'CONTACT NUMBER', detail: 'This field is required.', life: 3000 });
-        } else if (datePerformed === null) { 
+        } 
+        // else if (IRNumber === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
+        // } 
+        // else if (dateIncident === null) { 
+        //     toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
+        // } else if (dateReceive === null) { 
+        //     toast.current.show({ severity: 'error', summary: 'DATE RECEIVE', detail: 'This field is required.', life: 3000 });
+        // } else if (detailsIncident === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'INCIDENT DETAILS', detail: 'This field is required.', life: 3000 });
+        // } else if (sitePOC === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'SITE POC', detail: 'This field is required.', life: 3000 });
+        // } else if (contactNumber === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'CONTACT NUMBER', detail: 'This field is required.', life: 3000 });
+        // } 
+        else if (datePerformed === null) { 
             toast.current.show({ severity: 'error', summary: 'DATE PERFORMED', detail: 'This field is required.', life: 3000 });
         } else if (detailsActualFindings === "") { 
             toast.current.show({ severity: 'error', summary: 'ACTUAL FINDINDS', detail: 'This field is required.', life: 3000 });
@@ -228,13 +233,13 @@ export default function RepairReport() {
                 body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
-                ir_no: IRNumber,
-                check_list: "",
-                incident_date: format(dateIncident, 'yyyy-MM-dd'),
-                date_receive: format(dateReceive, 'yyyy-MM-dd'),
-                incident_details: detailsIncident,
-                site_poc: sitePOC,
-                contact_no: contactNumber,
+                ir_no: reportType === "incident" ? IRNumber : "",
+                check_list: reportType === "checklist" ? checklistNumber : "",
+                // incident_date: format(dateIncident, 'yyyy-MM-dd'),
+                // date_receive: format(dateReceive, 'yyyy-MM-dd'),
+                // incident_details: detailsIncident,
+                // site_poc: sitePOC,
+                // contact_no: contactNumber,
                 perform_date: format(datePerformed, 'yyyy-MM-dd'),
                 actual_findings: detailsActualFindings,
                 actual_remarks: detailsActualRemarks,
@@ -297,6 +302,7 @@ export default function RepairReport() {
         setJobID([]);
         setTaskID('');
         setIRNumber('');
+        setChecklistNumber('');
         setDateIncident(null);
         setDateReceive(null);
         setDetailsIncident('');
@@ -324,6 +330,7 @@ export default function RepairReport() {
 
     const handleSelectReportNo = (value) => {
         console.log(value.value)
+
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
@@ -334,16 +341,25 @@ export default function RepairReport() {
         setPlateNumber(value.value.body_no.plate_no);
         setCSNumber(value.value.body_no.vin_no);
         setChassisNumber(value.value.body_no.vin_no);
-
         setTaskID(value.value.task.task_id);
-        setIRNumber(value.value.ir_no.ir_no);
-        let valueDateTime = new Date(value.value.ir_no.date_time);
-        let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
-        setDateIncident(valueDate);
-        setDateReceive(convertDatetoGMT(value.value.ir_no.date));
-        setDetailsIncident(value.value.ir_no.problem_obs);
-        setSitePOC(value.value.ir_no.admin_name);
-        setContactNumber(value.value.ir_no.contact_number);
+
+        if (value.value.ir_no !== null) {
+            console.log("this incident");
+            setReportType('incident');
+            setIRNumber(value.value.ir_no.ir_no);
+            let valueDateTime = new Date(value.value.ir_no.date_time);
+            let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+            setDateIncident(valueDate);
+            setDateReceive(convertDatetoGMT(value.value.ir_no.date));
+            setDetailsIncident(value.value.ir_no.problem_obs);
+            setSitePOC(value.value.ir_no.admin_name);
+            setContactNumber(value.value.ir_no.contact_number);
+        } else {
+            console.log("this checklist");
+            setReportType('checklist');
+            setChecklistNumber(value.value.check_list);
+        }
+        
     }
 
     const convertDatetoGMT = (value) => {
