@@ -352,7 +352,7 @@ def upload_path(instance, filename):
 
 class PDF(models.Model):
     pdf_id = models.AutoField(primary_key=True)
-    car = models.OneToOneField(Car, related_name='pdf', on_delete=models.PROTECT)
+    car = models.OneToOneField(Car, related_name='pdf', on_delete=models.CASCADE)
     pdf = models.FileField(upload_to=upload_path, null=True, blank=True)
 
     date_updated = models.DateField(auto_now=True, null=True, blank=True)

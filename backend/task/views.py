@@ -204,21 +204,30 @@ class TaskView(viewsets.ModelViewSet):
         if user_permission(user, 'can_edit_task'): 
             queryset = Task.objects.all()
             task = get_object_or_404(queryset, pk=pk)    # get user
-            if task.checklist:
+            if task.job_order.type == False:
                 queryset = CheckList.objects.all()
                 report = get_object_or_404(queryset, task=pk) 
+                if task.task_status_mn == False and report.noted_by is None:
+                    task.task_status_mn = True;
+                    report.noted_by = user
+                    car = Car.objects.get(body_no=task.body_no.body_no)
+                    car.status = "A"
+                    car.save()
+                    task.save()
+                    report.save()
+                    return Response("Success",status=status.HTTP_200_OK)
             else:
                 queryset = Repair.objects.all()
                 report = get_object_or_404(queryset, task=pk) 
-            if task.task_status_mn == False and report.noted_by is None:
-                task.task_status_mn = True;
-                report.noted_by = user
-                car = Car.objects.get(body_no=task.body_no.body_no)
-                car.status = "A"
-                car.save()
-                task.save()
-                report.save()
-                return Response("Success",status=status.HTTP_200_OK)       
+                if task.task_status_mn == False and report.approved_by is None:
+                    task.task_status_mn = True;
+                    report.approved_by = user
+                    car = Car.objects.get(body_no=task.body_no.body_no)
+                    car.status = "A"
+                    car.save()
+                    task.save()
+                    report.save()
+                    return Response("Success",status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
