@@ -198,12 +198,11 @@ class RepairView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
                 sender = User.objects.get(username=user.username)
                 recipients = User.objects.filter(permission__can_add_task=True)
-                message = "Repair Report for" + str(car.body_no) + "is created."
-                notify.send(sender, recipient=recipients, action_object=serializer, target=serializer, 
-                                level='info', verb='info', description=message)
+                message = "Repair Report for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='repair,create', description=message)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
@@ -224,6 +223,10 @@ class RepairView(viewsets.ModelViewSet):  # add this
             labor = CostSerializer(labor, many=True)
             serializer_data['labor'] = labor.data
             serializer_data['revised'] = repair_reversion(repair)
+
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='repair')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -248,7 +251,11 @@ class RepairView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Repair Report for " + str(car.body_no) + " is udated."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='repair,update', description=message)
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -258,6 +265,12 @@ class RepairView(viewsets.ModelViewSet):  # add this
         if user_permission(user, 'can_delete_repair_reports'): 
             queryset = Repair.objects.all()
             repair = get_object_or_404(queryset, pk=pk)
+            
+            sender = User.objects.get(username=user.username)
+            recipients = User.objects.filter(permission__can_add_task=True)
+            message = "Repair Report for " + str(repair.body_no.body_no) + " is deleted."
+            notify.send(sender, recipient=recipients, level='info', 
+                        verb='Repair', description=message)
             repair.delete()
             queryset = Image.objects.filter(image_name=pk ,mode="cr")
             for image in queryset:
@@ -387,7 +400,11 @@ class CheckListView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Check List for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='checklist,create', description=message)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
@@ -402,6 +419,9 @@ class CheckListView(viewsets.ModelViewSet):  # add this
             serializer_data = serializer.data
             serializer_data['analysis'] = analysis(serializer_data)
             serializer_data['revised'] = checklist_reversion(check_list)
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='checklist')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -419,7 +439,11 @@ class CheckListView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Check List for " + str(car.body_no) + " is updated."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='checklist,update', description=message)
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -427,11 +451,16 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     
     def destroy(self, request, pk=None):      
         user = self.request.user
-        if user_permission(user, 'can_delete_repair_reports'): 
+        if user_permission(user, 'can_delete_checklist'): 
             try:
                 queryset = CheckList.objects.all()
-                repair = get_object_or_404(queryset, pk=pk)
-                repair.delete()
+                checklist = get_object_or_404(queryset, pk=pk)
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Check List for " + str(checklist.body_no.body_no) + " is deleted."
+                notify.send(sender, recipient=recipients, level='info', 
+                                verb='checklist,delete', description=message)
+                checklist.delete()
                 queryset = Image.objects.filter(image_name=pk ,mode="cl")
                 for image in queryset:
                     try:

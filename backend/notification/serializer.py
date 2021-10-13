@@ -6,4 +6,4 @@ class NotificationsSerializer(serializers.ModelSerializer):
     recipient = serializers.ReadOnlyField(source='recipient.user_info.full_name')
     class Meta:
         model = Notification
-        fields = '__all__' #['id','unread','verb','recipient','timestamp']
+        fields = ['id','unread','verb','target_object_id','recipient','description','timestamp']
