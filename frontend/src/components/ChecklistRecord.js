@@ -200,7 +200,6 @@ export default function ChecklistRecord() {
     }
 
     const assignChecklistRecordEdit = (value) => {
-        console.log(value)
         setChecklistID(value.check_list_id)
         setReportNo(value.job_order.job_id);
         setTask(value.job_order.task.task_id);
@@ -494,7 +493,7 @@ export default function ChecklistRecord() {
                 }
             })
             .catch((err) => {
-                
+                setIsLoading(false);
             });
         }
     }
@@ -759,7 +758,7 @@ export default function ChecklistRecord() {
                                                 <h6><b>REPORT No.:</b></h6>
                                                 {/* <Dropdown value={reportNo} options={inspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                                 onChange={event => onChangeReportNo(event.target.value)}/> */}
-                                                <InputText placeholder="Input Email" value={reportNo} disabled/>
+                                                <InputText placeholder="Input Report No." value={reportNo} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>YOUR EMAIL:</b></h6>

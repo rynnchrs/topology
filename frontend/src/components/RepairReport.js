@@ -329,8 +329,6 @@ export default function RepairReport() {
     }
 
     const handleSelectReportNo = (value) => {
-        console.log(value.value)
-
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
@@ -344,7 +342,6 @@ export default function RepairReport() {
         setTaskID(value.value.task.task_id);
 
         if (value.value.ir_no !== null) {
-            console.log("this incident");
             setReportType('incident');
             setIRNumber(value.value.ir_no.ir_no);
             let valueDateTime = new Date(value.value.ir_no.date_time);
@@ -354,10 +351,18 @@ export default function RepairReport() {
             setDetailsIncident(value.value.ir_no.problem_obs);
             setSitePOC(value.value.ir_no.admin_name);
             setContactNumber(value.value.ir_no.contact_number);
+
+            setChecklistNumber('');
         } else {
-            console.log("this checklist");
             setReportType('checklist');
             setChecklistNumber(value.value.check_list);
+
+            setIRNumber('');
+            setDateIncident(null);
+            setDateReceive(null);
+            setDetailsIncident('');
+            setSitePOC('');
+            setContactNumber('');
         }
         
     }
@@ -407,31 +412,39 @@ export default function RepairReport() {
                         <div className="card card-w-title">
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
-                                    <h6><b>JOB TYPE:</b></h6>
-                                    <InputText placeholder="REPAIR" disabled/>
-                                </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
                                     <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                     onChange={event => {setJobID(event.target.value); handleSelectReportNo(event)}}/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                    <h6><b>REPORT TYPE:</b></h6>
+                                    <InputText placeholder="Input Report Type" value={reportType.toUpperCase()} disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                    <h6><b>JOB TYPE:</b></h6>
+                                    <InputText placeholder="REPAIR" disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                    <h6><b>CHECKLIST No.:</b></h6>
+                                    <InputText placeholder="Input Checklist No." value={checklistNumber} disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                    <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
+                                    <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>SCHEDULE DATE:</b></h6>
                                     <InputText placeholder="Input Date" value={scheduleDate} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
-                                    <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                                    <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>MAKE:</b></h6>
                                     <InputText placeholder="Input Make" value={make} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>STATUS:</b></h6>
                                     <InputText placeholder="Input Status" value={status} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>LOCATION:</b></h6>
                                     <InputText placeholder="Input Location" value={location} disabled/>
                                 </div>
@@ -568,17 +581,21 @@ export default function RepairReport() {
                                     </div>
                                 </div>
 
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <h6><b>TOTAL COST ESTIMATE:</b></h6>
                                     <InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalEstimateCost} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <h6><b>GENERATED BY:</b></h6>
                                     <InputText placeholder="Input Name" value={localStorage.getItem("myfirst")} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                    <h6><b>NOTED BY:</b></h6>
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                    <h6><b>APPROVED BY:</b></h6>
                                     <InputText placeholder="Input Name" disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                    <h6><b>NOTED BY:</b></h6>
+                                    <InputText placeholder="Input Name" />
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">

@@ -1484,7 +1484,7 @@ export const JobScheduling = () => {
                         <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>REPORT No.:</b></h6>
                             { reportType.val === "incident" ? 
-                                <Dropdown value={reportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No I."
+                                <Dropdown value={reportNo} options={reportList} optionLabel="ir_no" placeholder="Select Report No."
                                 onChange={event => onChangeReportNo(event.target.value)} disabled={reportList.length === 0}/> :
                                 <Dropdown value={reportNo} options={reportList} optionLabel="check_list_id" placeholder="Select Report No."
                                 onChange={event => onChangeReportNo(event.target.value)} disabled={reportList.length === 0}/>

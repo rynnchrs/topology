@@ -265,7 +265,6 @@ export default function RepairRecords() {
     }
 
     const assignIncidentRecordDetails = (value) => {
-        console.log("iredit: ", value);
         setIRNo(value.ir_no);
         onChangeValue('f0', convertDatetoGMT(value.date));
         onChangeValue('f1', value.req_name);

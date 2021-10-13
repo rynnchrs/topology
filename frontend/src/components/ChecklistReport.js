@@ -17,7 +17,6 @@ export default function ChecklistReport() {
     const jobDescriptionOptions = [{name: 'REPAIR', val: 're'}, {name: 'INSPECTION', val: 'in'}, {name: 'PMS', val: 'pm'}];
 
     const [inspectionNotCreatedList, setInspectionNotCreatedList] = useState([]);
-    const [locationList, setLocationList] = useState([]);
 
     //variables to be save
     const [reportNo, setReportNo] =  useState('');
@@ -56,28 +55,6 @@ export default function ChecklistReport() {
     useEffect(() => {
         getInspectionNotCreated();
     }, []);
-
-    useEffect(() => {
-        let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
-
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/location-list/', config)
-            .then((res) => {
-                let loc = [...locationList];
-                for (var i = 0; i < Object.keys(res.data).length; i++) {
-                    loc.push({"location": res.data[i]})
-                }
-                setLocationList(loc);
-            })
-            .catch((err) => {
-                
-            });
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         getChecklistParts();
@@ -164,11 +141,6 @@ export default function ChecklistReport() {
     }
 
     const submitChecklist = () => {
-        // console.log(jobDescription)
-        // console.log(bodyNo)
-        // console.log(reportNo)
-        // console.log(partsIncluded)
-
         if (reportNo === '') {
             toast.current.show({ severity: 'error', summary: 'REQUIRED FIELD', detail: 'REPORT No.', life: 3000 });
         } else if (email === '') {
@@ -229,8 +201,6 @@ export default function ChecklistReport() {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
             })
 
-            // console.log(partsSubmit)
-            
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/checklist/', {
                 body_no: bodyNo,
                 parts: partsSubmit,
@@ -251,12 +221,11 @@ export default function ChecklistReport() {
                 vehicle_wt: vehicleWeight,
                 remarks: "",
                 status: vehicleStatus,
-                job_order: reportNo.job_no,
+                job_order: reportNo.job_id,
                 task: task,
                 noted_by: null
             }, config)
             .then((res) => {
-                console.log(res.data)
                 if (refImageUpload.current.state.files.length <= 0) {
                     submitChecklistAfter();
                 } else {
