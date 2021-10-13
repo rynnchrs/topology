@@ -282,6 +282,8 @@ export default function RepairReport() {
                     toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Cost', life: 3000 });
                 } else if (err.response.data.quantity) {
                     toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Quantity', life: 3000 });
+                } else if (err.response.data.errors[0].approved_by) {
+                    toast.current.show({ severity: 'error', summary: 'APPROVED BY', detail: 'Invalid Approved By', life: 3000 });
                 }
                 setIsLoading(false);
             })
@@ -329,7 +331,6 @@ export default function RepairReport() {
     }
 
     const handleSelectReportNo = (value) => {
-        console.log(value.value)
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
@@ -596,7 +597,7 @@ export default function RepairReport() {
                                 </div>
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <h6><b>NOTED BY:</b></h6>
-                                    <InputText placeholder="Input Name" />
+                                    <InputText placeholder="Input Name" disabled/>
                                 </div>
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">

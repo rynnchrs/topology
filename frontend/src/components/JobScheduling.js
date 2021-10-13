@@ -1147,12 +1147,21 @@ export const JobScheduling = () => {
         };
 
         axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
-        .then((res) => {;
-            getTaskList();
-            onHide('displayConfirmDelete');
-            onHide('displayJobEdit');
-            setMessage({title:"DELETE", content:"Successfully deleted."});
-            onClick('displayMessage');
+        .then((res) => {
+            console.log(res.data)
+            if (res.data === `Can't delete this because it's being use by Careta Reports`) {
+                onHide('displayConfirmDelete');
+                onHide('displayJobEdit');
+                setMessage({title:"DELETE FAILED", content:"Can't delete this because it's being use by Careta Reports."});
+                onClick('displayMessage');
+            } else {
+                getTaskList();
+                onHide('displayConfirmDelete');
+                onHide('displayJobEdit');
+                setMessage({title:"DELETE", content:"Successfully deleted."});
+                onClick('displayMessage');
+            }
+            
         })
         .catch((err) => {
             toast.current.show({ severity: 'error', summary: 'Delete Task Error', detail: 'Something went wrong.', life: 3000 });

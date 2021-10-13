@@ -154,7 +154,7 @@ export default function IncidentReport() {
         if (IRNo === "") {
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIR === null) {
-            toast.current.show({ severity: 'error', summary: 'DATE', detail: 'This field is required.', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'DATE CREATED', detail: 'This field is required.', life: 3000 });
         } else if (requestorName === "") {
             toast.current.show({ severity: 'error', summary: `REQUESTOR'S NAME`, detail: 'This field is required.', life: 3000 });
         } else if (projectName === "") {
@@ -180,7 +180,7 @@ export default function IncidentReport() {
         }  else if (locationIncident === "") {
             toast.current.show({ severity: 'error', summary: 'LOCATION OF INCIDENT', detail: 'This field is required.', life: 3000 });
         }  else if (dateDetails === null) {
-            toast.current.show({ severity: 'error', summary: 'DATE', detail: 'This field is required.', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
         } 
         // else if (timeDetails === null) {
         //     toast.current.show({ severity: 'error', summary: 'TIME', detail: 'This field is required.', life: 3000 });

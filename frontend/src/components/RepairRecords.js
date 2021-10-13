@@ -101,6 +101,7 @@ export default function RepairRecords() {
     ]);
     const [totalLaborCost, setTotalLaborCost] = useState("0.00");
     const [totalEstimateCost, setTotalEstimateCost] = useState("0.00");
+    const [newNotedBy, setNewNotedBy] = useState("");
     const [dateRepaired, setDateRepaired] = useState(null);
     const [detailsActionTaken, setDetailsActionTaken] = useState("");
     const [dateDone, setDateDone] = useState(null);
@@ -240,6 +241,7 @@ export default function RepairRecords() {
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
+        console.log(value)
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
@@ -262,7 +264,7 @@ export default function RepairRecords() {
         
         try {
             if (value.job_order.ir_no !== null) {
-                setReportType('this edit incident');
+                setReportType('incident');
                 handleChange("f0", value.job_order.ir_no.ir_no);
                 let valueDateTime = new Date(value.job_order.ir_no.date_time);
                 let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
@@ -271,14 +273,25 @@ export default function RepairRecords() {
                 handleChange("f3", value.job_order.ir_no.problem_obs);
                 handleChange("f4", value.job_order.ir_no.admin_name);
                 handleChange("f5", value.job_order.ir_no.contact_number);
+
+                setChecklistNumber('');
             } else {
-                setReportType('this edit checklist');
-                setChecklistNumber(value.check_list);
+                setReportType('checklist');
+                setChecklistNumber(value.job_order.check_list);
+
+                setIRNumber('');
+                setChecklistNumber('');
+                setDateIncident(null);
+                setDateReceive(null);
+                setDetailsIncident('');
+                setSitePOC('');
+                setContactNumber('');
             }
 
             handleChange("f6", convertDatetoGMT(value.perform_date));
             handleChange("f7", value.actual_findings);
             handleChange("f8", value.actual_remarks);
+            handleChange("f14", value.noted_by);
             handleChange("f9", convertDatetoGMT(value.repair_date));
             handleChange("f10", value.action_taken);
             handleChange("f11", convertDatetoGMT(value.date_done));
@@ -651,6 +664,8 @@ export default function RepairRecords() {
             toast.current.show({ severity: 'error', summary: 'ACTUAL FINDINDS', detail: 'This field is required.', life: 3000 });
         } else if (detailsActualRemarks === "") { 
             toast.current.show({ severity: 'error', summary: 'ACTUAL RECOMMENDATION', detail: 'This field is required.', life: 3000 });
+        } else if (newNotedBy === null || newNotedBy === "") { 
+            toast.current.show({ severity: 'error', summary: 'NOTED BY', detail: 'This field is required.', life: 3000 });
         } else if (dateRepaired === null) { 
             toast.current.show({ severity: 'error', summary: 'REPAIR DATE', detail: 'This field is required.', life: 3000 });
         } else if (detailsActionTaken === "") { 
@@ -691,6 +706,7 @@ export default function RepairRecords() {
                 },
             };
 
+            console.log(newNotedBy)
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', {
                 body_no: bodyNo,
                 parts: submitParts,
@@ -705,6 +721,7 @@ export default function RepairRecords() {
                 perform_date: format(datePerformed, 'yyyy-MM-dd'),
                 actual_findings: detailsActualFindings,
                 actual_remarks: detailsActualRemarks,
+                noted_by: newNotedBy,
                 repair_date: format(dateRepaired, 'yyyy-MM-dd'),
                 action_taken: detailsActionTaken,
                 date_done: format(dateDone, 'yyyy-MM-dd'),
@@ -768,7 +785,6 @@ export default function RepairRecords() {
                 setMessage({title:"DELETE", content:"Successfully deleted."});
                 onHide('displayConfirmDelete');
                 onClick('displayMessage');
-                
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
@@ -963,6 +979,14 @@ export default function RepairRecords() {
                     value !== rrd.revised.remarks ? updateRedFields(arrIndex, r, rrd.revised.remarks) : updateRedFields(arrIndex, e, e);
                 }
                 break;
+            case "f14":
+                setNewNotedBy(value);
+                // if (typeof(rrd.revised.remarks) === "undefined") {
+                //     value !== rrd.remarks ? updateRedFields(arrIndex, r, rrd.remarks) : updateRedFields(arrIndex, e, e);
+                // } else {
+                //     value !== rrd.revised.remarks ? updateRedFields(arrIndex, r, rrd.revised.remarks) : updateRedFields(arrIndex, e, e);
+                // }
+                break;
             case "p0":
                 if (typeof(value) === "undefined") {
                     arrParts[0] = {...arrParts[0], p: "", q: "", c: ""};
@@ -1117,31 +1141,39 @@ export default function RepairRecords() {
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                                     <div className="card card-w-title red-field">
                                         <div className="p-grid p-fluid">
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                                <h6><b>JOB TYPE:</b></h6>
-                                                <InputText placeholder="Input Job Type" value={jobType} disabled/>
-                                            </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT No.:</b></h6>
                                                 <InputText placeholder="Input Report No." value={jobOrder} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                                <h6><b>REPORT TYPE:</b></h6>
+                                                <InputText placeholder="Input Report Type" value={reportType.toUpperCase()} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>JOB TYPE:</b></h6>
+                                                <InputText placeholder="Input Job Type" value={jobType} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>CHECKLIST No.:</b></h6>
+                                                <InputText placeholder="Input Checklist No." value={checklistNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
+                                                <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>SCHEDULE DATE:</b></h6>
                                                 <InputText placeholder="Input Date" value={scheduleDate} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
-                                                <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                                                <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                            </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>MAKE:</b></h6>
                                                 <InputText placeholder="Input Make" value={make} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>STATUS:</b></h6>
                                                 <InputText placeholder="Input Make" value={status} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>LOCATION:</b></h6>
                                                 <InputText placeholder="Input Location" value={location} disabled/>
                                             </div>
@@ -1305,17 +1337,21 @@ export default function RepairRecords() {
                                                 </div>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>TOTAL COST ESTIMATE:</b></h6>
                                                 <InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalEstimateCost} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>GENERATED BY:</b></h6>
                                                 <InputText placeholder="Input Name" value={repairRecordDetails.generated_by} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>APPROVED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.approved_by === null ? "" : repairRecordDetails.approved_by} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>NOTED BY:</b></h6>
-                                                <InputText placeholder="Input Name" value={repairRecordDetails.noted_by === null ? "" : repairRecordDetails.noted_by} disabled/>
+                                                <InputText id="f14" placeholder="Input Name" value={newNotedBy} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
@@ -1577,17 +1613,21 @@ export default function RepairRecords() {
                                                 </div>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>TOTAL COST ESTIMATE:</b></h6>
                                                 <InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalEstimateCost} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>GENERATED BY:</b></h6>
                                                 <InputText placeholder="Input Name" value={repairRecordDetails.generated_by} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>APPROVED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.approved_by === null ? "" : repairRecordDetails.approved_by} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>NOTED BY:</b></h6>
-                                                <InputText placeholder="Input Name" value={repairRecordDetails.noted_by === null ? "" : repairRecordDetails.noted_by} disabled/>
+                                                <InputText id="f14" placeholder="Input Name" value={newNotedBy} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
