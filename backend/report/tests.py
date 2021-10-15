@@ -263,18 +263,19 @@ class RepairReportTestCase(APITestCase):
         # create initial task object
         self.task = Task.objects.create(body_no=self.car, job_order=self.job_order, manager=self.user) 
         # create task for ir
-        self.task_ir = Task.objects.create(body_no=self.car, job_order=self.job_cl, manager=self.user, ir_no=self.ir) 
+        self.task_ir = Task.objects.create(body_no=self.car, job_order=self.job, manager=self.user, ir_no=self.ir) 
         # create initial checklist 
         self.check_list = CheckList.objects.create(task=self.task, check_list_no=0, body_no=self.car, job_order=self.job_order, email=self.user)
         # create  task for checklist
-        self.task_cl = Task.objects.create(body_no=self.car, job_order=self.job, manager=self.user, check_list=self.check_list) 
+        self.task_cl = Task.objects.create(body_no=self.car, job_order=self.job_cl, manager=self.user, check_list=self.check_list) 
         # create initial repair object
         self.repair = Repair.objects.create(
                 job_order=self.job_order,
+                task = self.task,
                 diagnosed_by = self.user,   
                 generated_by = self.user,
                 repair_by = self.user,
-                body_no = self.car
+                body_no = self.car,
             ) # create repair
         with reversion.create_revision(): # create reversion for careta report
             self.repair.save()
@@ -302,7 +303,8 @@ class RepairReportTestCase(APITestCase):
                 "status_repair": "Non-Operational",
                 "remarks": "321",
                 "job_order": str(self.job),
-                "ir_no": "",
+                "task": str(self.task_ir),
+                "ir_no": "0001",
                 "check_list": "",
                 "body_no": "18-1654",
             }
@@ -322,6 +324,7 @@ class RepairReportTestCase(APITestCase):
                 "status_repair": "Non-Operational",
                 "remarks": "321",
                 "job_order": str(self.job),
+                "task": str(self.task_ir),
                 "ir_no": "0001",
                 "check_list": "",
                 "body_no": "18-1654",
@@ -342,6 +345,7 @@ class RepairReportTestCase(APITestCase):
                 "status_repair": "Non-Operational",
                 "remarks": "321",
                 "job_order": str(self.job_cl),
+                "task": str(self.task_cl),
                 "ir_no": "",
                 "check_list": 0,
                 "body_no": "18-1654",
@@ -379,6 +383,7 @@ class RepairReportTestCase(APITestCase):
                 "status_repair": "Non-Operational",
                 "remarks": "321",
                 "job_order": str(self.job_order),
+                "task": str(self.task),
                 "ir_no": "",
                 "check_list": "",
                 "body_no": "18-1654"
