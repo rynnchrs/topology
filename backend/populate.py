@@ -61,7 +61,16 @@ def populate():
             can_view_task = True,
             can_add_task = True,
             can_edit_task = True,
-            can_delete_task = True,)
+            can_delete_task = True,
+            can_view_checklist = True,
+            can_add_checklist = True,
+            can_edit_checklist = True,
+            can_delete_checklist = True,
+            can_view_ir = True,
+            can_add_ir = True,
+            can_edit_ir = True,
+            can_delete_ir = True,
+            )
     except:
         pass
 
