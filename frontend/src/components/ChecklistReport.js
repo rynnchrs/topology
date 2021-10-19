@@ -247,7 +247,8 @@ export default function ChecklistReport() {
                 }
             })
             .catch((err) => {
-                
+                setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong.', life: 3000 });
             });
         }
     }

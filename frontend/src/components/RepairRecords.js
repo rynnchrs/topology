@@ -229,19 +229,19 @@ export default function RepairRecords() {
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagRepairRecordDetails(true);
+                        flagRepairRecordDetails ? setIsLoading(false) : '';
                     })
                     .catch((err) => {
-                        
+                        setIsLoading(false);
                     });
             })
             .catch((err) => {
-                
+                setIsLoading(false);
             });
     }
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
-        console.log(value)
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
@@ -706,7 +706,6 @@ export default function RepairRecords() {
                 },
             };
 
-            console.log(newNotedBy)
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', {
                 body_no: bodyNo,
                 parts: submitParts,

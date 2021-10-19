@@ -36,6 +36,9 @@ export default function ChecklistRecord() {
     const [delChecklistID, setDelChecklistID] = useState('');
     const [flagChecklistRecordMethod, setFlagChecklistRecordMethod] = useState('');
 
+    const [reviseColor, setReviseColor] = useState(Array(41).fill(""));
+    const [reviseText, setReviseText] = useState(Array(41).fill(""));
+
     //variables to be save
     const [checklistID, setChecklistID] =  useState('');
     const [reportNo, setReportNo] =  useState('');
@@ -189,9 +192,10 @@ export default function ChecklistRecord() {
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagChecklistRecordList(true);
+                        flagChecklistRecordList ? setIsLoading(false) : '';
                     })
                     .catch((err) => {
-                        
+                        setIsLoading(false);
                     });
             })
             .catch((err) => {
@@ -203,28 +207,27 @@ export default function ChecklistRecord() {
         setChecklistID(value.check_list_id)
         setReportNo(value.job_order.job_id);
         setTask(value.job_order.task.task_id);
-        setEmail(value.email);
+        onChangeValue('f0', value.email);
         let splitScheduleDate = value.job_order.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
         setLocation(value.job_order.body_no.current_loc);
         setBodyNo(value.job_order.body_no.body_no);
         setMake(value.job_order.body_no.make = value.job_order.body_no.make === 'L30' ? 'L300 Exceed 2.5D MT' : value.job_order.body_no.make === 'SUV' ? 'Super Carry UV' : value.job_order.body_no.make ===  'G15' ? 'Gratour midi truck 1.5L' : value.job_order.body_no.make ===  'G12' ? 'Gratour midi truck 1.2L' : '');
-        setActualOdometer(value.odometer);
-        setJobDescription(jobDescriptionOptions.find(x => x.name === value.job_desc.toUpperCase()));
-        setPairEWD(value.pair_ewd);
-        setColorEWD(value.color_ewd = value.color_ewd === 'Yellow only' ? 'yo' : value.color_ewd === 'Red only' ? 'ro' : value.color_ewd ===  'both' ? 'bo' : '');
-        setBodyNoEWD(value.body_no_ewd);
-        setBodyNoFLTire(value.body_no_fl_tire);
-        setBodyNoFRTire(value.body_no_fr_tire);
-        setBodyNoRLTire(value.body_no_rl_tire);
-        setBodyNoRRTire(value.body_no_rr_tire);
-        setSpareTire(value.spare_tire);
-        setBodyNoSpareTire(value.body_no_spare);
-        setBodyNoBattery(value.body_no_batt);
-        setVehicleWeight(value.vehicle_wt);
-        // value.vehicle_wt === 'Operational' ? setVehicleStatus('Operational') : setVehicleStatus('noperational');
-        value.status === 'Operational' ? setVehicleStatus('Operational') : setVehicleStatus('noperational');
+        onChangeValue('f1', value.odometer);
+        onChangeValue('f2', jobDescriptionOptions.find(x => x.name === value.job_desc.toUpperCase()));
+        onChangeValue('f3', value.pair_ewd);
+        onChangeValue('f5', value.color_ewd = value.color_ewd === 'Yellow only' ? 'yo' : value.color_ewd === 'Red only' ? 'ro' : value.color_ewd ===  'both' ? 'bo' : '');
+        onChangeValue('f8', value.body_no_ewd);
+        onChangeValue('f10', value.body_no_fl_tire);
+        onChangeValue('f12', value.body_no_fr_tire);
+        onChangeValue('f14', value.body_no_rr_tire);
+        onChangeValue('f16', value.body_no_rl_tire);
+        onChangeValue('f18', value.spare_tire);
+        onChangeValue('f20', value.body_no_spare);
+        onChangeValue('f22', value.body_no_batt);
+        onChangeValue('f25', value.vehicle_wt);
+        onChangeValue('f27', value.status);
 
         let getPartsIncluded = [...partsIncluded];
         if (value.parts_included.includes('Unit is in good condition')) {
@@ -239,23 +242,26 @@ export default function ChecklistRecord() {
         if (value.parts_included.includes('For warranty')) {
             getPartsIncluded.push(3);
         }
-        if (value.parts_included === 'For body repair') {
+        if (value.parts_included.includes('For body repair')) {
             getPartsIncluded.push(4);
         }
-        if (value.parts_included === 'Concern out of scope') {
+        if (value.parts_included.includes('Concern out of scope')) {
             getPartsIncluded.push(5);
         }
-        if (value.parts_included === 'Worn out brake pads') {
+        if (value.parts_included.includes('Worn out brake pads')) {
             getPartsIncluded.push(6);
         }
-        if (value.parts_included === 'Worn out brake shoe') {
+        if (value.parts_included.includes('Worn out brake shoe')) {
             getPartsIncluded.push(7);
         }
-        if (value.parts_included === 'Low engine oil') {
+        if (value.parts_included.includes('Low engine oil')) {
             getPartsIncluded.push(8);
         }
-        if (value.parts_included === 'Worn out drive belt') {
+        if (value.parts_included.includes('Worn out drive belt')) {
             getPartsIncluded.push(9);
+        }
+        if (value.parts_included.includes('Others')) {
+            getPartsIncluded.push(10);
         }
         
         setPartsIncluded(getPartsIncluded);
@@ -440,12 +446,12 @@ export default function ChecklistRecord() {
             };
 
             let partsSubmit = [];
-            // checklistParts.map((x) => {
-            //     partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
-            // })
             checklistParts.filter(f => f.quantity !== 0).map((x) => {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
             })
+
+            // console.log("bsp: ",bodyNoSpareTire )
+            // console.log("partsInc: ",partsIncluded )
 
             axios.put(process.env.REACT_APP_SERVER_NAME + 'report/checklist/' + checklistID + '/', {
                 body_no: bodyNo,
@@ -547,7 +553,6 @@ export default function ChecklistRecord() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/checklist/' + delChecklistID + '/', config)
             .then((res) => {
-                console.log(res.data)
                 if (res.data === `Can't delete this because it's being use by Task Scheduling`) {
                     setIsLoading(false);
                     setMessage({title:"DELETE FAILED", content:"Can't delete this because it's being use by Task Scheduling."});
@@ -613,6 +618,7 @@ export default function ChecklistRecord() {
         } else {
             selectedPartsIncluded.splice(selectedPartsIncluded.indexOf(e.value), 1);
         }
+        // console.log(selectedPartsIncluded)
         setPartsIncluded(selectedPartsIncluded);
     }
 
@@ -638,6 +644,265 @@ export default function ChecklistRecord() {
         }
     }
 
+    const updateRevise = (index, color, text) => {
+        reviseColor[index] = color;
+        reviseText[index] = text;
+    }
+
+    const onChangeValue = (id, value) => {
+        /* eslint-disable no-unused-expressions */
+        let chkd = checklistRecordDetails;
+        let arrIndex = id.substring(1);
+        let r = "red";
+        let e = "";
+        let dt = "";
+        switch (id) {
+            case 'f0':
+                setEmail(value);
+                if (typeof(chkd.revised.email) === "undefined") {
+                    value !== chkd.email ? updateRevise(arrIndex, r, chkd.email) : updateRevise(arrIndex, e, e);
+                } else {
+                    value !== chkd.revised.email ? updateRevise(arrIndex, r, chkd.revised.email) : updateRevise(arrIndex, e, e);
+                }
+                break;
+            case 'f1':
+                setActualOdometer(value);
+                if (typeof(chkd.revised.odometer) === "undefined") {
+                    parseInt(value) !== chkd.odometer ? updateRevise(arrIndex, r, chkd.odometer) : updateRevise(arrIndex, e, e);
+                } else {
+                    parseInt(value) !== chkd.revised.odometer ? updateRevise(arrIndex, r, chkd.revised.odometer) : updateRevise(arrIndex, e, e);
+                }
+                break;
+            case 'f2':
+                setJobDescription(value);
+                if (typeof(chkd.revised.job_desc) === "undefined") {
+                    value.name !== chkd.job_desc.toUpperCase() ? updateRevise(arrIndex, r, chkd.job_desc.toUpperCase()) : updateRevise(arrIndex, e, e);
+                } else {
+                    value.name !== chkd.revised.job_desc.toUpperCase() ? updateRevise(arrIndex, r, chkd.revised.job_desc.toUpperCase()) : updateRevise(arrIndex, e, e);
+                }
+                break;
+            case 'f3':
+                setPairEWD(value);
+                if (typeof(chkd.revised.pair_ewd) === "undefined") {
+                    if (value !== chkd.pair_ewd) {
+                        value ? (updateRevise('3', r, e), updateRevise('4', e, e)) : (updateRevise('3', e, e), updateRevise('4', r, e));
+                    } else {
+                        updateRevise('3', e, e); updateRevise('4', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.pair_ewd) {
+                        value ? (updateRevise('3', r, e), updateRevise('4', e, e)) : (updateRevise('3', e, e), updateRevise('4', r, e));
+                    } else {
+                        updateRevise('3', e, e); updateRevise('4', e, e);
+                    }
+                }
+                break;
+            case 'f5':
+                setColorEWD(value);
+                if (typeof(chkd.revised.color_ewd) === "undefined") {
+                    if (value !== chkd.color_ewd) {
+                        if (value === 'yo') {
+                            updateRevise('5', r, e); updateRevise('6', e, e); updateRevise('7', e, e);
+                        } else if (value === 'ro') {
+                            updateRevise('5', e, e); updateRevise('6', r, e); updateRevise('7', e, e);
+                        } else {
+                            updateRevise('5', e, e); updateRevise('6', e, e); updateRevise('7', r, e);
+                        }
+                    } else {
+                        updateRevise('5', e, e); updateRevise('6', e, e); updateRevise('7', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.color_ewd) {
+                        if (value === 'yo') {
+                            updateRevise('5', r, e); updateRevise('6', e, e); updateRevise('7', e, e);
+                        } else if (value === 'ro') {
+                            updateRevise('5', e, e); updateRevise('6', r, e); updateRevise('7', e, e);
+                        } else {
+                            updateRevise('5', e, e); updateRevise('6', e, e); updateRevise('7', r, e);
+                        }
+                    } else {
+                        updateRevise('5', e, e); updateRevise('6', e, e); updateRevise('7', e, e);
+                    }
+                }
+                break;
+            case 'f8':
+                setBodyNoEWD(value);
+                if (typeof(chkd.revised.body_no_ewd) === "undefined") {
+                    if (value !== chkd.body_no_ewd) {
+                        value ? (updateRevise('8', r, e), updateRevise('9', e, e)) : (updateRevise('8', e, e), updateRevise('9', r, e));
+                    } else {
+                        updateRevise('8', e, e); updateRevise('9', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_ewd) {
+                        value ? (updateRevise('8', r, e), updateRevise('9', e, e)) :  (updateRevise('8', e, e), updateRevise('9', r, e));
+                    } else {
+                        updateRevise('8', e, e); updateRevise('9', e, e);
+                    }
+                }
+                break;
+            case 'f10':
+                setBodyNoFLTire(value);
+                if (typeof(chkd.revised.body_no_fl_tire) === "undefined") {
+                    if (value !== chkd.body_no_fl_tire) {
+                        value ? (updateRevise('10', r, e), updateRevise('11', e, e)) : (updateRevise('10', e, e), updateRevise('11', r, e));
+                    } else {
+                        updateRevise('10', e, e); updateRevise('11', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_fl_tire) {
+                        value ? (updateRevise('10', r, e), updateRevise('11', e, e)) : (updateRevise('10', e, e), updateRevise('11', r, e));
+                    } else {
+                        updateRevise('10', e, e); updateRevise('11', e, e);
+                    }
+                }
+                break;
+            case 'f12':
+                setBodyNoFRTire(value);
+                if (typeof(chkd.revised.body_no_fr_tire) === "undefined") {
+                    if (value !== chkd.body_no_fr_tire) {
+                        value ? (updateRevise('12', r, e), updateRevise('13', e, e)) : (updateRevise('12', e, e), updateRevise('13', r, e));
+                    } else {
+                        updateRevise('12', e, e); updateRevise('13', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_fr_tire) {
+                        value ? (updateRevise('12', r, e), updateRevise('13', e, e)) : (updateRevise('12', e, e), updateRevise('13', r, e));
+                    } else {
+                        updateRevise('12', e, e); updateRevise('13', e, e);
+                    }
+                }
+                break;
+            case 'f14':
+                setBodyNoRRTire(value);
+                if (typeof(chkd.revised.body_no_rr_tire) === "undefined") {
+                    if (value !== chkd.body_no_rr_tire) {
+                        value ? (updateRevise('14', r, e), updateRevise('15', e, e)) : (updateRevise('15', e, e), updateRevise('15', r, e));
+                    } else {
+                        updateRevise('14', e, e); updateRevise('15', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_rr_tire) {
+                        value ? (updateRevise('14', r, e), updateRevise('15', e, e)) : (updateRevise('14', e, e), updateRevise('15', r, e));
+                    } else {
+                        updateRevise('14', e, e); updateRevise('15', e, e);
+                    }
+                }
+                break;
+            case 'f16':
+                setBodyNoRLTire(value);
+                if (typeof(chkd.revised.body_no_rl_tire) === "undefined") {
+                    if (value !== chkd.body_no_rl_tire) {
+                        value ? (updateRevise('16', r, e), updateRevise('17', e, e)) : (updateRevise('16', e, e), updateRevise('17', r, e));
+                    } else {
+                        updateRevise('16', e, e); updateRevise('17', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_rl_tire) {
+                        value ? (updateRevise('16', r, e), updateRevise('17', e, e)) : (updateRevise('16', e, e), updateRevise('17', r, e));
+                    } else {
+                        updateRevise('16', e, e); updateRevise('17', e, e);
+                    }
+                }
+                break;
+            case 'f18':
+                setSpareTire(value);
+                if (typeof(chkd.revised.spare_tire) === "undefined") {
+                    if (value !== chkd.spare_tire) {
+                        value ? (updateRevise('18', r, e), updateRevise('19', e, e)) : (updateRevise('18', e, e), updateRevise('19', r, e));
+                    } else {
+                        updateRevise('18', e, e); updateRevise('19', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.spare_tire) {
+                        value ? (updateRevise('18', r, e), updateRevise('19', e, e)) : (updateRevise('18', e, e), updateRevise('19', r, e));
+                    } else {
+                        updateRevise('18', e, e); updateRevise('19', e, e);
+                    }
+                }
+                break;
+            case 'f20':
+                setBodyNoSpareTire(value);
+                if (typeof(chkd.revised.body_no_spare) === "undefined") {
+                    if (value !== chkd.body_no_spare) {
+                        value ? (updateRevise('20', r, e), updateRevise('21', e, e)) : (updateRevise('20', e, e), updateRevise('21', r, e));
+                    } else {
+                        updateRevise('20', e, e); updateRevise('21', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_spare) {
+                        value ? (updateRevise('20', r, e), updateRevise('21', e, e)) : (updateRevise('20', e, e), updateRevise('21', r, e));
+                    } else {
+                        updateRevise('20', e, e); updateRevise('21', e, e);
+                    }
+                }
+                break;
+            case 'f22':
+                setBodyNoBattery(value);
+                if (typeof(chkd.revised.body_no_batt) === "undefined") {
+                    if (value !== chkd.body_no_batt) {
+                        if (value === 0) {
+                            updateRevise('22', r, e); updateRevise('23', e, e); updateRevise('24', e, e);
+                        } else if (value === 1) {
+                            updateRevise('22', e, e); updateRevise('23', r, e); updateRevise('24', e, e);
+                        } else {
+                            updateRevise('22', e, e); updateRevise('23', e, e); updateRevise('24', r, e);
+                        }
+                    } else {
+                        updateRevise('22', e, e); updateRevise('23', e, e); updateRevise('24', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.body_no_batt) {
+                        if (value === 0) {
+                            updateRevise('22', r, e); updateRevise('23', e, e); updateRevise('24', e, e);
+                        } else if (value === 1) {
+                            updateRevise('22', e, e); updateRevise('23', r, e); updateRevise('24', e, e);
+                        } else {
+                            updateRevise('22', e, e); updateRevise('23', e, e); updateRevise('24', r, e);
+                        }
+                    } else {
+                        updateRevise('22', e, e); updateRevise('23', e, e); updateRevise('24', e, e);
+                    }
+                }
+                break;
+            case 'f25':
+                setVehicleWeight(value);
+                if (typeof(chkd.revised.vehicle_wt) === "undefined") {
+                    if (value !== chkd.vehicle_wt) {
+                        value ? (updateRevise('25', r, e), updateRevise('26', e, e)) : (updateRevise('25', e, e), updateRevise('26', r, e));
+                    } else {
+                        updateRevise('25', e, e); updateRevise('26', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.vehicle_wt) {
+                        value ? (updateRevise('25', r, e), updateRevise('26', e, e)) : (updateRevise('25', e, e), updateRevise('26', r, e));
+                    } else {
+                        updateRevise('25', e, e); updateRevise('26', e, e);
+                    }
+                }
+                break;
+            case 'f27':
+                value === 'Operational' ? setVehicleStatus('Operational') : setVehicleStatus('noperational');
+                if (typeof(chkd.revised.status) === "undefined") {
+                    if (value !== chkd.status) {
+                        value === 'Operational' ? (updateRevise('27', r, e), updateRevise('28', e, e)) : (updateRevise('27', e, e), updateRevise('28', r, e));
+                    } else {
+                        updateRevise('27', e, e); updateRevise('28', e, e);
+                    }
+                } else {
+                    if (value !== chkd.revised.status) {
+                        value === 'Operational' ? (updateRevise('27', r, e), updateRevise('28', e, e)) : (updateRevise('27', e, e), updateRevise('28', r, e));
+                    } else {
+                        updateRevise('27', e, e); updateRevise('28', e, e);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+
     const dialogFuncMap = {
         'displayChecklistRecordEdit': setDisplayChecklistRecordEdit,
         'displayPartsName': setDisplayPartsName,
@@ -657,9 +922,11 @@ export default function ChecklistRecord() {
             setHoldImageID("");
         } else if (name === 'displayChecklistRecordEdit') {
             setFlagChecklistRecordList(false);
+            setPartsIncluded([]);
         } else if (name === 'displayPDF') {
             setFlagChecklistRecordList(false);
             setFlagChecklistRecordMethod('');
+            setPartsIncluded([]);
         }
     }
 
@@ -760,7 +1027,7 @@ export default function ChecklistRecord() {
                                     <h4>CHECKLIST REPORT</h4>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                                    <div className="card card-w-title">
+                                    <div className="card card-w-title red-field">
                                         <div className="p-grid p-fluid">
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT No.:</b></h6>
@@ -768,9 +1035,10 @@ export default function ChecklistRecord() {
                                                 onChange={event => onChangeReportNo(event.target.value)}/> */}
                                                 <InputText placeholder="Input Report No." value={reportNo} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[0]}>
                                                 <h6><b>YOUR EMAIL:</b></h6>
-                                                <InputText placeholder="Input Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                                                <InputText placeholder="Input Email" value={email} onChange={(e) => onChangeValue('f0', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[0]}</small>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>SCHEDULE DATE:</b></h6>
@@ -790,25 +1058,27 @@ export default function ChecklistRecord() {
                                                 <InputText placeholder="Input Make/Model" value={make} disabled/>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[1]}>
                                                 <h6><b>ACTUAL ODOMETER READING:</b></h6>
-                                                <InputText placeholder="Input Reading" value={actualOdometer} onChange={(e) => setActualOdometer(e.target.value)}/>
+                                                <InputText placeholder="Input Reading" value={actualOdometer} onChange={(e) => onChangeValue('f1', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[1]}</small>
                                             </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[2]}>
                                                 <h6><b>JOB DESCRIPTION:</b></h6>
                                                 <Dropdown value={jobDescription} options={jobDescriptionOptions} optionLabel="name" placeholder="Select Job Description" 
-                                                onChange={event => setJobDescription(event.target.value)} />
+                                                onChange={event => onChangeValue('f2', event.target.value)} />
+                                                <small className="p-invalid p-d-block">{reviseText[2]}</small>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Is there a pair of Early Warning Device?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="ewd1" onChange={(e) => setPairEWD(true)} checked={pairEWD === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[3]}>
+                                                        <RadioButton inputId="ewd1" onChange={(e) => onChangeValue('f3', true)} checked={pairEWD === true}/>
                                                         <label htmlFor="ewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="ewd2" onChange={(e) => setPairEWD(false)} checked={pairEWD === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[4]}>
+                                                        <RadioButton inputId="ewd2" onChange={(e) => onChangeValue('f3', false)} checked={pairEWD === false}/>
                                                         <label htmlFor="ewd2">No</label>
                                                     </div>
                                                 </div>
@@ -816,16 +1086,16 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>What color of Early Warning Device is available?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setColorEWD('yo')} checked={colorEWD === 'yo'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[5]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f5', 'yo')} checked={colorEWD === 'yo'}/>
                                                         <label htmlFor="cewd1">Yellow Only</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setColorEWD('ro')} checked={colorEWD === 'ro'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[6]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f5', 'ro')} checked={colorEWD === 'ro'}/>
                                                         <label htmlFor="cewd2">Red Only</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd3" onChange={(e) => setColorEWD('bo')} checked={colorEWD === 'bo'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[7]}>
+                                                        <RadioButton inputId="cewd3" onChange={(e) => onChangeValue('f5', 'bo')} checked={colorEWD === 'bo'}/>
                                                         <label htmlFor="cewd3">Both</label>
                                                     </div>
                                                 </div>
@@ -833,12 +1103,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Early Warning Device marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoEWD(true)} checked={bodyNoEWD === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[8]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f8', true)} checked={bodyNoEWD === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoEWD(false)} checked={bodyNoEWD === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[9]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f8', false)} checked={bodyNoEWD === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -846,12 +1116,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Front left hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoFLTire(true)} checked={bodyNoFLTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[10]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f10', true)} checked={bodyNoFLTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoFLTire(false)} checked={bodyNoFLTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[11]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f10', false)} checked={bodyNoFLTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -859,12 +1129,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Front right hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoFRTire(true)} checked={bodyNoFRTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[12]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f12', true)} checked={bodyNoFRTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoFRTire(false)} checked={bodyNoFRTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[13]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f12', false)} checked={bodyNoFRTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -872,12 +1142,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Rear right hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoRRTire(true)} checked={bodyNoRRTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[14]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f14', true)} checked={bodyNoRRTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoRRTire(false)} checked={bodyNoRRTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[15]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f14', false)} checked={bodyNoRRTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -885,12 +1155,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Rear left hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoRLTire(true)} checked={bodyNoRLTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[16]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f16', true)} checked={bodyNoRLTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoRLTire(false)} checked={bodyNoRLTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[17]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f16', false)} checked={bodyNoRLTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -898,12 +1168,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Is there a reserve or spare tire?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setSpareTire(true)} checked={spareTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[18]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f18', true)} checked={spareTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setSpareTire(false)} checked={spareTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[19]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f18', false)} checked={spareTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -911,12 +1181,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Reserve or spare tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoSpareTire(true)} checked={bodyNoSpareTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[20]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f20', true)} checked={bodyNoSpareTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoSpareTire(false)} checked={bodyNoSpareTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[21]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f20', false)} checked={bodyNoSpareTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -924,16 +1194,16 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Battery marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoBattery(0)} checked={bodyNoBattery === 0}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[22]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f22', 0)} checked={bodyNoBattery === 0}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoBattery(1)} checked={bodyNoBattery === 1}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[23]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f22', 1)} checked={bodyNoBattery === 1}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd3" onChange={(e) => setBodyNoBattery(2)} checked={bodyNoBattery === 2}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[24]}>
+                                                        <RadioButton inputId="cewd3" onChange={(e) => onChangeValue('f22', 2)} checked={bodyNoBattery === 2}/>
                                                         <label htmlFor="cewd3">Other</label>
                                                     </div>
                                                 </div>
@@ -941,12 +1211,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Correct vehicle weight & capacity labels?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setVehicleWeight(true)} checked={vehicleWeight === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[25]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f25', true)} checked={vehicleWeight === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setVehicleWeight(false)} checked={vehicleWeight === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[26]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f25', false)} checked={vehicleWeight === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -954,12 +1224,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Vehicle status</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setVehicleStatus('Operational')} checked={vehicleStatus === 'Operational'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[27]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f27', 'Operational')} checked={vehicleStatus === 'Operational'}/>
                                                         <label htmlFor="cewd1">Operational</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setVehicleStatus('noperational')} checked={vehicleStatus === 'noperational'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[28]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f27', 'noperational')} checked={vehicleStatus === 'noperational'}/>
                                                         <label htmlFor="cewd2">Non operational</label>
                                                     </div>
                                                 </div>
