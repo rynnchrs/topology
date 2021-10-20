@@ -127,7 +127,6 @@ export default function IncidentReport() {
     };
 
     const onSelectBodyNo = (value) => {
-        console.log(value)
         setPlateNumber(value.plate_no);
         setArea(value.permanent_loc);
         setExactLocation(value.current_loc);
@@ -150,7 +149,6 @@ export default function IncidentReport() {
     }
 
     const submitIncidentReport = () => {
-        console.log(operational)
         if (IRNo === "") {
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIR === null) {
@@ -211,7 +209,6 @@ export default function IncidentReport() {
 
             // let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), timeDetails.getHours(), timeDetails.getMinutes(), timeDetails.getSeconds());
             let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), 0, 0, 0);
-            console.log("op: ", operational.val);
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'task/ir-report/', {
                 repair_type: repairType,
@@ -478,6 +475,11 @@ export default function IncidentReport() {
                                     <h6><b>RECOMMENDATION/REQUEST:</b></h6>
                                     <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
                                         value={recommendation} onChange={(e) => setRecommendation(e.target.value)}/>
+                                </div>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                    <h6><b>ADDITIONAL REMARKS:</b></h6>
+                                    <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                        /* value={recommendation} onChange={(e) => setRecommendation(e.target.value)} *//>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>

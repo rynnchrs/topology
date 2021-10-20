@@ -1148,7 +1148,6 @@ export const JobScheduling = () => {
 
         axios.delete(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
         .then((res) => {
-            console.log(res.data)
             if (res.data === `Can't delete this because it's being use by Careta Reports`) {
                 onHide('displayConfirmDelete');
                 onHide('displayJobEdit');

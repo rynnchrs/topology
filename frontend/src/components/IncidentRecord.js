@@ -119,6 +119,7 @@ export default function RepairRecords() {
                 + '&body_no=' + sBodyNo
                 + '&date=' + sDateCreated, config)
                 .then((res) => {
+                    console.log(res.data)
                     setTotalCount(res.data.count);
                     setIRRecordList(res.data.results);
                 })
@@ -905,6 +906,17 @@ export default function RepairRecords() {
             </div>
         );
     }
+
+    const convertDatetoWords = (rowData) => {
+        let monthNames = ["Jan.", "Feb.", "Mar.", "Apr.", "May.","Jun.","Jul.", "Aug.", "Sep.", "Oct.", "Nov.","Dec."];
+        let splitStartDate = rowData.date.split("-");
+        let gmtStartDate = new Date(+splitStartDate[0], splitStartDate[1] - 1, +splitStartDate[2]);
+        return (
+            <div>
+                {monthNames[gmtStartDate.getUTCMonth()] + " " + (gmtStartDate.getUTCDate()) + "," + gmtStartDate.getUTCFullYear() + "-" + rowData.body_no + "-"}
+            </div>
+        );
+    }
     
     return(
         <div>
@@ -945,7 +957,7 @@ export default function RepairRecords() {
                 <div className="p-col-12">
                     <DataTable ref={dt} header={renderHeader()} value={IRRecordList} className="p-datatable-sm" 
                         resizableColumns columnResizeMode="expand" emptyMessage="No records found">
-                        <Column field="ir_no" header="Incident Report No." style={{paddingLeft: '3%'}}></Column>
+                        <Column field={convertDatetoWords} header="Incident Report No." style={{paddingLeft: '3%'}}></Column>
                         <Column body={actionBody}></Column>
                     </DataTable>
                     <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
@@ -1130,6 +1142,11 @@ export default function RepairRecords() {
                                                 <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
                                                     value={recommendation} onChange={(e) => onChangeValue('f16', e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{reviseText[16]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                                <h6><b>ADDITIONAL REMARKS:</b></h6>
+                                                <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                                    /* value={recommendation} onChange={(e) => setRecommendation(e.target.value)} *//>
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[17]}>
                                                 <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>
@@ -1349,6 +1366,11 @@ export default function RepairRecords() {
                                                 <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
                                                     value={recommendation} onChange={(e) => onChangeValue('f16', e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{reviseText[16]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                                <h6><b>ADDITIONAL REMARKS:</b></h6>
+                                                <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                                    /* value={recommendation} onChange={(e) => setRecommendation(e.target.value)} *//>
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[17]}>
                                                 <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>
