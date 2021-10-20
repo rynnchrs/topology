@@ -58,6 +58,7 @@ class Permission(models.Model):         # permission Model
     can_edit_repair_reports = models.BooleanField(default=False)
     can_delete_repair_reports = models.BooleanField(default=False)
 
+    can_approved_task = models.BooleanField(default=False)
     can_view_task = models.BooleanField(default=False)
     can_add_task = models.BooleanField(default=False)
     can_edit_task = models.BooleanField(default=False)

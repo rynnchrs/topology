@@ -187,16 +187,13 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['approved_by'] = ""
+            request.data['noted_by'] = ""
             cost = request.data['parts'] + request.data['labor']
             request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 job = JobOrder.objects.get(pk=request.data['job_order'])
                 car = Car.objects.get(body_no=job.task.body_no.body_no)
-                if request.data['status_repair'] == "Operational":
-                    car.operational = True
-                else:
-                    car.operational = False
                 car.save()
                 sender = User.objects.get(username=user.username)
                 recipients = User.objects.filter(permission__can_add_task=True)
@@ -237,7 +234,8 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['diagnosed_by'] = user.id 
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
-            request.data['approved_by'] = "" 
+            request.data['approved_by'] = ""
+            request.data['noted_by'] = ""
             cost = request.data['parts'] + request.data['labor']
             request.data['cost'] = cost
             queryset = Repair.objects.all()

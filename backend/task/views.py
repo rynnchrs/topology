@@ -265,20 +265,50 @@ class TaskView(viewsets.ModelViewSet):
                     task.save()
                     report.save()
                     return Response("Success",status=status.HTTP_200_OK)
+                else:
+                    return Response("Already Noted",status=status.HTTP_400_BAD_REQUEST)
             else:
                 queryset = Repair.objects.all()
                 report = get_object_or_404(queryset, task=pk) 
-                if task.task_status_mn == False and report.approved_by is None:
+                if task.task_status_mn == False and report.noted_by is None:
                     task.task_status_mn = True;
-                    report.approved_by = user
-                    car = Car.objects.get(body_no=task.body_no.body_no)
-                    car.status = "A"
-                    car.save()
+                    report.noted_by = user
                     task.save()
                     report.save()
-                    return Response("Success",status=status.HTTP_200_OK)       
+                    return Response("Success",status=status.HTTP_200_OK)
+                else:
+                    return Response("Already Noted",status=status.HTTP_400_BAD_REQUEST)
+                         
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+    @action(detail=True, methods=['put'])
+    def status_bm(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_approved_task'): 
+            queryset = Task.objects.all()
+            task = get_object_or_404(queryset, pk=pk) 
+            queryset = Repair.objects.all()
+            report = get_object_or_404(queryset, task=pk) 
+            if task.task_status_bm == False and report.approved_by is None:
+                task.task_status_bm = True;
+                report.approved_by = user
+                car = Car.objects.get(body_no=task.body_no.body_no)
+                car.status = "A"
+                if report.status_repair == "Operational":
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
+                task.save()
+                report.save()
+                return Response("Success",status=status.HTTP_200_OK)
+            else:
+                return Response("Already Approved",status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
     @action(detail=False)
     def status_approval(self, request):  # list of all task for approval

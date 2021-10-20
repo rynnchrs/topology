@@ -73,6 +73,7 @@ class Task(models.Model):
     end_date_actual = models.DateField(null=True, blank=True)
     task_status_fm = models.BooleanField(default=False)
     task_status_mn = models.BooleanField(default=False)
+    task_status_bm = models.BooleanField(default=False)
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 

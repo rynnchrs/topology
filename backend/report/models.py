@@ -185,8 +185,8 @@ class Repair(models.Model):
     actual_findings = models.TextField(max_length=200, null=True, blank=True)
     actual_remarks = models.TextField(max_length=200, null=True, blank=True)
     generated_by = models.ForeignKey(User, related_name='generated', on_delete=models.CASCADE)
-    approved_by = models.ForeignKey(User, related_name='noted', on_delete=models.CASCADE, null=True, blank=True)
-    noted_by = models.CharField(max_length=50, null=True, blank=True)
+    approved_by = models.ForeignKey(User, related_name='approved', on_delete=models.CASCADE, null=True, blank=True)
+    noted_by = models.ForeignKey(User, related_name='noted', on_delete=models.CASCADE, null=True, blank=True)
     #action taken
     repair_by = models.ForeignKey(User, related_name='repair', on_delete=models.CASCADE)
     repair_date = models.DateField(default=datetime.date.today)

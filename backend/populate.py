@@ -58,6 +58,7 @@ def populate():
             can_add_repair_reports = True,
             can_edit_repair_reports = True,
             can_delete_repair_reports = True,
+            can_approved_task = False,
             can_view_task = True,
             can_add_task = True,
             can_edit_task = True,
