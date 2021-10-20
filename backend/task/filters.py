@@ -33,6 +33,7 @@ class IRFilter(filters.FilterSet):
     body_no = filters.CharFilter(field_name="body_no__body_no", lookup_expr='startswith')
     ir_no = filters.CharFilter(field_name="ir_no", lookup_expr='startswith')
     project_name = filters.CharFilter(field_name="project_name", lookup_expr='startswith')
+    operational = filters.CharFilter(field_name="operational", lookup_expr='exact')
     date = filters.CharFilter(field_name="date", lookup_expr='exact')
   
     class Meta:
