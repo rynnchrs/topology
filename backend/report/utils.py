@@ -99,16 +99,12 @@ def checklist_reversion(checklist):
     latest = Version.objects.get_for_object(checklist)[0] # get the latest version
     revised = diff(latest.field_dict,first.field_dict) # get the old item only
     parts_list = CheckList.Parts_List
+    print(first.field_dict['parts_included'])
     try:
         revised['parts_included']
-        try:
-            lists =[(values) for key, values in revised['parts_included'].items()]
-            parts_included = [(y) for v in lists[0] for x,y in parts_list if v==x]
-            revised['parts_included'] = parts_included
-        except:
-            lists =[int(values) for values in revised['parts_included']]
-            parts_included = [(y) for v in lists for x,y in parts_list if v==x]
-            revised['parts_included'] = parts_included
+        lists =[int(values) for values in first.field_dict['parts_included']]
+        parts_included = [(y) for v in lists for x,y in parts_list if v==x]
+        revised['parts_included'] = parts_included
     except:
         pass
 
