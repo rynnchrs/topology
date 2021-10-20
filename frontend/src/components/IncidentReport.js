@@ -47,6 +47,7 @@ export default function IncidentReport() {
     const [timeDetails, setTimeDetails] = useState(null);
     const [problemObserved, setProblemObserved] = useState('');
     const [recommendation, setRecommendation] = useState('');
+    const [remarks, setRemarks] = useState('');
     const [preparedBy, setPreparedBy] = useState('');
     const [adminName, setAdminName] = useState('');
     const [contactNumber, setContactNumber] = useState('');
@@ -187,6 +188,8 @@ export default function IncidentReport() {
             toast.current.show({ severity: 'error', summary: 'PROBLEM OBSERVED', detail: 'This field is required.', life: 3000 });
         } else if (recommendation === "") {
             toast.current.show({ severity: 'error', summary: 'RECOMMENDATION', detail: 'This field is required.', life: 3000 });
+        } else if (remarks === "") {
+            toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS', detail: 'This field is required.', life: 3000 });
         } else if (preparedBy === "") {
             toast.current.show({ severity: 'error', summary: 'PREPARED BY', detail: 'This field is required.', life: 3000 });
         } else if (adminName === "") {
@@ -228,6 +231,7 @@ export default function IncidentReport() {
                 incedent_loc: locationIncident,
                 problem_obs: problemObserved,
                 recommendation: recommendation,
+                remarks: remarks,
                 date_time: newDateTimeGMT,
                 // date_time: format(dateDetails, 'yyyy-MM-dd'),
                 prepared_by: preparedBy,
@@ -479,7 +483,7 @@ export default function IncidentReport() {
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
                                     <h6><b>ADDITIONAL REMARKS:</b></h6>
                                     <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
-                                        /* value={recommendation} onChange={(e) => setRecommendation(e.target.value)} *//>
+                                        value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>

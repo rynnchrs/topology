@@ -39,8 +39,8 @@ export default function RepairRecords() {
     const [IRRecordNo, setIRRecordNo] = useState('');
     const [flagIRRecordMethod, setFlagIRRecordMethod] = useState('');
 
-    const [reviseColor, setReviseColor] = useState(Array(29).fill(""));
-    const [reviseText, setReviseText] = useState(Array(29).fill(""));
+    const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
+    const [reviseText, setReviseText] = useState(Array(30).fill(""));
     const [reviseColorRT, setReviseColorRT] = useState(Array(8).fill(""));
 
     //variables to be edit
@@ -69,6 +69,7 @@ export default function RepairRecords() {
     const [timeDetails, setTimeDetails] = useState(null);
     const [problemObserved, setProblemObserved] = useState('');
     const [recommendation, setRecommendation] = useState('');
+    const [remarks, setRemarks] = useState('');
     const [preparedBy, setPreparedBy] = useState('');
     const [adminName, setAdminName] = useState('');
     const [contactNumber, setContactNumber] = useState('');
@@ -119,7 +120,6 @@ export default function RepairRecords() {
                 + '&body_no=' + sBodyNo
                 + '&date=' + sDateCreated, config)
                 .then((res) => {
-                    console.log(res.data)
                     setTotalCount(res.data.count);
                     setIRRecordList(res.data.results);
                 })
@@ -266,6 +266,7 @@ export default function RepairRecords() {
     }
 
     const assignIncidentRecordDetails = (value) => {
+        console.log(value)
         setIRNo(value.ir_no);
         onChangeValue('f0', convertDatetoGMT(value.date));
         onChangeValue('f1', value.req_name);
@@ -311,6 +312,7 @@ export default function RepairRecords() {
         onChangeValue('f14', valueTime);
         onChangeValue('f15', value.problem_obs);
         onChangeValue('f16', value.recommendation);
+        onChangeValue('f22', value.remarks);
         onChangeValue('f17', value.prepared_by);
         onChangeValue('f18', value.admin_name);
         onChangeValue('f19', value.contact_number)
@@ -421,6 +423,8 @@ export default function RepairRecords() {
             toast.current.show({ severity: 'error', summary: 'PROBLEM OBSERVED', detail: 'This field is required.', life: 3000 });
         } else if (recommendation === "") {
             toast.current.show({ severity: 'error', summary: 'RECOMMENDATION', detail: 'This field is required.', life: 3000 });
+        } else if (remarks === "") {
+            toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS', detail: 'This field is required.', life: 3000 });
         } else if (preparedBy === "") {
             toast.current.show({ severity: 'error', summary: 'PREPARED BY', detail: 'This field is required.', life: 3000 });
         } else if (adminName === "") {
@@ -462,6 +466,7 @@ export default function RepairRecords() {
                 incedent_loc: locationIncident,
                 problem_obs: problemObserved,
                 recommendation: recommendation,
+                remarks: remarks,
                 date_time: newDateTime,
                 prepared_by: preparedBy,
                 noted_by: notedBy,
@@ -814,6 +819,14 @@ export default function RepairRecords() {
                     value !== ird.revised.approved_by ? updateRevise(arrIndex, r, ird.revised.approved_by) : updateRevise(arrIndex, e, e);
                 }
                 break;
+            case 'f22':
+                setRemarks(value);
+                if (typeof(ird.revised.remarks) === "undefined") {
+                    value !== ird.remarks ? updateRevise(arrIndex, r, ird.remarks) : updateRevise(arrIndex, e, e);
+                } else {
+                    value !== ird.revised.remarks ? updateRevise(arrIndex, r, ird.revised.remarks) : updateRevise(arrIndex, e, e);
+                }
+                break;
             default:
                 break;
         }
@@ -836,8 +849,8 @@ export default function RepairRecords() {
         setFlagIRRecordMethod('');
         setIRRecordID('');
         setIRRecordNo('');
-        setReviseColor(Array(29).fill(""));
-        setReviseText(Array(29).fill(""));
+        setReviseColor(Array(30).fill(""));
+        setReviseText(Array(30).fill(""));
         setReviseColorRT(Array(8).fill(""));
 
         setIRNo('');
@@ -911,9 +924,10 @@ export default function RepairRecords() {
         let monthNames = ["Jan.", "Feb.", "Mar.", "Apr.", "May.","Jun.","Jul.", "Aug.", "Sep.", "Oct.", "Nov.","Dec."];
         let splitStartDate = rowData.date.split("-");
         let gmtStartDate = new Date(+splitStartDate[0], splitStartDate[1] - 1, +splitStartDate[2]);
+        let stats = rowData.operational ? "Operational" : "Non-operational"
         return (
             <div>
-                {monthNames[gmtStartDate.getUTCMonth()] + " " + (gmtStartDate.getUTCDate()) + "," + gmtStartDate.getUTCFullYear() + "-" + rowData.body_no + "-"}
+                {monthNames[gmtStartDate.getUTCMonth()] + " " + (gmtStartDate.getUTCDate()) + "," + gmtStartDate.getUTCFullYear() + "-" + rowData.body_no + "-" + stats}
             </div>
         );
     }
@@ -1143,10 +1157,11 @@ export default function RepairRecords() {
                                                     value={recommendation} onChange={(e) => onChangeValue('f16', e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{reviseText[16]}</small>
                                             </div>
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[22]}>
                                                 <h6><b>ADDITIONAL REMARKS:</b></h6>
                                                 <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
-                                                    /* value={recommendation} onChange={(e) => setRecommendation(e.target.value)} *//>
+                                                    value={remarks} onChange={(e) => onChangeValue('f22', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[22]}</small>
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[17]}>
                                                 <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>
@@ -1367,10 +1382,11 @@ export default function RepairRecords() {
                                                     value={recommendation} onChange={(e) => onChangeValue('f16', e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{reviseText[16]}</small>
                                             </div>
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + reviseColor[22]}>
                                                 <h6><b>ADDITIONAL REMARKS:</b></h6>
                                                 <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
-                                                    /* value={recommendation} onChange={(e) => setRecommendation(e.target.value)} *//>
+                                                    value={remarks} onChange={(e) => onChangeValue('f22', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[22]}</small>
                                             </div>
                                             <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[17]}>
                                                 <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>
