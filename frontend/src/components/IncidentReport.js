@@ -47,6 +47,7 @@ export default function IncidentReport() {
     const [timeDetails, setTimeDetails] = useState(null);
     const [problemObserved, setProblemObserved] = useState('');
     const [recommendation, setRecommendation] = useState('');
+    const [remarks, setRemarks] = useState('');
     const [preparedBy, setPreparedBy] = useState('');
     const [adminName, setAdminName] = useState('');
     const [contactNumber, setContactNumber] = useState('');
@@ -127,7 +128,6 @@ export default function IncidentReport() {
     };
 
     const onSelectBodyNo = (value) => {
-        console.log(value)
         setPlateNumber(value.plate_no);
         setArea(value.permanent_loc);
         setExactLocation(value.current_loc);
@@ -150,11 +150,10 @@ export default function IncidentReport() {
     }
 
     const submitIncidentReport = () => {
-        console.log(operational)
         if (IRNo === "") {
             toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
         } else if (dateIR === null) {
-            toast.current.show({ severity: 'error', summary: 'DATE', detail: 'This field is required.', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'DATE CREATED', detail: 'This field is required.', life: 3000 });
         } else if (requestorName === "") {
             toast.current.show({ severity: 'error', summary: `REQUESTOR'S NAME`, detail: 'This field is required.', life: 3000 });
         } else if (projectName === "") {
@@ -180,7 +179,7 @@ export default function IncidentReport() {
         }  else if (locationIncident === "") {
             toast.current.show({ severity: 'error', summary: 'LOCATION OF INCIDENT', detail: 'This field is required.', life: 3000 });
         }  else if (dateDetails === null) {
-            toast.current.show({ severity: 'error', summary: 'DATE', detail: 'This field is required.', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
         } 
         // else if (timeDetails === null) {
         //     toast.current.show({ severity: 'error', summary: 'TIME', detail: 'This field is required.', life: 3000 });
@@ -189,6 +188,8 @@ export default function IncidentReport() {
             toast.current.show({ severity: 'error', summary: 'PROBLEM OBSERVED', detail: 'This field is required.', life: 3000 });
         } else if (recommendation === "") {
             toast.current.show({ severity: 'error', summary: 'RECOMMENDATION', detail: 'This field is required.', life: 3000 });
+        } else if (remarks === "") {
+            toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS', detail: 'This field is required.', life: 3000 });
         } else if (preparedBy === "") {
             toast.current.show({ severity: 'error', summary: 'PREPARED BY', detail: 'This field is required.', life: 3000 });
         } else if (adminName === "") {
@@ -211,7 +212,6 @@ export default function IncidentReport() {
 
             // let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), timeDetails.getHours(), timeDetails.getMinutes(), timeDetails.getSeconds());
             let newDateTimeGMT = new Date(dateDetails.getFullYear(), dateDetails.getMonth(), dateDetails.getDate(), 0, 0, 0);
-            console.log("op: ", operational.val);
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'task/ir-report/', {
                 repair_type: repairType,
@@ -231,6 +231,7 @@ export default function IncidentReport() {
                 incedent_loc: locationIncident,
                 problem_obs: problemObserved,
                 recommendation: recommendation,
+                remarks: remarks,
                 date_time: newDateTimeGMT,
                 // date_time: format(dateDetails, 'yyyy-MM-dd'),
                 prepared_by: preparedBy,
@@ -478,6 +479,11 @@ export default function IncidentReport() {
                                     <h6><b>RECOMMENDATION/REQUEST:</b></h6>
                                     <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
                                         value={recommendation} onChange={(e) => setRecommendation(e.target.value)}/>
+                                </div>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk">
+                                    <h6><b>ADDITIONAL REMARKS:</b></h6>
+                                    <InputTextarea placeholder="Discuss details here." rows={5} cols={30} autoResize
+                                        value={remarks} onChange={(e) => setRemarks(e.target.value)}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>PREPARED BY: (Driver/Custodian/Dispatcher)</b></h6>

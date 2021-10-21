@@ -185,7 +185,7 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['diagnosed_by'] = user.id 
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
-            request.data['noted_by'] = ""
+            request.data['approved_by'] = ""
             cost = request.data['parts'] + request.data['labor']
             request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)

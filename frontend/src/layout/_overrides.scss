@@ -420,8 +420,16 @@
         border: 2px solid rgb(255, 49, 49);
        }
     }
+    .p-radiobutton .p-radiobutton-box {
+      border: 2px solid rgb(255, 49, 49);
+      &:hover {
+        border: 2px solid rgb(255, 49, 49);
+       }
+    }
+
   }
 }
+
 /* end global */
 
 

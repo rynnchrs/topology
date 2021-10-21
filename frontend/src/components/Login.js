@@ -47,8 +47,8 @@ export const Login = (props) => {
                         <div className="p-col"></div>
                         <div className="p-col">
                             <center>
-                                <div><img src='/assets/layout/images/careta-logo.png' alt="" /></div>
-                                <div><label style={{ fontSize: '25px', fontWeight: 'bold' }}>Sign in</label></div>
+                                <div><img src='/assets/layout/images/autohome.png' alt="" style={{width:'170px', height: '170px'}}/></div>
+                                <div><label style={{ fontSize: '25px', fontWeight: 'bold', color:'#595959' }}>LOGIN</label></div>
                             </center>
                         </div>
                         <div className="p-col"></div>
@@ -83,7 +83,7 @@ export const Login = (props) => {
 
                     <div className="p-grid p-fluid">
                         <div className="p-field p-col"> </div>
-                        <div className="p-field p-col">  <Button label="LOGIN" className="p-button-lg p-shadow-5" onClick={submitData} > </Button> </div>
+                        <div className="p-field p-col">  <Button label="SUBMIT" className="p-button-lg p-shadow-3" onClick={submitData} > </Button> </div>
                         <div className="p-field p-col"> </div>
                     </div>
 
