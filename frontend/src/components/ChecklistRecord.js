@@ -684,7 +684,7 @@ export default function ChecklistRecord() {
                 if (typeof(chkd.revised.job_desc) === "undefined") {
                     value.name !== chkd.job_desc.toUpperCase() ? updateRevise(arrIndex, r, chkd.job_desc.toUpperCase()) : updateRevise(arrIndex, e, e);
                 } else {
-                    value.name !== chkd.revised.job_desc.toUpperCase() ? updateRevise(arrIndex, r, chkd.revised.job_desc.toUpperCase()) : updateRevise(arrIndex, e, e);
+                    value.name !== chkd.revised.job_desc[0].toUpperCase() ? updateRevise(arrIndex, r, chkd.revised.job_desc[0].toUpperCase()) : updateRevise(arrIndex, e, e);
                 }
                 break;
             case 'f3':
