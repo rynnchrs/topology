@@ -293,7 +293,7 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
         if parts_data:
             for part_data in parts_data:
                 CheckListReportParts.objects.create(check_list=instance, **part_data)
-        
+
         instance.parts_included = validated_data.get('parts_included', instance.parts_included)
         instance.odometer = validated_data.get('odometer', instance.odometer)
         instance.job_desc = validated_data.get('job_desc', instance.job_desc)
@@ -305,6 +305,7 @@ class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer
         instance.body_no_rl_tire = validated_data.get('body_no_rl_tire', instance.body_no_rl_tire)
         instance.body_no_rr_tire = validated_data.get('body_no_rr_tire', instance.body_no_rr_tire)
         instance.spare_tire = validated_data.get('spare_tire', instance.spare_tire)
+        instance.body_no_spare = validated_data.get('body_no_spare', instance.body_no_spare)
         instance.body_no_batt = validated_data.get('body_no_batt', instance.body_no_batt)
         instance.vehicle_wt = validated_data.get('vehicle_wt', instance.vehicle_wt)
         instance.color_ewd = validated_data.get('color_ewd', instance.color_ewd)
