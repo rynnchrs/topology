@@ -266,7 +266,6 @@ export default function RepairRecords() {
     }
 
     const assignIncidentRecordDetails = (value) => {
-        console.log(value)
         setIRNo(value.ir_no);
         onChangeValue('f0', convertDatetoGMT(value.date));
         onChangeValue('f1', value.req_name);
@@ -927,7 +926,7 @@ export default function RepairRecords() {
         let stats = rowData.operational ? "Operational" : "Non-operational"
         return (
             <div>
-                {monthNames[gmtStartDate.getUTCMonth()] + " " + (gmtStartDate.getUTCDate()) + "," + gmtStartDate.getUTCFullYear() + "-" + rowData.body_no + "-" + stats}
+                {monthNames[gmtStartDate.getUTCMonth()] + "" + (gmtStartDate.getUTCDate() + 1) + "," + gmtStartDate.getUTCFullYear() + "/" + rowData.body_no + "/" + stats}
             </div>
         );
     }
