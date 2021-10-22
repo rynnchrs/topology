@@ -205,6 +205,7 @@ export default function ChecklistRecord() {
     }
 
     const assignChecklistRecordEdit = (value) => {
+        console.log("chk: ",value)
         setChecklistID(value.check_list_id)
         setReportNo(value.job_order.job_id);
         setTask(value.job_order.task.task_id);
@@ -964,14 +965,18 @@ export default function ChecklistRecord() {
         } else if (name === 'displayChecklistRecordEdit') {
             setFlagChecklistRecordList(false);
             setPartsIncluded([]);
+            setReviseColor(Array(30).fill(""));
+            setReviseText(Array(30).fill(""));
+            setReviseColorPI(Array(12).fill(""));
         } else if (name === 'displayPDF') {
             setFlagChecklistRecordList(false);
             setFlagChecklistRecordMethod('');
             setPartsIncluded([]);
+            setReviseColor(Array(30).fill(""));
+            setReviseText(Array(30).fill(""));
+            setReviseColorPI(Array(12).fill(""));
         }
-        setReviseColor(Array(30).fill(""));
-        setReviseText(Array(30).fill(""));
-        setReviseColorPI(Array(12).fill(""));
+        
     }
 
     const renderFooter = (name) => {
@@ -1379,22 +1384,23 @@ export default function ChecklistRecord() {
                 <div className="dialog-display">
                     <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
                         <div id="toPdf" className="p-grid p-fluid">
-                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                     <h4>CHECKLIST REPORT</h4>
                                 </div>
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                                    <div className="card card-w-title">
+                                    <div className="card card-w-title red-field">
                                         <div className="p-grid p-fluid">
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT No.:</b></h6>
                                                 {/* <Dropdown value={reportNo} options={inspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                                 onChange={event => onChangeReportNo(event.target.value)}/> */}
-                                                <InputText placeholder="Input Email" value={reportNo} disabled/>
+                                                <InputText placeholder="Input Report No." value={reportNo} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[0]}>
                                                 <h6><b>YOUR EMAIL:</b></h6>
-                                                <InputText placeholder="Input Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                                                <InputText placeholder="Input Email" value={email} onChange={(e) => onChangeValue('f0', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[0]}</small>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>SCHEDULE DATE:</b></h6>
@@ -1414,25 +1420,27 @@ export default function ChecklistRecord() {
                                                 <InputText placeholder="Input Make/Model" value={make} disabled/>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[1]}>
                                                 <h6><b>ACTUAL ODOMETER READING:</b></h6>
-                                                <InputText placeholder="Input Reading" value={actualOdometer} onChange={(e) => setActualOdometer(e.target.value)}/>
+                                                <InputText placeholder="Input Reading" value={actualOdometer} onChange={(e) => onChangeValue('f1', e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{reviseText[1]}</small>
                                             </div>
-                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + reviseColor[2]}>
                                                 <h6><b>JOB DESCRIPTION:</b></h6>
                                                 <Dropdown value={jobDescription} options={jobDescriptionOptions} optionLabel="name" placeholder="Select Job Description" 
-                                                onChange={event => setJobDescription(event.target.value)} />
+                                                onChange={event => onChangeValue('f2', event.target.value)} />
+                                                <small className="p-invalid p-d-block">{reviseText[2]}</small>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Is there a pair of Early Warning Device?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="ewd1" onChange={(e) => setPairEWD(true)} checked={pairEWD === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[3]}>
+                                                        <RadioButton inputId="ewd1" onChange={(e) => onChangeValue('f3', true)} checked={pairEWD === true}/>
                                                         <label htmlFor="ewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="ewd2" onChange={(e) => setPairEWD(false)} checked={pairEWD === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[4]}>
+                                                        <RadioButton inputId="ewd2" onChange={(e) => onChangeValue('f3', false)} checked={pairEWD === false}/>
                                                         <label htmlFor="ewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1440,16 +1448,16 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>What color of Early Warning Device is available?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setColorEWD('yo')} checked={colorEWD === 'yo'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[5]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f5', 'yo')} checked={colorEWD === 'yo'}/>
                                                         <label htmlFor="cewd1">Yellow Only</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setColorEWD('ro')} checked={colorEWD === 'ro'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[6]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f5', 'ro')} checked={colorEWD === 'ro'}/>
                                                         <label htmlFor="cewd2">Red Only</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd3" onChange={(e) => setColorEWD('bo')} checked={colorEWD === 'bo'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[7]}>
+                                                        <RadioButton inputId="cewd3" onChange={(e) => onChangeValue('f5', 'bo')} checked={colorEWD === 'bo'}/>
                                                         <label htmlFor="cewd3">Both</label>
                                                     </div>
                                                 </div>
@@ -1457,12 +1465,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Early Warning Device marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoEWD(true)} checked={bodyNoEWD === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[8]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f8', true)} checked={bodyNoEWD === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoEWD(false)} checked={bodyNoEWD === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[9]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f8', false)} checked={bodyNoEWD === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1470,12 +1478,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Front left hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoFLTire(true)} checked={bodyNoFLTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[10]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f10', true)} checked={bodyNoFLTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoFLTire(false)} checked={bodyNoFLTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[11]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f10', false)} checked={bodyNoFLTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1483,12 +1491,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Front right hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoFRTire(true)} checked={bodyNoFRTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[12]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f12', true)} checked={bodyNoFRTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoFRTire(false)} checked={bodyNoFRTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[13]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f12', false)} checked={bodyNoFRTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1496,12 +1504,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Rear right hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoRRTire(true)} checked={bodyNoRRTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[14]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f14', true)} checked={bodyNoRRTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoRRTire(false)} checked={bodyNoRRTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[15]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f14', false)} checked={bodyNoRRTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1509,12 +1517,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Rear left hand tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoRLTire(true)} checked={bodyNoRLTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[16]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f16', true)} checked={bodyNoRLTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoRLTire(false)} checked={bodyNoRLTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[17]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f16', false)} checked={bodyNoRLTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1522,12 +1530,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Is there a reserve or spare tire?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setSpareTire(true)} checked={spareTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[18]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f18', true)} checked={spareTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setSpareTire(false)} checked={spareTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[19]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f18', false)} checked={spareTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1535,12 +1543,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Reserve or spare tire marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoSpareTire(true)} checked={bodyNoSpareTire === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[20]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f20', true)} checked={bodyNoSpareTire === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoSpareTire(false)} checked={bodyNoSpareTire === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[21]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f20', false)} checked={bodyNoSpareTire === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1548,16 +1556,16 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Battery marked with body number?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setBodyNoBattery(0)} checked={bodyNoBattery === 0}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[22]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f22', 0)} checked={bodyNoBattery === 0}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setBodyNoBattery(1)} checked={bodyNoBattery === 1}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[23]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f22', 1)} checked={bodyNoBattery === 1}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd3" onChange={(e) => setBodyNoBattery(2)} checked={bodyNoBattery === 2}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[24]}>
+                                                        <RadioButton inputId="cewd3" onChange={(e) => onChangeValue('f22', 2)} checked={bodyNoBattery === 2}/>
                                                         <label htmlFor="cewd3">Other</label>
                                                     </div>
                                                 </div>
@@ -1565,12 +1573,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Correct vehicle weight & capacity labels?</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setVehicleWeight(true)} checked={vehicleWeight === true}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[25]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f25', true)} checked={vehicleWeight === true}/>
                                                         <label htmlFor="cewd1">Yes</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setVehicleWeight(false)} checked={vehicleWeight === false}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[26]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f25', false)} checked={vehicleWeight === false}/>
                                                         <label htmlFor="cewd2">No</label>
                                                     </div>
                                                 </div>
@@ -1578,12 +1586,12 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>Vehicle status</b></h6>
                                                 <div className="p-formgroup-inline">
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd1" onChange={(e) => setVehicleStatus('Operational')} checked={vehicleStatus === 'Operational'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[27]}>
+                                                        <RadioButton inputId="cewd1" onChange={(e) => onChangeValue('f27', 'Operational')} checked={vehicleStatus === 'Operational'}/>
                                                         <label htmlFor="cewd1">Operational</label>
                                                     </div>
-                                                    <div className="p-field-radiobutton">
-                                                        <RadioButton inputId="cewd2" onChange={(e) => setVehicleStatus('noperational')} checked={vehicleStatus === 'noperational'}/>
+                                                    <div className={"p-field-radiobutton " + reviseColor[28]}>
+                                                        <RadioButton inputId="cewd2" onChange={(e) => onChangeValue('f27', 'noperational')} checked={vehicleStatus === 'noperational'}/>
                                                         <label htmlFor="cewd2">Non operational</label>
                                                     </div>
                                                 </div>
@@ -1591,47 +1599,47 @@ export default function ChecklistRecord() {
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk resize-label">
                                                 <h6><b>PLEASE INCLUDE REMARKS:</b></h6>
                                                 <small><i>*If upon inspection concern is not related or out of scope, kindly put "Unit is in good condition"</i></small>
-                                                <div className="p-field-checkbox" style={{paddingTop:'10px'}}>
+                                                <div className={"p-field-checkbox " + reviseColorPI[0]} style={{paddingTop:'10px'}}>
                                                     <Checkbox inputId="cb1" value={0} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(0) !== -1}/>
                                                     <label htmlFor="cb1">Unit is in good condition, no concern and defect found.</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[1]}>
                                                     <Checkbox inputId="cb1" value={1} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(1) !== -1}/>
                                                     <label htmlFor="cb1">Cracked windshield</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[2]}>
                                                     <Checkbox inputId="cb1" value={2} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(2) !== -1}/>
                                                     <label htmlFor="cb1">Rough idling, Cleaned and adjust throttle valve</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[3]}>
                                                     <Checkbox inputId="cb1" value={3} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(3) !== -1}/>
                                                     <label htmlFor="cb1">For warranty checking with the dealership</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[4]}>
                                                     <Checkbox inputId="cb1" value={4} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(4) !== -1}/>
                                                     <label htmlFor="cb1">For body repair and insurance claim</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[5]}>
                                                     <Checkbox inputId="cb1" value={5} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(5) !== -1}/>
                                                     <label htmlFor="cb1">Concern out of scope</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[6]}>
                                                     <Checkbox inputId="cb1" value={6} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(6) !== -1}/>
                                                     <label htmlFor="cb1">Worn out brake pads</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[7]}>
                                                     <Checkbox inputId="cb1" value={7} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(7) !== -1}/>
                                                     <label htmlFor="cb1">Worn out brake shoe</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[8]}>
                                                     <Checkbox inputId="cb1" value={8} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(8) !== -1}/>
                                                     <label htmlFor="cb1">Low engine oil</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[9]}>
                                                     <Checkbox inputId="cb1" value={9} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(9) !== -1}/>
                                                     <label htmlFor="cb1">Worn out drive belt component</label>
                                                 </div>
-                                                <div className="p-field-checkbox">
+                                                <div className={"p-field-checkbox " + reviseColorPI[10]}>
                                                     <Checkbox inputId="cb1" value={10} onChange={(e) => onChangePartsIncluded(e)} checked={partsIncluded.indexOf(10) !== -1}/>
                                                     <label htmlFor="cb1">Other</label>
                                                 </div>
@@ -1653,7 +1661,6 @@ export default function ChecklistRecord() {
                                                     )
                                                 }
                                                 <Button icon="pi pi-plus" onClick={() => onClick('displayPartsName')} style={{width: '50px'}}/>
-                                                {/* <Button label="CURR" onClick={() => showCurr()} style={{width: '50px'}}/> */}
                                             </div>
 
                                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk">
