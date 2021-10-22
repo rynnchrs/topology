@@ -325,12 +325,13 @@ class JobOrderView(viewsets.ViewSet):
             # filter the used job order in inspection table
             inspection = CheckList.objects.values_list('job_order', flat=False)
             # filter True(inspection) and used job order
-            queryset = JobOrder.objects.filter(type=False).filter(job_no__in=inspection) 
+            queryset = JobOrder.objects.filter(type=False).filter(job_id__in=inspection) 
+            print(queryset)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
-            repair = CheckList.objects.all().values_list('job_order', flat=True)
-            queryset = JobOrder.objects.filter(type=False).filter(job_id__in=repair)
+            inspection = CheckList.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).filter(job_id__in=inspection)
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -344,12 +345,12 @@ class JobOrderView(viewsets.ViewSet):
             # filter the used job order in inspection table
             inspection = CheckList.objects.all().values_list('job_order', flat=True)
             # filter True(inspection) and remove all used job order
-            queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=inspection)
+            queryset = JobOrder.objects.all().filter(type=False).exclude(job_id__in=inspection)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
-            repair = CheckList.objects.all().values_list('job_order', flat=True)
-            queryset = JobOrder.objects.filter(type=False).exclude(job_id__in=repair)
+            inspection = CheckList.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).exclude(job_id__in=inspection)
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
