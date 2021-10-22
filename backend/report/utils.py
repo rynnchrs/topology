@@ -87,8 +87,10 @@ def repair_reversion(repair):
     revised['parts'] = cost_parts
     revised['labor'] = cost_labor
 
-    if 'noted_by_id' in revised:
-        del revised['noted_by_id']
+    if 'approved_by_id' in revised:
+        del revised['approved_by_id']
+    if 'noted_by' in revised:
+        del revised['noted_by']
         
     return revised
 
@@ -96,17 +98,21 @@ def checklist_reversion(checklist):
     first = Version.objects.get_for_object(checklist).last() # get the oldest version
     latest = Version.objects.get_for_object(checklist)[0] # get the latest version
     revised = diff(latest.field_dict,first.field_dict) # get the old item only
+
     parts_list = CheckList.Parts_List
+    job_desc_value = CheckList.Job_List
+
+    try:
+        revised['job_desc']
+        job_desc = [(y) for x,y in job_desc_value if revised['job_desc']==x]
+        revised['job_desc'] = job_desc
+    except:
+        pass
     try:
         revised['parts_included']
-        try:
-            lists =[(values) for key, values in revised['parts_included'].items()]
-            parts_included = [(y) for v in lists[0] for x,y in parts_list if v==x]
-            revised['parts_included'] = parts_included
-        except:
-            lists =[int(values) for values in revised['parts_included']]
-            parts_included = [(y) for v in lists for x,y in parts_list if v==x]
-            revised['parts_included'] = parts_included
+        lists =[int(values) for values in first.field_dict['parts_included']]
+        parts_included = [(y) for v in lists for x,y in parts_list if v==x]
+        revised['parts_included'] = parts_included
     except:
         pass
 

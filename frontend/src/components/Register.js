@@ -385,7 +385,7 @@ export const Register = () => {
                     </div>
 
                     <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>
-                        <Panel header="PERMISSION" className="p-col-12 p-md-12"><center>
+                        <Panel header="PERMISSION" className="p-col-12 p-md-12 resize-label"><center>
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-3 p-md-3 p-sm-12" style={{ display: 'flex', alignItems:'center', margin: 'auto'}}>
                                     <Checkbox classname="p-checkbox-lg" checked={userLevel === "manager"} onChange={event => setPermissionLevel("manager")}> </Checkbox>

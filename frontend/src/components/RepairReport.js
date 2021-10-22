@@ -25,11 +25,13 @@ export default function RepairReport() {
     const [plateNumber, setPlateNumber] = useState('');
     const [CSNumber, setCSNumber] = useState('');
     const [chassisNumber, setChassisNumber] = useState('');
+    const [reportType, setReportType] = useState('');
 
     //variables to be saved
     const [jobID, setJobID] = useState([]);
     const [taskID, setTaskID] = useState('');
     const [IRNumber, setIRNumber] = useState('');
+    const [checklistNumber, setChecklistNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
     const [detailsIncident, setDetailsIncident] = useState('');
@@ -166,19 +168,22 @@ export default function RepairReport() {
     const submitRepairReport = () => {
         if (typeof(jobID.job_id) === "undefined") {
             toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'Please select report no. first.', life: 3000 });
-        } else if (IRNumber === "") { 
-            toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
-        } else if (dateIncident === null) { 
-            toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateReceive === null) { 
-            toast.current.show({ severity: 'error', summary: 'DATE RECEIVE', detail: 'This field is required.', life: 3000 });
-        } else if (detailsIncident === "") { 
-            toast.current.show({ severity: 'error', summary: 'INCIDENT DETAILS', detail: 'This field is required.', life: 3000 });
-        } else if (sitePOC === "") { 
-            toast.current.show({ severity: 'error', summary: 'SITE POC', detail: 'This field is required.', life: 3000 });
-        } else if (contactNumber === "") { 
-            toast.current.show({ severity: 'error', summary: 'CONTACT NUMBER', detail: 'This field is required.', life: 3000 });
-        } else if (datePerformed === null) { 
+        } 
+        // else if (IRNumber === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
+        // } 
+        // else if (dateIncident === null) { 
+        //     toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
+        // } else if (dateReceive === null) { 
+        //     toast.current.show({ severity: 'error', summary: 'DATE RECEIVE', detail: 'This field is required.', life: 3000 });
+        // } else if (detailsIncident === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'INCIDENT DETAILS', detail: 'This field is required.', life: 3000 });
+        // } else if (sitePOC === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'SITE POC', detail: 'This field is required.', life: 3000 });
+        // } else if (contactNumber === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'CONTACT NUMBER', detail: 'This field is required.', life: 3000 });
+        // } 
+        else if (datePerformed === null) { 
             toast.current.show({ severity: 'error', summary: 'DATE PERFORMED', detail: 'This field is required.', life: 3000 });
         } else if (detailsActualFindings === "") { 
             toast.current.show({ severity: 'error', summary: 'ACTUAL FINDINDS', detail: 'This field is required.', life: 3000 });
@@ -228,13 +233,13 @@ export default function RepairReport() {
                 body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
-                ir_no: IRNumber,
-                check_list: "",
-                incident_date: format(dateIncident, 'yyyy-MM-dd'),
-                date_receive: format(dateReceive, 'yyyy-MM-dd'),
-                incident_details: detailsIncident,
-                site_poc: sitePOC,
-                contact_no: contactNumber,
+                ir_no: reportType === "incident" ? IRNumber : "",
+                check_list: reportType === "checklist" ? checklistNumber : "",
+                // incident_date: format(dateIncident, 'yyyy-MM-dd'),
+                // date_receive: format(dateReceive, 'yyyy-MM-dd'),
+                // incident_details: detailsIncident,
+                // site_poc: sitePOC,
+                // contact_no: contactNumber,
                 perform_date: format(datePerformed, 'yyyy-MM-dd'),
                 actual_findings: detailsActualFindings,
                 actual_remarks: detailsActualRemarks,
@@ -277,6 +282,8 @@ export default function RepairReport() {
                     toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Cost', life: 3000 });
                 } else if (err.response.data.quantity) {
                     toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Quantity', life: 3000 });
+                } else if (err.response.data.errors[0].approved_by) {
+                    toast.current.show({ severity: 'error', summary: 'APPROVED BY', detail: 'Invalid Approved By', life: 3000 });
                 }
                 setIsLoading(false);
             })
@@ -297,6 +304,7 @@ export default function RepairReport() {
         setJobID([]);
         setTaskID('');
         setIRNumber('');
+        setChecklistNumber('');
         setDateIncident(null);
         setDateReceive(null);
         setDetailsIncident('');
@@ -334,16 +342,32 @@ export default function RepairReport() {
         setPlateNumber(value.value.body_no.plate_no);
         setCSNumber(value.value.body_no.vin_no);
         setChassisNumber(value.value.body_no.vin_no);
-
         setTaskID(value.value.task.task_id);
-        setIRNumber(value.value.ir_no.ir_no);
-        let valueDateTime = new Date(value.value.ir_no.date_time);
-        let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
-        setDateIncident(valueDate);
-        setDateReceive(convertDatetoGMT(value.value.ir_no.date));
-        setDetailsIncident(value.value.ir_no.problem_obs);
-        setSitePOC(value.value.ir_no.admin_name);
-        setContactNumber(value.value.ir_no.contact_number);
+
+        if (value.value.ir_no !== null) {
+            setReportType('incident');
+            setIRNumber(value.value.ir_no.ir_no);
+            let valueDateTime = new Date(value.value.ir_no.date_time);
+            let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+            setDateIncident(valueDate);
+            setDateReceive(convertDatetoGMT(value.value.ir_no.date));
+            setDetailsIncident(value.value.ir_no.problem_obs);
+            setSitePOC(value.value.ir_no.admin_name);
+            setContactNumber(value.value.ir_no.contact_number);
+
+            setChecklistNumber('');
+        } else {
+            setReportType('checklist');
+            setChecklistNumber(value.value.check_list);
+
+            setIRNumber('');
+            setDateIncident(null);
+            setDateReceive(null);
+            setDetailsIncident('');
+            setSitePOC('');
+            setContactNumber('');
+        }
+        
     }
 
     const convertDatetoGMT = (value) => {
@@ -391,31 +415,39 @@ export default function RepairReport() {
                         <div className="card card-w-title">
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
-                                    <h6><b>JOB TYPE:</b></h6>
-                                    <InputText placeholder="REPAIR" disabled/>
-                                </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
                                     <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                     onChange={event => {setJobID(event.target.value); handleSelectReportNo(event)}}/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                    <h6><b>REPORT TYPE:</b></h6>
+                                    <InputText placeholder="Input Report Type" value={reportType.toUpperCase()} disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                    <h6><b>JOB TYPE:</b></h6>
+                                    <InputText placeholder="REPAIR" disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                    <h6><b>CHECKLIST No.:</b></h6>
+                                    <InputText placeholder="Input Checklist No." value={checklistNumber} disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                    <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
+                                    <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>SCHEDULE DATE:</b></h6>
                                     <InputText placeholder="Input Date" value={scheduleDate} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
-                                    <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
-                                    <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>MAKE:</b></h6>
                                     <InputText placeholder="Input Make" value={make} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>STATUS:</b></h6>
                                     <InputText placeholder="Input Status" value={status} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>LOCATION:</b></h6>
                                     <InputText placeholder="Input Location" value={location} disabled/>
                                 </div>
@@ -552,15 +584,19 @@ export default function RepairReport() {
                                     </div>
                                 </div>
 
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <h6><b>TOTAL COST ESTIMATE:</b></h6>
                                     <InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalEstimateCost} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <h6><b>GENERATED BY:</b></h6>
                                     <InputText placeholder="Input Name" value={localStorage.getItem("myfirst")} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                    <h6><b>APPROVED BY:</b></h6>
+                                    <InputText placeholder="Input Name" disabled/>
+                                </div>
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <h6><b>NOTED BY:</b></h6>
                                     <InputText placeholder="Input Name" disabled/>
                                 </div>

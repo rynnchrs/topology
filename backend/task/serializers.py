@@ -237,9 +237,10 @@ class RepairJobSerializer(serializers.ModelSerializer):
 
 class IRListSerializers(serializers.ModelSerializer):
     body_no = serializers.CharField(source='body_no.body_no')
+    
     class Meta:
         model= IR
-        fields =  ['ir_id','ir_no','date','body_no','project_name']
+        fields =  ['ir_id','ir_no','date','operational','body_no','project_name']
 
 
 class IRSerializers(serializers.ModelSerializer): # Inspection serializer 
