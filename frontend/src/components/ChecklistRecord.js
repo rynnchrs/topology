@@ -501,6 +501,11 @@ export default function ChecklistRecord() {
                 }
             })
             .catch((err) => {
+                if (err.toJSON().message === 'Network Error'){
+                    toast.current.show({ severity: 'error', summary: 'NETWEORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                } else if (err.response.data.errors[0].email) {
+                    toast.current.show({ severity: 'error', summary: 'YOUR EMAIL', detail: 'Invalid Email', life: 3000 });
+                }
                 setIsLoading(false);
             });
         }
