@@ -9,16 +9,21 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Paginator } from 'primereact/paginator';
 import { Dialog } from 'primereact/dialog';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { Carousel } from 'primereact/carousel';
 import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 import axios from "axios";
 import { format } from 'date-fns';
 
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
 export default function RepairRecords() {
 
     //search fields
     const [searchJobNumber, setSearchJobNumber] = useState("");
+    const [searchBodyNo, setSearchBodyNo] = useState('');
     const searchJobTypeOptions = [{ name: "SHOW ALL", val: "" }, { name: "REPAIR", val: "True" }, { name: "INSPECTION", val: "False" }];
     const [searchJobType, setSearchJobType] = useState([]);
     const [searchDateCreated, setSearchDateCreated] = useState(null);
@@ -58,9 +63,12 @@ export default function RepairRecords() {
     const [plateNumber, setPlateNumber] = useState("");
     const [CSNumber, setCSNumber] = useState("");
     const [chassisNumber, setChassisNumber] = useState("");
+    const [flagRepairRecordMethod, setFlagRepairRecordMethod] = useState('');
+    const [reportType, setReportType] = useState('');
 
     //variables to be edit
     const [IRNumber, setIRNumber] = useState("");
+    const [checklistNumber, setChecklistNumber] = useState('');
     const [dateIncident, setDateIncident] = useState(null);
     const [dateReceive, setDateReceive] = useState(null);
     const [detailsIncident, setDetailsIncident] = useState("");
@@ -93,6 +101,7 @@ export default function RepairRecords() {
     ]);
     const [totalLaborCost, setTotalLaborCost] = useState("0.00");
     const [totalEstimateCost, setTotalEstimateCost] = useState("0.00");
+    const [newNotedBy, setNewNotedBy] = useState("");
     const [dateRepaired, setDateRepaired] = useState(null);
     const [detailsActionTaken, setDetailsActionTaken] = useState("");
     const [dateDone, setDateDone] = useState(null);
@@ -114,9 +123,11 @@ export default function RepairRecords() {
 
     const [displayRepairRecordEdit, setDisplayRepairRecordEdit] = useState(false);
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [displayMessage, setDisplayMessage] = useState(false);
     const [message, setMessage] = useState({title:"", content:""});
     const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
+    const [displayPDF, setDisplayPDF] = useState(false);
 
     useEffect(() => {
         let token = localStorage.getItem("token");
@@ -167,11 +178,13 @@ export default function RepairRecords() {
             };
 
             let sjobNumber = searchJobNumber;
+            let sBodyNo = searchBodyNo;
             let sDateCreated = searchDateCreated === null ? "" : format(searchDateCreated, 'yyyy-MM-dd');
             let sJobType = searchJobType.length <= 0 ? "" : searchJobType.val;
 
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'report/repair/?job_no=' + sjobNumber 
+                + '&body_no=' + sBodyNo
                 + '&type=' + sJobType
                 + '&date_created=' + sDateCreated
                 + '&page=' + sentPage, config)
@@ -200,6 +213,7 @@ export default function RepairRecords() {
     }
 
     const getRepairRecordData = (value) => {
+        setIsLoading(true);
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -215,26 +229,27 @@ export default function RepairRecords() {
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagRepairRecordDetails(true);
+                        flagRepairRecordDetails ? setIsLoading(false) : '';
                     })
                     .catch((err) => {
-                        
+                        setIsLoading(false);
                     });
             })
             .catch((err) => {
-                
+                setIsLoading(false);
             });
     }
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
-        console.log("val: ", value);
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
         setTaskID(value.job_order.task.task_id);
-        let splitScheduleDate = value.job_order.task.schedule_date.split("-");
-        let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
-        setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
+        // let splitScheduleDate = value.job_order.task.schedule_date.split("-");
+        // let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
+        // setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
+        setScheduleDate(format(convertDatetoGMT(value.job_order.task.schedule_date), 'yyyy-MM-dd'));
         setBodyNo(value.job_order.body_no.body_no);
         setMake(value.job_order.body_no.make);
         setStatus(value.job_order.body_no.operational);
@@ -248,17 +263,35 @@ export default function RepairRecords() {
         // setTotalEstimateCost(value.total_estimate_cost.toFixed(2));
         
         try {
-            handleChange("f0", value.job_order.ir_no.ir_no);
-            let valueDateTime = new Date(value.job_order.ir_no.date_time);
-            let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
-            handleChange("f1", valueDate);
-            handleChange("f2", convertDatetoGMT(value.job_order.ir_no.date));
-            handleChange("f3", value.job_order.ir_no.problem_obs);
-            handleChange("f4", value.job_order.ir_no.admin_name);
-            handleChange("f5", value.job_order.ir_no.contact_number);
+            if (value.job_order.ir_no !== null) {
+                setReportType('incident');
+                handleChange("f0", value.job_order.ir_no.ir_no);
+                let valueDateTime = new Date(value.job_order.ir_no.date_time);
+                let valueDate = new Date(valueDateTime.getFullYear(), valueDateTime.getMonth(), valueDateTime.getDate());
+                handleChange("f1", valueDate);
+                handleChange("f2", convertDatetoGMT(value.job_order.ir_no.date));
+                handleChange("f3", value.job_order.ir_no.problem_obs);
+                handleChange("f4", value.job_order.ir_no.admin_name);
+                handleChange("f5", value.job_order.ir_no.contact_number);
+
+                setChecklistNumber('');
+            } else {
+                setReportType('checklist');
+                setChecklistNumber(value.job_order.check_list);
+
+                setIRNumber('');
+                setChecklistNumber('');
+                setDateIncident(null);
+                setDateReceive(null);
+                setDetailsIncident('');
+                setSitePOC('');
+                setContactNumber('');
+            }
+
             handleChange("f6", convertDatetoGMT(value.perform_date));
             handleChange("f7", value.actual_findings);
             handleChange("f8", value.actual_remarks);
+            handleChange("f14", value.noted_by);
             handleChange("f9", convertDatetoGMT(value.repair_date));
             handleChange("f10", value.action_taken);
             handleChange("f11", convertDatetoGMT(value.date_done));
@@ -368,7 +401,36 @@ export default function RepairRecords() {
         } catch(err) {
 
         }
-        onClick('displayRepairRecordEdit');
+
+        setTimeout(() => {
+            if (flagRepairRecordMethod === 'pdf') {
+                onClick('displayPDF');
+                convertPDF();
+            } else {
+                setIsLoading(false);
+                onClick('displayRepairRecordEdit');
+            }
+        }, 1500);
+        
+    }
+
+    const convertPDF = () => {
+        try {
+            const input = document.getElementById('toPdf');
+            html2canvas(input)
+            .then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF();
+                var width = pdf.internal.pageSize.getWidth();
+                var height = pdf.internal.pageSize.getHeight();
+                pdf.addImage(imgData, 'JPEG', 16, 8, width-36, height-18);
+                window.open(pdf.output('bloburl'));
+                onHide('displayPDF');
+                setIsLoading(false);
+            });
+        } catch (err) {
+
+        }
     }
 
     const reportImageTemplate = (reportImage) => {
@@ -385,7 +447,6 @@ export default function RepairRecords() {
     }
 
     const submitDeleteImage = () => {
-        console.log(holdImageID);
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -546,6 +607,14 @@ export default function RepairRecords() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[searchJobNumber]);
 
+    useEffect(() => {
+        clearTimeout(timeOutId);
+        setTimeOutId(setTimeout(() => {
+            submitSearch();
+        }, 1000));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[searchBodyNo]);
+
     const submitSearch = () => {
         let token = localStorage.getItem("token");
         const config = {
@@ -556,11 +625,13 @@ export default function RepairRecords() {
         };
 
         let sjobNumber = searchJobNumber;
+        let sBodyNo = searchBodyNo;
         let sDateCreated = searchDateCreated === null ? "" : format(searchDateCreated, 'yyyy-MM-dd');
         let sJobType = searchJobType.length <= 0 ? "" : searchJobType.val;
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'report/repair/?job_no=' + sjobNumber 
+            .get(process.env.REACT_APP_SERVER_NAME + 'report/repair/?job_no=' + sjobNumber
+            + '&body_no=' + sBodyNo
             + '&type=' + sJobType
             + '&date_created=' + sDateCreated
             + '&page=1', config)
@@ -574,24 +645,27 @@ export default function RepairRecords() {
     }
 
     const submitEditRepairRecord = () => {
-        if (IRNumber === "") { 
-            toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
-        } else if (dateIncident === null) { 
-            toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
-        } else if (dateReceive === null) { 
-            toast.current.show({ severity: 'error', summary: 'DATE RECEIVE', detail: 'This field is required.', life: 3000 });
-        } else if (detailsIncident === "") { 
-            toast.current.show({ severity: 'error', summary: 'INCIDENT DETAILS', detail: 'This field is required.', life: 3000 });
-        } else if (sitePOC === "") { 
-            toast.current.show({ severity: 'error', summary: 'SITE POC', detail: 'This field is required.', life: 3000 });
-        } else if (contactNumber === "") { 
-            toast.current.show({ severity: 'error', summary: 'CONTACT NUMBER', detail: 'This field is required.', life: 3000 });
-        } else if (datePerformed === null) { 
+        // if (IRNumber === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'IR NUMBER', detail: 'This field is required.', life: 3000 });
+        // } else if (dateIncident === null) { 
+        //     toast.current.show({ severity: 'error', summary: 'INCIDENT DATE', detail: 'This field is required.', life: 3000 });
+        // } else if (dateReceive === null) { 
+        //     toast.current.show({ severity: 'error', summary: 'DATE RECEIVE', detail: 'This field is required.', life: 3000 });
+        // } else if (detailsIncident === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'INCIDENT DETAILS', detail: 'This field is required.', life: 3000 });
+        // } else if (sitePOC === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'SITE POC', detail: 'This field is required.', life: 3000 });
+        // } else if (contactNumber === "") { 
+        //     toast.current.show({ severity: 'error', summary: 'CONTACT NUMBER', detail: 'This field is required.', life: 3000 });
+        // } else 
+        if (datePerformed === null) { 
             toast.current.show({ severity: 'error', summary: 'DATE PERFORMED', detail: 'This field is required.', life: 3000 });
         } else if (detailsActualFindings === "") { 
             toast.current.show({ severity: 'error', summary: 'ACTUAL FINDINDS', detail: 'This field is required.', life: 3000 });
         } else if (detailsActualRemarks === "") { 
             toast.current.show({ severity: 'error', summary: 'ACTUAL RECOMMENDATION', detail: 'This field is required.', life: 3000 });
+        } else if (newNotedBy === null || newNotedBy === "") { 
+            toast.current.show({ severity: 'error', summary: 'NOTED BY', detail: 'This field is required.', life: 3000 });
         } else if (dateRepaired === null) { 
             toast.current.show({ severity: 'error', summary: 'REPAIR DATE', detail: 'This field is required.', life: 3000 });
         } else if (detailsActionTaken === "") { 
@@ -603,6 +677,7 @@ export default function RepairRecords() {
         } else if (remarks === "") { 
             toast.current.show({ severity: 'error', summary: 'ADDITIONAL REMARKS and/or RECOMMENDATIONS', detail: 'This field is required.', life: 3000 });
         } else {
+            setIsLoading(true);
             let submitParts = [];
             parts.filter(f => f.p !== "").map((x) =>
                 submitParts.push({
@@ -635,8 +710,8 @@ export default function RepairRecords() {
                 body_no: bodyNo,
                 parts: submitParts,
                 labor: submitLabor,
-                ir_no: IRNumber,
-                check_list: "",
+                ir_no: reportType === "incident" ? IRNumber : "",
+                check_list: reportType === "checklist" ? checklistNumber : "",
                 // incident_date: format(dateIncident, 'yyyy-MM-dd'),
                 // date_receive: format(dateReceive, 'yyyy-MM-dd'),
                 // incident_details: detailsIncident,
@@ -645,6 +720,7 @@ export default function RepairRecords() {
                 perform_date: format(datePerformed, 'yyyy-MM-dd'),
                 actual_findings: detailsActualFindings,
                 actual_remarks: detailsActualRemarks,
+                noted_by: newNotedBy,
                 repair_date: format(dateRepaired, 'yyyy-MM-dd'),
                 action_taken: detailsActionTaken,
                 date_done: format(dateDone, 'yyyy-MM-dd'),
@@ -679,11 +755,13 @@ export default function RepairRecords() {
                 } else if (err.response.data.job_order) {
                     toast.current.show({ severity: 'error', summary: 'REPORT NO.', detail: 'The report no. had a report already.', life: 3000 });
                 }
+                setIsLoading(false);
             })
         }
     }
 
     const submitEditRepairRecordAfter = () => {
+        setIsLoading(false);
         setMessage({title:"EDIT", content:"Successfully updated."});
         onHide('displayRepairRecordEdit');
         onClick('displayMessage');
@@ -702,30 +780,10 @@ export default function RepairRecords() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/repair/' + repairID + '/', config)
             .then((res) => {
-                // axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + repairID +'/?mode=cr', config)
-                // .then((res) => {
-                //     console.log("getimage: ", res.data);
-                //     let imageIDs = "";
-                //     res.data.map((x) => {
-                //         imageIDs += x.id;
-                //         imageIDs += ",";
-                //     })
-                //     console.log(imageIDs);
-                //     axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ repairID +'/?mode=cr&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
-                //     .then((res) => {
-                //         console.log("deleteimage: ", res.data);
-                        getRepairRecord();
-                        setMessage({title:"DELETE", content:"Successfully deleted."});
-                        onHide('displayConfirmDelete');
-                        onClick('displayMessage');
-                //     })
-                //     .catch((err) => {
-
-                //     });
-                // })
-                // .catch((err) => {
-                    
-                // });
+                getRepairRecord();
+                setMessage({title:"DELETE", content:"Successfully deleted."});
+                onHide('displayConfirmDelete');
+                onClick('displayMessage');
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
@@ -920,6 +978,14 @@ export default function RepairRecords() {
                     value !== rrd.revised.remarks ? updateRedFields(arrIndex, r, rrd.revised.remarks) : updateRedFields(arrIndex, e, e);
                 }
                 break;
+            case "f14":
+                setNewNotedBy(value);
+                // if (typeof(rrd.revised.remarks) === "undefined") {
+                //     value !== rrd.remarks ? updateRedFields(arrIndex, r, rrd.remarks) : updateRedFields(arrIndex, e, e);
+                // } else {
+                //     value !== rrd.revised.remarks ? updateRedFields(arrIndex, r, rrd.revised.remarks) : updateRedFields(arrIndex, e, e);
+                // }
+                break;
             case "p0":
                 if (typeof(value) === "undefined") {
                     arrParts[0] = {...arrParts[0], p: "", q: "", c: ""};
@@ -939,6 +1005,7 @@ export default function RepairRecords() {
         'displayConfirmDelete': setDisplayConfirmDelete,
         'displayMessage': setDisplayMessage,
         'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
+        'displayPDF': setDisplayPDF,
     }
 
     const onClick = (name) => {
@@ -949,7 +1016,7 @@ export default function RepairRecords() {
         dialogFuncMap[`${name}`](false);
         if (name === 'displayConfirmDeleteImage') {
             setHoldImageID("");
-        } else if (name === 'displayRepairRecordEdit') {
+        } else if (name === 'displayRepairRecordEdit' || name === 'displayPDF') {
             setParts(initialPartsLabor);
             setLabor(initialPartsLabor);
             setFlagRepairRecordDetails(false);
@@ -967,6 +1034,7 @@ export default function RepairRecords() {
             setRedFieldReviseLaborQ(Array(15).fill(""));
             setRedFieldLaborC(Array(15).fill(""));
             setRedFieldReviseLaborC(Array(15).fill(""));
+            setFlagRepairRecordMethod('');
         }
     }
 
@@ -1004,8 +1072,9 @@ export default function RepairRecords() {
         return (
             <div>
                 <center>
-                <Button style={{marginRight: '5%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getRepairRecordData(rowData.repair_id)}/>
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
+                <Button style={{marginRight: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getRepairRecordData(rowData.repair_id)}/>
+                <Button style={{marginRight: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setRepairID(rowData.repair_id); onClick('displayConfirmDelete'); }}/>
+                <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagRepairRecordMethod('pdf'); getRepairRecordData(rowData.repair_id)}}/>
                 </center>
             </div>
         );
@@ -1013,21 +1082,30 @@ export default function RepairRecords() {
     
     return(
         <div>
+            <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                <ProgressSpinner />
+            </div>
             <Toast ref={toast}/>
             <div className="p-grid p-fluid">
                 <div className="p-col-12">
                     <div className="card card-w-title">
                         <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
                                     <InputText placeholder="Search Report No." value={searchJobNumber} onChange={(event) => setSearchJobNumber(event.target.value)}/>
                                 </span>
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <span className="p-input-icon-left">
+                                    <i className="pi pi-search" />
+                                    <InputText placeholder="Search Body No." value={searchBodyNo} onChange={(event) => setSearchBodyNo(event.target.value)}/>
+                                </span>
+                            </div>
+                            <div className="p-col-12 p-lg-2 p-md-2p-sm-12">
                                 <Dropdown placeholder="Select Job Type" optionLabel="name"  value={searchJobType} options={searchJobTypeOptions} onChange={event => setSearchJobType(event.target.value)}/>
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <Calendar placeholder="Select Date" value={searchDateCreated} onChange={(e) => setSearchDateCreated(e.value)} showIcon />
                             </div>
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
@@ -1055,6 +1133,290 @@ export default function RepairRecords() {
                 <div className="dialog-display">
                     <Dialog header="EDIT REPAIR" visible={displayRepairRecordEdit} onHide={() => onHide('displayRepairRecordEdit')} blockScroll={true}>
                         <div className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                    <h4>FIELD REPORT</h4>
+                                </div>
+                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                    <div className="card card-w-title red-field">
+                                        <div className="p-grid p-fluid">
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                                <h6><b>REPORT No.:</b></h6>
+                                                <InputText placeholder="Input Report No." value={jobOrder} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                                <h6><b>REPORT TYPE:</b></h6>
+                                                <InputText placeholder="Input Report Type" value={reportType.toUpperCase()} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>JOB TYPE:</b></h6>
+                                                <InputText placeholder="Input Job Type" value={jobType} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>CHECKLIST No.:</b></h6>
+                                                <InputText placeholder="Input Checklist No." value={checklistNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>VEHICLE: </b><i>(Body No.)</i></h6>
+                                                <InputText placeholder="Input Body No." value={bodyNo} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>SCHEDULE DATE:</b></h6>
+                                                <InputText placeholder="Input Date" value={scheduleDate} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>MAKE:</b></h6>
+                                                <InputText placeholder="Input Make" value={make} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>STATUS:</b></h6>
+                                                <InputText placeholder="Input Make" value={status} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>LOCATION:</b></h6>
+                                                <InputText placeholder="Input Location" value={location} disabled/>
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                <h5>VEHICLE INFORMATION</h5>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[0]}>
+                                                <h6><b>IR NUMBER:</b></h6>
+                                                <InputText id="f0" placeholder="Input IR Number" value={IRNumber} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[0]}</small> */}
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>PLATE No.:</b></h6>
+                                                <InputText placeholder="Input Plate Number" value={plateNumber} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>CS No.:</b></h6>
+                                                <InputText placeholder="Input CS Number" value={CSNumber} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[1]}>
+                                                <h6><b>INCIDENT DATE:</b></h6>
+                                                <Calendar id="f1" placeholder="Select Date" value={dateIncident} onChange={(e) => handleChange(e.target.id, e.value)} showIcon disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[1]}</small> */}
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[2]}>
+                                                <h6><b>DATE RECEIVE:</b></h6>
+                                                <Calendar id="f2" placeholder="Select Date" value={dateReceive} onChange={(e) => handleChange(e.target.id, e.value)} showIcon disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[2]}</small> */}
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                <h5>INCIDENT DETAILS</h5>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[3]}>
+                                                <h6><b>DETAILS:</b></h6>
+                                                <InputTextarea id="f3" placeholder="Discuss details here or leave it blank." rows={5} cols={30} autoResize
+                                                value={detailsIncident} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[3]}</small> */}
+                                            </div>
+                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                                <h6><b>CHASSIS No.:</b></h6>
+                                                <InputText placeholder="Input Chassis Number" value={chassisNumber} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[4]}>
+                                                <h6><b>SITE POC:</b></h6>
+                                                <InputText id="f4" placeholder="Input SITE POC" value={sitePOC} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[4]}</small> */}
+                                            </div>
+                                            <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + redField[5]}>
+                                                <h6><b>CONTACT No.:</b></h6>
+                                                <InputText id="f5" placeholder="Input Contact Number" value={contactNumber} onChange={(e) => handleChange(e.target.id, e.target.value)} disabled/>
+                                                {/* <small className="p-invalid p-d-block">{redFieldRevise[5]}</small> */}
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                <h5>ACTUAL FINDINGS</h5>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>REPAIR BY/DIAGNOSED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={localStorage.getItem("myfirst")} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[6]}>
+                                                <h6><b>DATE PERFORMED:</b></h6>
+                                                <Calendar id="f6" placeholder="Select Date" value={datePerformed} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[6]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[7]}>
+                                                <h6><b>FINDINGS:</b></h6>
+                                                <InputTextarea id="f7" placeholder="Discuss findings here or leave it blank." rows={5} cols={30} autoResize
+                                                value={detailsActualFindings} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[7]}</small>
+                                                <small><i>Note: Please provide a technical report together with this document for evaluation.</i></small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[8]}>
+                                                <h6><b>RECOMMENDATIONS:</b></h6>
+                                                <InputTextarea id="f8" placeholder="Discuss recommendations here or leave it blank." rows={5} cols={30} autoResize
+                                                value={detailsActualRemarks} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[8]}</small>
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 report-title">
+                                                <div className="p-grid p-fluid">
+                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                        <h5>PARTS</h5>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                        <table>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><h6><b>PARTICULARS</b></h6></td>
+                                                                    <td><h6><b>QTY</b></h6></td>
+                                                                    <td><h6><b>COST</b></h6></td>
+                                                                </tr>
+                                                                {
+                                                                    parts.map((x, index) =>
+                                                                        <tr className="repair-table" key={index}>
+                                                                            <td className={redFieldPartsP[index]}>
+                                                                                <InputText value={x.p} onChange={(e) => partsData(index, "p", e.target.value)}/>
+                                                                                <div style={{height:'15px'}}><small className="p-invalid p-d-block">{redFieldRevisePartsP[index]}</small></div>
+                                                                            </td>
+                                                                            <td className={redFieldPartsQ[index]}>
+                                                                                <InputText style={{textAlign: 'right'}} value={x.q} onChange={(e) => partsData(index, "q", e.target.value)}/>
+                                                                                <div style={{height:'15px'}}><small className="p-invalid p-d-block">{redFieldRevisePartsQ[index]}</small></div>
+                                                                            </td>
+                                                                            <td className={redFieldPartsC[index]}>
+                                                                                <InputText style={{textAlign: 'right'}} value={x.c} onChange={(e) => partsData(index, "c", e.target.value)}/>
+                                                                                <div style={{height:'15px'}}><small className="p-invalid p-d-block">{redFieldRevisePartsC[index]}</small></div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )
+                                                                }
+                                                                <tr>
+                                                                    <td colSpan="2"><h6><b>TOTAL PARTS COST:</b></h6></td>
+                                                                    <td><InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalPartsCost} disabled/></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12 report-title">
+                                                <div className="p-grid p-fluid">
+                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                        <h5>LABOR</h5>
+                                                    </div>
+                                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                        <table>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><h6><b>PARTICULARS</b></h6></td>
+                                                                    <td><h6><b>QTY</b></h6></td>
+                                                                    <td><h6><b>COST</b></h6></td>
+                                                                </tr>
+                                                                {
+                                                                    labor.map((x, index) =>
+                                                                        <tr className="repair-table" key={index}>
+                                                                            <td className={redFieldLaborP[index]}>
+                                                                                <InputText value={x.p} onChange={(e) => laborData(index, "p", e.target.value)}/>
+                                                                                <div style={{height:'15px'}}><small className="p-invalid p-d-block">{redFieldReviseLaborP[index]}</small></div>
+                                                                            </td>
+                                                                            <td className={redFieldLaborQ[index]}>
+                                                                                <InputText style={{textAlign: 'right'}} value={x.q} onChange={(e) => laborData(index, "q", e.target.value)}/>
+                                                                                <div style={{height:'15px'}}><small className="p-invalid p-d-block">{redFieldReviseLaborQ[index]}</small></div>
+                                                                            </td>
+                                                                            <td className={redFieldLaborC[index]}>
+                                                                                <InputText style={{textAlign: 'right'}} value={x.c} onChange={(e) => laborData(index, "c", e.target.value)}/>
+                                                                                <div style={{height:'15px'}}><small className="p-invalid p-d-block">{redFieldReviseLaborC[index]}</small></div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )
+                                                                }
+                                                                <tr>
+                                                                    <td colSpan="2"><h6><b>TOTAL LABOR COST:</b></h6></td>
+                                                                    <td><InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalLaborCost} disabled/></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>TOTAL COST ESTIMATE:</b></h6>
+                                                <InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalEstimateCost} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>GENERATED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.generated_by} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>APPROVED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.approved_by === null ? "" : repairRecordDetails.approved_by} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>NOTED BY:</b></h6>
+                                                <InputText id="f14" placeholder="Input Name" value={newNotedBy} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                            </div>
+
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                <h5>ACTION TAKEN</h5>
+                                            </div>
+                                            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                                <h6><b>REPAIRED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={localStorage.getItem("myfirst")} disabled/>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[9]}>
+                                                <h6><b>REPAIR DATE:</b></h6>
+                                                <Calendar id="f9" placeholder="Select Date" value={dateRepaired} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[9]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[10]}>
+                                                <h6><b>ACTION TAKEN DETAILS:</b></h6>
+                                                <InputTextarea id="f10" placeholder="Discuss action taken here or leave it blank." rows={5} cols={30} autoResize
+                                                value={detailsActionTaken} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[10]}</small>
+                                                <small><i>Note: Please provide a technical service report together with this document for repair/s done.</i></small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[11]}>
+                                                <h6><b>DATE DONE:</b></h6>
+                                                <Calendar id="f11" placeholder="Select Date" value={dateDone} onChange={(e) => handleChange(e.target.id, e.value)} showIcon/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[11]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-6 p-md-6 p-sm-12 required-asterisk " + redField[12]}>
+                                                <h6><b>STATUS AFTER REPAIR:</b></h6>
+                                                <Dropdown id="f12" options={statusRepairOptions} optionLabel="name" placeholder="Select Status" 
+                                                value={statusRepair} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[12]}</small>
+                                            </div>
+                                            <div className={"p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk " + redField[13]}>
+                                                <h6><b>ADDITIONAL REMARKS and/or RECOMMENDATIONS:</b></h6>
+                                                <InputTextarea id="f13" placeholder="Discuss remarks/recommendation here or leave it blank." rows={5} cols={30} autoResize
+                                                value={remarks} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
+                                                <small className="p-invalid p-d-block">{redFieldRevise[13]}</small>
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk image-upload">
+                                                <h6><b>IMAGE UPLOAD:</b></h6>
+                                                <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
+                                                    emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />
+                                            </div>
+                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <h6><b>REPORT IMAGES:</b></h6>
+                                                <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <Button label="UPDATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitEditRepairRecord()}/>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                            <ProgressSpinner />
+                        </div>
+                    </Dialog>
+                </div>
+
+                <div className="dialog-display">
+                    <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
+                        <div id="toPdf" className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                     <h4>FIELD REPORT</h4>
@@ -1250,17 +1612,21 @@ export default function RepairRecords() {
                                                 </div>
                                             </div>
 
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>TOTAL COST ESTIMATE:</b></h6>
                                                 <InputText style={{textAlign: 'right', fontWeight: '600'}} value={totalEstimateCost} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>GENERATED BY:</b></h6>
                                                 <InputText placeholder="Input Name" value={repairRecordDetails.generated_by} disabled/>
                                             </div>
-                                            <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                                                <h6><b>APPROVED BY:</b></h6>
+                                                <InputText placeholder="Input Name" value={repairRecordDetails.approved_by === null ? "" : repairRecordDetails.approved_by} disabled/>
+                                            </div>
+                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                                 <h6><b>NOTED BY:</b></h6>
-                                                <InputText placeholder="Input Name" value={repairRecordDetails.noted_by === null ? "" : repairRecordDetails.noted_by} disabled/>
+                                                <InputText id="f14" placeholder="Input Name" value={newNotedBy} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
                                             </div>
 
                                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
@@ -1299,24 +1665,13 @@ export default function RepairRecords() {
                                                 value={remarks} onChange={(e) => handleChange(e.target.id, e.target.value)}/>
                                                 <small className="p-invalid p-d-block">{redFieldRevise[13]}</small>
                                             </div>
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 required-asterisk image-upload">
-                                                <h6><b>IMAGE UPLOAD:</b></h6>
-                                                <FileUpload ref={refImageUpload} customUpload multiple accept="image/*" maxFileSize={1000000}
-                                                    emptyTemplate={<p className="p-m-0">Drag and drop files to here to upload.</p>} />
-                                            </div>
-                                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                                                <h6><b>REPORT IMAGES:</b></h6>
-                                                <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={reportImage} numVisible={1} numScroll={1} itemTemplate={reportImageTemplate}/>
-                                            </div>
-                                            <div className="p-col-12 p-lg-9 p-md-9 p-sm-12"></div>
-                                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
-                                                <Button label="UPDATE" className="p-button-md p-shadow-4 p-button-rounded" onClick={() => submitEditRepairRecord()}/>
-                                            </div>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                            <ProgressSpinner />
                         </div>
                     </Dialog>
                 </div>

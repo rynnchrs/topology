@@ -43,6 +43,7 @@ class IR(models.Model):
     incedent_loc = models.CharField(max_length=20, null=True, blank=True)
     problem_obs = models.TextField(max_length=200, null=True, blank=True)
     recommendation = models.TextField(max_length=200, null=True, blank=True)
+    remarks = models.TextField(max_length=200, null=True, blank=True)
     date_time = models.DateTimeField(blank=True, null=True)
     prepared_by = models.CharField(max_length=50, null=True, blank=True)
     noted_by = models.CharField(max_length=50, null=True, blank=True)
