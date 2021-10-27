@@ -13,8 +13,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .filters import UserFilter
-from .models import Permission
-from .serializers import (MyTokenObtainPairSerializer,
+from .models import DashboardPermission, Permission
+from .serializers import (DashboardPermissionSerializer, MyTokenObtainPairSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
                           PermissionRepairReportSerializer,
@@ -100,6 +100,12 @@ class UserView(viewsets.ModelViewSet):   # User ModelViewSet view, create, updat
             queryset = User.objects.all()
             users = get_object_or_404(queryset, username=pk)    # get user
             users.delete()
+            try:
+                image = Image.objects.get(pk=pk)
+                image.image.delete(save=False)
+                image.delete()
+            except:
+                pass
             return Response(status=status.HTTP_200_OK)        
         else: 
             return Response(status=status.HTTP_401_UNAUTHORIZED)     
@@ -157,12 +163,6 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
             queryset = Permission.objects.all()
             user = get_object_or_404(queryset, user__username=pk) # get user
             user.delete()
-            try:
-                image = Image.objects.get(pk=pk)
-                image.image.delete(save=False)
-                image.delete()
-            except:
-                pass
             return Response(status=status.HTTP_200_OK)        
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -253,5 +253,51 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
             return Response(status=status.HTTP_401_UNAUTHORIZED)   
 
 
+class DashboardPermissionView(viewsets.ViewSet):  # permission ViewSet
+    permission_classes = [IsAuthenticated]
+    serializer_class = DashboardPermissionSerializer 
 
+    def create(self, request):      # create permission
+        user = self.request.user
+        if user_permission(user, 'can_add_users'):    # permission
+            serializer = DashboardPermissionSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response("Created",status=status.HTTP_201_CREATED)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+    def list(self, request):    # Permission List
+        user = self.request.user
+        if user_permission(user, 'can_view_users'):   
+            queryset = DashboardPermission.objects.all()
+            serializer = DashboardPermissionSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)            
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def retrieve(self, request, pk=None):       # retrieve permission
+        user = self.request.user
+        if user_permission(user, 'can_view_users'): # permission
+            queryset = DashboardPermission.objects.all()
+            users = get_object_or_404(queryset, user__username=pk)
+            serializer = DashboardPermissionSerializer(users,  many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)          
+        else:
+            if pk == user.username:    # if current user is equal to pk
+                queryset = DashboardPermission.objects.all()
+                users = get_object_or_404(queryset, user__username=pk)    # get user
+                serializer = DashboardPermissionSerializer(users,  many=False)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:    
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def destroy(self, request, pk=None):    # delete task permission
+        user = self.request.user
+        if user_permission(user, 'can_delete_users'): # permission 
+            queryset = DashboardPermission.objects.all()
+            user = get_object_or_404(queryset, user__username=pk) # get user
+            user.delete()
+            return Response("Deleted",status=status.HTTP_200_OK)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
