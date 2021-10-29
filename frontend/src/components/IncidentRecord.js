@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import QrReader from 'react-qr-reader'
 
 export default function RepairRecords() {
 
@@ -38,6 +39,7 @@ export default function RepairRecords() {
     const [IRRecordID, setIRRecordID] = useState('');
     const [IRRecordNo, setIRRecordNo] = useState('');
     const [flagIRRecordMethod, setFlagIRRecordMethod] = useState('');
+    const [qrResult, setQrResult] = useState('No Result');
 
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
@@ -92,6 +94,7 @@ export default function RepairRecords() {
     const [message, setMessage] = useState({title:"", content:""});
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [displayPDF, setDisplayPDF] = useState(false);
+    const [displayQR, setDisplayQR] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -379,9 +382,12 @@ export default function RepairRecords() {
             .then((res) => {
                 setTotalCount(res.data.count);
                 setIRRecordList(res.data.results);
+                onHide('displayQR');
+                setQrResult('No Result');
             })
             .catch((err) => {
-                
+                onHide('displayQR');
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -575,6 +581,15 @@ export default function RepairRecords() {
             });
         } catch (err){
 
+        }
+    }
+
+    const handleScan = data => {
+        if (data) {
+            setQrResult(data);
+            setTimeout(() => {
+                setSearchBodyNo(data);
+            }, 50);
         }
     }
 
@@ -836,6 +851,7 @@ export default function RepairRecords() {
         'displayMessage': setDisplayMessage,
         'displayConfirmDelete': setDisplayConfirmDelete,
         'displayPDF': setDisplayPDF,
+        'displayQR': setDisplayQR,
     }
 
     const onClick = (name) => {
@@ -959,6 +975,7 @@ export default function RepairRecords() {
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                                    <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
                                 </div>
                             </div>
                         </div>
@@ -1444,6 +1461,17 @@ export default function RepairRecords() {
                             <div style={{fontSize: '16px'}}>{message.content}</div>
                         </div>
                     </div>
+                </Dialog>
+
+                <Dialog header="SCAN QR" style={{width: '310px' }} visible={displayQR} onHide={() => onHide('displayQR')} blockScroll={true}>
+                    <center>
+                        <h5><b>{qrResult}</b></h5>
+                        <QrReader
+                            delay={300}
+                            onScan={handleScan}
+                            style={{height: '260px', width: '260px'}}
+                        />
+                    </center>
                 </Dialog>
 
             </div>

@@ -14,6 +14,8 @@ import { Carousel } from 'primereact/carousel';
 import { FileUpload } from 'primereact/fileupload';
 import axios from "axios";
 
+import QrReader from 'react-qr-reader'
+
 export class Vehicles extends Component {
     
     constructor() {
@@ -93,6 +95,9 @@ export class Vehicles extends Component {
             vdVisibility: false,
             ddVisibility: false,
             diVisibility: false,
+            displayQR: false,
+
+            qrResult: 'No result',
 
             vBrandSelected: 'Mitsubishi', //test data only
 
@@ -251,7 +256,6 @@ export class Vehicles extends Component {
         window.open(url);
     }
 
-    
     refreshList = () => {
         axios
           .get(process.env.REACT_APP_SERVER_NAME + "api/careta/?search=")
@@ -1199,6 +1203,11 @@ export class Vehicles extends Component {
                         newvehicleData:this.state.vehicleData
                     });
                 }
+            } else if  (vm === 'qr') {
+                this.setState({
+                    displayQR: true,
+                    qrResult: 'No result'
+                });
             }
         }
 
@@ -1847,8 +1856,20 @@ export class Vehicles extends Component {
 
         }
 
+        const handleScan = data => {
+            if (data) {
+                this.setState({
+                    qrResult: data,
+                })
+                setTimeout(() => {
+                    selectItem(data);
+                }, 50);
+            }
+        }
+    
         //GET VALUES OF CAR FROM DB
-        const selectItem = event => {
+        const selectItem = value => {
+            console.log("bdno:", value)
             let token = localStorage.getItem("token");
             const config = {
                 headers: {
@@ -1857,10 +1878,11 @@ export class Vehicles extends Component {
                 },
             };
             axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + event.value.body_no + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value + '/', config)
                 .then(res =>  {
                     this.setState({ 
-                        vehicleData: res.data
+                        vehicleData: res.data,
+                        displayQR: false,
                     });
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.car_id +'/?mode=ci', config)
                     .then((res) => {
@@ -2166,6 +2188,15 @@ export class Vehicles extends Component {
             }
 
 
+        }
+
+        const dialogHideQR = (e) =>{
+            if(this.state.displayQR) {
+                this.setState({
+                    displayQR: false,
+                    qrResult: 'No result'
+                });
+            }
         }
 
         const ConfirmDeleteProceedHandler = () => {
@@ -3060,9 +3091,6 @@ export class Vehicles extends Component {
                                             }
                                         </div>
                                     </AccordionTab>
-                                    {/* {
-                                        console.log(this.state.vmModalMode)
-                                    } */}
                                 </Accordion>
                             </div>
                         </Dialog>
@@ -3071,10 +3099,13 @@ export class Vehicles extends Component {
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
                         <div className="p-col-12" name="searchbox"> 
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">
+                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
-                                    completeMethod={this.searchList} onSelect={selectItem}
+                                    completeMethod={this.searchList} onSelect={(event) => selectItem(event.value.body_no)}
                                     onChange={event => this.setState({searchBody: event.target.value})}/>
+                                </div>
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                    <Button label="SCAN QR" icon="pi pi-th-large" className="p-button-success" onClick={() => onShow('qr')}/>
                                 </div>
                                 <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                     <Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => this.exportData()}/>
@@ -3737,6 +3768,19 @@ export class Vehicles extends Component {
                             </div>
                         </div>
                     </Fieldset>
+                </div>
+
+                <div className="dialog-display">
+                <Dialog header="SCAN QR" style={{width: '310px' }} visible={this.state.displayQR} onHide={() => dialogHideQR()} blockScroll={true}>
+                    <center>
+                        <h5><b>{this.state.qrResult}</b></h5>
+                        <QrReader
+                            delay={300}
+                            onScan={handleScan}
+                            style={{ height: 400, width: 260 }}
+                        />
+                    </center>
+                </Dialog>
                 </div>
             </div>
         );
