@@ -284,6 +284,8 @@ export default function RepairReport() {
                     toast.current.show({ severity: 'error', summary: 'PARTS', detail: 'Invalid Quantity', life: 3000 });
                 } else if (err.response.data.errors[0].approved_by) {
                     toast.current.show({ severity: 'error', summary: 'APPROVED BY', detail: 'Invalid Approved By', life: 3000 });
+                } else if (err.response.data.ir_no) {
+                    toast.current.show({ severity: 'error', summary: 'IR NO.', detail: 'IR No. already exists.', life: 3000 });
                 }
                 setIsLoading(false);
             })
@@ -331,6 +333,7 @@ export default function RepairReport() {
     }
 
     const handleSelectReportNo = (value) => {
+        console.log(value.value)
         let splitScheduleDate = value.value.task.schedule_date.split("-");
         let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
         setScheduleDate(format(gmtScheduleDate, 'yyyy-MM-dd'));
