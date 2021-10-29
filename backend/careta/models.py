@@ -73,8 +73,6 @@ class Permission(models.Model):         # permission Model
     can_add_checklist = models.BooleanField(default=False)
     can_edit_checklist = models.BooleanField(default=False)
     can_delete_checklist = models.BooleanField(default=False)
-    
-    can_view_dashboard = models.BooleanField(default=False)
 
     date_created = models.DateField(auto_now_add=True)
 
