@@ -13,6 +13,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from image.models import Image
+from notifications.signals import notify
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -186,18 +187,19 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
             request.data['approved_by'] = ""
+            request.data['noted_by'] = ""
             cost = request.data['parts'] + request.data['labor']
             request.data['cost'] = cost
             serializer = RepairSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 job = JobOrder.objects.get(pk=request.data['job_order'])
                 car = Car.objects.get(body_no=job.task.body_no.body_no)
-                if request.data['status_repair'] == "Operational":
-                    car.operational = True
-                else:
-                    car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Repair Report for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='repair,create', description=message)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
@@ -218,6 +220,10 @@ class RepairView(viewsets.ModelViewSet):  # add this
             labor = CostSerializer(labor, many=True)
             serializer_data['labor'] = labor.data
             serializer_data['revised'] = repair_reversion(repair)
+
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='repair')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -228,7 +234,8 @@ class RepairView(viewsets.ModelViewSet):  # add this
             request.data['diagnosed_by'] = user.id 
             request.data['generated_by'] = user.id 
             request.data['repair_by'] = user.id 
-            request.data['approved_by'] = "" 
+            request.data['approved_by'] = ""
+            request.data['noted_by'] = ""
             cost = request.data['parts'] + request.data['labor']
             request.data['cost'] = cost
             queryset = Repair.objects.all()
@@ -242,7 +249,11 @@ class RepairView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Repair Report for " + str(car.body_no) + " is udated."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='repair,update', description=message)
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -252,6 +263,12 @@ class RepairView(viewsets.ModelViewSet):  # add this
         if user_permission(user, 'can_delete_repair_reports'): 
             queryset = Repair.objects.all()
             repair = get_object_or_404(queryset, pk=pk)
+            
+            sender = User.objects.get(username=user.username)
+            recipients = User.objects.filter(permission__can_add_task=True)
+            message = "Repair Report for " + str(repair.body_no.body_no) + " is deleted."
+            notify.send(sender, recipient=recipients, level='info', 
+                        verb='Repair', description=message)
             repair.delete()
             queryset = Image.objects.filter(image_name=pk ,mode="cr")
             for image in queryset:
@@ -319,7 +336,7 @@ class CheckListPartsView(viewsets.ModelViewSet):
 
     def list(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             serializer = CheckListPartsSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -329,7 +346,7 @@ class CheckListPartsView(viewsets.ModelViewSet):
 
     def create(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             serializer = CheckListPartsSerializer(data=request.data, many=True)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -340,7 +357,7 @@ class CheckListPartsView(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             queryset = self.filter_queryset(self.get_queryset().filter(pk=pk))
             queryset.delete()
             return Response("deleted", status=status.HTTP_200_OK)        
@@ -358,7 +375,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     
     def list(self, request): 
         user = self.request.user   
-        if user_permission(user, 'can_view_repair_reports'): 
+        if user_permission(user, 'can_view_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -372,7 +389,7 @@ class CheckListView(viewsets.ModelViewSet):  # add this
             
     def create(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_checklist'): 
             serializer = CheckListSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 car = Car.objects.get(body_no=request.data['body_no'])
@@ -381,7 +398,11 @@ class CheckListView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Check List for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='checklist,create', description=message)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
@@ -389,20 +410,23 @@ class CheckListView(viewsets.ModelViewSet):  # add this
 
     def retrieve(self, request, pk=None):  
         user = self.request.user
-        if user_permission(user,'can_view_repair_reports'): 
+        if user_permission(user,'can_view_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             check_list = get_object_or_404(queryset, pk=pk) 
             serializer = CheckListSerializer(check_list,many=False)
             serializer_data = serializer.data
             serializer_data['analysis'] = analysis(serializer_data)
             serializer_data['revised'] = checklist_reversion(check_list)
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='checklist')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def update(self, request, pk=None):
         user = self.request.user
-        if user_permission(user, 'can_edit_repair_reports'): 
+        if user_permission(user, 'can_edit_checklist'): 
             queryset = self.filter_queryset(self.get_queryset())
             check_list = get_object_or_404(queryset, pk=pk) 
             serializer = CheckListSerializer(instance=check_list, data=request.data)
@@ -413,7 +437,11 @@ class CheckListView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Check List for " + str(car.body_no) + " is updated."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='checklist,update', description=message)
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -421,11 +449,16 @@ class CheckListView(viewsets.ModelViewSet):  # add this
     
     def destroy(self, request, pk=None):      
         user = self.request.user
-        if user_permission(user, 'can_delete_repair_reports'): 
+        if user_permission(user, 'can_delete_checklist'): 
             try:
                 queryset = CheckList.objects.all()
-                repair = get_object_or_404(queryset, pk=pk)
-                repair.delete()
+                checklist = get_object_or_404(queryset, pk=pk)
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Check List for " + str(checklist.body_no.body_no) + " is deleted."
+                notify.send(sender, recipient=recipients, level='info', 
+                                verb='checklist,delete', description=message)
+                checklist.delete()
                 queryset = Image.objects.filter(image_name=pk ,mode="cl")
                 for image in queryset:
                     try:

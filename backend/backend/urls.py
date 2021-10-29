@@ -31,7 +31,7 @@ urlpatterns = [
     path('car/',  include('car.urls')), 
     path('careta/',  include('careta.urls')), 
     path('report/',  include('report.urls')), 
-    path('notifications/',  include('notifications.urls')), 
+    path('notification/',  include('notification.urls')), 
     path('task/',  include('task.urls')), 
     path('dashboard/',  include('dashboard.urls')),
     path('image/',  include('image.urls')),
