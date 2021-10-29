@@ -1,11 +1,20 @@
 import datetime
 from datetime import datetime as date
 
+from django.views.generic.list import ListView
+
 from car.models import Car
+from careta.models import User
+from notifications.models import Notification
+from notifications.signals import notify
 from report.models import Inspection
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
+from rest_framework import generics, permissions, serializers, status, viewsets
+from rest_framework.decorators import action, api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .serializer import NotificationsSerializer
 
 
 class InspectionNotifyView(viewsets.ViewSet):
@@ -54,3 +63,37 @@ class InspectionNotifyView(viewsets.ViewSet):
             context.append(str(inspection.driver))
         return Response({"driver":context}, status=status.HTTP_200_OK)
 
+
+class AllNotificationsList(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = NotificationsSerializer
+
+    def get_queryset(self):
+        notifs = self.request.user.notifications.all()
+        return notifs
+
+
+class UnreadNotificationsList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        count = self.request.user.notifications.unread().count()
+        data = {
+            'unread_count': count,
+        }
+        return Response(data)
+
+
+class NotificationView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['post'])
+    def expired(self, request):
+        user = self.request.user
+        car = Car.objects.get(car_id=1)
+        sender = User.objects.get(username=user.username)
+        recipients = User.objects.filter(permission__can_add_task=True)
+        message = "Expired"
+        notify.send(sender, recipient=recipients, action_object=car, target=car, 
+                        level='warning', verb='Warning', description=message)
+        return Response(status=status.HTTP_200_OK)

@@ -10,6 +10,12 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
                     'permanent_loc','dealer','cs_no','engine_no']
 
 
+class QRCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = ['body_no','qr_code']
+
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car

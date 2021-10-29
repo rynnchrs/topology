@@ -1,8 +1,14 @@
 import datetime
 from datetime import date
+from io import BytesIO
+from os import remove
 
+import qrcode
+from django.conf import settings
+from django.core.files import File
 from django.db import models
 from phone_field import PhoneField
+from PIL import Image, ImageDraw, ImageEnhance
 
 
 class Car(models.Model):
@@ -118,8 +124,45 @@ class Car(models.Model):
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
 
+    qr_code = models.ImageField(upload_to='QR-Codes', blank=True)
+
     def _str_(self):
         return self.body_no
+
+    def save(self, *args, **kwargs):
+        try:
+            filename = f'QR-Codes/{self.body_no}.png'
+
+            file_path = '.'+settings.MEDIA_URL+filename
+            remove(file_path)
+        except:
+            pass
+        
+        logo = Image.open('./media/autohome.png').resize((70, 70))
+    
+        qrcode_img = qrcode.QRCode(
+            version=8,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=4,
+            border=4
+        )
+        qrcode_img.add_data(self.body_no)
+        qrcode_img.make()
+
+        white = Image.new('RGB', (85, 85), color = (255,255,255))
+        pos = ((white.size[0] - logo.size[0]) // 2, (white.size[1] - logo.size[1]) // 2)
+        white.paste(logo,pos)
+        canvas = qrcode_img.make_image().convert('RGB')
+        pos = ((canvas.size[0] - white.size[0]) // 2, (canvas.size[1] - white.size[1]) // 2)
+        
+        canvas.paste(white, pos)
+        fname = f'{self.body_no}.png' 
+        buffer = BytesIO()
+        canvas.save(buffer,'PNG')
+        self.qr_code.save(fname, File(buffer), save=False)
+        canvas.close()
+        super().save(*args, **kwargs)
+
 
     @property
     def get_total(self):
