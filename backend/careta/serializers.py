@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Permission, UserInfo
+from .models import DashboardPermission, Permission, UserInfo
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -179,6 +179,19 @@ class PermissionTaskSerializer(serializers.ModelSerializer):    # task permissio
         extra_kwargs = {'slug': {'read_only': True},}
 
 
+class DashboardPermissionSerializer(serializers.ModelSerializer): 
+    user = serializers.CharField()
+    slug = serializers.CharField(read_only=True, source='user.username')
+    class Meta:
+        model = DashboardPermission
+        fields = '__all__'
+
+    def validate(self, obj): # validate if user field input is username
+        try:
+            obj['user'] = User.objects.get(username=obj['user'])
+        except:
+            raise serializers.ValidationError({'user':'Invalid username in permission'})
+        return obj
 
 
 

@@ -9,6 +9,7 @@ from .views import MyTokenObtainPairView, RegisterView, UserListView
 router = routers.DefaultRouter()  
 router.register(r'users', views.UserView, 'users') 
 router.register(r'permission', views.PermissionView, 'permission') 
+router.register(r'dashboard', views.DashboardPermissionView, 'dashboard') 
 
 urlpatterns = [
     path('', include(router.urls)),

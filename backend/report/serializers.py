@@ -100,6 +100,7 @@ class CostSerializer(serializers.ModelSerializer): # cost info ingeritance
 class RepairSerializer(serializers.ModelSerializer): # repair serializer
     cost = CostSerializer(many=True, write_only=True)
     approved_by = serializers.CharField(required=False, allow_blank=True)
+    noted_by = serializers.CharField(required=False, allow_blank=True)
     body_no = serializers.CharField(write_only=True)
     ir_no = serializers.CharField(required=False, allow_blank=True, write_only=True)
     check_list = serializers.CharField(required=False, allow_blank=True,  write_only=True)
@@ -122,6 +123,11 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 obj['approved_by'] = None
         except:
             errors.append({"approved_by": 'Invalid Approved By'})
+        try:
+            if obj['noted_by'] == "":
+                obj['noted_by'] = None
+        except:
+            errors.append({"noted_by": 'Invalid Noted By'})
         if obj['ir_no'] != "":
             try:
                 obj['ir_no'] = IR.objects.get(ir_no=obj['ir_no'])
@@ -189,7 +195,6 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
                 obj.quantity = 0
                 obj.save()
 
-        instance.noted_by = validated_data.get('noted_by', instance.noted_by)
         instance.perform_date = validated_data.get('perform_date', instance.perform_date)
         instance.actual_findings = validated_data.get('actual_findings', instance.actual_findings)
         instance.actual_remarks = validated_data.get('actual_remarks', instance.actual_remarks)
@@ -210,6 +215,8 @@ class RepairSerializer(serializers.ModelSerializer): # repair serializer
         self.fields['generated_by'] = serializers.CharField(source='generated_by.user_info.full_name')
         if instance.approved_by is not None:
             self.fields['approved_by'] = serializers.CharField(source='approved_by.user_info.full_name')
+        if instance.noted_by is not None:
+            self.fields['noted_by'] = serializers.CharField(source='noted_by.user_info.full_name')
         return super(RepairSerializer, self).to_representation(instance)
 
 

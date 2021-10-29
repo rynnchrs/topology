@@ -6,7 +6,7 @@ from car.models import Car
 from careta.models import Permission, UserInfo
 from django.contrib.auth.models import User
 from django.test import TestCase
-from report.models import CheckList
+from report.models import CheckList, Repair
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -100,6 +100,17 @@ class TaskTestCase(APITestCase):
         #fieldman
         self.fieldman = Fieldman.objects.create(task=self.task, field_man=self.user)
         #task id
+        self.job_repair = JobOrder.objects.create(type=True)
+        self.task_repair = Task.objects.create(body_no=self.car, job_order=self.job_repair, manager=self.user) 
+        self.repair = Repair.objects.create(
+                job_order=self.job_repair,
+                task = self.task_repair,
+                diagnosed_by = self.user,   
+                generated_by = self.user,
+                repair_by = self.user,
+                body_no = self.car,
+            ) # create repair
+        self.fieldman_repair = Fieldman.objects.create(task=self.task_repair, field_man=self.user)
         self.id = str(self.task.pk)
 
     def test_task_list(self):
@@ -173,11 +184,11 @@ class TaskTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_status_fm(self):  # status fm
-        response = self.client.put('/task/task-scheduling/'+self.id+'/status_fm/')
+        response = self.client.put('/task/task-scheduling/'+str(self.task_repair.pk)+'/status_fm/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_status_mn(self):  # status mn
-        response = self.client.put('/task/task-scheduling/'+self.id+'/status_mn/')
+        response = self.client.put('/task/task-scheduling/'+str(self.task_repair.pk)+'/status_mn/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_status_approval(self):  # status approval list
@@ -195,6 +206,7 @@ class IRTestCase(APITestCase):
             "body_no": "18-1654",
             "project_name": "Careta Projects",
             "repair_type":["me","el","ba"],
+            "operational": True,
         }
     INVALID_IR = {
             "body_no": "18-1655"  #invalid body_no
@@ -208,10 +220,10 @@ class IRTestCase(APITestCase):
             }
     TEST_PERMISSION = {
                 "slug": "sample",
-                "can_view_repair_reports": True,
-                "can_add_repair_reports": True,
-                "can_edit_repair_reports": True,
-                "can_delete_repair_reports": True,
+                "can_view_ir": True,
+                "can_add_ir": True,
+                "can_edit_ir": True,
+                "can_delete_ir": True,
             }
     TEST_CAR = {
             "vin_no": "PAEL65NYHJB005043",

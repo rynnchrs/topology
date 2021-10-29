@@ -58,13 +58,43 @@ class Permission(models.Model):         # permission Model
     can_edit_repair_reports = models.BooleanField(default=False)
     can_delete_repair_reports = models.BooleanField(default=False)
 
+    can_approved_task = models.BooleanField(default=False)
     can_view_task = models.BooleanField(default=False)
     can_add_task = models.BooleanField(default=False)
     can_edit_task = models.BooleanField(default=False)
     can_delete_task = models.BooleanField(default=False)
+
+    can_view_ir = models.BooleanField(default=False)
+    can_add_ir = models.BooleanField(default=False)
+    can_edit_ir = models.BooleanField(default=False)
+    can_delete_ir = models.BooleanField(default=False)
+
+    can_view_checklist = models.BooleanField(default=False)
+    can_add_checklist = models.BooleanField(default=False)
+    can_edit_checklist = models.BooleanField(default=False)
+    can_delete_checklist = models.BooleanField(default=False)
+    
+    can_view_dashboard = models.BooleanField(default=False)
 
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
 
+
+class DashboardPermission(models.Model):         # permission Model
+    user = models.OneToOneField(User, related_name='dashboard', on_delete=models.CASCADE)
+    slug = models.CharField(max_length=30)
+
+    can_view_recieved_items = models.BooleanField(default=False)
+    can_view_operational_status = models.BooleanField(default=False)
+    can_view_expiring_cars = models.BooleanField(default=False)
+    can_view_expiry_table = models.BooleanField(default=False)
+    can_view_driver_inspection = models.BooleanField(default=False)
+    can_view_task = models.BooleanField(default=False)
+    can_view_ir = models.BooleanField(default=False)
+    
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
