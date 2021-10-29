@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from .models import Permission, UserInfo
+from .models import DashboardPermission, Permission, UserInfo
 
 
 class UserInfoAdmin(admin.ModelAdmin):  # add this
@@ -10,4 +10,4 @@ class UserInfoAdmin(admin.ModelAdmin):  # add this
 # Register your models here.
 admin.site.register(UserInfo, UserInfoAdmin)  # add this
 admin.site.register(Permission)  # add this
-
+admin.site.register(DashboardPermission)  # add this

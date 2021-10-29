@@ -1,16 +1,16 @@
 import json
 from datetime import datetime as date
 
-from django.db.models.deletion import ProtectedError
-
 from car.models import Car
 from careta.serializers import UserListSerializer
 from django.contrib.auth.models import User
+from django.db.models.deletion import ProtectedError
 from django_filters import filters
 from django_filters import rest_framework as filter
 from image.models import Image
+from notifications.signals import notify
 from report.models import CheckList, Repair
-from rest_framework import filters, generics, status, viewsets
+from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -65,6 +65,18 @@ class TaskInspectionView(viewsets.ModelViewSet):
                         car.status = "R"
                     car.save()
                     serializer.save()
+            
+            sender = User.objects.get(username=user.username)
+            recipients_mn = User.objects.filter(permission__can_add_task=True)
+            message = "Task Schedule for " + str(car.current_loc) + " is created."
+            notify.send(sender, recipient=recipients_mn,  target=serializer.save(), 
+                            level='info', verb='task,create', description=message)
+            field_man = []
+            for fieldman in request.data['fieldman']:
+                field_man.append(fieldman['field_man'])
+            recipents_fm = User.objects.filter(username__in=field_man)
+            notify.send(sender, recipient=recipents_fm,  target=serializer.save(), 
+                            level='info', verb='task,create', description=message)
             return Response("Successfully Created",status=status.HTTP_201_CREATED)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)  
@@ -106,7 +118,17 @@ class TaskView(viewsets.ModelViewSet):
                 else:
                     car.status = "R"
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients_mn = User.objects.filter(permission__can_add_task=True)
+                message = "Task Schedule for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients_mn,  target=serializer.save(), 
+                                level='info', verb='task,create', description=message)
+                field_man = []
+                for fieldman in request.data['fieldman']:
+                    field_man.append(fieldman['field_man'])
+                recipents_fm = User.objects.filter(username__in=field_man)
+                notify.send(sender, recipient=recipents_fm,  target=serializer.save(), 
+                                level='info', verb='task,create', description=message)
             return Response("Successfully Created",status=status.HTTP_201_CREATED)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)   
@@ -117,11 +139,17 @@ class TaskView(viewsets.ModelViewSet):
         task = get_object_or_404(queryset, pk=pk)
         if user_permission(user, 'can_view_task'):  
             serializer = TaskSerializer(instance=task, many=False)
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='task')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer.data, status=status.HTTP_200_OK)      
         else:
             queryset = Task.objects.all().filter(fieldman__field_man__username=user.username)
             task = get_object_or_404(queryset, pk=pk)
             serializer = TaskSerializer(instance=task, many=False)
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='task')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer.data, status=status.HTTP_200_OK)      
             
     def update(self, request, pk=None):    
@@ -132,7 +160,17 @@ class TaskView(viewsets.ModelViewSet):
             task = get_object_or_404(queryset, pk=pk)   
             serializer = TaskSerializer(instance=task, data=request.data)
             if serializer.is_valid(raise_exception=True):
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients_mn = User.objects.filter(permission__can_add_task=True)
+                message = "Task Schedule for " + str(task.body_no.body_no) + " is updated."
+                notify.send(sender, recipient=recipients_mn,  target=serializer.save(), 
+                                level='info', verb='task,update', description=message)
+                field_man = []
+                for fieldman in request.data['fieldman']:
+                    field_man.append(fieldman['field_man'])
+                recipents_fm = User.objects.filter(username__in=field_man)
+                notify.send(sender, recipient=recipents_fm,  target=serializer.save(), 
+                                level='info', verb='task,update', description=message)
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -145,6 +183,17 @@ class TaskView(viewsets.ModelViewSet):
                 task = get_object_or_404(queryset, pk=pk)    # get user
                 queryset = JobOrder.objects.all()
                 job_order = get_object_or_404(queryset, pk=task.job_order.job_id)
+                sender = User.objects.get(username=user.username)
+                recipients_mn = User.objects.filter(permission__can_add_task=True)
+                message = "Task Schedule for " + str(task.body_no.body_no) + " is deleted."
+                notify.send(sender, recipient=recipients_mn, level='info',
+                                verb='task,delete', description=message)
+                field_man = []
+                for fieldman in request.data['fieldman']:
+                    field_man.append(fieldman['field_man'])
+                recipents_fm = User.objects.filter(username__in=field_man)
+                notify.send(sender, recipient=recipents_fm, level='info',
+                                verb='task,delete', description=message)
                 task.delete()
                 job_order.delete()
                 return Response("Successfully Deleted",status=status.HTTP_200_OK)   
@@ -216,20 +265,50 @@ class TaskView(viewsets.ModelViewSet):
                     task.save()
                     report.save()
                     return Response("Success",status=status.HTTP_200_OK)
+                else:
+                    return Response("Already Noted",status=status.HTTP_400_BAD_REQUEST)
             else:
                 queryset = Repair.objects.all()
                 report = get_object_or_404(queryset, task=pk) 
-                if task.task_status_mn == False and report.approved_by is None:
+                if task.task_status_mn == False and report.noted_by is None:
                     task.task_status_mn = True;
-                    report.approved_by = user
-                    car = Car.objects.get(body_no=task.body_no.body_no)
-                    car.status = "A"
-                    car.save()
+                    report.noted_by = user
                     task.save()
                     report.save()
-                    return Response("Success",status=status.HTTP_200_OK)       
+                    return Response("Success",status=status.HTTP_200_OK)
+                else:
+                    return Response("Already Noted",status=status.HTTP_400_BAD_REQUEST)
+                         
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+    @action(detail=True, methods=['put'])
+    def status_bm(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_approved_task'): 
+            queryset = Task.objects.all()
+            task = get_object_or_404(queryset, pk=pk) 
+            queryset = Repair.objects.all()
+            report = get_object_or_404(queryset, task=pk) 
+            if task.task_status_bm == False and report.approved_by is None:
+                task.task_status_bm = True;
+                report.approved_by = user
+                car = Car.objects.get(body_no=task.body_no.body_no)
+                car.status = "A"
+                if report.status_repair == "Operational":
+                    car.operational = True
+                else:
+                    car.operational = False
+                car.save()
+                task.save()
+                report.save()
+                return Response("Success",status=status.HTTP_200_OK)
+            else:
+                return Response("Already Approved",status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
     @action(detail=False)
     def status_approval(self, request):  # list of all task for approval
@@ -325,12 +404,13 @@ class JobOrderView(viewsets.ViewSet):
             # filter the used job order in inspection table
             inspection = CheckList.objects.values_list('job_order', flat=False)
             # filter True(inspection) and used job order
-            queryset = JobOrder.objects.filter(type=False).filter(job_no__in=inspection) 
+            queryset = JobOrder.objects.filter(type=False).filter(job_id__in=inspection) 
+            print(queryset)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
-            repair = CheckList.objects.all().values_list('job_order', flat=True)
-            queryset = JobOrder.objects.filter(type=False).filter(job_id__in=repair)
+            inspection = CheckList.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).filter(job_id__in=inspection)
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -344,12 +424,12 @@ class JobOrderView(viewsets.ViewSet):
             # filter the used job order in inspection table
             inspection = CheckList.objects.all().values_list('job_order', flat=True)
             # filter True(inspection) and remove all used job order
-            queryset = JobOrder.objects.all().filter(type=False).exclude(job_no__in=inspection)
+            queryset = JobOrder.objects.all().filter(type=False).exclude(job_id__in=inspection)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif user_permission(user, 'can_add_repair_reports'):
-            repair = CheckList.objects.all().values_list('job_order', flat=True)
-            queryset = JobOrder.objects.filter(type=False).exclude(job_id__in=repair)
+            inspection = CheckList.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).exclude(job_id__in=inspection)
             queryset = queryset.filter(task__fieldman__field_man=user.pk)
             serializer = RepairJobSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -411,7 +491,7 @@ class IRView(viewsets.ModelViewSet):  # add this
     
     def list(self, request): 
         user = self.request.user   
-        if user_permission(user, 'can_view_repair_reports'): 
+        if user_permission(user, 'can_view_ir'): 
             queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -424,7 +504,7 @@ class IRView(viewsets.ModelViewSet):  # add this
 
     def create(self, request):
         user = self.request.user
-        if user_permission(user, 'can_add_repair_reports'): 
+        if user_permission(user, 'can_add_ir'): 
             serializer = IRSerializers(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 car = Car.objects.get(body_no=request.data['body_no'])
@@ -433,7 +513,11 @@ class IRView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Incident Report for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='ir-report,create', description=message)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
@@ -441,19 +525,22 @@ class IRView(viewsets.ModelViewSet):  # add this
 
     def retrieve(self, request, pk=None):  
         user = self.request.user
-        if user_permission(user,'can_view_repair_reports'): 
+        if user_permission(user,'can_view_ir'): 
             queryset = queryset = self.filter_queryset(self.get_queryset())
             ir = get_object_or_404(queryset, pk=pk) 
             serializer = IRSerializers(ir,many=False)
             serializer_data = serializer.data
             serializer_data['revised'] = ir_reversion(ir)
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='task')
+            for notif in notifs:
+                notif.mark_as_read()
             return Response(serializer_data, status=status.HTTP_200_OK)          
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def update(self, request, pk=None):
         user = self.request.user
-        if user_permission(user, 'can_edit_repair_reports'): 
+        if user_permission(user, 'can_edit_ir'): 
             queryset = self.filter_queryset(self.get_queryset())
             ir = get_object_or_404(queryset, pk=pk) 
             serializer = IRSerializers(instance=ir, data=request.data)
@@ -464,18 +551,27 @@ class IRView(viewsets.ModelViewSet):  # add this
                 else:
                     car.operational = False
                 car.save()
-                serializer.save()
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Incident Report for " + str(car.body_no) + " is updated."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='ir-report,update', description=message)
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)    
     
     def destroy(self, request, pk=None):      
         user = self.request.user
-        if user_permission(user, 'can_delete_repair_reports'): 
+        if user_permission(user, 'can_delete_ir'): 
             try:
                 queryset = IR.objects.all()
-                repair = get_object_or_404(queryset, pk=pk)
-                repair.delete()
+                ir = get_object_or_404(queryset, pk=pk)
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Incident Report for " + str(ir.body_no.body_no) + " is created."
+                notify.send(sender, recipient=recipients, level='info',
+                                verb='ir-report,create', description=message)
+                ir.delete()
                 queryset = Image.objects.filter(image_name=pk ,mode="ir")
                 for image in queryset:
                     try:

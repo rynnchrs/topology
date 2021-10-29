@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from .filters import CarFilter
 from .models import PDF, TPL, Car, Contract, Insurance
 from .serializers import (CarInfoSerializer, CarSerializer, ContractSerializer,
-                          InsuranceSerializer, PDFSerializer,
+                          InsuranceSerializer, PDFSerializer, QRCodeSerializer,
                           SearchInventorySerializer, TPLSerializer)
 
 
@@ -219,3 +219,11 @@ class PDFView(viewsets.ModelViewSet):  # add this
         pdf.pdf.delete(save=False)
         pdf.delete()
         return Response("successfully Deleted",status=status.HTTP_200_OK)   
+
+
+class QRCodeView(generics.ListAPIView):  #list of all car with filtering
+    permission_classes = [IsAuthenticated]
+    queryset = Car.objects.all().order_by('car_id') 
+    serializer_class = QRCodeSerializer  
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^body_no',]

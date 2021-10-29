@@ -15,4 +15,5 @@ urlpatterns = [
     path('', include(router.urls)),
     re_path('^api/careta-list/(?P<username>.+)/$', views.InsuranceList.as_view()),
     path('car-list/', views.CarListView.as_view(), name='car-list'), # 
+    path('qr-code/', views.QRCodeView.as_view(), name='qr-code'),
 ]
