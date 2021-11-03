@@ -203,4 +203,4 @@ CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:3030',
 ]
 
-
+GOOGLE_API_KEY=[]
