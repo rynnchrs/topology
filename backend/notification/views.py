@@ -6,6 +6,7 @@ from car.models import Car
 from careta.models import User
 from django.conf import settings
 from django.views.generic.list import ListView
+from geopy.geocoders import Nominatim
 from notifications.models import Notification
 from notifications.signals import notify
 from report.models import Inspection
@@ -104,15 +105,15 @@ class NotificationView(viewsets.ViewSet):
         lat = request.GET['lat']
         lng = request.GET['lng']
         body_no = request.GET['body_no']
-
-        location = requests.get(
-            'https://maps.googleapis.com/maps/api/geocode/json?',
-            params={
-                'latlng':f'{lat},{lng}',
-                'key': settings.GOOGLE_API_KEY
-            }
-        )
-        print(location.content)
+        geolocator = Nominatim(user_agent="notification")
+        location = geolocator.reverse(f'{lat},{lng}')
+        # location = requests.get(
+        #     'https://maps.googleapis.com/maps/api/geocode/json?',
+        #     params={
+        #         'latlng':f'{lat},{lng}',
+        #         'key': settings.GOOGLE_API_KEY
+        #     }
+        # )
         # current_loc = Car.objects.get(body_no=body_no)
         # if location != current_loc.current_loc:
 
@@ -127,5 +128,5 @@ class NotificationView(viewsets.ViewSet):
         #     notify.send(sender, recipient=recipients,  target=serializer.save(), 
         #                     level='warning', verb='gps', description=message)
         #     return Response("message",status=status.HTTP_201_CREATED) 
-        return Response(status=status.HTTP_200_OK)  
+        return Response(location.raw,status=status.HTTP_200_OK)  
    
