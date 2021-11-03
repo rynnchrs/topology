@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import QrReader from 'react-qr-reader'
 
 export default function ChecklistRecord() {
 
@@ -35,6 +36,7 @@ export default function ChecklistRecord() {
     const [checklistRecordDetails, setCheckListRecordDetails] = useState([]);
     const [delChecklistID, setDelChecklistID] = useState('');
     const [flagChecklistRecordMethod, setFlagChecklistRecordMethod] = useState('');
+    const [qrResult, setQrResult] = useState('No Result');
 
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
@@ -88,6 +90,7 @@ export default function ChecklistRecord() {
     const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [displayPDF, setDisplayPDF] = useState(false);
+    const [displayQR, setDisplayQR] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -389,9 +392,12 @@ export default function ChecklistRecord() {
             .then((res) => {
                 setTotalCount(res.data.count);
                 setChecklistRecordList(res.data.results);
+                onHide('displayQR');
+                setQrResult('No Result');
             })
             .catch((err) => {
-                
+                onHide('displayQR');
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
@@ -650,6 +656,19 @@ export default function ChecklistRecord() {
         } catch (err){
 
         }
+    }
+
+    const handleScan = data => {
+        if (data) {
+            setQrResult(data);
+            setTimeout(() => {
+                setSearchBodyNo(data);
+            }, 50);
+        }
+    }
+
+    const handleError = data => {
+        
     }
 
     const updateRevise = (index, color, text) => {
@@ -952,6 +971,7 @@ export default function ChecklistRecord() {
         'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
         'displayConfirmDelete': setDisplayConfirmDelete,
         'displayPDF': setDisplayPDF,
+        'displayQR': setDisplayQR,
     }
 
     const onClick = (name) => {
@@ -976,7 +996,6 @@ export default function ChecklistRecord() {
             setReviseText(Array(30).fill(""));
             setReviseColorPI(Array(12).fill(""));
         }
-        
     }
 
     const renderFooter = (name) => {
@@ -1049,6 +1068,7 @@ export default function ChecklistRecord() {
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                                    <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
                                 </div>
                             </div>
                         </div>
@@ -1724,6 +1744,18 @@ export default function ChecklistRecord() {
                             <div style={{fontSize: '16px'}}>{message.content}</div>
                         </div>
                     </div>
+                </Dialog>
+
+                <Dialog header="SCAN QR" style={{width: '310px' }} visible={displayQR} onHide={() => onHide('displayQR')} blockScroll={true}>
+                    <center>
+                        <h5><b>{qrResult}</b></h5>
+                        <QrReader
+                            delay={300}
+                            onScan={handleScan}
+                            onError={handleError}
+                            style={{height: '260px', width: '260px'}}
+                        />
+                    </center>
                 </Dialog>
 
             </div>

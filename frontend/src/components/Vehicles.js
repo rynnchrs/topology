@@ -14,6 +14,8 @@ import { Carousel } from 'primereact/carousel';
 import { FileUpload } from 'primereact/fileupload';
 import axios from "axios";
 
+import QrReader from 'react-qr-reader'
+
 export class Vehicles extends Component {
     
     constructor() {
@@ -93,6 +95,9 @@ export class Vehicles extends Component {
             vdVisibility: false,
             ddVisibility: false,
             diVisibility: false,
+            displayQR: false,
+
+            qrResult: 'No result',
 
             vBrandSelected: 'Mitsubishi', //test data only
 
@@ -122,6 +127,7 @@ export class Vehicles extends Component {
             // ],
             initialVehicleImage: [{id: "", image: "/media/noimage.jpg"}],
             vehicleImage: [{id: "", image: "/media/noimage.jpg"}],
+            qrImage: ['/media/noimage.jpg'],
             holdImageID: "",
             counter: 0,
         };
@@ -217,6 +223,14 @@ export class Vehicles extends Component {
         );
     }
 
+    qrImageTemplate = (qrImage) => {
+        return (
+            <div>
+                <center><img src={process.env.REACT_APP_SERVER_NAME + qrImage.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+            </div>
+        );
+    }
+
     editVehicleImageTemplate = (vehicleImage) => {
         return (
             <div>
@@ -251,7 +265,6 @@ export class Vehicles extends Component {
         window.open(url);
     }
 
-    
     refreshList = () => {
         axios
           .get(process.env.REACT_APP_SERVER_NAME + "api/careta/?search=")
@@ -611,7 +624,6 @@ export class Vehicles extends Component {
 
     //MODIFY VEHICLE INFO ALGORITHM
     editVehicle = () => {
-        console.log("aw", this.refImageUpload.current)
         if (this.state.APIvehicleData.status === "") {
             this.toast.current.show({ severity: 'error', summary: 'Identification (Status)', detail: 'This field is required.', life: 3000 });
         } else if (this.state.APIvehicleData.operational === "") {
@@ -1199,6 +1211,11 @@ export class Vehicles extends Component {
                         newvehicleData:this.state.vehicleData
                     });
                 }
+            } else if  (vm === 'qr') {
+                this.setState({
+                    displayQR: true,
+                    qrResult: 'No result'
+                });
             }
         }
 
@@ -1847,8 +1864,23 @@ export class Vehicles extends Component {
 
         }
 
+        const handleScan = data => {
+            if (data) {
+                this.setState({
+                    qrResult: data,
+                })
+                setTimeout(() => {
+                    selectItem(data);
+                }, 50);
+            }
+        }
+
+        const handleError = data => {
+            
+        }
+    
         //GET VALUES OF CAR FROM DB
-        const selectItem = event => {
+        const selectItem = value => {
             let token = localStorage.getItem("token");
             const config = {
                 headers: {
@@ -1857,10 +1889,13 @@ export class Vehicles extends Component {
                 },
             };
             axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + event.value.body_no + '/', config)
+                .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value + '/', config)
                 .then(res =>  {
-                    this.setState({ 
-                        vehicleData: res.data
+                    this.setState({
+                        searchBody: value,
+                        vehicleData: res.data,
+                        displayQR: false,
+                        qrImage: [res.data.qr_code.substring(21, res.data.qr_code.length)]
                     });
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.car_id +'/?mode=ci', config)
                     .then((res) => {
@@ -2166,6 +2201,15 @@ export class Vehicles extends Component {
             }
 
 
+        }
+
+        const dialogHideQR = (e) =>{
+            if(this.state.displayQR) {
+                this.setState({
+                    displayQR: false,
+                    qrResult: 'No result'
+                });
+            }
         }
 
         const ConfirmDeleteProceedHandler = () => {
@@ -3060,9 +3104,6 @@ export class Vehicles extends Component {
                                             }
                                         </div>
                                     </AccordionTab>
-                                    {/* {
-                                        console.log(this.state.vmModalMode)
-                                    } */}
                                 </Accordion>
                             </div>
                         </Dialog>
@@ -3071,10 +3112,13 @@ export class Vehicles extends Component {
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
                         <div className="p-col-12" name="searchbox"> 
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-lg-8 p-md-8 p-sm-12">
+                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                     <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
-                                    completeMethod={this.searchList} onSelect={selectItem}
+                                    completeMethod={this.searchList} onSelect={(event) => selectItem(event.value.body_no)}
                                     onChange={event => this.setState({searchBody: event.target.value})}/>
+                                </div>
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                    <Button label="SCAN QR" icon="pi pi-th-large" className="p-button-success" onClick={() => onShow('qr')}/>
                                 </div>
                                 <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                     <Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => this.exportData()}/>
@@ -3733,10 +3777,34 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                     </AccordionTab>
+                                    <AccordionTab header={<label><span><b>QR Code </b></span><i className="pi pi-list"></i></label>}>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dQRCode" className="p-col-12 p-md-2">Image:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={this.state.qrImage} numVisible={1} numScroll={1} itemTemplate={this.qrImageTemplate}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionTab>
                                 </Accordion>
                             </div>
                         </div>
                     </Fieldset>
+                </div>
+
+                <div className="dialog-display">
+                <Dialog header="SCAN QR" style={{width: '310px' }} visible={this.state.displayQR} onHide={() => dialogHideQR()} blockScroll={true}>
+                    <center>
+                        <h5><b>{this.state.qrResult}</b></h5>
+                        <QrReader
+                            delay={300}
+                            onScan={handleScan}
+                            onError={handleError}
+                            style={{height: 260, width: 260}}
+                        />
+                    </center>
+                </Dialog>
                 </div>
             </div>
         );
