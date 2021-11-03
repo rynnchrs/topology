@@ -127,7 +127,7 @@ export class Vehicles extends Component {
             // ],
             initialVehicleImage: [{id: "", image: "/media/noimage.jpg"}],
             vehicleImage: [{id: "", image: "/media/noimage.jpg"}],
-            qrImage: ['/media/noimage.jpg'],
+            qrImage: [process.env.REACT_APP_SERVER_NAME + 'media/noimage.jpg'],
             holdImageID: "",
             counter: 0,
         };
