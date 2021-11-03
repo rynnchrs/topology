@@ -226,7 +226,7 @@ export class Vehicles extends Component {
     qrImageTemplate = (qrImage) => {
         return (
             <div>
-                <center><img src={process.env.REACT_APP_SERVER_NAME + qrImage.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+                <center><img src={qrImage} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
             </div>
         );
     }
@@ -1895,7 +1895,8 @@ export class Vehicles extends Component {
                         searchBody: value,
                         vehicleData: res.data,
                         displayQR: false,
-                        qrImage: [res.data.qr_code.substring(21, res.data.qr_code.length)]
+                        // qrImage: [res.data.qr_code.substring(21, res.data.qr_code.length)]
+                        qrImage: [res.data.qr_code]
                     });
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.car_id +'/?mode=ci', config)
                     .then((res) => {
