@@ -446,6 +446,10 @@ export default function RepairRecords() {
         }
     }
 
+    const handleError = data => {
+        
+    }
+
     const reportImageTemplate = (reportImage) => {
         return (
             <div>
@@ -1737,6 +1741,7 @@ export default function RepairRecords() {
                         <QrReader
                             delay={300}
                             onScan={handleScan}
+                            onError={handleError}
                             style={{height: '260px', width: '260px'}}
                         />
                     </center>

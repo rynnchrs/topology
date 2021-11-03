@@ -667,6 +667,10 @@ export default function ChecklistRecord() {
         }
     }
 
+    const handleError = data => {
+        
+    }
+
     const updateRevise = (index, color, text) => {
         reviseColor[index] = color;
         reviseText[index] = text;
@@ -1748,6 +1752,7 @@ export default function ChecklistRecord() {
                         <QrReader
                             delay={300}
                             onScan={handleScan}
+                            onError={handleError}
                             style={{height: '260px', width: '260px'}}
                         />
                     </center>

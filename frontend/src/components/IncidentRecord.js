@@ -593,6 +593,10 @@ export default function RepairRecords() {
         }
     }
 
+    const handleError = data => {
+        
+    }
+
     const getIncidentRecord = () => {
         let token = localStorage.getItem("token");
         const config = {
@@ -1469,6 +1473,7 @@ export default function RepairRecords() {
                         <QrReader
                             delay={300}
                             onScan={handleScan}
+                            onError={handleError}
                             style={{height: '260px', width: '260px'}}
                         />
                     </center>

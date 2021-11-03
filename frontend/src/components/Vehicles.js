@@ -127,6 +127,7 @@ export class Vehicles extends Component {
             // ],
             initialVehicleImage: [{id: "", image: "/media/noimage.jpg"}],
             vehicleImage: [{id: "", image: "/media/noimage.jpg"}],
+            qrImage: ['/media/noimage.jpg'],
             holdImageID: "",
             counter: 0,
         };
@@ -218,6 +219,14 @@ export class Vehicles extends Component {
         return (
             <div>
                 <center><img src={process.env.REACT_APP_SERVER_NAME + vehicleImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
+            </div>
+        );
+    }
+
+    qrImageTemplate = (qrImage) => {
+        return (
+            <div>
+                <center><img src={process.env.REACT_APP_SERVER_NAME + qrImage.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></center>
             </div>
         );
     }
@@ -615,7 +624,6 @@ export class Vehicles extends Component {
 
     //MODIFY VEHICLE INFO ALGORITHM
     editVehicle = () => {
-        console.log("aw", this.refImageUpload.current)
         if (this.state.APIvehicleData.status === "") {
             this.toast.current.show({ severity: 'error', summary: 'Identification (Status)', detail: 'This field is required.', life: 3000 });
         } else if (this.state.APIvehicleData.operational === "") {
@@ -1866,10 +1874,13 @@ export class Vehicles extends Component {
                 }, 50);
             }
         }
+
+        const handleError = data => {
+            
+        }
     
         //GET VALUES OF CAR FROM DB
         const selectItem = value => {
-            console.log("bdno:", value)
             let token = localStorage.getItem("token");
             const config = {
                 headers: {
@@ -1880,9 +1891,11 @@ export class Vehicles extends Component {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'car/careta/' + value + '/', config)
                 .then(res =>  {
-                    this.setState({ 
+                    this.setState({
+                        searchBody: value,
                         vehicleData: res.data,
                         displayQR: false,
+                        qrImage: [res.data.qr_code.substring(21, res.data.qr_code.length)]
                     });
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.car_id +'/?mode=ci', config)
                     .then((res) => {
@@ -3764,6 +3777,16 @@ export class Vehicles extends Component {
                                             </div>
                                         </div>
                                     </AccordionTab>
+                                    <AccordionTab header={<label><span><b>QR Code </b></span><i className="pi pi-list"></i></label>}>
+                                        <div className="p-fluid">
+                                            <div className="p-field p-grid">
+                                                <label htmlFor="dQRCode" className="p-col-12 p-md-2">Image:</label>
+                                                <div className="p-col-12 p-md-10">
+                                                    <Carousel style={{paddingTop:'5px', border:"1px solid lightgrey"}} value={this.state.qrImage} numVisible={1} numScroll={1} itemTemplate={this.qrImageTemplate}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionTab>
                                 </Accordion>
                             </div>
                         </div>
@@ -3777,7 +3800,8 @@ export class Vehicles extends Component {
                         <QrReader
                             delay={300}
                             onScan={handleScan}
-                            style={{ height: 400, width: 260 }}
+                            onError={handleError}
+                            style={{height: 260, width: 260}}
                         />
                     </center>
                 </Dialog>
