@@ -639,24 +639,137 @@ export default function ChecklistRecord() {
     const convertPDF = () => {
         try {
             const input = document.getElementById('toPdf');
+
             html2canvas(input)
             .then((canvas) => {
                 const imgData = canvas.toDataURL('image/png');
+                // console.log("imageW: ", imgData)
 
-                const pdf = new jsPDF();
+                let imgWidth = 210;
+                let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                // let imgHeight = ((canvas.height * imgWidth) / 2454)*1.24;
+                console.log("cw: ", canvas.width)
+                console.log("ch: ", canvas.height)
+                console.log("ih: ", imgHeight)
+
+
+                var img1 = new Image();
+                img1.src = imgData;
+                img1.height = 250;
+                
+
+                let pageheight = 290;
+
+                // var pdf = new jsPDF();
+                var pdf = new jsPDF('p', 'mm', 'a4');
+                // var pdf = new jsPDF('p', 'mm', [210,280]);
 
                 var width = pdf.internal.pageSize.getWidth();
                 var height = pdf.internal.pageSize.getHeight();
 
-                pdf.addImage(imgData, 'JPEG', 18, 8, width-40, height-18);
+                console.log("h: ", height)
+                console.log("w: ", width)
+
+                // const pdf = new jsPDF({
+                //     orientation: "p",
+                //     unit: "mm",
+                //     format: [210, 297],
+                // });
+
+                var width = pdf.internal.pageSize.getWidth();
+                var height = pdf.internal.pageSize.getHeight();
+
+                let position = 10;
+                var heightLeft = imgHeight;
+
+                pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
+
+                heightLeft -= pageheight;
+
+                while (heightLeft >= 0) {
+                    width = pdf.internal.pageSize.getWidth();
+                    height = pdf.internal.pageSize.getHeight();
+                    
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
+                    heightLeft -= pageheight;
+                }
+
+                // // pdf.addImage(imgData, 'JPEG', 18, 8, width-40, height-18);\
                 window.open(pdf.output('bloburl'));
                 onHide('displayPDF');
                 setIsLoading(false);
             });
         } catch (err){
-
+            console.log(err)
         }
     }
+
+    // useEffect(() => {
+    //     const script = document.createElement('script');
+    //     script.src = "https://cdnjs.cloudflare.com/ajax/libs/react/16.6.1/umd/react.production.min.js";
+    //     script.async = true;
+    //     document.body.appendChild(script);
+    //     return () => {
+    //       document.body.removeChild(script);
+    //     }
+    //   }, []);
+    // useEffect(() => {
+    //     const script = document.createElement('script');
+    //     script.src = "https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.6.1/umd/react-dom.production.min.js";
+    //     script.async = true;
+    //     document.body.appendChild(script);
+    //     return () => {
+    //       document.body.removeChild(script);
+    //     }
+    //   }, []);
+    // useEffect(() => {
+    //     const script = document.createElement('script');
+    //     script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js";
+    //     script.async = true;
+    //     document.body.appendChild(script);
+    //     return () => {
+    //       document.body.removeChild(script);
+    //     }
+    //   }, []);
+
+    
+
+    // const convertPDF = () => {
+    //     try {
+    //         // const rawHTML = document.getElementById('toPdf');
+
+    //         const container = document.querySelector("#toPdf");
+    //         const matches = container.querySelectorAll(".container");
+
+    //         const pdf = new jsPDF();
+    //         // var pdf = new jsPDF('p','mm','a4');
+    //         let imgWidth = 210;
+    //         let imgHeight = 297;
+    //         console.log("raw: ", matches);
+    //         console.log("rawlen: ", matches.length);
+
+    //         // matches.forEach((element, i) => {
+    //         //     html2canvas(element)
+    //         //     .then((canvas) => {
+    //         //         // const imgData = canvas.toDataURL('image/png');
+    //         //         // pdf.addImage(imgData, 'PNG', 14, 10, imgWidth, imgHeight);
+
+    //         //         const isFinal = matches.length === i + 1;
+
+    //         //         if (isFinal) {
+    //         //             console.log("done")
+    //         //         } else {
+    //         //             console.log("adding: ", i)
+    //         //         }
+    //         //     })
+    //         // })
+            
+    //     } catch (err){
+    //         console.log(err)
+    //     }
+    // }
 
     const handleScan = data => {
         if (data) {
