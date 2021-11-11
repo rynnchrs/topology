@@ -35,6 +35,7 @@ urlpatterns = [
     path('task/',  include('task.urls')), 
     path('dashboard/',  include('dashboard.urls')),
     path('image/',  include('image.urls')),
+    path('emails/',  include('emails.urls')),
     path('docs/', include_docs_urls(title=API_TITLE,
                                     description=API_DESCRIPTION)),
     path('schema/', schema_view)

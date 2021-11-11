@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'task',
     'dashboard',
     'image',
+    'emails',
 ]
 
 REST_FRAMEWORK = {
@@ -202,3 +203,10 @@ CORS_ORIGIN_REGEX_WHITELIST = [
 ]
 
 GOOGLE_API_KEY=[]
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'syd.frisco@gmail.com'
+EMAIL_HOST_PASSWORD = 'pxadcgbeplpmfynj'
+EMAIL_USE_TLS = True

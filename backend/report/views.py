@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from image.models import Image
 from notifications.signals import notify
-from rest_framework import filters, generics, status, viewsets
+from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -23,14 +23,14 @@ from reversion.models import Version
 from task.models import JobOrder, Task
 
 from .export import export, repair_export
-from .filters import CheckListFilter, InspectionFilter, RepairFilter
-from .models import CheckList, CheckListParts, Cost, Inspection, Repair
+from .filters import CheckListFilter, FieldInspectionFilter, InspectionFilter, RepairFilter
+from .models import CheckList, CheckListParts, Cost, FieldInspection, Inspection, Repair
 from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
-                          CheckListSerializer, CostSerializer,
+                          CheckListSerializer, CostSerializer, FieldInspectionListSerializer, FieldInspectionSerializer,
                           InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
-from .utils import (analysis, checklist_reversion, repair_reversion, reversion,
+from .utils import (analysis, checklist_reversion, fi_report_reversion, fi_report_serialized, repair_reversion, reversion,
                     user_permission)
 
 
@@ -485,3 +485,165 @@ class CheckListView(viewsets.ModelViewSet):  # add this
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class CheckListPartsView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = CheckListParts.objects.all()
+    serializer_class = CheckListPartsSerializer
+
+    def list(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_checklist'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = CheckListPartsSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+
+
+    def create(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_checklist'): 
+            serializer = CheckListPartsSerializer(data=request.data, many=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_201_CREATED)  
+            return Response(serializer.errors)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+
+    def destroy(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_add_checklist'): 
+            queryset = self.filter_queryset(self.get_queryset().filter(pk=pk))
+            queryset.delete()
+            return Response("deleted", status=status.HTTP_200_OK)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)  
+
+
+class FieldInspectionView(viewsets.ModelViewSet):  # add this
+    permission_classes = [IsAuthenticated]
+    queryset = FieldInspection.objects.all().order_by('-fi_report_id')  # add this
+    serializer_class = FieldInspectionSerializer  # add this
+    filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = FieldInspectionFilter
+    ordering_fields = ['fi_report_id', 'date_created']
+    
+    def list(self, request): 
+        user = self.request.user   
+        if user_permission(user, 'can_view_checklist'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = FieldInspectionListSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)      
+            serializer = FieldInspectionListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+            
+    def create(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_checklist'): 
+            serializer = FieldInspectionSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['body_no'])
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Field Inspection Report for " + str(car.body_no) + " is created."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='field_inspection,create', description=message)
+                return Response(serializer.data,status=status.HTTP_201_CREATED)  
+            return Response(serializer.errors)        
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)    
+
+    def retrieve(self, request, pk=None):  
+        user = self.request.user
+        if user_permission(user,'can_view_checklist'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            inspection = get_object_or_404(queryset, pk=pk) 
+            serializer = FieldInspectionSerializer(inspection,many=False)
+            serializer_data = serializer.data
+            serializer_data['revised'] = fi_report_reversion(inspection)
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='field_inspection')
+            for notif in notifs:
+                notif.mark_as_read()
+            return Response(serializer_data, status=status.HTTP_200_OK)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def update(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user, 'can_edit_checklist'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            inspection = get_object_or_404(queryset, pk=pk) 
+            serializer = FieldInspectionSerializer(instance=inspection, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                car = Car.objects.get(body_no=request.data['body_no'])
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Field Inspection Report for " + str(car.body_no) + " is updated."
+                notify.send(sender, recipient=recipients,  target=serializer.save(), 
+                                level='info', verb='field_inspection,update', description=message)
+            return Response(serializer.data, status=status.HTTP_200_OK)       
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+            
+    def destroy(self, request, pk=None):      
+        user = self.request.user
+        if user_permission(user, 'can_delete_checklist'): 
+            try:
+                queryset = self.filter_queryset(self.get_queryset())
+                inspection = get_object_or_404(queryset, pk=pk)
+                sender = User.objects.get(username=user.username)
+                recipients = User.objects.filter(permission__can_add_task=True)
+                message = "Field Inspection Report " + str(inspection.body_no.body_no) + " is deleted."
+                notify.send(sender, recipient=recipients, level='info', 
+                                verb='inspection_field,delete', description=message)
+                inspection.delete()
+                queryset = Image.objects.filter(image_name=pk ,mode="fi")
+                for image in queryset:
+                    try:
+                        image.image.delete(save=False)
+                        image.delete()
+                    except:
+                        pass
+                return Response("Successfully Deleted",status=status.HTTP_200_OK)      
+            except ProtectedError:
+                return Response("Can't delete this because it's being use by Task Scheduling", status=status.HTTP_200_OK)    
+        else: 
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    @action(detail=True)
+    def pdf(self, request, pk=None):
+        user = self.request.user
+        if user_permission(user,'can_view_checklist'): 
+            queryset = self.filter_queryset(self.get_queryset())
+            inspection = get_object_or_404(queryset, pk=pk) 
+            serializer = FieldInspectionSerializer(inspection,many=False)
+            serializer_data = serializer.data
+            notifs = user.notifications.filter(target_object_id=pk, verb__startswith='field_inspection')
+            for notif in notifs:
+                notif.mark_as_read()
+            return Response(fi_report_serialized(serializer_data), status=status.HTTP_200_OK)          
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # @action(detail=False)
+    # def task_not_created(self, request):
+    #     user = self.request.user
+    #     if user_permission(user, 'can_add_task'):
+    #         # filter the used job order in inspection table
+    #         check_list = Task.objects.all().values_list('check_list', flat=True)
+    #         # filter True(inspection) and remove all used job order
+    #         check_list = [i for i in check_list if i is not None]
+    #         queryset = CheckList.objects.all().exclude(pk__in=check_list)
+    #         serializer = CheckListListSerializer(queryset, many=True)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)

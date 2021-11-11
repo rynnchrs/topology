@@ -79,7 +79,8 @@ class UnreadNotificationsList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        count = self.request.user.notifications.unread().count()
+        notification = self.request.user.notifications.all().filter(unread=True)
+        count = notification.exclude(verb__contains='delete').count()
         data = {
             'unread_count': count,
         }
