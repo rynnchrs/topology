@@ -1407,10 +1407,11 @@ export const JobScheduling = () => {
                                         localStorage.getItem("viewUsers") === "true" ? 
                                                 <div className="p-grid p-fluid">
                                                     <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
-                                                        <Button style={{minWidth:'max-content'}} className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
+                                                        {/* <Button style={{minWidth:'max-content'}} className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/> */}
                                                     </div>
                                                     <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
-                                                        <Button label="CREATE REPAIR" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/>
+                                                        {/* <Button label="CREATE REPAIR" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/> */}
+                                                        <Button className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
                                                     </div>
                                                 </div>
                                         : ''

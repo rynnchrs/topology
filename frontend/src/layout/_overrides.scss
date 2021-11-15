@@ -367,6 +367,38 @@
 }
 /* end css for careta report */
 
+/* css for field inspection report */
+
+.field-inspection-table {
+  table {
+    // width: 100%;
+    border-collapse: collapse;
+    line-height: 1;
+  }
+  tr:not(first-child) {
+    border-bottom: 1px solid rgb(192, 192, 192);
+  }
+  td {
+    width: 35px;
+    // border: 1px solid blue;
+  }
+  td:first-child + td {
+    width: 35px;
+  }
+  td:first-child + td + td {
+    width: 35px;
+  }
+  td:first-child + td + td + td {
+    width: 150px;
+    height: 15px;
+  }
+  td:first-child + td + td + td + td {
+    width: 35px;
+  }
+}
+/* end css for field inspection report */
+
+
 /* override global size of dialog in all forms*/
 .dialog-display{
   @media only screen and (max-width : 2500px) { 
