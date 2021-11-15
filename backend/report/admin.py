@@ -2,7 +2,7 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
 
-from .models import CheckList, CheckListParts, CheckListReportParts, Cost, Inspection, Repair
+from .models import CheckList, CheckListParts, CheckListReportParts, Cost, FieldInspection, Inspection, Repair
 
 # Register your models here.
 
@@ -41,3 +41,10 @@ class CheckListReportPartsAdmin(admin.ModelAdmin):
     list_display = ['id','check_list_parts','quantity']
 
 admin.site.register(CheckListReportParts, CheckListReportPartsAdmin)
+
+
+class FieldInspectionAdmin(VersionAdmin):
+    model = FieldInspection
+    list_display = ['fi_report_id','body_no',]
+
+admin.site.register(FieldInspection, FieldInspectionAdmin)

@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from .models import Inspection, Repair
+from .models import FieldInspection, Inspection, Repair
 
 class InspectionFilter(filters.FilterSet):
     inspection_id = filters.NumberFilter(field_name="inspection_id", lookup_expr='exact')
@@ -32,3 +32,13 @@ class CheckListFilter(filters.FilterSet):
     class Meta:
         models = Repair
         fields = ['check_list_id','body_no','job_no','type','date_created']
+
+
+class FieldInspectionFilter(filters.FilterSet):
+    fi_report_id = filters.NumberFilter(field_name="fi_report_id", lookup_expr='exact')
+    body_no = filters.CharFilter(field_name="body_no__body_no", lookup_expr='startswith')
+    job_no = filters.CharFilter(field_name="job_order__job_no", lookup_expr='startswith')
+    inspection_date = filters.CharFilter(field_name="inspection_date", lookup_expr='startswith')
+    class Meta:
+        models = FieldInspection
+        fields = ['fi_report_id','body_no','job_no','inspection_date']

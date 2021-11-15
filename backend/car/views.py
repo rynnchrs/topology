@@ -6,11 +6,17 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from image.models import Image
+from report.models import CheckList, Inspection, Repair
+from report.serializers import (CheckListListSerializer,
+                                InspectionListSerializer, RepairListSerializer)
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from task.models import IR, Task
+from task.serializers import IRListSerializers, WarningTaskSerializer
 
 from .filters import CarFilter
 from .models import PDF, TPL, Car, Contract, Insurance
@@ -45,7 +51,8 @@ class CarView(viewsets.ModelViewSet):  # add this
     
     def destroy(self, request, slug=None):       
         queryset = Car.objects.all()
-        car = get_object_or_404(queryset, slug=slug)  
+        car = get_object_or_404(queryset, slug=slug)
+        car.qr_code.delete(save=False)
         car.delete()
         queryset = Image.objects.filter(image_name=slug ,mode="ci")
         for image in queryset:
@@ -227,3 +234,31 @@ class QRCodeView(generics.ListAPIView):  #list of all car with filtering
     serializer_class = QRCodeSerializer  
     filter_backends = [filters.SearchFilter]
     search_fields = ['^body_no',]
+
+
+class HistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        body_no = request.GET['body_no']
+
+        driver_reports = Inspection.objects.filter(body_no__body_no=body_no).order_by('-inspection_id')[:5]
+        incident_report = IR.objects.filter(body_no__body_no=body_no).order_by('-ir_id')[:5]
+        task_schedule = Task.objects.filter(body_no__body_no=body_no).order_by('-task_id')[:5]
+        check_list = CheckList.objects.filter(body_no__body_no=body_no).order_by('-check_list_id')[:5]
+        repair_report = Repair.objects.filter(body_no__body_no=body_no).order_by('-repair_id')[:5]
+
+        driver_reports = InspectionListSerializer(driver_reports, many=True)
+        incident_report = IRListSerializers(incident_report, many=True)
+        task_schedule = WarningTaskSerializer(task_schedule, many=True)
+        check_list = CheckListListSerializer(check_list, many=True)
+        repair_report = RepairListSerializer(repair_report, many=True)
+        
+        context = {
+            'driver_reports': driver_reports.data,
+            'incident_report': incident_report.data,
+            'task_schedule': task_schedule.data,
+            'check_list': check_list.data,
+            'repair_report': repair_report.data,
+        }
+        return Response(context, status=status.HTTP_200_OK)
