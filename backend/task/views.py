@@ -9,7 +9,7 @@ from django_filters import filters
 from django_filters import rest_framework as filter
 from image.models import Image
 from notifications.signals import notify
-from report.models import CheckList, Repair
+from report.models import CheckList, FieldInspection, Repair
 from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -254,7 +254,7 @@ class TaskView(viewsets.ModelViewSet):
             queryset = Task.objects.all()
             task = get_object_or_404(queryset, pk=pk)    # get user
             if task.job_order.type == False:
-                queryset = CheckList.objects.all()
+                queryset = FieldInspection.objects.all()
                 report = get_object_or_404(queryset, task=pk) 
                 if task.task_status_mn == False and report.noted_by is None:
                     task.task_status_mn = True;

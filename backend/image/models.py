@@ -15,6 +15,8 @@ class Image(models.Model):
         ('cr','Careta Reports'),
         ('cl','Check List'),
         ('ir','IR'),
+        ('fi','Field Inspection'),
+        ('dp','Damage Parts'),
     ]
     mode  = models.CharField(max_length=2, choices=Mode_List)
     

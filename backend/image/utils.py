@@ -29,4 +29,14 @@ def upload_path(instance, filename):
         path = str(instance.image_name)
         filename = '{}.{}'.format(instance.image_id, ext)
         return '/'.join(['IR/',path,filename])
+    elif instance.mode == 'fi':
+        ext = filename.split('.')[-1]
+        path = str(instance.image_name)
+        filename = '{}.{}'.format(instance.image_id, ext)
+        return '/'.join(['Field-Inspection/',path,filename])
+    elif instance.mode == 'dp':
+        ext = filename.split('.')[-1]
+        path = str(instance.image_name)
+        filename = '{}.{}'.format(instance.image_id, ext)
+        return '/'.join(['Damage-Parts/',path,filename])
 

@@ -35,8 +35,10 @@ urlpatterns = [
     path('task/',  include('task.urls')), 
     path('dashboard/',  include('dashboard.urls')),
     path('image/',  include('image.urls')),
+    path('emails/',  include('emails.urls')),
     path('docs/', include_docs_urls(title=API_TITLE,
                                     description=API_DESCRIPTION)),
     path('schema/', schema_view)
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

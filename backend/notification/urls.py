@@ -8,7 +8,6 @@ router = routers.DefaultRouter()
 router.register(r'inspection', views.InspectionNotifyView, 'inspection'),
 router.register(r'', views.NotificationView, 'notification'),
 
-    
 
 urlpatterns = [
     path('', include(router.urls)),

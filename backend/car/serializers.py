@@ -10,6 +10,27 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
                     'permanent_loc','dealer','cs_no','engine_no']
 
 
+class CarFieldInspectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = ['body_no','make','series','color','brand','release_year',
+                    'transmission','cylinder','current_loc','operational']
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['make'] = serializers.CharField(source='get_make_display', read_only=True)
+        self.fields['series'] = serializers.CharField(source='get_series_display', read_only=True)
+        self.fields['brand'] = serializers.CharField(source='get_brand_display', read_only=True)
+        self.fields['transmission'] = serializers.CharField(source='get_transmission_display', read_only=True)
+        self.fields['operational'] = serializers.SerializerMethodField(read_only=True)
+        return super(CarFieldInspectionSerializer, self).to_representation(instance)
+
+    def get_operational(self, obj):
+        if obj.operational == False:
+            return "Inspection"
+        else:
+            return "Repair"
+
+
 class QRCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car

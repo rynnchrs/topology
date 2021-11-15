@@ -1,12 +1,12 @@
 from car.models import Car
-from car.serializers import CarInfoSerializer
+from car.serializers import CarFieldInspectionSerializer, CarInfoSerializer
 from django.contrib.auth.models import User
 from rest_framework import fields, serializers
 from task.models import IR
 from task.serializers import RepairJobSerializer
 
 from .models import (CheckList, CheckListParts, CheckListReportParts, Cost,
-                     Inspection, Repair)
+                     FieldInspection, Inspection, Repair)
 
 
 class InspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
@@ -259,7 +259,6 @@ class CheckListReportPartsSerializer(serializers.ModelSerializer): # cost info i
         return obj
     
 
-
 class CheckListSerializer(serializers.ModelSerializer): # Inspection serializer 
     parts = CheckListReportPartsSerializer(many=True, required=False)
     parts_included = fields.MultipleChoiceField(choices=CheckList.Parts_List)
@@ -364,3 +363,46 @@ class CheckListListSerializer(serializers.ModelSerializer): # list of all repair
             return "Inspection"
         else:
             return "Repair"
+
+
+class FieldInspectionSerializer(serializers.ModelSerializer): # Inspection serializer 
+    body_no = serializers.CharField()
+    approved_by = serializers.CharField(required=False, allow_blank=True)
+    noted_by = serializers.CharField(required=False, allow_blank=True)
+    class Meta:
+        model = FieldInspection
+        fields = '__all__'
+
+    def validate(self, obj): # validate if vin_no input is vin_no
+        errors = []
+        try:
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
+        except:
+           errors.append({"body_no": 'Invalid Body No.'})
+        try:
+            if obj['approved_by'] == "":
+                obj['approved_by'] = None
+        except:
+            errors.append({"approved_by": 'Invalid Approved By'})
+        try:
+            if obj['noted_by'] == "":
+                obj['noted_by'] = None
+        except:
+            errors.append({"noted_by": 'Invalid Noted By'})
+        if errors:
+            raise serializers.ValidationError({'errors':errors})
+        return obj
+        
+
+    def to_representation(self, instance): # instance of vin_no
+        self.fields['body_no'] =  CarFieldInspectionSerializer(read_only=True)
+        return super(FieldInspectionSerializer, self).to_representation(instance)
+
+
+class FieldInspectionListSerializer(serializers.ModelSerializer): # list of all repair
+    body_no = serializers.CharField(source='body_no.body_no')
+    job_order = serializers.CharField(source='job_order.job_no')
+    class Meta:
+        model = FieldInspection
+        fields = ['fi_report_id','body_no','job_order','inspection_date']
+    
