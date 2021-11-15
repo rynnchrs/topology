@@ -14,7 +14,7 @@ class CarFieldInspectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = ['body_no','make','series','color','brand','release_year',
-                    'transmission','cylinder','current_loc','operational']
+                    'transmission','cylinder','current_loc','operational',]
 
     def to_representation(self, instance): # instance of vin_no
         self.fields['make'] = serializers.CharField(source='get_make_display', read_only=True)
@@ -26,9 +26,9 @@ class CarFieldInspectionSerializer(serializers.ModelSerializer):
 
     def get_operational(self, obj):
         if obj.operational == False:
-            return "Inspection"
+            return "Non-Operational"
         else:
-            return "Repair"
+            return "Operational"
 
 
 class QRCodeSerializer(serializers.ModelSerializer):
