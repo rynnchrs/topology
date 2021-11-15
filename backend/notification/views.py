@@ -71,16 +71,20 @@ class AllNotificationsList(generics.ListAPIView):
     serializer_class = NotificationsSerializer
 
     def get_queryset(self):
-        notifs = self.request.user.notifications.all()
-        return notifs
+        notification = self.request.user.notifications.all()
+        notifs = notification.filter(verb__contains='delete').filter(unread=True)
+        for notif in notifs:
+            notif.unread = False
+            notif.save()
+        return notification
 
 
 class UnreadNotificationsList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        notification = self.request.user.notifications.all().filter(unread=True)
-        count = notification.exclude(verb__contains='delete').count()
+        count = self.request.user.notifications.all().filter(unread=True).count()
+        
         data = {
             'unread_count': count,
         }

@@ -634,16 +634,16 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    # @action(detail=False)
-    # def task_not_created(self, request):
-    #     user = self.request.user
-    #     if user_permission(user, 'can_add_task'):
-    #         # filter the used job order in inspection table
-    #         check_list = Task.objects.all().values_list('check_list', flat=True)
-    #         # filter True(inspection) and remove all used job order
-    #         check_list = [i for i in check_list if i is not None]
-    #         queryset = CheckList.objects.all().exclude(pk__in=check_list)
-    #         serializer = CheckListListSerializer(queryset, many=True)
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    @action(detail=False)
+    def task_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in inspection table
+            check_list = Task.objects.all().values_list('check_list', flat=True)
+            # filter True(inspection) and remove all used job order
+            check_list = [i for i in check_list if i is not None]
+            queryset = CheckList.objects.all().exclude(pk__in=check_list)
+            serializer = CheckListListSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
