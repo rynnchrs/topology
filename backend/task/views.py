@@ -437,6 +437,25 @@ class JobOrderView(viewsets.ViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=False)
+    def fi_inspection_not_created(self, request):
+        user = self.request.user
+        if user_permission(user, 'can_add_task'):
+            # filter the used job order in inspection table
+            inspection = FieldInspection.objects.all().values_list('job_order', flat=True)
+            # filter True(inspection) and remove all used job order
+            queryset = JobOrder.objects.all().filter(type=False).exclude(job_id__in=inspection)
+            serializer = RepairJobSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif user_permission(user, 'can_add_repair_reports'):
+            inspection = FieldInspection.objects.all().values_list('job_order', flat=True)
+            queryset = JobOrder.objects.filter(type=False).exclude(job_id__in=inspection)
+            queryset = queryset.filter(task__fieldman__field_man=user.pk)
+            serializer = RepairJobSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            
+    @action(detail=False)
     def repair_list(self, request):
         user = self.request.user
         if user_permission(user, 'can_view_task'):
