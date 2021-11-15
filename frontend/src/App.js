@@ -176,7 +176,7 @@ const App = () => {
     sidebarSubMenu4.push({label: 'Checklist Record', icon: 'pi pi-th-large', to: '/checklistrecord'});
     sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
     sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
-    sidebarMenu.push({label: 'Careta Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
+    sidebarMenu.push({label: 'CSR Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
 
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);
