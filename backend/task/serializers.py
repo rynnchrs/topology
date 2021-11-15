@@ -1,4 +1,5 @@
 from car.models import Car
+from car.serializers import CarFieldInspectionSerializer
 from django.contrib.auth.models import User
 from report.models import CheckList
 from rest_framework import fields, serializers
@@ -233,6 +234,24 @@ class RepairJobSerializer(serializers.ModelSerializer):
         self.fields['ir_no'] = IRTaskSerializer(source='task.ir_no')
         self.fields['check_list'] = serializers.CharField(source='task.check_list')
         return super(RepairJobSerializer, self).to_representation(instance)   
+
+
+class FieldInspectionJobSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+    class Meta:
+        model = JobOrder
+        fields = '__all__'
+
+    def get_type(self, obj):
+        if obj.type == False:
+            return "Inspection"
+        else:
+            return "Repair"
+
+    def to_representation(self, instance): 
+        self.fields['task'] = RepairTaskSerializer(read_only=True)
+        self.fields['body_no'] = CarFieldInspectionSerializer(source='task.body_no')
+        return super(FieldInspectionJobSerializer, self).to_representation(instance)
 
 
 class IRListSerializers(serializers.ModelSerializer):
