@@ -10,6 +10,7 @@ import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 import axios from "axios";
+import { format } from 'date-fns';
 
 export default function FieldInspectionReport() {
 
@@ -67,93 +68,182 @@ export default function FieldInspectionReport() {
             });
     }
 
+    const initialExterior = [
+        {g: false, f: false, p: false, label: "Hood", notes: ''},
+        {g: false, f: false, p: false, label: "Front", notes: ''},
+        {g: false, f: false, p: false, label: "Front Bumper", notes: ''},
+        {g: false, f: false, p: false, label: "Fenders", notes: ''},
+        {g: false, f: false, p: false, label: "Doors", notes: ''},
+        {g: false, f: false, p: false, label: "Roof", notes: ''},
+        {g: false, f: false, p: false, label: "Rear", notes: ''},
+        {g: false, f: false, p: false, label: "Rear Bumper", notes: ''},
+        {g: false, f: false, p: false, label: "Trunk", notes: ''},
+        {g: false, f: false, p: false, label: "Trim", notes: '' },
+        {g: false, f: false, p: false, label: "Fuel Door", notes: ''},
+        {g: false, f: false, p: false, label: "Paint Condition", notes: ''}
+    ];
+
     const [exterior, setExterior] = useState([
-        {g: false, f: false, p: false, label: "Hood", notes: ""},
-        {g: false, f: false, p: false, label: "Front", notes: ""},
-        {g: false, f: false, p: false, label: "Front Bumper", notes: ""},
-        {g: false, f: false, p: false, label: "Fenders", notes: ""},
-        {g: false, f: false, p: false, label: "Doors", notes: ""},
-        {g: false, f: false, p: false, label: "Roof", notes: ""},
-        {g: false, f: false, p: false, label: "Rear", notes: ""},
-        {g: false, f: false, p: false, label: "Rear Bumper", notes: ""},
-        {g: false, f: false, p: false, label: "Trunk", notes: ""},
-        {g: false, f: false, p: false, label: "Trim", notes: "" },
-        {g: false, f: false, p: false, label: "Fuel Door", notes: ""},
-        {g: false, f: false, p: false, label: "Paint Condition", notes: ""},
+        {g: false, f: false, p: false, label: "Hood", notes: ''},
+        {g: false, f: false, p: false, label: "Front", notes: ''},
+        {g: false, f: false, p: false, label: "Front Bumper", notes: ''},
+        {g: false, f: false, p: false, label: "Fenders", notes: ''},
+        {g: false, f: false, p: false, label: "Doors", notes: ''},
+        {g: false, f: false, p: false, label: "Roof", notes: ''},
+        {g: false, f: false, p: false, label: "Rear", notes: ''},
+        {g: false, f: false, p: false, label: "Rear Bumper", notes: ''},
+        {g: false, f: false, p: false, label: "Trunk", notes: ''},
+        {g: false, f: false, p: false, label: "Trim", notes: '' },
+        {g: false, f: false, p: false, label: "Fuel Door", notes: ''},
+        {g: false, f: false, p: false, label: "Paint Condition", notes: ''}
     ]);
 
+    const initialGlass = [
+        {g: false, f: false, p: false, label: "Windshield", notes: ''},
+        {g: false, f: false, p: false, label: "Windows", notes: ''},
+        {g: false, f: false, p: false, label: "Mirrors", notes: ''},
+        {g: false, f: false, p: false, label: "Rear Window", notes: ''}
+    ];
+
     const [glass, setGlass] = useState([
-        {g: false, f: false, p: false, label: "Windshield", notes: ""},
-        {g: false, f: false, p: false, label: "Windows", notes: ""},
-        {g: false, f: false, p: false, label: "Mirrors", notes: ""},
-        {g: false, f: false, p: false, label: "Rear Window", notes: ""}
+        {g: false, f: false, p: false, label: "Windshield", notes: ''},
+        {g: false, f: false, p: false, label: "Windows", notes: ''},
+        {g: false, f: false, p: false, label: "Mirrors", notes: ''},
+        {g: false, f: false, p: false, label: "Rear Window", notes: ''}
+    ]);
+
+    const initialTiresWheels = useState([
+        {g: false, f: false, p: false, label: "Condition of Tires", notes: ''},
+        {g: false, f: false, p: false, label: "Condition of Wheels", notes: ''},
+        {g: false, f: false, p: false, label: "Spare Tire", notes: ''}
     ]);
 
     const [tiresWheels, setTiresWheels] = useState([
-        {g: false, f: false, p: false, label: "Condition of Tires", notes: ""},
-        {g: false, f: false, p: false, label: "Condition of Wheels", notes: ""},
-        {g: false, f: false, p: false, label: "Spare Tire", notes: ""}
+        {g: false, f: false, p: false, label: "Condition of Tires", notes: ''},
+        {g: false, f: false, p: false, label: "Condition of Wheels", notes: ''},
+        {g: false, f: false, p: false, label: "Spare Tire", notes: ''}
+    ]);
+
+    const initialUnderbody = useState([
+        {g: false, f: false, p: false, label: "Frame", notes: ''},
+        {g: false, f: false, p: false, label: "Exhaust System", notes: ''},
+        {g: false, f: false, p: false, label: "Transmission", notes: ''},
+        {g: false, f: false, p: false, label: "Drive Axie", notes: ''},
+        {g: false, f: false, p: false, label: "Suspension", notes: ''},
+        {g: false, f: false, p: false, label: "Brake System", notes: ''}
     ]);
 
     const [underbody, setUnderbody] = useState([
-        {g: false, f: false, p: false, label: "Frame", notes: ""},
-        {g: false, f: false, p: false, label: "Exhaust System", notes: ""},
-        {g: false, f: false, p: false, label: "Transmission", notes: ""},
-        {g: false, f: false, p: false, label: "Drive Axie", notes: ""},
-        {g: false, f: false, p: false, label: "Suspension", notes: ""},
-        {g: false, f: false, p: false, label: "Brake System", notes: ""}
+        {g: false, f: false, p: false, label: "Frame", notes: ''},
+        {g: false, f: false, p: false, label: "Exhaust System", notes: ''},
+        {g: false, f: false, p: false, label: "Transmission", notes: ''},
+        {g: false, f: false, p: false, label: "Drive Axie", notes: ''},
+        {g: false, f: false, p: false, label: "Suspension", notes: ''},
+        {g: false, f: false, p: false, label: "Brake System", notes: ''}
+    ]);
+
+    const initialUnderhood = useState([
+        {g: false, f: false, p: false, label: "Engine Compartment", notes: ''},
+        {g: false, f: false, p: false, label: "Battery", notes: ''},
+        {g: false, f: false, p: false, label: "Oil", notes: ''},
+        {g: false, f: false, p: false, label: "Fluids", notes: ''},
+        {g: false, f: false, p: false, label: "Wiring", notes: ''},
+        {g: false, f: false, p: false, label: "Belts", notes: ''},
+        {g: false, f: false, p: false, label: "Hoses", notes: ''},
+        {g: false, f: false, p: false, label: "Any Non-Stock Modifications", notes: ''}
     ]);
 
     const [underhood, setUnderhood] = useState([
-        {g: false, f: false, p: false, label: "Engine Compartment", notes: ""},
-        {g: false, f: false, p: false, label: "Battery", notes: ""},
-        {g: false, f: false, p: false, label: "Oil", notes: ""},
-        {g: false, f: false, p: false, label: "Fluids", notes: ""},
-        {g: false, f: false, p: false, label: "Wiring", notes: ""},
-        {g: false, f: false, p: false, label: "Belts", notes: ""},
-        {g: false, f: false, p: false, label: "Hoses", notes: ""},
-        {g: false, f: false, p: false, label: "Any Non-Stock Modifications", notes: ""}
+        {g: false, f: false, p: false, label: "Engine Compartment", notes: ''},
+        {g: false, f: false, p: false, label: "Battery", notes: ''},
+        {g: false, f: false, p: false, label: "Oil", notes: ''},
+        {g: false, f: false, p: false, label: "Fluids", notes: ''},
+        {g: false, f: false, p: false, label: "Wiring", notes: ''},
+        {g: false, f: false, p: false, label: "Belts", notes: ''},
+        {g: false, f: false, p: false, label: "Hoses", notes: ''},
+        {g: false, f: false, p: false, label: "Any Non-Stock Modifications", notes: ''}
+    ]);
+
+    const initialInterior = useState([
+        {g: false, f: false, p: false, label: "Seats", notes: ''},
+        {g: false, f: false, p: false, label: "Headliner", notes: ''},
+        {g: false, f: false, p: false, label: "Carpet"},
+        {g: false, f: false, p: false, label: "Door Panels", notes: ''},
+        {g: false, f: false, p: false, label: "Glove Box", notes: ''},
+        {g: false, f: false, p: false, label: "Vanity Mirrors", notes: ''},
+        {g: false, f: false, p: false, label: "Interior Trim", notes: ''},
+        {g: false, f: false, p: false, label: "Dashboard", notes: ''},
+        {g: false, f: false, p: false, label: "Dashboard Gauges", notes: ''},
+        {g: false, f: false, p: false, label: "Air Conditioning", notes: ''},
+        {g: false, f: false, p: false, label: "Heater", notes: ''},
+        {g: false, f: false, p: false, label: "Defroster", notes: ''}
     ]);
 
     const [interior, setInterior] = useState([
-        {g: false, f: false, p: false, label: "Seats", notes: ""},
-        {g: false, f: false, p: false, label: "Headliner", notes: ""},
+        {g: false, f: false, p: false, label: "Seats", notes: ''},
+        {g: false, f: false, p: false, label: "Headliner", notes: ''},
         {g: false, f: false, p: false, label: "Carpet"},
-        {g: false, f: false, p: false, label: "Door Panels", notes: ""},
-        {g: false, f: false, p: false, label: "Glove Box", notes: ""},
-        {g: false, f: false, p: false, label: "Vanity Mirrors", notes: ""},
-        {g: false, f: false, p: false, label: "Interior Trim", notes: ""},
-        {g: false, f: false, p: false, label: "Dashboard", notes: ""},
-        {g: false, f: false, p: false, label: "Dashboard Gauges", notes: ""},
-        {g: false, f: false, p: false, label: "Air Conditioning", notes: ""},
-        {g: false, f: false, p: false, label: "Heater", notes: ""},
-        {g: false, f: false, p: false, label: "Defroster", notes: ""}
+        {g: false, f: false, p: false, label: "Door Panels", notes: ''},
+        {g: false, f: false, p: false, label: "Glove Box", notes: ''},
+        {g: false, f: false, p: false, label: "Vanity Mirrors", notes: ''},
+        {g: false, f: false, p: false, label: "Interior Trim", notes: ''},
+        {g: false, f: false, p: false, label: "Dashboard", notes: ''},
+        {g: false, f: false, p: false, label: "Dashboard Gauges", notes: ''},
+        {g: false, f: false, p: false, label: "Air Conditioning", notes: ''},
+        {g: false, f: false, p: false, label: "Heater", notes: ''},
+        {g: false, f: false, p: false, label: "Defroster", notes: ''}
+    ]);
+
+    const initialElectricalSystem = useState([
+        {g: false, f: false, p: false, label: "Power Locks", notes: ''},
+        {g: false, f: false, p: false, label: "Power Seats", notes: ''},
+        {g: false, f: false, p: false, label: "Power Steering", notes: ''},
+        {g: false, f: false, p: false, label: "Power Windows", notes: ''},
+        {g: false, f: false, p: false, label: "Power Mirrors", notes: ''},
+        {g: false, f: false, p: false, label: "Audio System", notes: ''},
+        {g: false, f: false, p: false, label: "Onboard Computer", notes: ''},
+        {g: false, f: false, p: false, label: "Headlights", notes: ''},
+        {g: false, f: false, p: false, label: "Taillights", notes: ''},
+        {g: false, f: false, p: false, label: "Signal Lights", notes: ''},
+        {g: false, f: false, p: false, label: "Brake Lights", notes: ''},
+        {g: false, f: false, p: false, label: "Parking Lights", notes: ''}
     ]);
 
     const [electricalSystem, setElectricalSystem] = useState([
-        {g: false, f: false, p: false, label: "Power Locks", notes: ""},
-        {g: false, f: false, p: false, label: "Power Seats", notes: ""},
-        {g: false, f: false, p: false, label: "Power Steering", notes: ""},
-        {g: false, f: false, p: false, label: "Power Windows", notes: ""},
-        {g: false, f: false, p: false, label: "Power Mirrors", notes: ""},
-        {g: false, f: false, p: false, label: "Audio System", notes: ""},
-        {g: false, f: false, p: false, label: "Onboard Computer", notes: ""},
-        {g: false, f: false, p: false, label: "Headlights", notes: ""},
-        {g: false, f: false, p: false, label: "Taillights", notes: ""},
-        {g: false, f: false, p: false, label: "Signal Lights", notes: ""},
-        {g: false, f: false, p: false, label: "Brake Lights", notes: ""},
-        {g: false, f: false, p: false, label: "Parking Lights", notes: ""}
+        {g: false, f: false, p: false, label: "Power Locks", notes: ''},
+        {g: false, f: false, p: false, label: "Power Seats", notes: ''},
+        {g: false, f: false, p: false, label: "Power Steering", notes: ''},
+        {g: false, f: false, p: false, label: "Power Windows", notes: ''},
+        {g: false, f: false, p: false, label: "Power Mirrors", notes: ''},
+        {g: false, f: false, p: false, label: "Audio System", notes: ''},
+        {g: false, f: false, p: false, label: "Onboard Computer", notes: ''},
+        {g: false, f: false, p: false, label: "Headlights", notes: ''},
+        {g: false, f: false, p: false, label: "Taillights", notes: ''},
+        {g: false, f: false, p: false, label: "Signal Lights", notes: ''},
+        {g: false, f: false, p: false, label: "Brake Lights", notes: ''},
+        {g: false, f: false, p: false, label: "Parking Lights", notes: ''}
+    ]);
+
+    const initialRoadTestFindings = useState([
+        {g: false, f: false, p: false, label: "Starting", notes: ''},
+        {g: false, f: false, p: false, label: "Idling", notes: ''},
+        {g: false, f: false, p: false, label: "Engine Performance", notes: ''},
+        {g: false, f: false, p: false, label: "Acceleration", notes: ''},
+        {g: false, f: false, p: false, label: "Transmission Shift Quality", notes: ''},
+        {g: false, f: false, p: false, label: "Steering", notes: ''},
+        {g: false, f: false, p: false, label: "Braking", notes: ''},
+        {g: false, f: false, p: false, label: "Suspension Performance", notes: ''}
     ]);
 
     const [roadTestFindings, setRoadTestFindings] = useState([
-        {g: false, f: false, p: false, label: "Starting", notes: ""},
-        {g: false, f: false, p: false, label: "Idling", notes: ""},
-        {g: false, f: false, p: false, label: "Engine Performance", notes: ""},
-        {g: false, f: false, p: false, label: "Acceleration", notes: ""},
-        {g: false, f: false, p: false, label: "Transmission Shift Quality", notes: ""},
-        {g: false, f: false, p: false, label: "Steering", notes: ""},
-        {g: false, f: false, p: false, label: "Braking", notes: ""},
-        {g: false, f: false, p: false, label: "Suspension Performance", notes: ""}
+        {g: false, f: false, p: false, label: "Starting", notes: ''},
+        {g: false, f: false, p: false, label: "Idling", notes: ''},
+        {g: false, f: false, p: false, label: "Engine Performance", notes: ''},
+        {g: false, f: false, p: false, label: "Acceleration", notes: ''},
+        {g: false, f: false, p: false, label: "Transmission Shift Quality", notes: ''},
+        {g: false, f: false, p: false, label: "Steering", notes: ''},
+        {g: false, f: false, p: false, label: "Braking", notes: ''},
+        {g: false, f: false, p: false, label: "Suspension Performance", notes: ''}
     ]);
 
     const submitFieldInspection = () => {
@@ -274,6 +364,7 @@ export default function FieldInspectionReport() {
                     "body_no": bodyNo,
                     "approved_by": "",
                     "noted_by": "",
+                    "inspection_date" : format(dateInspection, 'yyyy-MM-dd'),
                     "mileage": mileage,
                     "body_style": bodyStyle === "" ? null : bodyStyle,
                     "drive_type": driverType === "" ? null : driverType,
@@ -447,7 +538,34 @@ export default function FieldInspectionReport() {
     }
 
     const submitFieldInspectionAfter = () => {
+        setFieldInspectionData([]);
+        setDateInspection(null);
+        setYear("");
+        setMake("");
+        setModel("");
+        setMileage("");
+        setBodyNo("");
+        setBodyStyle("");
+        setTransmission("");
+        setEngine("");
+        setDriverType("");
+        setInspector("CARETA");
+        setLocation("");
+        setExteriorColor("");
+        setDoorCount("");
+        setCondition("");
+
+        // setExterior(initialExterior);
+        // setGlass(initialGlass);
+        // setTiresWheels(initialTiresWheels);
+        // setUnderbody(initialUnderbody);
+        // setUnderhood(initialUnderhood);
+        // setInterior(initialInterior);
+        // setElectricalSystem(initialElectricalSystem);
+        // setRoadTestFindings(initialRoadTestFindings);
+
         window.scrollTo({top: 0, left: 0, behavior:'smooth'});
+        refImageUpload.current.clear();
         setIsLoading(false);
         setMessage({title:"CREATE", content:"Successfully created."});
         onClick('displayMessage');

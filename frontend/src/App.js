@@ -38,6 +38,7 @@ import  ChecklistRecord from './components/ChecklistRecord';
 import  IncidentReport from './components/IncidentReport';
 import  IncidentRecord from './components/IncidentRecord';
 import  FieldInspectionReport from './components/FieldInspectionReport';
+import  FieldInspectionRecord from './components/FieldInspectionRecord';
 
 import axios from "axios";
 import jwt_decode from "jwt-decode";
@@ -178,6 +179,7 @@ const App = () => {
     // sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
     // sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
     sidebarSubMenu4.push({label: 'Field Inspection Report', icon: 'pi pi-th-large', to: '/fieldinspectionreport'});
+    sidebarSubMenu4.push({label: 'Field Inspection Record', icon: 'pi pi-th-large', to: '/fieldinspectionrecord'});
     sidebarMenu.push({label: 'CSR Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
 
     const onInputStyleChange = (inputStyle) => {
@@ -315,6 +317,7 @@ const App = () => {
                 <Route path="/incidentreport" exact component={IncidentReport} />
                 <Route path="/incidentrecord" exact component={IncidentRecord} />
                 <Route path="/fieldinspectionreport" exact component={FieldInspectionReport} />
+                <Route path="/fieldinspectionrecord" exact component={FieldInspectionRecord} />
             </div>
 
             <AppFooter />
