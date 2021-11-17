@@ -20,8 +20,10 @@ class PDFtoEmail(viewsets.ViewSet):
     def create(self, request):
         serializer = SendEmailSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            subject =  f"Inspection Report for {request.data['body_no']}"
-            body = "Click the url to generate pdf file of this report. \n http://localhost:3000/#/login."
+            queryset = FieldInspection.objects.all()
+            inspection = get_object_or_404(queryset, pk=request.data['fi_report_id'])
+            subject =  f"Inspection Report for {inspection.body_no.body_no}"
+            body = f"Click the url to generate pdf file of this report. \n http://localhost:3000/#/emptypage/{inspection}/"
             to = request.data['email']
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
@@ -47,7 +49,7 @@ class PDFtoEmail(viewsets.ViewSet):
 
             for report in reports:
                 subject += f' {report.body_no.body_no},'
-                body += f'http://localhost:3000/#/login\n'
+                body += f'http://localhost:3000/#/emptypage/{report}/'
             subject = subject[:-1] + '.'
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
