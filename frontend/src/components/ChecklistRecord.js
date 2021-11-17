@@ -658,7 +658,7 @@ export default function ChecklistRecord() {
                 img1.height = 250;
                 
 
-                let pageheight = 290;
+                let pageheight = 297;
 
                 // var pdf = new jsPDF();
                 var pdf = new jsPDF('p', 'mm', 'a4');
@@ -681,23 +681,34 @@ export default function ChecklistRecord() {
 
                 let position = 10;
                 var heightLeft = imgHeight;
+                var appendHeight = pageheight;
 
                 pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
+                // pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, appendHeight);
 
                 heightLeft -= pageheight;
+                console.log("HL: ", heightLeft)
 
                 while (heightLeft >= 0) {
                     width = pdf.internal.pageSize.getWidth();
                     height = pdf.internal.pageSize.getHeight();
+
+
+                    
                     
                     position = heightLeft - imgHeight;
+                    console.log("pos: ", position)
+                    appendHeight = position + 280;
                     pdf.addPage();
                     pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
                     heightLeft -= pageheight;
+                    console.log("HL: ", heightLeft)
+                    
                 }
 
                 // // pdf.addImage(imgData, 'JPEG', 18, 8, width-40, height-18);\
                 window.open(pdf.output('bloburl'));
+                console.log(pdf.output('bloburl'));
                 onHide('displayPDF');
                 setIsLoading(false);
             });
@@ -738,33 +749,26 @@ export default function ChecklistRecord() {
 
     // const convertPDF = () => {
     //     try {
-    //         // const rawHTML = document.getElementById('toPdf');
+    //         const rawHTML = document.getElementById('toPdf');
 
-    //         const container = document.querySelector("#toPdf");
-    //         const matches = container.querySelectorAll(".container");
+    //         html2canvas(rawHTML)
+    //         .then((canvas) => {
+    //             const imageData = canvas.toDataURL('image/png');
+    //             var image = new Image();
+    //             image = Canvas2Image.convertToJPEG(canvas);
 
-    //         const pdf = new jsPDF();
-    //         // var pdf = new jsPDF('p','mm','a4');
-    //         let imgWidth = 210;
-    //         let imgHeight = 297;
-    //         console.log("raw: ", matches);
-    //         console.log("rawlen: ", matches.length);
+    //             const pdf = new jsPDF();
 
-    //         // matches.forEach((element, i) => {
-    //         //     html2canvas(element)
-    //         //     .then((canvas) => {
-    //         //         // const imgData = canvas.toDataURL('image/png');
-    //         //         // pdf.addImage(imgData, 'PNG', 14, 10, imgWidth, imgHeight);
+    //             pdf.addImage(imageData, 'PNG', 12, 10);
 
-    //         //         const isFinal = matches.length === i + 1;
+    //             var croppingYPosition = 1095;
+    //             count = (image.height) / 1095;
 
-    //         //         if (isFinal) {
-    //         //             console.log("done")
-    //         //         } else {
-    //         //             console.log("adding: ", i)
-    //         //         }
-    //         //     })
-    //         // })
+    //             console.log("imgH: ", image.height);
+    //             console.log("cnt: ", count);
+
+                
+    //         })
             
     //     } catch (err){
     //         console.log(err)
