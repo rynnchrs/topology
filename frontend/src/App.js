@@ -39,6 +39,7 @@ import  IncidentReport from './components/IncidentReport';
 import  IncidentRecord from './components/IncidentRecord';
 import  FieldInspectionReport from './components/FieldInspectionReport';
 import  FieldInspectionRecord from './components/FieldInspectionRecord';
+import  PDFGet from './components/PDFGet';
 
 import axios from "axios";
 import jwt_decode from "jwt-decode";
@@ -318,6 +319,7 @@ const App = () => {
                 <Route path="/incidentrecord" exact component={IncidentRecord} />
                 <Route path="/fieldinspectionreport" exact component={FieldInspectionReport} />
                 <Route path="/fieldinspectionrecord" exact component={FieldInspectionRecord} />
+                <Route path="/pdfget" exact component={PDFGet} />
             </div>
 
             <AppFooter />
