@@ -1,6 +1,8 @@
 from car.models import Car
-from .models import Email
+from report.models import FieldInspection
 from rest_framework import serializers
+
+from .models import Email
 
 
 class EmailSerializer(serializers.ModelSerializer):
@@ -10,18 +12,22 @@ class EmailSerializer(serializers.ModelSerializer):
 
 
 class SendEmailSerializer(serializers.ModelSerializer):
-    body_no = serializers.CharField()
+    fi_report_id = serializers.CharField(required=False, allow_blank=True)
     email = serializers.ListField()
     class Meta:
         model = Email
-        fields = ['body_no', 'email']
+        fields = ['fi_report_id', 'email']
 
     def validate(self, obj):
         errors = []
-        try:
-            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
-        except:
-           errors.append({"body_no": 'Invalid Body No.'})
+        if obj['fi_report_id']: 
+            try:
+                obj['fi_report_id'] = FieldInspection.objects.get(pk=obj['fi_report_id'])
+            except:
+                errors.append({"fi_report_id": 'Invalid Field Inspection Report ID.'})
+        else:
+            pass
+
         for email in obj['email']:
             try:
                 email = Email.objects.get(email_add=email)
