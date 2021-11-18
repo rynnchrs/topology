@@ -1043,7 +1043,7 @@ export default function FieldInspectionReport() {
 
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 image-upload">
                                     <h6><b>IMAGE UPLOAD:</b></h6>
-                                    <FileUpload ref={refImageUpload} multiple accept="image/*" maxFileSize={1000000} onClear={onClearImageFile}
+                                    <FileUpload ref={refImageUpload} multiple accept="image/*"/*  maxFileSize={1000000} */ onClear={onClearImageFile}
                                         emptyTemplate={<p className="p-m-0">Click Choose and select image files to upload.</p>} />
                                 </div>
 

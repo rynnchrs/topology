@@ -12,8 +12,11 @@ import {Calendar} from 'primereact/calendar';
 import {Toast} from 'primereact/toast'
 import { Carousel } from 'primereact/carousel';
 import { FileUpload } from 'primereact/fileupload';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import axios from "axios";
 
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import QrReader from 'react-qr-reader'
 
 export class Vehicles extends Component {
@@ -96,8 +99,11 @@ export class Vehicles extends Component {
             ddVisibility: false,
             diVisibility: false,
             displayQR: false,
+            displayPDF: false,
 
             qrResult: 'No result',
+            qrList: [],
+            isLoading: false,
 
             vBrandSelected: 'Mitsubishi', //test data only
 
@@ -130,6 +136,7 @@ export class Vehicles extends Component {
             qrImage: [process.env.REACT_APP_SERVER_NAME + 'media/noimage.jpg'],
             holdImageID: "",
             counter: 0,
+            counterQRPicList: 0,
         };
 
         this.toast = createRef(null) 
@@ -258,6 +265,114 @@ export class Vehicles extends Component {
     exportData() {
         let url = process.env.REACT_APP_SERVER_NAME + 'car/careta/export_list/';
         window.open(url);
+    }
+
+    exportQR() {
+        this.setState({
+            isLoading: true,
+        });
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'car/qr-code/', config)
+            .then((res) => {
+                this.setState({
+                    qrList: res.data.results
+                });
+            
+                if (res.data.next === null){
+    
+                } else {
+                    this.setState({
+                        counterQRPicList: 2
+                    });
+                    this.nextPageQRPicList();
+                }
+            })
+            .catch((err) => {
+                
+            });
+        
+    }
+
+    nextPageQRPicList = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'car/qr-code/?page=' + this.state.counterQRPicList, config)
+            .then((res) => {
+                this.setState({
+                    qrList: this.state.qrList.concat(res.data.results)
+                });
+                if (res.data.next === null){
+                    this.setState({
+                        displayPDF: true,
+                    });
+                    this.convertPDF();
+                } else {
+                    this.setState({
+                        counterQRPicList: this.state.counterQRPicList + 1
+                    });
+                    this.nextPageQRPicList();
+                }
+            })
+            .catch((err) => {
+                
+            });
+    }
+
+    convertPDF = () => {
+        try {
+            const input = document.getElementById('toPdf');
+
+            html2canvas(input, {allowTaint: true, useCORS: true})
+            .then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+
+                let imgWidth = 210;
+                let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                let pageheight = 297;
+
+                // var pdf = new jsPDF();
+                var pdf = new jsPDF('p', 'mm', 'a4');
+                // var pdf = new jsPDF('p', 'mm', [210,280]);
+
+                let position = 10;
+                var heightLeft = imgHeight;
+                var appendHeight = pageheight;
+
+                pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
+
+                heightLeft -= pageheight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    appendHeight = position + 280;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
+                    heightLeft -= pageheight;
+                    
+                }
+                
+                window.open(pdf.output('bloburl'));
+                this.setState({
+                    displayPDF: false,
+                    isLoading: false
+                });
+            });
+        } catch (err){
+            console.log(err)
+        }
     }
 
     newTab() {
@@ -1215,6 +1330,10 @@ export class Vehicles extends Component {
                 this.setState({
                     displayQR: true,
                     qrResult: 'No result'
+                });
+            } else if  (vm === 'pdf') {
+                this.setState({
+                    displayPDF: true,
                 });
             }
         }
@@ -2213,6 +2332,14 @@ export class Vehicles extends Component {
             }
         }
 
+        const dialogHidePDF = (e) =>{
+            if(this.state.displayPDF) {
+                this.setState({
+                    displayPDF: false,
+                });
+            }
+        }
+
         const ConfirmDeleteProceedHandler = () => {
             if(this.state.ddVisibility)
             {
@@ -3113,19 +3240,23 @@ export class Vehicles extends Component {
                     <Fieldset legend="Search Vehicle" className="p-grid p-dir-col">
                         <div className="p-col-12" name="searchbox"> 
                             <div className="p-grid p-fluid">
-                                <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                     <AutoComplete forceSelection field="body_no" placeholder="Input Body No. here" value={this.state.searchBody} suggestions={this.state.filteredSuggestions} 
                                     completeMethod={this.searchList} onSelect={(event) => selectItem(event.value.body_no)}
                                     onChange={event => this.setState({searchBody: event.target.value})}/>
                                 </div>
                                 <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
-                                    <Button label="SCAN QR" icon="pi pi-th-large" className="p-button-success" onClick={() => onShow('qr')}/>
+                                    <Button label="SCAN" icon="pi pi-th-large" className="p-button-success" onClick={() => onShow('qr')}/>
                                 </div>
                                 <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                     <Button label="EXPORT" icon="pi pi-file" className="p-button-success" onClick={() => this.exportData()}/>
                                 </div>
                                 <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                     <Button label="MAP" icon="pi pi-map-marker" onClick={() => this.newTab()}/>
+                                </div>
+                                <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                    <Button label="PDF QR" icon="pi pi-file" onClick={() => this.exportQR()}/>
+                                    {/* <Button label="PDF QR" icon="pi pi-file" onClick={() => onShow('pdf')}/> */}
                                 </div>
                             </div>
                         </div>
@@ -3795,17 +3926,60 @@ export class Vehicles extends Component {
                 </div>
 
                 <div className="dialog-display">
-                <Dialog header="SCAN QR" style={{width: '310px' }} visible={this.state.displayQR} onHide={() => dialogHideQR()} blockScroll={true}>
-                    <center>
-                        <h5><b>{this.state.qrResult}</b></h5>
-                        <QrReader
-                            delay={300}
-                            onScan={handleScan}
-                            onError={handleError}
-                            style={{height: 260, width: 260}}
-                        />
-                    </center>
-                </Dialog>
+                    <Dialog header="SCAN QR" style={{width: '310px' }} visible={this.state.displayQR} onHide={() => dialogHideQR()} blockScroll={true}>
+                        <center>
+                            <h5><b>{this.state.qrResult}</b></h5>
+                            <QrReader
+                                delay={300}
+                                onScan={handleScan}
+                                onError={handleError}
+                                style={{height: 260, width: 260}}
+                            />
+                        </center>
+                    </Dialog>
+                </div>
+
+                <div className="p-grid p-fluid">
+                    <div className="dialog-display">
+                        <Dialog header="GENERATING PDF..." visible={this.state.displayPDF} onHide={() => dialogHidePDF()} blockScroll={true}>
+                            <div id="toPdf" className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                        <h4>QR LIST</h4>
+                                    </div>
+                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                        <div className="card card-w-title">
+                                            <div className="p-grid p-fluid">
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                    <div className="p-grid p-fluid">
+                                                        {/* <h6><b>REPORT No.:</b></h6> */}
+                                                        {
+                                                            this.state.qrList.map((x, index) =>
+                                                                // <tr /* className="repair-table" */ key={index}>
+                                                                    // <td><img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></td>
+                                                                    <div className="p-col-12 p-lg-4 p-md-4 p-sm-4" key={index}>
+                                                                        <div className="p-grid p-fluid">
+                                                                            <center><img src={x.qr_code} alt="" style={{width:'230px', height: '230px'}}/><br></br>
+                                                                            <label>{x.body_no}</label></center>
+                                                                        </div>
+                                                                    </div>
+                                                                    // <td><InputText/></td>
+                                                                    // <td><InputText /></td>
+                                                                // </tr>
+                                                            )
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="gray-out" style={{display: this.state.isLoading ? "flex" : "none"}}>
+                                <ProgressSpinner />
+                            </div>
+                        </Dialog>
+                    </div>
                 </div>
             </div>
         );
