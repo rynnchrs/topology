@@ -37,7 +37,7 @@ class CarView(viewsets.ModelViewSet):  # add this
         serializer = CarSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)    
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)    
         return Response(serializer.data, status=status.HTTP_201_CREATED)      
 
     def update(self, request, slug=None):
@@ -46,7 +46,7 @@ class CarView(viewsets.ModelViewSet):  # add this
         serializer = CarSerializer(instance=car, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)    
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)    
         return Response(serializer.data, status=status.HTTP_200_OK)   
     
     def destroy(self, request, slug=None):       
@@ -61,7 +61,7 @@ class CarView(viewsets.ModelViewSet):  # add this
                 image.delete()
             except:
                 pass
-        subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)    
+        subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)    
         return Response(status=status.HTTP_200_OK)         
 
     @action(detail=False, permission_classes=[AllowAny])
@@ -104,7 +104,7 @@ class ContractView(viewsets.ModelViewSet):  # add this
         serializer = ContractSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)      
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)      
         return Response(status=status.HTTP_201_CREATED)      
 
     def update(self, request, slug=None):
@@ -113,14 +113,14 @@ class ContractView(viewsets.ModelViewSet):  # add this
         serializer = ContractSerializer(instance=contract, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)     
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)     
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
     def destroy(self, request, slug=None):       
         queryset = Contract.objects.all()
         contract = get_object_or_404(queryset, slug=slug)  
         contract.delete()
-        subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)    
+        subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)    
         return Response(status=status.HTTP_200_OK)   
 
 
@@ -134,7 +134,7 @@ class TPLView(viewsets.ModelViewSet):  # add this
         serializer = TPLSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)      
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)      
         return Response(status=status.HTTP_201_CREATED)      
 
     def update(self, request, slug=None):
@@ -143,14 +143,14 @@ class TPLView(viewsets.ModelViewSet):  # add this
         serializer = TPLSerializer(instance=tpl, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)     
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)     
         return Response(serializer.data, status=status.HTTP_200_OK)  
 
     def destroy(self, request, slug=None):       
         queryset = TPL.objects.all()
         tpl = get_object_or_404(queryset, slug=slug)  
         tpl.delete()
-        subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)    
+        subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)    
         return Response(status=status.HTTP_200_OK)   
 
 class InsuranceView(viewsets.ModelViewSet):  # add this
@@ -163,7 +163,7 @@ class InsuranceView(viewsets.ModelViewSet):  # add this
         serializer = InsuranceSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)      
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)      
         return Response(status=status.HTTP_201_CREATED)      
 
     def update(self, request, slug=None):
@@ -172,14 +172,14 @@ class InsuranceView(viewsets.ModelViewSet):  # add this
         serializer = InsuranceSerializer(instance=insurance, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)     
+            subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)     
         return Response(serializer.data, status=status.HTTP_200_OK)     
     
     def destroy(self, request, slug=None):       
         queryset = Insurance.objects.all()
         insurance = get_object_or_404(queryset, slug=slug)  
         insurance.delete()
-        subprocess.Popen(["/home/topodev/venv/bin/python", "car-export.py"], shell=True)    
+        subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)    
         return Response(status=status.HTTP_200_OK)   
 
 
