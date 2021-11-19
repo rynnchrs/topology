@@ -1277,7 +1277,7 @@ export default function FieldInspectionReport() {
                 <div className="p-col-12">
                     <DataTable ref={dt} header={renderHeader()} value={fieldInspectionRecordList} className="p-datatable-sm" 
                         resizableColumns columnResizeMode="expand" emptyMessage="No records found">
-                        <Column field="fi_report_id" header="Field Inspection No." style={{paddingLeft: '3%'}}></Column>
+                        <Column field="job_order" header="Field Inspection No." style={{paddingLeft: '3%'}}></Column>
                         <Column body={actionBody}></Column>
                     </DataTable>
                     <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
