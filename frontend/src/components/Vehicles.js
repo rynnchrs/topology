@@ -367,9 +367,9 @@ export class Vehicles extends Component {
                     }
                     
                 }
-                // window.open(pdf.output('bloburl'));
+                window.open(pdf.output('bloburl'));
                 this.setState({
-                    // displayPDF: false,
+                    displayPDF: false,
                     isLoading: false,
                 });
             });
