@@ -503,7 +503,7 @@ export const JobScheduling = () => {
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                     <div className="job-datatable-item" style={{borderLeft: '5px solid ' + jobTypeColor}}>
                         <div style={{float: 'left', width:'40px'}}>
-                            <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_id}</b></p>
+                            <p style={{fontSize: '14px'}}><b>{jobList.job_order.job_no}</b></p>
                         </div>
                         <div style={{float: 'right', width:'27px'}}>
                             <Button icon="pi pi-cog" className="p-shadow-1 p-button-text" style={{width: '27px', height: '27px', color: 'black'}}

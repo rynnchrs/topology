@@ -400,7 +400,7 @@
 
 
 /* override global size of dialog in all forms*/
-.dialog-display{
+.dialog-display {
   @media only screen and (max-width : 2500px) { 
     .p-dialog {
       width: 70vw;
@@ -408,7 +408,8 @@
   }
   @media only screen and (max-width : 991px) {
     .p-dialog {
-      width: 70vw;
+      // width: 70vw;
+      width: 100%;
     }
   }
   @media only screen and (max-width : 767px) { 
@@ -416,7 +417,17 @@
       width: 340px;
     }
   }
-  
+}
+
+.dialog-display-pdf {
+  .p-dialog {
+    min-width: 1120px;
+    width: 1120px;
+  }
+  .p-dialog-content {
+    min-width: 1120px;
+    width: 1120px;
+  }
 }
 /* end override global size of dialog in all forms*/
 
@@ -469,6 +480,7 @@
     }
   }
 }
+
 
 /* end global */
 
