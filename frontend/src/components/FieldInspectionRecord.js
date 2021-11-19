@@ -16,6 +16,9 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import axios from "axios";
 import { format } from 'date-fns';
 
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
 export default function FieldInspectionReport() {
 
     //search fields
@@ -23,8 +26,8 @@ export default function FieldInspectionReport() {
     const [searchBodyNo, setSearchBodyNo] = useState('');
     const [searchDateInspection, setSearchDateInspection] = useState(null);
 
-    const [fieldInspectionNotCreatedList, setFieldInspectionNotCreatedList] = useState([]);
-    const [fieldInspectionData, setFieldInspectionData] = useState([]);
+    // const [fieldInspectionNotCreatedList, setFieldInspectionNotCreatedList] = useState([]);
+    // const [fieldInspectionData, setFieldInspectionData] = useState([]);
     const [notes, setNotes] = useState('');
     const [theLabel, setTheLabel] = useState('');
     const [theIndex, setTheIndex] = useState('');
@@ -34,6 +37,7 @@ export default function FieldInspectionReport() {
     const [flagFieldInspectionRecordList, setFlagFieldInspectionRecordList] = useState(false);
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
     const [delFieldInspectionID, setDelFieldInspectionID] = useState('');
+    const [flagFieldInspectionRecordMethod, setFlagFieldInspectionRecordMethod] = useState('');
 
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
@@ -50,7 +54,7 @@ export default function FieldInspectionReport() {
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
     const [fieldInspectionTaskID, setFieldInspectionTaskID] =  useState('');
-    const [fieldInspectionJobNo, setFieldInspectionJobNo] =  useState('');
+    const [fieldInspectionJobID, setFieldInspectionJobID] =  useState('');
     const [dateInspection, setDateInspection] = useState(null);
     const [year, setYear] = useState('');
     const [make, setMake] = useState('');
@@ -175,6 +179,7 @@ export default function FieldInspectionReport() {
     const [displayFieldInspectionRecordEdit, setDisplayFieldInspectionRecordEdit] = useState(false);
     const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
+    const [displayPDF, setDisplayPDF] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -306,7 +311,7 @@ export default function FieldInspectionReport() {
             // console.log("fi: ",value);
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);
-            setFieldInspectionJobNo(value.job_order);
+            setFieldInspectionJobID(value.job_order);
 
             onChangeValue('f0', convertDatetoGMT(value.inspection_date));
 
@@ -331,11 +336,12 @@ export default function FieldInspectionReport() {
             onChangeValue('f4', value.door_count);
 
             setCondition(value.body_no.operational);
+            let i;
 
             arrExterior = exterior.slice();
             let syntaxExterior = ["hood", "front", "front_bumper", "fenders", "doors", "roof", "rear", "rear_bumper", "trunk", "trim", "fuel_door", "pait_condition"];
             let syntaxExteriorNote = ["hood_note", "front_note", "front_bumper_note", "fenders_note", "doors_note", "roof_note", "rear_note", "rear_bumper_note", "trunk_note", "trim_note", "fuel_door_note", "pait_condition_note"];
-            for (let i = 0; i < syntaxExterior.length; i++) {
+            for (i = 0; i < syntaxExterior.length; i++) {
                 Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
                     // console.log("resX:", value[x])
                     if (value[x].toLowerCase() === "g") {
@@ -353,7 +359,7 @@ export default function FieldInspectionReport() {
             arrGlass = glass.slice();
             let syntaxGlass = ["windshield", "windows", "mirrors", "rear_window"];
             let syntaxGlassNote = ["windshield_note", "windows_note", "mirrors_note", "rear_window_note"];
-            for (let i = 0; i < syntaxGlass.length; i++) {
+            for (i = 0; i < syntaxGlass.length; i++) {
                 Object.keys(value).filter(f => f === syntaxGlass[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrGlass[i] = {...arrGlass[i], g: true, f: false, p: false};
@@ -370,7 +376,7 @@ export default function FieldInspectionReport() {
             arrTiresWheels = tiresWheels.slice();
             let syntaxTiresWheels = ["tires_condition", "wheels_condition", "spare_tire"];
             let syntaxTiresWheelsNote = ["tires_condition_note", "wheels_condition_note", "spare_tire_note"];
-            for (let i = 0; i < syntaxTiresWheels.length; i++) {
+            for (i = 0; i < syntaxTiresWheels.length; i++) {
                 Object.keys(value).filter(f => f === syntaxTiresWheels[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrTiresWheels[i] = {...arrTiresWheels[i], g: true, f: false, p: false};
@@ -387,7 +393,7 @@ export default function FieldInspectionReport() {
             arrUnderBody = underbody.slice();
             let syntaxUnderBody = ["frame", "exhaust_system", "transmission", "drive_axle", "suspension", "breake_system"];
             let syntaxUnderBodyNote = ["frame_note", "exhaust_system_note", "transmission_note", "drive_axle_note", "suspension_note", "breake_system_note"];
-            for (let i = 0; i < syntaxUnderBody.length; i++) {
+            for (i = 0; i < syntaxUnderBody.length; i++) {
                 Object.keys(value).filter(f => f === syntaxUnderBody[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrUnderBody[i] = {...arrUnderBody[i], g: true, f: false, p: false};
@@ -404,7 +410,7 @@ export default function FieldInspectionReport() {
             arrUnderHood = underhood.slice();
             let syntaxUnderHood = ["engine_compartment", "battery", "oil", "fluids", "wiring", "belts", "hoses", "non_stock_modif"];
             let syntaxUnderHoodNote = ["engine_compartment_note", "battery_note", "oil_note", "fluids_note", "wiring_note", "belts_note", "hoses_note", "non_stock_modif_note"];
-            for (let i = 0; i < syntaxUnderHood.length; i++) {
+            for (i = 0; i < syntaxUnderHood.length; i++) {
                 Object.keys(value).filter(f => f === syntaxUnderHood[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrUnderHood[i] = {...arrUnderHood[i], g: true, f: false, p: false};
@@ -421,7 +427,7 @@ export default function FieldInspectionReport() {
             arrInterior = interior.slice();
             let syntaxInterior = ["seats", "headliner", "carpet", "door_panels", "glove_box", "vanity_mirrors", "interioir_trim", "dashboard", "dashboard_gauges", "air_conditioning", "heater", "defroster"];
             let syntaxInteriorNote = ["seats_note", "headliner_note", "carpet_note", "door_panels_note", "glove_box_note", "vanity_mirrors_note", "interioir_trim_note", "dashboard_note", "dashboard_gauges_note", "air_conditioning_note", "heater_note", "defroster_note"];
-            for (let i = 0; i < syntaxInterior.length; i++) {
+            for (i = 0; i < syntaxInterior.length; i++) {
                 Object.keys(value).filter(f => f === syntaxInterior[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrInterior[i] = {...arrInterior[i], g: true, f: false, p: false};
@@ -438,7 +444,7 @@ export default function FieldInspectionReport() {
             arrElectricalSystem = electricalSystem.slice();
             let syntaxElectricalSystem = ["power_locks", "power_seats", "power_steering", "power_windows", "power_mirrors", "audio_system", "onboard_computer", "headlights", "taillights", "signal_lights", "brake_lights", "parking_lights"];
             let syntaxElectricalSystemNote = ["power_locks_note", "power_seats_note", "power_steering_note", "power_windows_note", "power_mirrors_note", "audio_system_note", "onboard_computer_note", "headlights_note", "taillights_note", "signal_lights_note", "brake_lights_note", "parking_lights_note"];
-            for (let i = 0; i < syntaxElectricalSystem.length; i++) {
+            for (i = 0; i < syntaxElectricalSystem.length; i++) {
                 Object.keys(value).filter(f => f === syntaxElectricalSystem[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrElectricalSystem[i] = {...arrElectricalSystem[i], g: true, f: false, p: false};
@@ -455,7 +461,7 @@ export default function FieldInspectionReport() {
             arrRoadTestFindings= roadTestFindings.slice();
             let syntaxRoadTestFindings = ["starting", "idling", "engine_performance", "acceleration", "trans_shift_quality", "steering", "braking", "suspension_performance"];
             let syntaxRoadTestFindingsNote = ["starting_note", "idling_note", "engine_performance_note", "acceleration_note", "trans_shift_quality_note", "steering_note", "braking_note", "suspension_performance_note"];
-            for (let i = 0; i < syntaxRoadTestFindings.length; i++) {
+            for (i= 0; i < syntaxRoadTestFindings.length; i++) {
                 Object.keys(value).filter(f => f === syntaxRoadTestFindings[i]).map(x => {
                     if (value[x].toLowerCase() === "g") {
                         arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: true, f: false, p: false};
@@ -469,9 +475,60 @@ export default function FieldInspectionReport() {
                 })
             }
 
-            setIsLoading(false);
-            onClick('displayFieldInspectionRecordEdit');
+            setTimeout(() => {
+                if (flagFieldInspectionRecordMethod === 'pdf') {
+                    onClick('displayPDF');
+                    convertPDF();
+                } else {
+                    setIsLoading(false);
+                    onClick('displayFieldInspectionRecordEdit');
+                }
+            }, 1500);
+
         } catch(err) {
+            console.log(err)
+        }
+    }
+
+    const convertPDF = () => {
+        try {
+            var quotes = document.getElementById('toPdf');
+
+            html2canvas(quotes)
+            .then((canvas) => {
+                var pdf = new jsPDF('p', 'pt', 'letter');
+
+                var srcImg  = canvas;
+                var sX      = 0;
+                var sY      = 0; // start 980 pixels down for every new page
+                var sWidth  = 1075;
+                var sHeight = 1100;
+                var dX      = 0;
+                var dY      = 0;
+                var dWidth  = 900;
+                var dHeight = 1100;
+
+                for (var i = 0; i < quotes.clientHeight/1100; i++) {
+                    sY = 1100*i;
+                    var onePageCanvas = document.createElement("canvas");
+                    onePageCanvas.setAttribute('width', 900);
+                    onePageCanvas.setAttribute('height', 1100);
+                    var ctx = onePageCanvas.getContext('2d');
+                    ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                    var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                    var width         = onePageCanvas.width;
+                    var height        = onePageCanvas.clientHeight;
+
+                    if (i > 0) {
+                        pdf.addPage();
+                    }
+                    pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                }
+                window.open(pdf.output('bloburl'));
+                onHide('displayPDF');
+                setIsLoading(false);
+            });
+        } catch (err){
             console.log(err)
         }
     }
@@ -563,85 +620,85 @@ export default function FieldInspectionReport() {
     const submitFieldInspection = () => {
         let flagChecking = true;
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < exterior.length; i++) {
-        //         if (exterior[i].g === false && exterior[i].f === false && exterior[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'EXTERIOR', detail: 'Please check one: ' + exterior[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < exterior.length; i++) {
+                if (exterior[i].g === false && exterior[i].f === false && exterior[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'EXTERIOR', detail: 'Please check one: ' + exterior[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < glass.length; i++) {
-        //         if (glass[i].g === false && glass[i].f === false && glass[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'GLASS', detail: 'Please check one: ' + glass[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < glass.length; i++) {
+                if (glass[i].g === false && glass[i].f === false && glass[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'GLASS', detail: 'Please check one: ' + glass[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < tiresWheels.length; i++) {
-        //         if (tiresWheels[i].g === false && tiresWheels[i].f === false && tiresWheels[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'TIRES AND WHEELS', detail: 'Please check one: ' + tiresWheels[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < tiresWheels.length; i++) {
+                if (tiresWheels[i].g === false && tiresWheels[i].f === false && tiresWheels[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'TIRES AND WHEELS', detail: 'Please check one: ' + tiresWheels[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
         
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < underbody.length; i++) {
-        //         if (underbody[i].g === false && underbody[i].f === false && underbody[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underbody[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < underbody.length; i++) {
+                if (underbody[i].g === false && underbody[i].f === false && underbody[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underbody[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < underhood.length; i++) {
-        //         if (underhood[i].g === false && underhood[i].f === false && underhood[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underhood[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < underhood.length; i++) {
+                if (underhood[i].g === false && underhood[i].f === false && underhood[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underhood[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < interior.length; i++) {
-        //         if (interior[i].g === false && interior[i].f === false && interior[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'INTERIOR', detail: 'Please check one: ' + interior[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < interior.length; i++) {
+                if (interior[i].g === false && interior[i].f === false && interior[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'INTERIOR', detail: 'Please check one: ' + interior[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < electricalSystem.length; i++) {
-        //         if (electricalSystem[i].g === false && electricalSystem[i].f === false && electricalSystem[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'ELECTRICAL SYSTEM', detail: 'Please check one: ' + electricalSystem[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < electricalSystem.length; i++) {
+                if (electricalSystem[i].g === false && electricalSystem[i].f === false && electricalSystem[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'ELECTRICAL SYSTEM', detail: 'Please check one: ' + electricalSystem[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
-        // if (flagChecking === true) {
-        //     for (var i = 0; i < roadTestFindings.length; i++) {
-        //         if (roadTestFindings[i].g === false && roadTestFindings[i].f === false && roadTestFindings[i].p === false) {
-        //             toast.current.show({severity: 'error', summary: 'road test findings', detail: 'Please check one: ' + roadTestFindings[i].label, life: 3000});
-        //             flagChecking = false;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (flagChecking === true) {
+            for (var i = 0; i < roadTestFindings.length; i++) {
+                if (roadTestFindings[i].g === false && roadTestFindings[i].f === false && roadTestFindings[i].p === false) {
+                    toast.current.show({severity: 'error', summary: 'road test findings', detail: 'Please check one: ' + roadTestFindings[i].label, life: 3000});
+                    flagChecking = false;
+                    break;
+                }
+            }
+        }
 
         if (flagChecking === true) {
             if (fieldInspectionID === "") {
@@ -673,7 +730,7 @@ export default function FieldInspectionReport() {
                 axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', {
                     "fi_report_id": fieldInspectionID,
                     "task": fieldInspectionTaskID,
-                    "job_order": fieldInspectionJobNo,
+                    "job_order": fieldInspectionJobID,
                     "body_no": bodyNo,
                     "approved_by": "",
                     "noted_by": "",
@@ -1118,6 +1175,7 @@ export default function FieldInspectionReport() {
         'displayFieldInspectionRecordEdit': setDisplayFieldInspectionRecordEdit,
         'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
         'displayConfirmDelete': setDisplayConfirmDelete,
+        'displayPDF': setDisplayPDF,
     }
 
     const onClick = (name) => {
@@ -1126,6 +1184,9 @@ export default function FieldInspectionReport() {
 
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
+        if (name === 'displayPDF') {
+            setFlagFieldInspectionRecordMethod('');
+        }
         setFlagFieldInspectionRecordList(false);
         setReviseColor(Array(30).fill(""));
         setReviseText(Array(30).fill(""));
@@ -1167,7 +1228,7 @@ export default function FieldInspectionReport() {
                 <center>
                     <Button style={{marginRight: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
                     <Button style={{marginRight: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); onClick('displayConfirmDelete')}}/>
-                    <Button icon="pi pi-download" className="p-button-rounded p-button-success"/>
+                    <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
                 </center>
             </div>
         );
@@ -1216,7 +1277,7 @@ export default function FieldInspectionReport() {
                 <div className="p-col-12">
                     <DataTable ref={dt} header={renderHeader()} value={fieldInspectionRecordList} className="p-datatable-sm" 
                         resizableColumns columnResizeMode="expand" emptyMessage="No records found">
-                        <Column field="fi_report_id" header="Field Inspection No." style={{paddingLeft: '3%'}}></Column>
+                        <Column field="job_order" header="Field Inspection No." style={{paddingLeft: '3%'}}></Column>
                         <Column body={actionBody}></Column>
                     </DataTable>
                     <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
@@ -1527,6 +1588,303 @@ export default function FieldInspectionReport() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                            <ProgressSpinner />
+                        </div>
+                    </Dialog>
+                </div>
+
+                <div className="dialog-display-pdf" >
+                    <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
+                        <div id="toPdf" className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                                <h4>FIELD INSPECTION REPORT</h4>
+                            </div>
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                <div className="card card-w-title">
+                                    <div className="p-grid p-fluid">
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>REPORT No.:</b></h6>
+                                            {/* <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
+                                            onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/> */}
+                                            <InputText placeholder="Input Report No." value={fieldInspectionID} disabled/>
+                                        </div>
+                                        <div className={"p-col-4 required-asterisk " + reviseColor[0]}>
+                                            <h6><b>INSPECTION DATE:</b></h6>
+                                            {/* <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => setDateInspection(e.value)} showIcon readOnlyInput/> */}
+                                            <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
+                                            <small className="p-invalid p-d-block">{reviseText[0]}</small>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>YEAR:</b></h6>
+                                            <InputText placeholder="Input Year" value={year} disabled/>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>MAKE:</b></h6>
+                                            <InputText placeholder="Input Make" value={make} disabled/>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>MODEL:</b></h6>
+                                            <InputText placeholder="Input Make" value={model} disabled/>
+                                        </div>
+                                        <div className={"p-col-4 required-asterisk " + reviseColor[1]}>
+                                            <h6><b>MILEAGE:</b></h6>
+                                            <InputText placeholder="Input Mileage" value={mileage} onChange={(e) => onChangeValue('f1', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[1]}</small>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>BODY No.:</b></h6>
+                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
+                                        </div>
+                                        <div className={"p-col-4 required-asterisk " + reviseColor[2]}>
+                                            <h6><b>BODY STYLE:</b></h6>
+                                            <InputText placeholder="Input Body Style" value={bodyStyle} onChange={(e) => onChangeValue('f2', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[2]}</small>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>TRANSMISSION:</b></h6>
+                                            <InputText placeholder="Input Transmisison" value={transmission} disabled/>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>ENGINE:</b></h6>
+                                            <InputText placeholder="Input Body No." value={engine} disabled/>
+                                        </div>
+                                        <div className={"p-col-4 required-asterisk " + reviseColor[3]}>
+                                            <h6><b>DRIVER TYPE:</b></h6>
+                                            <InputText placeholder="Input Driver Type" value={driverType} onChange={(e) => onChangeValue('f3', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[3]}</small>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>INSPECTOR:</b></h6>
+                                            <InputText placeholder="Input Inspector" value={inspector} disabled/>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>LOCATION:</b></h6>
+                                            <InputText placeholder="Input Location" value={location} disabled/>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>EXTERIOR COLOR:</b></h6>
+                                            <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
+                                        </div>
+                                        <div className={"p-col-4 required-asterisk " + reviseColor[4]}>
+                                            <h6><b>DOOR COUNT:</b></h6>
+                                            <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[4]}</small>
+                                        </div>
+                                        <div className="p-col-4 required-asterisk">
+                                            <h6><b>CONDITION:</b></h6>
+                                            <InputText placeholder="Input Condition" value={condition} disabled/>
+                                        </div>
+
+                                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{borderTop:'2px solid blue', borderBottom:'2px solid blue', marginBottom:'1px'}}>
+                                            <center><b>G=Good F=Fair P=Poor</b></center>
+                                        </div>
+                                        
+                                        <div className="p-col-4">
+                                            <div className="p-grid p-fluid">
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>EXTERIOR</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {/* <tr>
+                                                                <td><h6><b>G</b></h6></td>
+                                                                <td><h6><b>F</b></h6></td>
+                                                                <td><h6><b>P</b></h6></td>
+                                                            </tr> */}
+                                                            {
+                                                                exterior.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpExterior(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpExterior(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpExterior(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        {/* <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => {setTheLabel(x.label); setTheIndex(index); setTheType("exte"); setNotes(x.notes)}}/></td> */}
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "exte", x.notes)}/></td>
+                                                                        {/* <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => console.log(exterior)}/></td> */}
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>GLASS</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                glass.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpGlass(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpGlass(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpGlass(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "glas", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>TIRES AND WHEELS</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                tiresWheels.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpTiresWheels(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpTiresWheels(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpTiresWheels(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "tire", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>UNDERBODY</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                underbody.slice(0, 2).map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderbody(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderbody(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderbody(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "undb", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-col-4">
+                                            <div className="p-grid p-fluid">
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                underbody.slice(2, underbody.length).map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderbody(index + 2, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderbody(index + 2, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderbody(index + 2, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index + 2, "undb", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>UNDERHOOD</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                underhood.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderhood(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderhood(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpUnderhood(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "undh", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>INTERIOR</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                interior.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpInterior(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpInterior(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpInterior(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "inte", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-col-4">
+                                            <div className="p-grid p-fluid">
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>ELECTRICAL SYSTEM</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                electricalSystem.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpElectricalSystem(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpElectricalSystem(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpElectricalSystem(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "elec", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title">
+                                                    <h5>ROAD TEST FINDINGS</h5>
+                                                </div>
+                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 field-inspection-table">
+                                                    <table>
+                                                        <tbody>
+                                                            {
+                                                                roadTestFindings.map((x, index) =>
+                                                                    <tr key={index}>
+                                                                        <td><Button label="G" className={x.g ? "active-btn" : "p-button-outlined"} onClick={() => gfpRoadTestFindings(index, "g")}/></td>
+                                                                        <td><Button label="F" className={x.f ? "active-btn" : "p-button-outlined"} onClick={() => gfpRoadTestFindings(index, "f")}/></td>
+                                                                        <td><Button label="P" className={x.p ? "active-btn" : "p-button-outlined"} onClick={() => gfpRoadTestFindings(index, "p")}/></td>
+                                                                        <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
+                                                                        <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "road", x.notes)}/></td>
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         </div>
                         <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
                             <ProgressSpinner />
