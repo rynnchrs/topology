@@ -22,7 +22,7 @@ class ReportImageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         image_data = validated_data.pop('images')
-        count = 0
+        count = Image.objects.filter(image_name=image_data[0]['image_name'], mode=image_data[0]['mode']).count()
         for image in image_data:
             count += 1
             Image.objects.create(image_id=count, **image)
