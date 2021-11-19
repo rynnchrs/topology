@@ -360,7 +360,7 @@ export default function FieldInspectionReport() {
 
                 axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', {
                     "task": fieldInspectionData.task.task_id,
-                    "job_order": fieldInspectionData.job_no,
+                    "job_order": fieldInspectionData.job_id,
                     "body_no": bodyNo,
                     "approved_by": "",
                     "noted_by": "",
@@ -775,7 +775,7 @@ export default function FieldInspectionReport() {
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
-                                    <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
+                                    <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_no" placeholder="Select Job Number" 
                                     onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
