@@ -168,9 +168,11 @@ class WarningTaskSerializer(serializers.ModelSerializer):
     fieldman = FieldmanSerializer(many=True)
     job_order = JobOrderSerializer()
     current_loc = serializers.CharField(source='body_no.current_loc')
+    body_no = serializers.CharField(source='body_no.body_no')
     class Meta:
         model= Task
-        fields =  ['task_id','job_order','fieldman','start_date','end_date','schedule_date','task_status_fm','task_status_mn','current_loc']
+        fields =  ['task_id','job_order','body_no','fieldman','start_date',
+        'end_date','schedule_date','task_status_fm','task_status_mn','current_loc']
 
 
 class RepairCarInfoSerializer(serializers.ModelSerializer):

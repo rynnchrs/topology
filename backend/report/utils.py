@@ -237,7 +237,7 @@ def fi_report_serialized(data):
 
     for key, value in data.items():
         if '_note' in key:
-            if value is not None:
+            if value:
                 index = note.index(key)
                 if index <= 11:
                     real = field[index]
