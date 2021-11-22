@@ -3,19 +3,20 @@ from datetime import datetime as date
 from os import remove
 from wsgiref.util import FileWrapper
 
-from django.db.models.deletion import ProtectedError
-
 from car.models import Car
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import query
+from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filter
 from image.models import Image
+from image.serializers import ReportImageSerializer
 from notifications.signals import notify
 from rest_framework import filters, generics, serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import serializer_helpers
@@ -23,14 +24,19 @@ from reversion.models import Version
 from task.models import JobOrder, Task
 
 from .export import export, repair_export
-from .filters import CheckListFilter, FieldInspectionFilter, InspectionFilter, RepairFilter
-from .models import CheckList, CheckListParts, Cost, FieldInspection, Inspection, Repair
+from .filters import (CheckListFilter, FieldInspectionFilter, InspectionFilter,
+                      RepairFilter)
+from .models import (CheckList, CheckListParts, Cost, FieldInspection,
+                     Inspection, Repair)
 from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
-                          CheckListSerializer, CostSerializer, FieldInspectionListSerializer, FieldInspectionSerializer,
+                          CheckListSerializer, CostSerializer,
+                          FieldInspectionListSerializer,
+                          FieldInspectionSerializer,
                           InspectionLastFourListSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
-from .utils import (analysis, checklist_reversion, fi_report_reversion, fi_report_serialized, repair_reversion, reversion,
+from .utils import (analysis, checklist_reversion, fi_report_reversion,
+                    fi_report_serialized, field_inspection_image, repair_reversion, reversion,
                     user_permission)
 
 
@@ -530,6 +536,7 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
     filter_backends = [filter.DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = FieldInspectionFilter
     ordering_fields = ['fi_report_id', 'date_created']
+    parser_classes = [MultiPartParser, FormParser]
     
     def list(self, request): 
         user = self.request.user   
@@ -556,6 +563,11 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
                 message = "Field Inspection Report for " + str(car.body_no) + " is created."
                 notify.send(sender, recipient=recipients,  target=serializer.save(), 
                                 level='info', verb='field_inspection,create', description=message)
+                request.data['imagename'] = serializer.data['fi_report_id']
+                serializer = ReportImageSerializer(data=field_inspection_image(request.data,serializer.data))
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response("Successfully Created",status=status.HTTP_201_CREATED)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)  
             return Response(serializer.errors)        
         else:
@@ -589,6 +601,10 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
                 message = "Field Inspection Report for " + str(car.body_no) + " is updated."
                 notify.send(sender, recipient=recipients,  target=serializer.save(), 
                                 level='info', verb='field_inspection,update', description=message)
+                serializer = ReportImageSerializer(data=field_inspection_image(request.data,serializer.data))
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response("Successfully Created",status=status.HTTP_201_CREATED)  
             return Response(serializer.data, status=status.HTTP_200_OK)       
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
