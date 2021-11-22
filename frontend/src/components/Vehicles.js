@@ -341,18 +341,18 @@ export class Vehicles extends Component {
                 var srcImg  = canvas;
                 var sX      = 0;
                 var sY      = 0; // start 980 pixels down for every new page
-                var sWidth  = 1075;
-                var sHeight = 1050;
+                var sWidth  = 1000;
+                var sHeight = 1040;
                 var dX      = 0;
                 var dY      = 0;
                 var dWidth  = 900;
-                var dHeight = 1050;
+                var dHeight = 980;
 
-                for (var i = 0; i < quotes.clientHeight/1000; i++) {
-                    sY = 1050*i;
+                for (var i = 0; i < quotes.clientHeight/1040; i++) {
+                    sY = 1040*i;
                     var onePageCanvas = document.createElement("canvas");
                     onePageCanvas.setAttribute('width', 900);
-                    onePageCanvas.setAttribute('height', 1050);
+                    onePageCanvas.setAttribute('height', 980);
                     var ctx = onePageCanvas.getContext('2d');
                     ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
                     var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
@@ -361,9 +361,9 @@ export class Vehicles extends Component {
 
                     if (i > 0) {
                         pdf.addPage();
-                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.65), (height*.65));
                     } else {
-                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.65), (height*.65));
                     }
                     
                 }
@@ -3948,30 +3948,21 @@ export class Vehicles extends Component {
                 <div className="p-grid p-fluid">
                     <div className="dialog-display-pdf">
                         <Dialog header="GENERATING PDF..." visible={this.state.displayPDF} onHide={() => dialogHidePDF()} blockScroll={true}>
-                            <div id="toPdf" className="p-grid p-fluid">
+                            <div /* id="toPdf" */ className="p-grid p-fluid">
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                                    {/* <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
-                                        <h4>QR LIST</h4>
-                                    </div> */}
-                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                    <div className="p-col-12 p-lg-12 p-md-12 p-sm-12"> 
                                         <div className="card card-w-title">
                                             <div className="p-grid p-fluid">
-                                                <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <div id="toPdf" className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                                                     <div className="p-grid p-fluid">
-                                                        {/* <h6><b>REPORT No.:</b></h6> */}
                                                         {
                                                             this.state.qrList.map((x, index) =>
-                                                                // <tr /* className="repair-table" */ key={index}>
-                                                                    // <td><img src={process.env.REACT_APP_SERVER_NAME + reportImage.image.substring(1)} alt="" style={{maxWidth:'100%', maxHeight: '100%'}}/></td>
                                                                     <div className="p-col-4" key={index}>
                                                                         <div className="p-grid p-fluid">
                                                                             <center><img src={x.qr_code} alt="" style={{width:'230px', height: '230px'}}/><br></br>
                                                                             <label>{x.body_no}</label></center>
                                                                         </div>
                                                                     </div>
-                                                                    // <td><InputText/></td>
-                                                                    // <td><InputText /></td>
-                                                                // </tr>
                                                             )
                                                         }
                                                     </div>
