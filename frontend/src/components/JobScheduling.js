@@ -521,11 +521,15 @@ export const JobScheduling = () => {
                                             }
                                         </p>
                                     </div>
-                                    <div className="p-col-12 p-lg-6 p-md-12 p-sm-12">
+                                    <div className="p-col-12 p-lg-3 p-md-12 p-sm-12">
+                                        <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-tag"></i> {jobList.body_no}</p>
+                                    </div>
+                                    <div className="p-col-12 p-lg-3 p-md-12 p-sm-12">
                                         <p style={{fontSize: '14px', paddingLeft: '17px', wordBreak:'wrap', textIndent:'-9px'}}><i className="pi pi-map-marker"></i> {jobList.current_loc}</p>
                                     </div>
                                 </div>
                             </div>
+
                             <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
                                 <div className="p-grid p-fluid">
                                     <div className="p-col" style={{minWidth:'150px'}}>
@@ -1725,7 +1729,7 @@ export const JobScheduling = () => {
                     <div className="p-col-12 p-lg-12" style={{paddingTop:'5%'}}>
                         <div className="p-grid p-nogutter">
                             <div className="p-col" style={{color: jobTypeColor}}>
-                                <h3><b>Job No. {jobData.task_id}</b></h3>
+                                <h4><b>Report No. {jobData.job_order.job_no}</b></h4>
                                 <b style={{fontSize: '14px', color: jobTypeColor, textTransform: 'uppercase'}}>{jobData.job_order.type}</b>
                             </div>
                             <div className="p-col" style={{textAlign:'right'}}>
