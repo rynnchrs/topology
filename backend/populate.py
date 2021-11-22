@@ -420,5 +420,5 @@ for data in datas():
         pass
 print(populate())
 
-subprocess.Popen(["python","car-export.py"], shell=True)    
+subprocess.Popen(["/home/topodev/venv/bin/python /home/topodev/topology/backend/car-export.py"], shell=True)                      
 
