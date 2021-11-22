@@ -1729,7 +1729,7 @@ export const JobScheduling = () => {
                     <div className="p-col-12 p-lg-12" style={{paddingTop:'5%'}}>
                         <div className="p-grid p-nogutter">
                             <div className="p-col" style={{color: jobTypeColor}}>
-                                <h4><b>Report No. {jobData.job_order.job_no}</b></h4>
+                                <h5><b>Report No. {jobData.job_order.job_no}</b></h5>
                                 <b style={{fontSize: '14px', color: jobTypeColor, textTransform: 'uppercase'}}>{jobData.job_order.type}</b>
                             </div>
                             <div className="p-col" style={{textAlign:'right'}}>

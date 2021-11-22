@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import QrReader from 'react-qr-reader'
 
 export default function FieldInspectionReport() {
 
@@ -39,6 +40,7 @@ export default function FieldInspectionReport() {
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
     const [delFieldInspectionID, setDelFieldInspectionID] = useState('');
     const [flagFieldInspectionRecordMethod, setFlagFieldInspectionRecordMethod] = useState('');
+    const [qrResult, setQrResult] = useState('No Result');
 
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
@@ -187,6 +189,7 @@ export default function FieldInspectionReport() {
     const [displayPDF, setDisplayPDF] = useState(false);
     const [displayEmail, setDisplayEmail] = useState(false);
     const [displayAddEmail, setDisplayAddEmail] = useState(false);
+    const [displayQR, setDisplayQR] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -579,6 +582,19 @@ export default function FieldInspectionReport() {
             });
     }
 
+    const handleScan = data => {
+        if (data) {
+            setQrResult(data);
+            setTimeout(() => {
+                setSearchBodyNo(data);
+            }, 50);
+        }
+    }
+
+    const handleError = data => {
+        
+    }
+
     const [timeOutId, setTimeOutId] = useState(null);
     useEffect(() => {
         clearTimeout(timeOutId);
@@ -616,8 +632,11 @@ export default function FieldInspectionReport() {
             .then((res) => {
                 setTotalCount(res.data.count);
                 setFieldInspectionRecordList(res.data.results);
+                onHide('displayQR');
+                setQrResult('No Result');
             })
             .catch((err) => {
+                onHide('displayQR');
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -1192,6 +1211,7 @@ export default function FieldInspectionReport() {
         'displayPDF': setDisplayPDF,
         'displayEmail': setDisplayEmail,
         'displayAddEmail': setDisplayAddEmail,
+        'displayQR': setDisplayQR,
     }
 
     const onClick = (name) => {
@@ -1284,6 +1304,7 @@ export default function FieldInspectionReport() {
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                                    <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
                                 </div>
                             </div>
                         </div>
@@ -1997,6 +2018,18 @@ export default function FieldInspectionReport() {
                             <div style={{fontSize: '16px'}}>{message.content}</div>
                         </div>
                     </div>
+                </Dialog>
+
+                <Dialog header="SCAN QR" style={{width: '310px' }} visible={displayQR} onHide={() => onHide('displayQR')} blockScroll={true}>
+                    <center>
+                        <h5><b>{qrResult}</b></h5>
+                        <QrReader
+                            delay={300}
+                            onScan={handleScan}
+                            onError={handleError}
+                            style={{height: '260px', width: '260px'}}
+                        />
+                    </center>
                 </Dialog>
             </div>
         </div>

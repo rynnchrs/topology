@@ -112,11 +112,11 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Rear Window", notes: ''}
     ]);
 
-    const initialTiresWheels = useState([
+    const initialTiresWheels = [
         {g: false, f: false, p: false, label: "Condition of Tires", notes: ''},
         {g: false, f: false, p: false, label: "Condition of Wheels", notes: ''},
         {g: false, f: false, p: false, label: "Spare Tire", notes: ''}
-    ]);
+    ];
 
     const [tiresWheels, setTiresWheels] = useState([
         {g: false, f: false, p: false, label: "Condition of Tires", notes: ''},
@@ -124,14 +124,14 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Spare Tire", notes: ''}
     ]);
 
-    const initialUnderbody = useState([
+    const initialUnderbody = [
         {g: false, f: false, p: false, label: "Frame", notes: ''},
         {g: false, f: false, p: false, label: "Exhaust System", notes: ''},
         {g: false, f: false, p: false, label: "Transmission", notes: ''},
         {g: false, f: false, p: false, label: "Drive Axie", notes: ''},
         {g: false, f: false, p: false, label: "Suspension", notes: ''},
         {g: false, f: false, p: false, label: "Brake System", notes: ''}
-    ]);
+    ];
 
     const [underbody, setUnderbody] = useState([
         {g: false, f: false, p: false, label: "Frame", notes: ''},
@@ -142,7 +142,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Brake System", notes: ''}
     ]);
 
-    const initialUnderhood = useState([
+    const initialUnderhood = [
         {g: false, f: false, p: false, label: "Engine Compartment", notes: ''},
         {g: false, f: false, p: false, label: "Battery", notes: ''},
         {g: false, f: false, p: false, label: "Oil", notes: ''},
@@ -151,7 +151,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Belts", notes: ''},
         {g: false, f: false, p: false, label: "Hoses", notes: ''},
         {g: false, f: false, p: false, label: "Any Non-Stock Modifications", notes: ''}
-    ]);
+    ];
 
     const [underhood, setUnderhood] = useState([
         {g: false, f: false, p: false, label: "Engine Compartment", notes: ''},
@@ -164,7 +164,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Any Non-Stock Modifications", notes: ''}
     ]);
 
-    const initialInterior = useState([
+    const initialInterior = [
         {g: false, f: false, p: false, label: "Seats", notes: ''},
         {g: false, f: false, p: false, label: "Headliner", notes: ''},
         {g: false, f: false, p: false, label: "Carpet"},
@@ -177,7 +177,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Air Conditioning", notes: ''},
         {g: false, f: false, p: false, label: "Heater", notes: ''},
         {g: false, f: false, p: false, label: "Defroster", notes: ''}
-    ]);
+    ];
 
     const [interior, setInterior] = useState([
         {g: false, f: false, p: false, label: "Seats", notes: ''},
@@ -194,7 +194,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Defroster", notes: ''}
     ]);
 
-    const initialElectricalSystem = useState([
+    const initialElectricalSystem = [
         {g: false, f: false, p: false, label: "Power Locks", notes: ''},
         {g: false, f: false, p: false, label: "Power Seats", notes: ''},
         {g: false, f: false, p: false, label: "Power Steering", notes: ''},
@@ -207,7 +207,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Signal Lights", notes: ''},
         {g: false, f: false, p: false, label: "Brake Lights", notes: ''},
         {g: false, f: false, p: false, label: "Parking Lights", notes: ''}
-    ]);
+    ];
 
     const [electricalSystem, setElectricalSystem] = useState([
         {g: false, f: false, p: false, label: "Power Locks", notes: ''},
@@ -224,7 +224,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Parking Lights", notes: ''}
     ]);
 
-    const initialRoadTestFindings = useState([
+    const initialRoadTestFindings = [
         {g: false, f: false, p: false, label: "Starting", notes: ''},
         {g: false, f: false, p: false, label: "Idling", notes: ''},
         {g: false, f: false, p: false, label: "Engine Performance", notes: ''},
@@ -233,7 +233,7 @@ export default function FieldInspectionReport() {
         {g: false, f: false, p: false, label: "Steering", notes: ''},
         {g: false, f: false, p: false, label: "Braking", notes: ''},
         {g: false, f: false, p: false, label: "Suspension Performance", notes: ''}
-    ]);
+    ];
 
     const [roadTestFindings, setRoadTestFindings] = useState([
         {g: false, f: false, p: false, label: "Starting", notes: ''},
@@ -540,6 +540,7 @@ export default function FieldInspectionReport() {
         setDoorCount("");
         setCondition("");
 
+        
         // setExterior(initialExterior);
         // setGlass(initialGlass);
         // setTiresWheels(initialTiresWheels);
@@ -555,6 +556,14 @@ export default function FieldInspectionReport() {
         setMessage({title:"CREATE", content:"Successfully created."});
         onClick('displayMessage');
         getFieldInspectionNotCreated();
+        setExterior(initialExterior);
+        setGlass(initialGlass);
+        setTiresWheels(initialTiresWheels);
+        setUnderbody(initialUnderbody);
+        setUnderhood(initialUnderhood);
+        setInterior(initialInterior);
+        setElectricalSystem(initialElectricalSystem);
+        setRoadTestFindings(initialRoadTestFindings);
     }
 
     const gfpExterior = (index, value) => {
