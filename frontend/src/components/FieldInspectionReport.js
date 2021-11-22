@@ -247,7 +247,6 @@ export default function FieldInspectionReport() {
     ]);
 
     const submitFieldInspection = () => {
-        console.log(exterior)
         let flagChecking = true;
 
         if (flagChecking === true) {
@@ -337,16 +336,7 @@ export default function FieldInspectionReport() {
                 toast.current.show({ severity: 'error', summary: 'INSPECTION DATE:', detail: 'This field is required.', life: 3000 });
             } else if (mileage === "") { 
                 toast.current.show({ severity: 'error', summary: 'MILEAGE', detail: 'This field is required.', life: 3000 });
-            } 
-            // else if (bodyStyle === "") { 
-            //     toast.current.show({ severity: 'error', summary: 'BODY STYLE', detail: 'This field is required.', life: 3000 });
-            // } else if (driverType === "") { 
-            //     toast.current.show({ severity: 'error', summary: 'DRIVER TYPE', detail: 'This field is required.', life: 3000 });
-            // } 
-            // else if (inspector === "") { 
-            //     toast.current.show({ severity: 'error', summary: 'INSPECTOR', detail: 'This field is required.', life: 3000 });
-            // } 
-            else if (doorCount === "") { 
+            } else if (doorCount === "") { 
                 toast.current.show({ severity: 'error', summary: 'DOOR COUNT', detail: 'This field is required.', life: 3000 });
             } else {
                 setIsLoading(true);
@@ -358,181 +348,176 @@ export default function FieldInspectionReport() {
                     },
                 };
 
-                axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', {
-                    "task": fieldInspectionData.task.task_id,
-                    "job_order": fieldInspectionData.job_id,
-                    "body_no": bodyNo,
-                    "approved_by": "",
-                    "noted_by": "",
-                    "inspection_date" : format(dateInspection, 'yyyy-MM-dd'),
-                    "mileage": mileage,
-                    "body_style": bodyStyle === "" ? null : bodyStyle,
-                    "drive_type": driverType === "" ? null : driverType,
-                    "door_count": doorCount,
-                    "hood": exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F",
-                    "hood_note": exterior[0].notes === "" ? null : exterior[0].notes,
-                    "front": exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F",
-                    "front_note": exterior[1].notes === "" ? null : exterior[1].notes,
-                    "front_bumper": exterior[2].g === true ? "G" : exterior[2].p === true ? "P" : "F",
-                    "front_bumper_note": exterior[2].notes === "" ? null : exterior[2].notes,
-                    "fenders": exterior[3].g === true ? "G" : exterior[3].p === true ? "P" : "F",
-                    "fenders_note": exterior[3].notes === "" ? null : exterior[3].notes,
-                    "doors": exterior[4].g === true ? "G" : exterior[4].p === true ? "P" : "F",
-                    "doors_note": exterior[4].notes === "" ? null : exterior[4].notes,
-                    "roof": exterior[5].g === true ? "G" : exterior[5].p === true ? "P" : "F",
-                    "roof_note": exterior[5].notes === "" ? null : exterior[5].notes,
-                    "rear": exterior[6].g === true ? "G" : exterior[6].p === true ? "P" : "F",
-                    "rear_note": exterior[6].notes === "" ? null : exterior[6].notes,
-                    "rear_bumper": exterior[7].g === true ? "G" : exterior[7].p === true ? "P" : "F",
-                    "rear_bumper_note": exterior[7].notes === "" ? null : exterior[7].notes,
-                    "trunk": exterior[8].g === true ? "G" : exterior[8].p === true ? "P" : "F",
-                    "trunk_note": exterior[8].notes === "" ? null : exterior[8].notes,
-                    "trim": exterior[9].g === true ? "G" : exterior[9].p === true ? "P" : "F",
-                    "trim_note": exterior[9].notes === "" ? null : exterior[9].notes,
-                    "fuel_door": exterior[10].g === true ? "G" : exterior[10].p === true ? "P" : "F",
-                    "fuel_door_note": exterior[10].notes === "" ? null : exterior[10].notes,
-                    "pait_condition": exterior[11].g === true ? "G" : exterior[11].p === true ? "P" : "F",
-                    "pait_condition_note": exterior[11].notes === "" ? null : exterior[11].notes,
+                let formData = new FormData();
+                formData.append("task", fieldInspectionData.task.task_id);
+                formData.append("job_order", fieldInspectionData.job_id);
+                formData.append("body_no", bodyNo);
+                formData.append("approved_by", "");
+                formData.append("noted_by", "");
+                formData.append("inspection_date" , format(dateInspection, 'yyyy-MM-dd'));
+                formData.append("mileage", mileage);
+                formData.append("body_style", bodyStyle === "" ? null : bodyStyle);
+                formData.append("drive_type", driverType === "" ? null : driverType);
+                formData.append("door_count", doorCount);
+                formData.append("hood", exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F");
+                formData.append("hood_note", exterior[0].notes === "" ? null : exterior[0].notes);
+                formData.append("front", exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F");
+                formData.append("front_note", exterior[1].notes === "" ? null : exterior[1].notes);
+                formData.append("front_bumper", exterior[2].g === true ? "G" : exterior[2].p === true ? "P" : "F");
+                formData.append("front_bumper_note", exterior[2].notes === "" ? null : exterior[2].notes);
+                formData.append("fenders", exterior[3].g === true ? "G" : exterior[3].p === true ? "P" : "F");
+                formData.append("fenders_note", exterior[3].notes === "" ? null : exterior[3].notes);
+                formData.append("doors", exterior[4].g === true ? "G" : exterior[4].p === true ? "P" : "F");
+                formData.append("doors_note", exterior[4].notes === "" ? null : exterior[4].notes);
+                formData.append("roof", exterior[5].g === true ? "G" : exterior[5].p === true ? "P" : "F");
+                formData.append("roof_note", exterior[5].notes === "" ? null : exterior[5].notes);
+                formData.append("rear", exterior[6].g === true ? "G" : exterior[6].p === true ? "P" : "F");
+                formData.append("rear_note", exterior[6].notes === "" ? null : exterior[6].notes);
+                formData.append("rear_bumper", exterior[7].g === true ? "G" : exterior[7].p === true ? "P" : "F");
+                formData.append("rear_bumper_note", exterior[7].notes === "" ? null : exterior[7].notes);
+                formData.append("trunk", exterior[8].g === true ? "G" : exterior[8].p === true ? "P" : "F");
+                formData.append("trunk_note", exterior[8].notes === "" ? null : exterior[8].notes);
+                formData.append("trim", exterior[9].g === true ? "G" : exterior[9].p === true ? "P" : "F");
+                formData.append("trim_note", exterior[9].notes === "" ? null : exterior[9].notes);
+                formData.append("fuel_door", exterior[10].g === true ? "G" : exterior[10].p === true ? "P" : "F");
+                formData.append("fuel_door_note", exterior[10].notes === "" ? null : exterior[10].notes);
+                formData.append("pait_condition", exterior[11].g === true ? "G" : exterior[11].p === true ? "P" : "F");
+                formData.append("pait_condition_note", exterior[11].notes === "" ? null : exterior[11].notes);
 
-                    "windshield": glass[0].g === true ? "G" : glass[0].p === true ? "P" : "F",
-                    "windshield_note": glass[0].notes === "" ? null : glass[0].notes,
-                    "windows": glass[1].g === true ? "G" : glass[1].p === true ? "P" : "F",
-                    "windows_note": glass[1].notes === "" ? null : glass[1].notes,
-                    "mirrors": glass[2].g === true ? "G" : glass[2].p === true ? "P" : "F",
-                    "mirrors_note": glass[2].notes === "" ? null : glass[2].notes,
-                    "rear_window": glass[3].g === true ? "G" : glass[3].p === true ? "P" : "F",
-                    "rear_window_note": glass[3].notes === "" ? null : glass[3].notes,
+                formData.append("windshield", glass[0].g === true ? "G" : glass[0].p === true ? "P" : "F");
+                formData.append("windshield_note", glass[0].notes === "" ? null : glass[0].notes);
+                formData.append("windows", glass[1].g === true ? "G" : glass[1].p === true ? "P" : "F");
+                formData.append("windows_note", glass[1].notes === "" ? null : glass[1].notes);
+                formData.append("mirrors", glass[2].g === true ? "G" : glass[2].p === true ? "P" : "F");
+                formData.append("mirrors_note", glass[2].notes === "" ? null : glass[2].notes);
+                formData.append("rear_window", glass[3].g === true ? "G" : glass[3].p === true ? "P" : "F");
+                formData.append("rear_window_note", glass[3].notes === "" ? null : glass[3].notes);
 
-                    "tires_condition": tiresWheels[0].g === true ? "G" : tiresWheels[0].p === true ? "P" : "F",
-                    "tires_condition_note": tiresWheels[0].notes === "" ? null : tiresWheels[0].notes,
-                    "wheels_condition": tiresWheels[1].g === true ? "G" : tiresWheels[1].p === true ? "P" : "F",
-                    "wheels_condition_note": glass[1].notes === "" ? null : glass[1].notes,
-                    "spare_tire": tiresWheels[2].g === true ? "G" : tiresWheels[2].p === true ? "P" : "F",
-                    "spare_tire_note": tiresWheels[2].notes === "" ? null : tiresWheels[2].notes,
+                formData.append("tires_condition", tiresWheels[0].g === true ? "G" : tiresWheels[0].p === true ? "P" : "F");
+                formData.append("tires_condition_note", tiresWheels[0].notes === "" ? null : tiresWheels[0].notes);
+                formData.append("wheels_condition", tiresWheels[1].g === true ? "G" : tiresWheels[1].p === true ? "P" : "F");
+                formData.append("wheels_condition_note", glass[1].notes === "" ? null : glass[1].notes);
+                formData.append("spare_tire", tiresWheels[2].g === true ? "G" : tiresWheels[2].p === true ? "P" : "F");
+                formData.append("spare_tire_note", tiresWheels[2].notes === "" ? null : tiresWheels[2].notes);
 
-                    "frame": underbody[0].g === true ? "G" : underbody[0].p === true ? "P" : "F",
-                    "frame_note": underbody[0].notes === "" ? null : underbody[0].notes,
-                    "exhaust_system": underbody[1].g === true ? "G" : underbody[1].p === true ? "P" : "F",
-                    "exhaust_system_note": underbody[1].notes === "" ? null : underbody[1].notes,
-                    "transmission": underbody[2].g === true ? "G" : underbody[2].p === true ? "P" : "F",
-                    "transmission_note": underbody[2].notes === "" ? null : underbody[2].notes,
-                    "drive_axle": underbody[3].g === true ? "G" : underbody[3].p === true ? "P" : "F",
-                    "drive_axle_note": underbody[3].notes === "" ? null : underbody[3].notes,
-                    "suspension": underbody[4].g === true ? "G" : underbody[4].p === true ? "P" : "F",
-                    "suspension_note": underbody[4].notes === "" ? null : underbody[4].notes,
-                    "breake_system": underbody[5].g === true ? "G" : underbody[5].p === true ? "P" : "F",
-                    "breake_system_note": underbody[5].notes === "" ? null : underbody[5].notes,
+                formData.append("frame", underbody[0].g === true ? "G" : underbody[0].p === true ? "P" : "F");
+                formData.append("frame_note", underbody[0].notes === "" ? null : underbody[0].notes);
+                formData.append("exhaust_system", underbody[1].g === true ? "G" : underbody[1].p === true ? "P" : "F");
+                formData.append("exhaust_system_note", underbody[1].notes === "" ? null : underbody[1].notes);
+                formData.append("transmission", underbody[2].g === true ? "G" : underbody[2].p === true ? "P" : "F");
+                formData.append("transmission_note", underbody[2].notes === "" ? null : underbody[2].notes);
+                formData.append("drive_axle", underbody[3].g === true ? "G" : underbody[3].p === true ? "P" : "F");
+                formData.append("drive_axle_note", underbody[3].notes === "" ? null : underbody[3].notes);
+                formData.append("suspension", underbody[4].g === true ? "G" : underbody[4].p === true ? "P" : "F");
+                formData.append("suspension_note", underbody[4].notes === "" ? null : underbody[4].notes);
+                formData.append("breake_system", underbody[5].g === true ? "G" : underbody[5].p === true ? "P" : "F");
+                formData.append("breake_system_note", underbody[5].notes === "" ? null : underbody[5].notes);
 
-                    "engine_compartment": underhood[0].g === true ? "G" : underhood[0].p === true ? "P" : "F",
-                    "engine_compartment_note": underhood[0].notes === "" ? null : underhood[0].notes,
-                    "battery": underhood[1].g === true ? "G" : underhood[1].p === true ? "P" : "F",
-                    "battery_note": underhood[1].notes === "" ? null : underhood[1].notes,
-                    "oil": underhood[2].g === true ? "G" : underhood[2].p === true ? "P" : "F",
-                    "oil_note": underhood[2].notes === "" ? null : underhood[2].notes,
-                    "fluids": underhood[3].g === true ? "G" : underhood[3].p === true ? "P" : "F",
-                    "fluids_note": underhood[3].notes === "" ? null : underhood[3].notes,
-                    "wiring": underhood[4].g === true ? "G" : underhood[4].p === true ? "P" : "F",
-                    "wiring_note": underhood[4].notes === "" ? null : underhood[4].notes,
-                    "belts": underhood[5].g === true ? "G" : underhood[5].p === true ? "P" : "F",
-                    "belts_note": underhood[5].notes === "" ? null : underhood[5].notes,
-                    "hoses": underhood[6].g === true ? "G" : underhood[6].p === true ? "P" : "F",
-                    "hoses_note": underhood[6].notes === "" ? null : underhood[6].notes,
-                    "non_stock_modif": underhood[7].g === true ? "G" : underhood[7].p === true ? "P" : "F",
-                    "non_stock_modif_note": underhood[7].notes === "" ? null : underhood[7].notes,
+                formData.append("engine_compartment", underhood[0].g === true ? "G" : underhood[0].p === true ? "P" : "F");
+                formData.append("engine_compartment_note", underhood[0].notes === "" ? null : underhood[0].notes);
+                formData.append("battery", underhood[1].g === true ? "G" : underhood[1].p === true ? "P" : "F");
+                formData.append("battery_note", underhood[1].notes === "" ? null : underhood[1].notes);
+                formData.append("oil", underhood[2].g === true ? "G" : underhood[2].p === true ? "P" : "F");
+                formData.append("oil_note", underhood[2].notes === "" ? null : underhood[2].notes);
+                formData.append("fluids", underhood[3].g === true ? "G" : underhood[3].p === true ? "P" : "F");
+                formData.append("fluids_note", underhood[3].notes === "" ? null : underhood[3].notes);
+                formData.append("wiring", underhood[4].g === true ? "G" : underhood[4].p === true ? "P" : "F");
+                formData.append("wiring_note", underhood[4].notes === "" ? null : underhood[4].notes);
+                formData.append("belts", underhood[5].g === true ? "G" : underhood[5].p === true ? "P" : "F");
+                formData.append("belts_note", underhood[5].notes === "" ? null : underhood[5].notes);
+                formData.append("hoses", underhood[6].g === true ? "G" : underhood[6].p === true ? "P" : "F");
+                formData.append("hoses_note", underhood[6].notes === "" ? null : underhood[6].notes);
+                formData.append("non_stock_modif", underhood[7].g === true ? "G" : underhood[7].p === true ? "P" : "F");
+                formData.append("non_stock_modif_note", underhood[7].notes === "" ? null : underhood[7].notes);
 
-                    "seats": interior[0].g === true ? "G" : interior[0].p === true ? "P" : "F",
-                    "seats_note": interior[0].notes === "" ? null : interior[0].notes,
-                    "headliner": interior[1].g === true ? "G" : interior[1].p === true ? "P" : "F",
-                    "headliner_note": interior[1].notes === "" ? null : interior[1].notes,
-                    "carpet": interior[2].g === true ? "G" : interior[2].p === true ? "P" : "F",
-                    "carpet_note": interior[2].notes === "" ? null : interior[2].notes,
-                    "door_panels": interior[3].g === true ? "G" : interior[3].p === true ? "P" : "F",
-                    "door_panels_note": interior[3].notes === "" ? null : interior[3].notes,
-                    "glove_box": interior[4].g === true ? "G" : interior[4].p === true ? "P" : "F",
-                    "glove_box_note": interior[4].notes === "" ? null : interior[4].notes,
-                    "vanity_mirrors": interior[5].g === true ? "G" : interior[5].p === true ? "P" : "F",
-                    "vanity_mirrors_note": interior[5].notes === "" ? null : interior[5].notes,
-                    "interioir_trim": interior[6].g === true ? "G" : interior[6].p === true ? "P" : "F",
-                    "interioir_trim_note": interior[6].notes === "" ? null : interior[6].notes,
-                    "dashboard": interior[7].g === true ? "G" : interior[7].p === true ? "P" : "F",
-                    "dashboard_note": interior[7].notes === "" ? null : interior[7].notes,
-                    "dashboard_gauges": interior[8].g === true ? "G" : interior[8].p === true ? "P" : "F",
-                    "dashboard_gauges_note": interior[8].notes === "" ? null : interior[8].notes,
-                    "air_conditioning": interior[9].g === true ? "G" : interior[9].p === true ? "P" : "F",
-                    "air_conditioning_note": interior[9].notes === "" ? null : interior[9].notes,
-                    "heater": interior[10].g === true ? "G" : interior[10].p === true ? "P" : "F",
-                    "heater_note": interior[10].notes === "" ? null : interior[10].notes,
-                    "defroster": interior[11].g === true ? "G" : interior[11].p === true ? "P" : "F",
-                    "defroster_note": interior[11].notes === "" ? null : interior[11].notes,
+                formData.append("seats", interior[0].g === true ? "G" : interior[0].p === true ? "P" : "F");
+                formData.append("seats_note", interior[0].notes === "" ? null : interior[0].notes);
+                formData.append("headliner", interior[1].g === true ? "G" : interior[1].p === true ? "P" : "F");
+                formData.append("headliner_note", interior[1].notes === "" ? null : interior[1].notes);
+                formData.append("carpet", interior[2].g === true ? "G" : interior[2].p === true ? "P" : "F");
+                formData.append("carpet_note", interior[2].notes === "" ? null : interior[2].notes);
+                formData.append("door_panels", interior[3].g === true ? "G" : interior[3].p === true ? "P" : "F");
+                formData.append("door_panels_note", interior[3].notes === "" ? null : interior[3].notes);
+                formData.append("glove_box", interior[4].g === true ? "G" : interior[4].p === true ? "P" : "F");
+                formData.append("glove_box_note", interior[4].notes === "" ? null : interior[4].notes);
+                formData.append("vanity_mirrors", interior[5].g === true ? "G" : interior[5].p === true ? "P" : "F");
+                formData.append("vanity_mirrors_note", interior[5].notes === "" ? null : interior[5].notes);
+                formData.append("interioir_trim", interior[6].g === true ? "G" : interior[6].p === true ? "P" : "F");
+                formData.append("interioir_trim_note", interior[6].notes === "" ? null : interior[6].notes);
+                formData.append("dashboard", interior[7].g === true ? "G" : interior[7].p === true ? "P" : "F");
+                formData.append("dashboard_note", interior[7].notes === "" ? null : interior[7].notes);
+                formData.append("dashboard_gauges", interior[8].g === true ? "G" : interior[8].p === true ? "P" : "F");
+                formData.append("dashboard_gauges_note", interior[8].notes === "" ? null : interior[8].notes);
+                formData.append("air_conditioning", interior[9].g === true ? "G" : interior[9].p === true ? "P" : "F");
+                formData.append("air_conditioning_note", interior[9].notes === "" ? null : interior[9].notes);
+                formData.append("heater", interior[10].g === true ? "G" : interior[10].p === true ? "P" : "F");
+                formData.append("heater_note", interior[10].notes === "" ? null : interior[10].notes);
+                formData.append("defroster", interior[11].g === true ? "G" : interior[11].p === true ? "P" : "F");
+                formData.append("defroster_note", interior[11].notes === "" ? null : interior[11].notes);
 
-                    "power_locks": electricalSystem[0].g === true ? "G" : electricalSystem[0].p === true ? "P" : "F",
-                    "power_locks_note":  electricalSystem[0].notes === "" ? null : electricalSystem[0].notes,
-                    "power_seats": electricalSystem[1].g === true ? "G" : electricalSystem[1].p === true ? "P" : "F",
-                    "power_seats_note": electricalSystem[1].notes === "" ? null : electricalSystem[1].notes,
-                    "power_steering": electricalSystem[2].g === true ? "G" : electricalSystem[2].p === true ? "P" : "F",
-                    "power_steering_note": electricalSystem[2].notes === "" ? null : electricalSystem[2].notes,
-                    "power_windows": electricalSystem[3].g === true ? "G" : electricalSystem[3].p === true ? "P" : "F",
-                    "power_windows_note": electricalSystem[3].notes === "" ? null : electricalSystem[3].notes,
-                    "power_mirrors": electricalSystem[4].g === true ? "G" : electricalSystem[4].p === true ? "P" : "F",
-                    "power_mirrors_note": electricalSystem[4].notes === "" ? null : electricalSystem[4].notes,
-                    "audio_system": electricalSystem[5].g === true ? "G" : electricalSystem[5].p === true ? "P" : "F",
-                    "audio_system_note": electricalSystem[5].notes === "" ? null : electricalSystem[5].notes,
-                    "onboard_computer": electricalSystem[6].g === true ? "G" : electricalSystem[6].p === true ? "P" : "F",
-                    "onboard_computer_note": electricalSystem[6].notes === "" ? null : electricalSystem[6].notes,
-                    "headlights": electricalSystem[7].g === true ? "G" : electricalSystem[7].p === true ? "P" : "F",
-                    "headlights_note": electricalSystem[7].notes === "" ? null : electricalSystem[7].notes,
-                    "taillights": electricalSystem[8].g === true ? "G" : electricalSystem[8].p === true ? "P" : "F",
-                    "taillights_note": electricalSystem[8].notes === "" ? null : electricalSystem[8].notes,
-                    "signal_lights": electricalSystem[9].g === true ? "G" : electricalSystem[9].p === true ? "P" : "F",
-                    "signal_lights_note": electricalSystem[9].notes === "" ? null : electricalSystem[9].notes,
-                    "brake_lights": electricalSystem[10].g === true ? "G" : electricalSystem[10].p === true ? "P" : "F",
-                    "brake_lights_note": electricalSystem[10].notes === "" ? null : electricalSystem[10].notes,
-                    "parking_lights": electricalSystem[11].g === true ? "G" : electricalSystem[11].p === true ? "P" : "F",
-                    "parking_lights_note": electricalSystem[11].notes === "" ? null : electricalSystem[11].notes,
+                formData.append("power_locks", electricalSystem[0].g === true ? "G" : electricalSystem[0].p === true ? "P" : "F");
+                formData.append("power_locks_note",  electricalSystem[0].notes === "" ? null : electricalSystem[0].notes);
+                formData.append("power_seats", electricalSystem[1].g === true ? "G" : electricalSystem[1].p === true ? "P" : "F");
+                formData.append("power_seats_note", electricalSystem[1].notes === "" ? null : electricalSystem[1].notes);
+                formData.append("power_steering", electricalSystem[2].g === true ? "G" : electricalSystem[2].p === true ? "P" : "F");
+                formData.append("power_steering_note", electricalSystem[2].notes === "" ? null : electricalSystem[2].notes);
+                formData.append("power_windows", electricalSystem[3].g === true ? "G" : electricalSystem[3].p === true ? "P" : "F");
+                formData.append("power_windows_note", electricalSystem[3].notes === "" ? null : electricalSystem[3].notes);
+                formData.append("power_mirrors", electricalSystem[4].g === true ? "G" : electricalSystem[4].p === true ? "P" : "F");
+                formData.append("power_mirrors_note", electricalSystem[4].notes === "" ? null : electricalSystem[4].notes);
+                formData.append("audio_system", electricalSystem[5].g === true ? "G" : electricalSystem[5].p === true ? "P" : "F");
+                formData.append("audio_system_note", electricalSystem[5].notes === "" ? null : electricalSystem[5].notes);
+                formData.append("onboard_computer", electricalSystem[6].g === true ? "G" : electricalSystem[6].p === true ? "P" : "F");
+                formData.append("onboard_computer_note", electricalSystem[6].notes === "" ? null : electricalSystem[6].notes);
+                formData.append("headlights", electricalSystem[7].g === true ? "G" : electricalSystem[7].p === true ? "P" : "F");
+                formData.append("headlights_note", electricalSystem[7].notes === "" ? null : electricalSystem[7].notes);
+                formData.append("taillights", electricalSystem[8].g === true ? "G" : electricalSystem[8].p === true ? "P" : "F");
+                formData.append("taillights_note", electricalSystem[8].notes === "" ? null : electricalSystem[8].notes);
+                formData.append("signal_lights", electricalSystem[9].g === true ? "G" : electricalSystem[9].p === true ? "P" : "F");
+                formData.append("signal_lights_note", electricalSystem[9].notes === "" ? null : electricalSystem[9].notes);
+                formData.append("brake_lights", electricalSystem[10].g === true ? "G" : electricalSystem[10].p === true ? "P" : "F");
+                formData.append("brake_lights_note", electricalSystem[10].notes === "" ? null : electricalSystem[10].notes);
+                formData.append("parking_lights", electricalSystem[11].g === true ? "G" : electricalSystem[11].p === true ? "P" : "F");
+                formData.append("parking_lights_note", electricalSystem[11].notes === "" ? null : electricalSystem[11].notes);
 
-                    "starting": roadTestFindings[0].g === true ? "G" : roadTestFindings[0].p === true ? "P" : "F",
-                    "starting_note": roadTestFindings[0].notes === "" ? null : roadTestFindings[0].notes,
-                    "idling": roadTestFindings[1].g === true ? "G" : roadTestFindings[1].p === true ? "P" : "F",
-                    "idling_note": roadTestFindings[1].notes === "" ? null : roadTestFindings[1].notes,
-                    "engine_performance": roadTestFindings[2].g === true ? "G" : roadTestFindings[2].p === true ? "P" : "F",
-                    "engine_performance_note": roadTestFindings[2].notes === "" ? null : roadTestFindings[2].notes,
-                    "acceleration": roadTestFindings[3].g === true ? "G" : roadTestFindings[3].p === true ? "P" : "F",
-                    "acceleration_note": roadTestFindings[3].notes === "" ? null : roadTestFindings[3].notes,
-                    "trans_shift_quality": roadTestFindings[4].g === true ? "G" : roadTestFindings[4].p === true ? "P" : "F",
-                    "trans_shift_quality_note": roadTestFindings[4].notes === "" ? null : roadTestFindings[4].notes,
-                    "steering": roadTestFindings[5].g === true ? "G" : roadTestFindings[5].p === true ? "P" : "F",
-                    "steering_note": roadTestFindings[5].notes === "" ? null : roadTestFindings[5].notes,
-                    "braking": roadTestFindings[6].g === true ? "G" : roadTestFindings[6].p === true ? "P" : "F",
-                    "braking_note": roadTestFindings[6].notes === "" ? null : roadTestFindings[6].notes,
-                    "suspension_performance": roadTestFindings[7].g === true ? "G" : roadTestFindings[7].p === true ? "P" : "F",
-                    "suspension_performance_note": roadTestFindings[7].notes === "" ? null : roadTestFindings[7].notes
-                }, config)
-                .then((res) => {
-                    console.log(res);
-                    submitFieldInspectionAfter();
-                    if (refImageUpload.current.state.files.length <= 0) {
+                formData.append("starting", roadTestFindings[0].g === true ? "G" : roadTestFindings[0].p === true ? "P" : "F");
+                formData.append("starting_note", roadTestFindings[0].notes === "" ? null : roadTestFindings[0].notes);
+                formData.append("idling", roadTestFindings[1].g === true ? "G" : roadTestFindings[1].p === true ? "P" : "F");
+                formData.append("idling_note", roadTestFindings[1].notes === "" ? null : roadTestFindings[1].notes);
+                formData.append("engine_performance", roadTestFindings[2].g === true ? "G" : roadTestFindings[2].p === true ? "P" : "F");
+                formData.append("engine_performance_note", roadTestFindings[2].notes === "" ? null : roadTestFindings[2].notes);
+                formData.append("acceleration", roadTestFindings[3].g === true ? "G" : roadTestFindings[3].p === true ? "P" : "F");
+                formData.append("acceleration_note", roadTestFindings[3].notes === "" ? null : roadTestFindings[3].notes);
+                formData.append("trans_shift_quality", roadTestFindings[4].g === true ? "G" : roadTestFindings[4].p === true ? "P" : "F");
+                formData.append("trans_shift_quality_note", roadTestFindings[4].notes === "" ? null : roadTestFindings[4].notes);
+                formData.append("steering", roadTestFindings[5].g === true ? "G" : roadTestFindings[5].p === true ? "P" : "F");
+                formData.append("steering_note", roadTestFindings[5].notes === "" ? null : roadTestFindings[5].notes);
+                formData.append("braking", roadTestFindings[6].g === true ? "G" : roadTestFindings[6].p === true ? "P" : "F");
+                formData.append("braking_note", roadTestFindings[6].notes === "" ? null : roadTestFindings[6].notes);
+                formData.append("suspension_performance", roadTestFindings[7].g === true ? "G" : roadTestFindings[7].p === true ? "P" : "F");
+                formData.append("suspension_performance_note", roadTestFindings[7].notes === "" ? null : roadTestFindings[7].notes);
+
+                if (refImageUpload.current.state.files.length <= 0) {
+                    axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                    .then((res) => {
                         submitFieldInspectionAfter();
-                    } else {
-                        let formData = new FormData();
-                        refImageUpload.current.state.files.map((f, index) => {
-                            formData.append("images[" + index + "]image", f);
-                            formData.append("images[" + index + "]mode", "fi");
-                            formData.append("images[" + index + "]image_name", res.data.fi_report_id);
-                            return null;
-                        })
-                        axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData, config)
-                        .then((res) => {
-                            submitFieldInspectionAfter();
-                        })
-                        .catch((err) => {
+                    })
+                    .catch((err) => {
 
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err)
-                    setIsLoading(false);
-                })
+                    });
+                } else {
+                    refImageUpload.current.state.files.map((f, index) => {
+                        formData.append("images[" + index + "]image", f);
+                        return null;
+                    })
+                    axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                    .then((res) => {
+                        submitFieldInspectionAfter();
+                    })
+                    .catch((err) => {
+
+                    });
+                }
             }
         }
     }
@@ -715,7 +700,6 @@ export default function FieldInspectionReport() {
     }
 
     const handleSelectReportNo = (value) => {
-        console.log("handle:", value)
         setYear(value.body_no.release_year);
         setMake(value.body_no.brand);
         setModel(value.body_no.make);
