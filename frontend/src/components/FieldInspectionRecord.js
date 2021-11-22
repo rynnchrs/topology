@@ -3,6 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
+import { AutoComplete } from 'primereact/autocomplete';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { FileUpload } from 'primereact/fileupload';
@@ -18,6 +19,7 @@ import { format } from 'date-fns';
 
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import QrReader from 'react-qr-reader'
 
 export default function FieldInspectionReport() {
 
@@ -38,6 +40,7 @@ export default function FieldInspectionReport() {
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
     const [delFieldInspectionID, setDelFieldInspectionID] = useState('');
     const [flagFieldInspectionRecordMethod, setFlagFieldInspectionRecordMethod] = useState('');
+    const [qrResult, setQrResult] = useState('No Result');
 
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
@@ -50,6 +53,10 @@ export default function FieldInspectionReport() {
     let arrInterior = useRef([]);
     let arrElectricalSystem = useRef([]);
     let arrRoadTestFindings = useRef([]);
+
+    //emails
+    const [email, setEmail] = useState('');
+    const [emailAcc, setEmailAcc] = useState([]);
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
@@ -180,6 +187,9 @@ export default function FieldInspectionReport() {
     const [displayConfirmDeleteImage, setDisplayConfirmDeleteImage] = useState(false);
     const [displayConfirmDelete, setDisplayConfirmDelete] = useState(false);
     const [displayPDF, setDisplayPDF] = useState(false);
+    const [displayEmail, setDisplayEmail] = useState(false);
+    const [displayAddEmail, setDisplayAddEmail] = useState(false);
+    const [displayQR, setDisplayQR] = useState(false);
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
@@ -308,7 +318,6 @@ export default function FieldInspectionReport() {
 
     const assignFieldInspectionRecordEdit = (value) => {
         try {
-            // console.log("fi: ",value);
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);
             setFieldInspectionJobID(value.job_order);
@@ -343,7 +352,6 @@ export default function FieldInspectionReport() {
             let syntaxExteriorNote = ["hood_note", "front_note", "front_bumper_note", "fenders_note", "doors_note", "roof_note", "rear_note", "rear_bumper_note", "trunk_note", "trim_note", "fuel_door_note", "pait_condition_note"];
             for (i = 0; i < syntaxExterior.length; i++) {
                 Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
-                    // console.log("resX:", value[x])
                     if (value[x].toLowerCase() === "g") {
                         arrExterior[i] = {...arrExterior[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -486,7 +494,7 @@ export default function FieldInspectionReport() {
             }, 1500);
 
         } catch(err) {
-            console.log(err)
+
         }
     }
 
@@ -529,7 +537,7 @@ export default function FieldInspectionReport() {
                 setIsLoading(false);
             });
         } catch (err){
-            console.log(err)
+
         }
     }
 
@@ -574,6 +582,19 @@ export default function FieldInspectionReport() {
             });
     }
 
+    const handleScan = data => {
+        if (data) {
+            setQrResult(data);
+            setTimeout(() => {
+                setSearchBodyNo(data);
+            }, 50);
+        }
+    }
+
+    const handleError = data => {
+        
+    }
+
     const [timeOutId, setTimeOutId] = useState(null);
     useEffect(() => {
         clearTimeout(timeOutId);
@@ -611,8 +632,11 @@ export default function FieldInspectionReport() {
             .then((res) => {
                 setTotalCount(res.data.count);
                 setFieldInspectionRecordList(res.data.results);
+                onHide('displayQR');
+                setQrResult('No Result');
             })
             .catch((err) => {
+                onHide('displayQR');
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong.', life: 3000 });
             });
     }
@@ -711,11 +735,7 @@ export default function FieldInspectionReport() {
                 toast.current.show({ severity: 'error', summary: 'BODY STYLE', detail: 'This field is required.', life: 3000 });
             } else if (driverType === "") { 
                 toast.current.show({ severity: 'error', summary: 'DRIVER TYPE', detail: 'This field is required.', life: 3000 });
-            } 
-            // else if (inspector === "") { 
-            //     toast.current.show({ severity: 'error', summary: 'INSPECTOR', detail: 'This field is required.', life: 3000 });
-            // } 
-            else if (doorCount === "") { 
+            }  else if (doorCount === "") { 
                 toast.current.show({ severity: 'error', summary: 'DOOR COUNT', detail: 'This field is required.', life: 3000 });
             } else {
                 setIsLoading(true);
@@ -727,183 +747,179 @@ export default function FieldInspectionReport() {
                     },
                 };
 
-                axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', {
-                    "fi_report_id": fieldInspectionID,
-                    "task": fieldInspectionTaskID,
-                    "job_order": fieldInspectionJobID,
-                    "body_no": bodyNo,
-                    "approved_by": "",
-                    "noted_by": "",
-                    "inspection_date" : format(dateInspection, 'yyyy-MM-dd'),
-                    "mileage": mileage,
-                    "body_style": bodyStyle === "" ? null : bodyStyle,
-                    "drive_type": driverType === "" ? null : driverType,
-                    "door_count": doorCount,
+                let formData = new FormData();
+                // formData.append("fi_report_id", fieldInspectionID);
+                formData.append("task", fieldInspectionTaskID);
+                formData.append("job_order", fieldInspectionJobID);
+                formData.append("body_no", bodyNo);
+                formData.append("approved_by", "");
+                formData.append("noted_by", "");
+                formData.append("inspection_date" , format(dateInspection, 'yyyy-MM-dd'));
+                formData.append("mileage", mileage);
+                formData.append("body_style", bodyStyle === "" ? null : bodyStyle);
+                formData.append("drive_type", driverType === "" ? null : driverType);
+                formData.append("door_count", doorCount);
+                formData.append("hood", exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F");
+                formData.append("hood_note", exterior[0].notes);
+                formData.append("front", exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F");
+                formData.append("front_note", exterior[1].notes);
+                formData.append("front_bumper", exterior[2].g === true ? "G" : exterior[2].p === true ? "P" : "F");
+                formData.append("front_bumper_note", exterior[2].notes);
+                formData.append("fenders", exterior[3].g === true ? "G" : exterior[3].p === true ? "P" : "F");
+                formData.append("fenders_note", exterior[3].notes);
+                formData.append("doors", exterior[4].g === true ? "G" : exterior[4].p === true ? "P" : "F");
+                formData.append("doors_note", exterior[4].notes);
+                formData.append("roof", exterior[5].g === true ? "G" : exterior[5].p === true ? "P" : "F");
+                formData.append("roof_note", exterior[5].notes);
+                formData.append("rear", exterior[6].g === true ? "G" : exterior[6].p === true ? "P" : "F");
+                formData.append("rear_note", exterior[6].notes);
+                formData.append("rear_bumper", exterior[7].g === true ? "G" : exterior[7].p === true ? "P" : "F");
+                formData.append("rear_bumper_note", exterior[7].notes);
+                formData.append("trunk", exterior[8].g === true ? "G" : exterior[8].p === true ? "P" : "F");
+                formData.append("trunk_note", exterior[8].notes);
+                formData.append("trim", exterior[9].g === true ? "G" : exterior[9].p === true ? "P" : "F");
+                formData.append("trim_note", exterior[9].notes);
+                formData.append("fuel_door", exterior[10].g === true ? "G" : exterior[10].p === true ? "P" : "F");
+                formData.append("fuel_door_note", exterior[10].notes);
+                formData.append("pait_condition", exterior[11].g === true ? "G" : exterior[11].p === true ? "P" : "F");
+                formData.append("pait_condition_note", exterior[11].notes);
 
-                    "hood": exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F",
-                    "hood_note": exterior[0].notes === "" ? null : exterior[0].notes,
-                    "front": exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F",
-                    "front_note": exterior[1].notes === "" ? null : exterior[1].notes,
-                    "front_bumper": exterior[2].g === true ? "G" : exterior[2].p === true ? "P" : "F",
-                    "front_bumper_note": exterior[2].notes === "" ? null : exterior[2].notes,
-                    "fenders": exterior[3].g === true ? "G" : exterior[3].p === true ? "P" : "F",
-                    "fenders_note": exterior[3].notes === "" ? null : exterior[3].notes,
-                    "doors": exterior[4].g === true ? "G" : exterior[4].p === true ? "P" : "F",
-                    "doors_note": exterior[4].notes === "" ? null : exterior[4].notes,
-                    "roof": exterior[5].g === true ? "G" : exterior[5].p === true ? "P" : "F",
-                    "roof_note": exterior[5].notes === "" ? null : exterior[5].notes,
-                    "rear": exterior[6].g === true ? "G" : exterior[6].p === true ? "P" : "F",
-                    "rear_note": exterior[6].notes === "" ? null : exterior[6].notes,
-                    "rear_bumper": exterior[7].g === true ? "G" : exterior[7].p === true ? "P" : "F",
-                    "rear_bumper_note": exterior[7].notes === "" ? null : exterior[7].notes,
-                    "trunk": exterior[8].g === true ? "G" : exterior[8].p === true ? "P" : "F",
-                    "trunk_note": exterior[8].notes === "" ? null : exterior[8].notes,
-                    "trim": exterior[9].g === true ? "G" : exterior[9].p === true ? "P" : "F",
-                    "trim_note": exterior[9].notes === "" ? null : exterior[9].notes,
-                    "fuel_door": exterior[10].g === true ? "G" : exterior[10].p === true ? "P" : "F",
-                    "fuel_door_note": exterior[10].notes === "" ? null : exterior[10].notes,
-                    "pait_condition": exterior[11].g === true ? "G" : exterior[11].p === true ? "P" : "F",
-                    "pait_condition_note": exterior[11].notes === "" ? null : exterior[11].notes,
+                formData.append("windshield", glass[0].g === true ? "G" : glass[0].p === true ? "P" : "F");
+                formData.append("windshield_note", glass[0].notes);
+                formData.append("windows", glass[1].g === true ? "G" : glass[1].p === true ? "P" : "F");
+                formData.append("windows_note", glass[1].notes);
+                formData.append("mirrors", glass[2].g === true ? "G" : glass[2].p === true ? "P" : "F");
+                formData.append("mirrors_note", glass[2].notes);
+                formData.append("rear_window", glass[3].g === true ? "G" : glass[3].p === true ? "P" : "F");
+                formData.append("rear_window_note", glass[3].notes);
 
-                    "windshield": glass[0].g === true ? "G" : glass[0].p === true ? "P" : "F",
-                    "windshield_note": glass[0].notes === "" ? null : glass[0].notes,
-                    "windows": glass[1].g === true ? "G" : glass[1].p === true ? "P" : "F",
-                    "windows_note": glass[1].notes === "" ? null : glass[1].notes,
-                    "mirrors": glass[2].g === true ? "G" : glass[2].p === true ? "P" : "F",
-                    "mirrors_note": glass[2].notes === "" ? null : glass[2].notes,
-                    "rear_window": glass[3].g === true ? "G" : glass[3].p === true ? "P" : "F",
-                    "rear_window_note": glass[3].notes === "" ? null : glass[3].notes,
+                formData.append("tires_condition", tiresWheels[0].g === true ? "G" : tiresWheels[0].p === true ? "P" : "F");
+                formData.append("tires_condition_note", tiresWheels[0].notes);
+                formData.append("wheels_condition", tiresWheels[1].g === true ? "G" : tiresWheels[1].p === true ? "P" : "F");
+                formData.append("wheels_condition_note", glass[1].notes);
+                formData.append("spare_tire", tiresWheels[2].g === true ? "G" : tiresWheels[2].p === true ? "P" : "F");
+                formData.append("spare_tire_note", tiresWheels[2].notes);
 
-                    "tires_condition": tiresWheels[0].g === true ? "G" : tiresWheels[0].p === true ? "P" : "F",
-                    "tires_condition_note": tiresWheels[0].notes === "" ? null : tiresWheels[0].notes,
-                    "wheels_condition": tiresWheels[1].g === true ? "G" : tiresWheels[1].p === true ? "P" : "F",
-                    "wheels_condition_note": glass[1].notes === "" ? null : glass[1].notes,
-                    "spare_tire": tiresWheels[2].g === true ? "G" : tiresWheels[2].p === true ? "P" : "F",
-                    "spare_tire_note": tiresWheels[2].notes === "" ? null : tiresWheels[2].notes,
+                formData.append("frame", underbody[0].g === true ? "G" : underbody[0].p === true ? "P" : "F");
+                formData.append("frame_note", underbody[0].notes);
+                formData.append("exhaust_system", underbody[1].g === true ? "G" : underbody[1].p === true ? "P" : "F");
+                formData.append("exhaust_system_note", underbody[1].notes);
+                formData.append("transmission", underbody[2].g === true ? "G" : underbody[2].p === true ? "P" : "F");
+                formData.append("transmission_note", underbody[2].notes);
+                formData.append("drive_axle", underbody[3].g === true ? "G" : underbody[3].p === true ? "P" : "F");
+                formData.append("drive_axle_note", underbody[3].notes);
+                formData.append("suspension", underbody[4].g === true ? "G" : underbody[4].p === true ? "P" : "F");
+                formData.append("suspension_note", underbody[4].notes);
+                formData.append("breake_system", underbody[5].g === true ? "G" : underbody[5].p === true ? "P" : "F");
+                formData.append("breake_system_note", underbody[5].notes);
 
-                    "frame": underbody[0].g === true ? "G" : underbody[0].p === true ? "P" : "F",
-                    "frame_note": underbody[0].notes === "" ? null : underbody[0].notes,
-                    "exhaust_system": underbody[1].g === true ? "G" : underbody[1].p === true ? "P" : "F",
-                    "exhaust_system_note": underbody[1].notes === "" ? null : underbody[1].notes,
-                    "transmission": underbody[2].g === true ? "G" : underbody[2].p === true ? "P" : "F",
-                    "transmission_note": underbody[2].notes === "" ? null : underbody[2].notes,
-                    "drive_axle": underbody[3].g === true ? "G" : underbody[3].p === true ? "P" : "F",
-                    "drive_axle_note": underbody[3].notes === "" ? null : underbody[3].notes,
-                    "suspension": underbody[4].g === true ? "G" : underbody[4].p === true ? "P" : "F",
-                    "suspension_note": underbody[4].notes === "" ? null : underbody[4].notes,
-                    "breake_system": underbody[5].g === true ? "G" : underbody[5].p === true ? "P" : "F",
-                    "breake_system_note": underbody[5].notes === "" ? null : underbody[5].notes,
+                formData.append("engine_compartment", underhood[0].g === true ? "G" : underhood[0].p === true ? "P" : "F");
+                formData.append("engine_compartment_note", underhood[0].notes);
+                formData.append("battery", underhood[1].g === true ? "G" : underhood[1].p === true ? "P" : "F");
+                formData.append("battery_note", underhood[1].notes);
+                formData.append("oil", underhood[2].g === true ? "G" : underhood[2].p === true ? "P" : "F");
+                formData.append("oil_note", underhood[2].notes);
+                formData.append("fluids", underhood[3].g === true ? "G" : underhood[3].p === true ? "P" : "F");
+                formData.append("fluids_note", underhood[3].notes);
+                formData.append("wiring", underhood[4].g === true ? "G" : underhood[4].p === true ? "P" : "F");
+                formData.append("wiring_note", underhood[4].notes);
+                formData.append("belts", underhood[5].g === true ? "G" : underhood[5].p === true ? "P" : "F");
+                formData.append("belts_note", underhood[5].notes);
+                formData.append("hoses", underhood[6].g === true ? "G" : underhood[6].p === true ? "P" : "F");
+                formData.append("hoses_note", underhood[6].notes);
+                formData.append("non_stock_modif", underhood[7].g === true ? "G" : underhood[7].p === true ? "P" : "F");
+                formData.append("non_stock_modif_note", underhood[7].notes);
 
-                    "engine_compartment": underhood[0].g === true ? "G" : underhood[0].p === true ? "P" : "F",
-                    "engine_compartment_note": underhood[0].notes === "" ? null : underhood[0].notes,
-                    "battery": underhood[1].g === true ? "G" : underhood[1].p === true ? "P" : "F",
-                    "battery_note": underhood[1].notes === "" ? null : underhood[1].notes,
-                    "oil": underhood[2].g === true ? "G" : underhood[2].p === true ? "P" : "F",
-                    "oil_note": underhood[2].notes === "" ? null : underhood[2].notes,
-                    "fluids": underhood[3].g === true ? "G" : underhood[3].p === true ? "P" : "F",
-                    "fluids_note": underhood[3].notes === "" ? null : underhood[3].notes,
-                    "wiring": underhood[4].g === true ? "G" : underhood[4].p === true ? "P" : "F",
-                    "wiring_note": underhood[4].notes === "" ? null : underhood[4].notes,
-                    "belts": underhood[5].g === true ? "G" : underhood[5].p === true ? "P" : "F",
-                    "belts_note": underhood[5].notes === "" ? null : underhood[5].notes,
-                    "hoses": underhood[6].g === true ? "G" : underhood[6].p === true ? "P" : "F",
-                    "hoses_note": underhood[6].notes === "" ? null : underhood[6].notes,
-                    "non_stock_modif": underhood[7].g === true ? "G" : underhood[7].p === true ? "P" : "F",
-                    "non_stock_modif_note": underhood[7].notes === "" ? null : underhood[7].notes,
+                formData.append("seats", interior[0].g === true ? "G" : interior[0].p === true ? "P" : "F");
+                formData.append("seats_note", interior[0].notes);
+                formData.append("headliner", interior[1].g === true ? "G" : interior[1].p === true ? "P" : "F");
+                formData.append("headliner_note", interior[1].notes);
+                formData.append("carpet", interior[2].g === true ? "G" : interior[2].p === true ? "P" : "F");
+                formData.append("carpet_note", interior[2].notes);
+                formData.append("door_panels", interior[3].g === true ? "G" : interior[3].p === true ? "P" : "F");
+                formData.append("door_panels_note", interior[3].notes);
+                formData.append("glove_box", interior[4].g === true ? "G" : interior[4].p === true ? "P" : "F");
+                formData.append("glove_box_note", interior[4].notes);
+                formData.append("vanity_mirrors", interior[5].g === true ? "G" : interior[5].p === true ? "P" : "F");
+                formData.append("vanity_mirrors_note", interior[5].notes);
+                formData.append("interioir_trim", interior[6].g === true ? "G" : interior[6].p === true ? "P" : "F");
+                formData.append("interioir_trim_note", interior[6].notes);
+                formData.append("dashboard", interior[7].g === true ? "G" : interior[7].p === true ? "P" : "F");
+                formData.append("dashboard_note", interior[7].notes);
+                formData.append("dashboard_gauges", interior[8].g === true ? "G" : interior[8].p === true ? "P" : "F");
+                formData.append("dashboard_gauges_note", interior[8].notes);
+                formData.append("air_conditioning", interior[9].g === true ? "G" : interior[9].p === true ? "P" : "F");
+                formData.append("air_conditioning_note", interior[9].notes);
+                formData.append("heater", interior[10].g === true ? "G" : interior[10].p === true ? "P" : "F");
+                formData.append("heater_note", interior[10].notes);
+                formData.append("defroster", interior[11].g === true ? "G" : interior[11].p === true ? "P" : "F");
+                formData.append("defroster_note", interior[11].notes);
 
-                    "seats": interior[0].g === true ? "G" : interior[0].p === true ? "P" : "F",
-                    "seats_note": interior[0].notes === "" ? null : interior[0].notes,
-                    "headliner": interior[1].g === true ? "G" : interior[1].p === true ? "P" : "F",
-                    "headliner_note": interior[1].notes === "" ? null : interior[1].notes,
-                    "carpet": interior[2].g === true ? "G" : interior[2].p === true ? "P" : "F",
-                    "carpet_note": interior[2].notes === "" ? null : interior[2].notes,
-                    "door_panels": interior[3].g === true ? "G" : interior[3].p === true ? "P" : "F",
-                    "door_panels_note": interior[3].notes === "" ? null : interior[3].notes,
-                    "glove_box": interior[4].g === true ? "G" : interior[4].p === true ? "P" : "F",
-                    "glove_box_note": interior[4].notes === "" ? null : interior[4].notes,
-                    "vanity_mirrors": interior[5].g === true ? "G" : interior[5].p === true ? "P" : "F",
-                    "vanity_mirrors_note": interior[5].notes === "" ? null : interior[5].notes,
-                    "interioir_trim": interior[6].g === true ? "G" : interior[6].p === true ? "P" : "F",
-                    "interioir_trim_note": interior[6].notes === "" ? null : interior[6].notes,
-                    "dashboard": interior[7].g === true ? "G" : interior[7].p === true ? "P" : "F",
-                    "dashboard_note": interior[7].notes === "" ? null : interior[7].notes,
-                    "dashboard_gauges": interior[8].g === true ? "G" : interior[8].p === true ? "P" : "F",
-                    "dashboard_gauges_note": interior[8].notes === "" ? null : interior[8].notes,
-                    "air_conditioning": interior[9].g === true ? "G" : interior[9].p === true ? "P" : "F",
-                    "air_conditioning_note": interior[9].notes === "" ? null : interior[9].notes,
-                    "heater": interior[10].g === true ? "G" : interior[10].p === true ? "P" : "F",
-                    "heater_note": interior[10].notes === "" ? null : interior[10].notes,
-                    "defroster": interior[11].g === true ? "G" : interior[11].p === true ? "P" : "F",
-                    "defroster_note": interior[11].notes === "" ? null : interior[11].notes,
+                formData.append("power_locks", electricalSystem[0].g === true ? "G" : electricalSystem[0].p === true ? "P" : "F");
+                formData.append("power_locks_note",  electricalSystem[0].notes);
+                formData.append("power_seats", electricalSystem[1].g === true ? "G" : electricalSystem[1].p === true ? "P" : "F");
+                formData.append("power_seats_note", electricalSystem[1].notes);
+                formData.append("power_steering", electricalSystem[2].g === true ? "G" : electricalSystem[2].p === true ? "P" : "F");
+                formData.append("power_steering_note", electricalSystem[2].notes);
+                formData.append("power_windows", electricalSystem[3].g === true ? "G" : electricalSystem[3].p === true ? "P" : "F");
+                formData.append("power_windows_note", electricalSystem[3].notes);
+                formData.append("power_mirrors", electricalSystem[4].g === true ? "G" : electricalSystem[4].p === true ? "P" : "F");
+                formData.append("power_mirrors_note", electricalSystem[4].notes);
+                formData.append("audio_system", electricalSystem[5].g === true ? "G" : electricalSystem[5].p === true ? "P" : "F");
+                formData.append("audio_system_note", electricalSystem[5].notes);
+                formData.append("onboard_computer", electricalSystem[6].g === true ? "G" : electricalSystem[6].p === true ? "P" : "F");
+                formData.append("onboard_computer_note", electricalSystem[6].notes);
+                formData.append("headlights", electricalSystem[7].g === true ? "G" : electricalSystem[7].p === true ? "P" : "F");
+                formData.append("headlights_note", electricalSystem[7].notes);
+                formData.append("taillights", electricalSystem[8].g === true ? "G" : electricalSystem[8].p === true ? "P" : "F");
+                formData.append("taillights_note", electricalSystem[8].notes);
+                formData.append("signal_lights", electricalSystem[9].g === true ? "G" : electricalSystem[9].p === true ? "P" : "F");
+                formData.append("signal_lights_note", electricalSystem[9].notes);
+                formData.append("brake_lights", electricalSystem[10].g === true ? "G" : electricalSystem[10].p === true ? "P" : "F");
+                formData.append("brake_lights_note", electricalSystem[10].notes);
+                formData.append("parking_lights", electricalSystem[11].g === true ? "G" : electricalSystem[11].p === true ? "P" : "F");
+                formData.append("parking_lights_note", electricalSystem[11].notes);
 
-                    "power_locks": electricalSystem[0].g === true ? "G" : electricalSystem[0].p === true ? "P" : "F",
-                    "power_locks_note":  electricalSystem[0].notes === "" ? null : electricalSystem[0].notes,
-                    "power_seats": electricalSystem[1].g === true ? "G" : electricalSystem[1].p === true ? "P" : "F",
-                    "power_seats_note": electricalSystem[1].notes === "" ? null : electricalSystem[1].notes,
-                    "power_steering": electricalSystem[2].g === true ? "G" : electricalSystem[2].p === true ? "P" : "F",
-                    "power_steering_note": electricalSystem[2].notes === "" ? null : electricalSystem[2].notes,
-                    "power_windows": electricalSystem[3].g === true ? "G" : electricalSystem[3].p === true ? "P" : "F",
-                    "power_windows_note": electricalSystem[3].notes === "" ? null : electricalSystem[3].notes,
-                    "power_mirrors": electricalSystem[4].g === true ? "G" : electricalSystem[4].p === true ? "P" : "F",
-                    "power_mirrors_note": electricalSystem[4].notes === "" ? null : electricalSystem[4].notes,
-                    "audio_system": electricalSystem[5].g === true ? "G" : electricalSystem[5].p === true ? "P" : "F",
-                    "audio_system_note": electricalSystem[5].notes === "" ? null : electricalSystem[5].notes,
-                    "onboard_computer": electricalSystem[6].g === true ? "G" : electricalSystem[6].p === true ? "P" : "F",
-                    "onboard_computer_note": electricalSystem[6].notes === "" ? null : electricalSystem[6].notes,
-                    "headlights": electricalSystem[7].g === true ? "G" : electricalSystem[7].p === true ? "P" : "F",
-                    "headlights_note": electricalSystem[7].notes === "" ? null : electricalSystem[7].notes,
-                    "taillights": electricalSystem[8].g === true ? "G" : electricalSystem[8].p === true ? "P" : "F",
-                    "taillights_note": electricalSystem[8].notes === "" ? null : electricalSystem[8].notes,
-                    "signal_lights": electricalSystem[9].g === true ? "G" : electricalSystem[9].p === true ? "P" : "F",
-                    "signal_lights_note": electricalSystem[9].notes === "" ? null : electricalSystem[9].notes,
-                    "brake_lights": electricalSystem[10].g === true ? "G" : electricalSystem[10].p === true ? "P" : "F",
-                    "brake_lights_note": electricalSystem[10].notes === "" ? null : electricalSystem[10].notes,
-                    "parking_lights": electricalSystem[11].g === true ? "G" : electricalSystem[11].p === true ? "P" : "F",
-                    "parking_lights_note": electricalSystem[11].notes === "" ? null : electricalSystem[11].notes,
+                formData.append("starting", roadTestFindings[0].g === true ? "G" : roadTestFindings[0].p === true ? "P" : "F");
+                formData.append("starting_note", roadTestFindings[0].notes);
+                formData.append("idling", roadTestFindings[1].g === true ? "G" : roadTestFindings[1].p === true ? "P" : "F");
+                formData.append("idling_note", roadTestFindings[1].notes);
+                formData.append("engine_performance", roadTestFindings[2].g === true ? "G" : roadTestFindings[2].p === true ? "P" : "F");
+                formData.append("engine_performance_note", roadTestFindings[2].notes);
+                formData.append("acceleration", roadTestFindings[3].g === true ? "G" : roadTestFindings[3].p === true ? "P" : "F");
+                formData.append("acceleration_note", roadTestFindings[3].notes);
+                formData.append("trans_shift_quality", roadTestFindings[4].g === true ? "G" : roadTestFindings[4].p === true ? "P" : "F");
+                formData.append("trans_shift_quality_note", roadTestFindings[4].notes);
+                formData.append("steering", roadTestFindings[5].g === true ? "G" : roadTestFindings[5].p === true ? "P" : "F");
+                formData.append("steering_note", roadTestFindings[5].notes);
+                formData.append("braking", roadTestFindings[6].g === true ? "G" : roadTestFindings[6].p === true ? "P" : "F");
+                formData.append("braking_note", roadTestFindings[6].notes);
+                formData.append("suspension_performance", roadTestFindings[7].g === true ? "G" : roadTestFindings[7].p === true ? "P" : "F");
+                formData.append("suspension_performance_note", roadTestFindings[7].notes);
 
-                    "starting": roadTestFindings[0].g === true ? "G" : roadTestFindings[0].p === true ? "P" : "F",
-                    "starting_note": roadTestFindings[0].notes === "" ? null : roadTestFindings[0].notes,
-                    "idling": roadTestFindings[1].g === true ? "G" : roadTestFindings[1].p === true ? "P" : "F",
-                    "idling_note": roadTestFindings[1].notes === "" ? null : roadTestFindings[1].notes,
-                    "engine_performance": roadTestFindings[2].g === true ? "G" : roadTestFindings[2].p === true ? "P" : "F",
-                    "engine_performance_note": roadTestFindings[2].notes === "" ? null : roadTestFindings[2].notes,
-                    "acceleration": roadTestFindings[3].g === true ? "G" : roadTestFindings[3].p === true ? "P" : "F",
-                    "acceleration_note": roadTestFindings[3].notes === "" ? null : roadTestFindings[3].notes,
-                    "trans_shift_quality": roadTestFindings[4].g === true ? "G" : roadTestFindings[4].p === true ? "P" : "F",
-                    "trans_shift_quality_note": roadTestFindings[4].notes === "" ? null : roadTestFindings[4].notes,
-                    "steering": roadTestFindings[5].g === true ? "G" : roadTestFindings[5].p === true ? "P" : "F",
-                    "steering_note": roadTestFindings[5].notes === "" ? null : roadTestFindings[5].notes,
-                    "braking": roadTestFindings[6].g === true ? "G" : roadTestFindings[6].p === true ? "P" : "F",
-                    "braking_note": roadTestFindings[6].notes === "" ? null : roadTestFindings[6].notes,
-                    "suspension_performance": roadTestFindings[7].g === true ? "G" : roadTestFindings[7].p === true ? "P" : "F",
-                    "suspension_performance_note": roadTestFindings[7].notes === "" ? null : roadTestFindings[7].notes
-                }, config)
-                .then((res) => {
-                    console.log(res);
-                    submitFieldInspectionAfter();
-                    if (refImageUpload.current.state.files.length <= 0) {
+                if (refImageUpload.current.state.files.length <= 0) {
+                    axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                    .then((res) => {
                         submitFieldInspectionAfter();
-                    } else {
-                        let formData = new FormData();
-                        refImageUpload.current.state.files.map((f, index) => {
-                            formData.append("images[" + index + "]image", f);
-                            formData.append("images[" + index + "]mode", "fi");
-                            formData.append("images[" + index + "]image_name", res.data.fi_report_id);
-                            return null;
-                        })
-                        axios.post(process.env.REACT_APP_SERVER_NAME + 'image/report-image/', formData, config)
-                        .then((res) => {
-                            submitFieldInspectionAfter();
-                        })
-                        .catch((err) => {
+                        
+                    })
+                    .catch((err) => {
 
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err)
-                    setIsLoading(false);
-                })
+                    });
+                } else {
+                    refImageUpload.current.state.files.map((f, index) => {
+                        formData.append("images[" + index + "]image", f);
+                        return null;
+                    })
+                    axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                    .then((res) => {
+                        submitFieldInspectionAfter();
+                        
+                    })
+                    .catch((err) => {
+
+                    });
+                }
             }
         }
     }
@@ -914,6 +930,24 @@ export default function FieldInspectionReport() {
         setIsLoading(false);
         setMessage({title:"UPDATE", content:"Successfully updated."});
         onClick('displayMessage');
+    }
+
+    const getEmail = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/emails/email/', config)
+            .then((res) => {
+                console.log(res.data)
+            })
+            .catch((err) => {
+                
+            });
     }
 
     const submitDeleteFieldInspection = () => {
@@ -929,7 +963,6 @@ export default function FieldInspectionReport() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + delFieldInspectionID + '/', config)
             .then((res) => {
-                console.log(res.data)
                 getFieldInspectionRecord();
                 setIsLoading(false);
                 setMessage({title:"DELETE", content:"Successfully deleted."});
@@ -1176,6 +1209,9 @@ export default function FieldInspectionReport() {
         'displayConfirmDeleteImage': setDisplayConfirmDeleteImage,
         'displayConfirmDelete': setDisplayConfirmDelete,
         'displayPDF': setDisplayPDF,
+        'displayEmail': setDisplayEmail,
+        'displayAddEmail': setDisplayAddEmail,
+        'displayQR': setDisplayQR,
     }
 
     const onClick = (name) => {
@@ -1228,7 +1264,9 @@ export default function FieldInspectionReport() {
                 <center>
                     <Button style={{marginRight: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
                     <Button style={{marginRight: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); onClick('displayConfirmDelete')}}/>
-                    <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
+                    {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
+                    <Button style={{marginRight: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
+                    <Button icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => onClick('displayEmail')}/>
                 </center>
             </div>
         );
@@ -1266,6 +1304,7 @@ export default function FieldInspectionReport() {
                             <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                                    <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
                                 </div>
                             </div>
                         </div>
@@ -1277,7 +1316,8 @@ export default function FieldInspectionReport() {
                 <div className="p-col-12">
                     <DataTable ref={dt} header={renderHeader()} value={fieldInspectionRecordList} className="p-datatable-sm" 
                         resizableColumns columnResizeMode="expand" emptyMessage="No records found">
-                        <Column field="job_order" header="Field Inspection No." style={{paddingLeft: '3%'}}></Column>
+                        <Column field="job_order" header="Report No." style={{paddingLeft: '3%'}}></Column>
+                        <Column field="body_no" header="Body No." style={{paddingLeft: '3%'}}></Column>
                         <Column body={actionBody}></Column>
                     </DataTable>
                     <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
@@ -1300,11 +1340,35 @@ export default function FieldInspectionReport() {
                                             onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/> */}
                                             <InputText placeholder="Input Report No." value={fieldInspectionID} disabled/>
                                         </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                            <h6><b>BODY No.:</b></h6>
+                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
+                                        </div>
                                         <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[0]}>
                                             <h6><b>INSPECTION DATE:</b></h6>
                                             {/* <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => setDateInspection(e.value)} showIcon readOnlyInput/> */}
                                             <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
                                             <small className="p-invalid p-d-block">{reviseText[0]}</small>
+                                        </div>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[1]}>
+                                            <h6><b>MILEAGE:</b></h6>
+                                            <InputText placeholder="Input Mileage" value={mileage} onChange={(e) => onChangeValue('f1', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[1]}</small>
+                                        </div>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[2]}>
+                                            <h6><b>BODY STYLE:</b></h6>
+                                            <InputText placeholder="Input Body Style" value={bodyStyle} onChange={(e) => onChangeValue('f2', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[2]}</small>
+                                        </div>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[3]}>
+                                            <h6><b>DRIVER TYPE:</b></h6>
+                                            <InputText placeholder="Input Driver Type" value={driverType} onChange={(e) => onChangeValue('f3', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[3]}</small>
+                                        </div>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[4]}>
+                                            <h6><b>DOOR COUNT:</b></h6>
+                                            <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
+                                            <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>YEAR:</b></h6>
@@ -1318,20 +1382,6 @@ export default function FieldInspectionReport() {
                                             <h6><b>MODEL:</b></h6>
                                             <InputText placeholder="Input Make" value={model} disabled/>
                                         </div>
-                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[1]}>
-                                            <h6><b>MILEAGE:</b></h6>
-                                            <InputText placeholder="Input Mileage" value={mileage} onChange={(e) => onChangeValue('f1', e.target.value)}/>
-                                            <small className="p-invalid p-d-block">{reviseText[1]}</small>
-                                        </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
-                                            <h6><b>BODY No.:</b></h6>
-                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                        </div>
-                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[2]}>
-                                            <h6><b>BODY STYLE:</b></h6>
-                                            <InputText placeholder="Input Body Style" value={bodyStyle} onChange={(e) => onChangeValue('f2', e.target.value)}/>
-                                            <small className="p-invalid p-d-block">{reviseText[2]}</small>
-                                        </div>
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>TRANSMISSION:</b></h6>
                                             <InputText placeholder="Input Transmisison" value={transmission} disabled/>
@@ -1339,11 +1389,6 @@ export default function FieldInspectionReport() {
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>ENGINE:</b></h6>
                                             <InputText placeholder="Input Body No." value={engine} disabled/>
-                                        </div>
-                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[3]}>
-                                            <h6><b>DRIVER TYPE:</b></h6>
-                                            <InputText placeholder="Input Driver Type" value={driverType} onChange={(e) => onChangeValue('f3', e.target.value)}/>
-                                            <small className="p-invalid p-d-block">{reviseText[3]}</small>
                                         </div>
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>INSPECTOR:</b></h6>
@@ -1356,11 +1401,6 @@ export default function FieldInspectionReport() {
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>EXTERIOR COLOR:</b></h6>
                                             <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
-                                        </div>
-                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[4]}>
-                                            <h6><b>DOOR COUNT:</b></h6>
-                                            <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
-                                            <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>CONDITION:</b></h6>
@@ -1393,7 +1433,6 @@ export default function FieldInspectionReport() {
                                                                         <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
                                                                         {/* <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => {setTheLabel(x.label); setTheIndex(index); setTheType("exte"); setNotes(x.notes)}}/></td> */}
                                                                         <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "exte", x.notes)}/></td>
-                                                                        {/* <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => console.log(exterior)}/></td> */}
                                                                     </tr>
                                                                 )
                                                             }
@@ -1704,7 +1743,6 @@ export default function FieldInspectionReport() {
                                                                         <td><label style={{fontWeight:'bold'}}>{x.label}</label></td>
                                                                         {/* <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => {setTheLabel(x.label); setTheIndex(index); setTheType("exte"); setNotes(x.notes)}}/></td> */}
                                                                         <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => showNotes(x.label, index, "exte", x.notes)}/></td>
-                                                                        {/* <td><Button icon="pi pi-paperclip" className="p-button-success" onClick={() => console.log(exterior)}/></td> */}
                                                                     </tr>
                                                                 )
                                                             }
@@ -1906,6 +1944,47 @@ export default function FieldInspectionReport() {
                     </div>
                 </Dialog>
 
+                <Dialog header="EMAIL" visible={displayEmail} style={{width: '310px'}} onHide={() => onHide('displayEmail')} blockScroll={true}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{paddingTop: '20px'}}>
+                            {/* <h6><b>SELECT EMAIL:</b></h6> */}
+                            <div className="p-grid p-fluid">
+                                <div className="p-col-9">
+                                    <AutoComplete forceSelection field="full_name" placeholder="Search Email" /* suggestions={suggestions} completeMethod={searchList} */ 
+                                    /* value={x.fullname} onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)} *//>
+                                </div>
+                                <div className="p-col-3">
+                                    <Button label="+" onClick={() => onClick('displayAddEmail')}/> 
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="p-col-12">
+                            <DataTable ref={dt} /* header={renderHeader()} */ /*  value={repairRecordList} */ className="p-datatable-sm" 
+                                resizableColumns columnResizeMode="expand" scrollable scrollHeight="250px" emptyMessage="No emails">
+                                <Column field="repair_id" header="Email" style={{ paddingLeft: '3%' }}></Column>
+                                <Column body={actionBody}></Column>
+                            </DataTable>
+                            
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <Button label="SEND" onClick={() => saveNotes(theType, theIndex, notes)}/>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <Dialog header="ADD EMAIL" visible={displayAddEmail} style={{ width: '290px' }} onHide={() => onHide('displayAddEmail')} blockScroll={true}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{paddingTop: '20px'}}>
+                            <h6><b>EMAIL ACCOUNT:</b></h6>
+                            <InputText placeholder="Input Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <Button label="ADD" /* onClick={() => submitEmail()} *//>
+                        </div>
+                    </div>
+                </Dialog>
+
                 <Dialog header="CONFIRMATION" visible={displayConfirmDeleteImage} style={{ width: '310px' }} footer={renderFooter('displayConfirmDeleteImage')} onHide={() => onHide('displayConfirmDeleteImage')}>
                     <div className="p-grid">
                         <div className="p-col-2">
@@ -1939,6 +2018,18 @@ export default function FieldInspectionReport() {
                             <div style={{fontSize: '16px'}}>{message.content}</div>
                         </div>
                     </div>
+                </Dialog>
+
+                <Dialog header="SCAN QR" style={{width: '310px' }} visible={displayQR} onHide={() => onHide('displayQR')} blockScroll={true}>
+                    <center>
+                        <h5><b>{qrResult}</b></h5>
+                        <QrReader
+                            delay={300}
+                            onScan={handleScan}
+                            onError={handleError}
+                            style={{height: '260px', width: '260px'}}
+                        />
+                    </center>
                 </Dialog>
             </div>
         </div>
