@@ -14,19 +14,21 @@ class ImageInfoSerializer(serializers.ModelSerializer):
 
 
 class ReportImageSerializer(serializers.ModelSerializer):
-    images = ImageInfoSerializer(many=True)
+    images = ImageInfoSerializer(many=True, required=False)
 
     class Meta:
         model = Image
         fields = ['images']
 
     def create(self, validated_data):
-        image_data = validated_data.pop('images')
-        count = Image.objects.filter(image_name=image_data[0]['image_name'], mode=image_data[0]['mode']).count()
-        for image in image_data:
-            count += 1
-            Image.objects.create(image_id=count, **image)
-        
+        try:
+            image_data = validated_data.pop('images')
+            count = Image.objects.filter(image_name=image_data[0]['image_name'], mode=image_data[0]['mode']).count()
+            for image in image_data:
+                count += 1
+                Image.objects.create(image_id=count, **image)
+        except:
+            pass
         return ()
             
     # def to_representation(self, instance):
