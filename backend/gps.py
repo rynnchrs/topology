@@ -1,5 +1,8 @@
 from datetime import datetime
+
 import requests
+
+from gps.models import GPS
 
 url = "https://www.gps51.com:8443"
 #url = "http://localhost:4444"
@@ -19,22 +22,66 @@ resp = requests.post(url+"/webapi?action=querymonitorlist&token="+token, data=pa
 
 res = resp.json()
 
-pars = '{"deviceid":"19171897963"}'
-resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
-resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
-records_obd = resp_odb.json()
-records_mileage = resp_mileage.json()
-print(f'odb: {records_obd["record"]}')
-print(" ")
-print(f'mileage: {records_mileage["records"]}')
+# # pars = '{"deviceid":"19171897963"}'
+# # resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
+# # resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
+# # records_obd = resp_odb.json()
+# # records_mileage = resp_mileage.json()
+# # print(f'odb: {records_obd["record"]}')
+# # print(" ")
+# # print(f'mileage: {records_mileage["records"]}')
 
 # for group in res["groups"]:
 #         if "devices" in group:
 #                 for device in group["devices"]:
 #                         print(device["deviceid"])
 #                         pars = '{"devices":["'+device["deviceid"]+'"]}'
-#                         #resp = requests.post("http://localhost:1234/webapi?action=reportalarm&token=">
-#                         resp = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
-#                         alarmrecords = resp.json()
-#                         print(resp.content)
+                                                
+#                         resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
+#                         resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
+#                         records_obd = resp_odb.json()
+#                         records_mileage = resp_mileage.json()
+#                         # print(f'odb: {records_obd["record"]}')
+#                         # print(" ")
+#                         # print(f'mileage: {records_mileage["records"]}')
+#                         if records_obd["record"]:
+#                             GPS.objects.create(
+#                                 obdrecordid 
+#                                 deviceid
+#                                 updatetime
+#                                 mileage
+#                                 gasolineconsumptionperhour
+#                                 gasolineconsumptionperhunkm
+#                                 overloaalculate
+#                                 coolanttemperature
+#                                 oilpressure
+#                                 inletbranchpressure
+#                                 inttemperature
+#                                 airmassflow
+#                                 throttleposition
+#                                 oilvalue
+#                                 faultcodeti
+#                                 faultcodes
+#                                 totaldistance
+
+#                                 === MILEAGE ===
+#                                 dailydetailreportid
+#                                 deviceid
+
+#                                 statisticsday
+
+#                                 beginoil
+#                                 endoil
+#                                 addoil
+#                                 leakoil
+#                                 idleoil
+
+#                                 totaloil
+#                                 totalnotrunningad
+#                                 beginnotrunningad
+#                                 endnotrunningad
+#                                 addnotrunningad
+#                                 leaknotrunningad
+#                                 idlenotrunningad
+#                             )
 

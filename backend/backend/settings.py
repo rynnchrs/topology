@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'dashboard',
     'image',
     'emails',
+    'gps',
 ]
 
 REST_FRAMEWORK = {

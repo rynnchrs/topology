@@ -563,7 +563,6 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
                 message = "Field Inspection Report for " + str(car.body_no) + " is created."
                 notify.send(sender, recipient=recipients,  target=serializer.save(), 
                                 level='info', verb='field_inspection,create', description=message)
-                request.data['imagename'] = serializer.data['fi_report_id']
                 serializer = ReportImageSerializer(data=field_inspection_image(request.data,serializer.data))
                 if serializer.is_valid(raise_exception=True):
                     serializer.save()
