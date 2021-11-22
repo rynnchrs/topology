@@ -22,66 +22,66 @@ resp = requests.post(url+"/webapi?action=querymonitorlist&token="+token, data=pa
 
 res = resp.json()
 
-# # pars = '{"deviceid":"19171897963"}'
-# # resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
-# # resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
-# # records_obd = resp_odb.json()
-# # records_mileage = resp_mileage.json()
-# # print(f'odb: {records_obd["record"]}')
-# # print(" ")
-# # print(f'mileage: {records_mileage["records"]}')
+# pars = '{"deviceid":"19171897963"}'
+# resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
+# resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
+# records_obd = resp_odb.json()
+# records_mileage = resp_mileage.json()
+# print(f'odb: {records_obd["record"]}')
+# print(" ")
+# print(f'mileage: {records_mileage["records"]}')
 
-# for group in res["groups"]:
-#         if "devices" in group:
-#                 for device in group["devices"]:
-#                         print(device["deviceid"])
-#                         pars = '{"devices":["'+device["deviceid"]+'"]}'
+for group in res["groups"]:
+        if "devices" in group:
+                for device in group["devices"]:
+                        print(device["deviceid"])
+                        pars = '{"devices":["'+device["deviceid"]+'"]}'
                                                 
-#                         resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
-#                         resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
-#                         records_obd = resp_odb.json()
-#                         records_mileage = resp_mileage.json()
-#                         # print(f'odb: {records_obd["record"]}')
-#                         # print(" ")
-#                         # print(f'mileage: {records_mileage["records"]}')
-#                         if records_obd["record"]:
-#                             GPS.objects.create(
-#                                 obdrecordid 
-#                                 deviceid
-#                                 updatetime
-#                                 mileage
-#                                 gasolineconsumptionperhour
-#                                 gasolineconsumptionperhunkm
-#                                 overloaalculate
-#                                 coolanttemperature
-#                                 oilpressure
-#                                 inletbranchpressure
-#                                 inttemperature
-#                                 airmassflow
-#                                 throttleposition
-#                                 oilvalue
-#                                 faultcodeti
-#                                 faultcodes
-#                                 totaldistance
+                        resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
+                        resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
+                        records_obd = resp_odb.json()
+                        records_mileage = resp_mileage.json()
+                        # print(f'odb: {records_obd["record"]}')
+                        # print(" ")
+                        # print(f'mileage: {records_mileage["records"]}')
+                        recordobd = records_obd["record"]
+                        recordmileage = records_obd["record"]
+                        if recordobd:
+                            GPS.objects.create(
+                                obdrecordid = recordobd.obdrecordid,
+                                deviceid = recordobd.deviceid,
+                                updatetime = recordobd.updatetime,
+                                mileage = recordobd.mileage,
+                                gasolineconsumptionperhour = recordobd.gasolineconsumptionperhour,
+                                gasolineconsumptionperhunkm = recordobd.gasolineconsumptionperhunkm,
+                                overloaalculate = recordobd.overloaalculate,
+                                coolanttemperature = recordobd.coolanttemperature,
+                                oilpressure = recordobd.oilpressure,
+                                inletbranchpressure = recordobd.inletbranchpressure,
+                                inttemperature = recordobd.inttemperature,
+                                airmassflow = recordobd.airmassflow,
+                                throttleposition = recordobd.throttleposition,
+                                oilvalue = recordobd.oilvalue,
+                                faultcodeti = recordobd.faultcodeti,
+                                faultcodes = recordobd.faultcodes,
+                                totaldistance = recordobd.totaldistance,
 
-#                                 === MILEAGE ===
-#                                 dailydetailreportid
-#                                 deviceid
+                                # === MILEAGE === 
 
-#                                 statisticsday
+                                statisticsday = recordmileage.statisticsday,
 
-#                                 beginoil
-#                                 endoil
-#                                 addoil
-#                                 leakoil
-#                                 idleoil
+                                beginoil = recordmileage.beginoil,
+                                endoil = recordmileage.endoil,
+                                addoil = recordmileage.addoil,
+                                leakoil = recordmileage.leakoil,
+                                idleoil = recordmileage.idleoil,
 
-#                                 totaloil
-#                                 totalnotrunningad
-#                                 beginnotrunningad
-#                                 endnotrunningad
-#                                 addnotrunningad
-#                                 leaknotrunningad
-#                                 idlenotrunningad
-#                             )
+                                totaloil = recordmileage.totaloil,
+                                totalnotrunningad = recordmileage.totalnotrunningad,
+                                beginnotrunningad = recordmileage.beginnotrunningad,
+                                endnotrunningad = recordmileage.endnotrunningad,
+                                addnotrunningad = recordmileage.addnotrunningad,
+                                leaknotrunningad = recordmileage.leaknotrunningad,
+                                idlenotrunningad = recordmileage.idlenotrunningad,
+                            )
 
