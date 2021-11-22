@@ -537,3 +537,21 @@ def listToString(s):
     str1 = " "
     # return string  
     return (str1.join(s))
+
+def field_inspection_image(request,serializer):
+    image_count = 0
+    for key in request:
+        if 'images' in key:
+            image_count += 1
+    images_mode = []
+    images_name = []
+    for i in range(image_count):
+        mode = f'images[{i}]mode'
+        image_name = f'images[{i}]image_name'
+        images_mode.append(mode)
+        images_name.append(image_name)
+    for image in images_mode:
+        request[image] = 'fi'
+    for image in images_name:
+        request[image] = serializer['fi_report_id']
+    return request
