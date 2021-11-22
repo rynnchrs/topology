@@ -189,8 +189,9 @@ class TaskView(viewsets.ModelViewSet):
                 notify.send(sender, recipient=recipients_mn, level='info',
                                 verb='task,delete', description=message)
                 field_man = []
-                for fieldman in request.data['fieldman']:
-                    field_man.append(fieldman['field_man'])
+                fieldman = Fieldman.objects.filter(task=1)
+                for i in range(len(fieldman)):
+                    field_man.append(fieldman[i].field_man)
                 recipents_fm = User.objects.filter(username__in=field_man)
                 notify.send(sender, recipient=recipents_fm, level='info',
                                 verb='task,delete', description=message)
