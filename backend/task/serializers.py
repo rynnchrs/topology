@@ -26,7 +26,7 @@ class CarInfoSerializer(serializers.ModelSerializer): # car info inheritance, ca
 
 
 class JobOrderSerializer(serializers.ModelSerializer):
-
+    field_inspection = serializers.CharField(read_only=True)
     class Meta:
         model = JobOrder
         fields = ['job_id','job_no','type','field_inspection']
