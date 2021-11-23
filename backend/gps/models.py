@@ -6,10 +6,11 @@ from car.models import Car
 class GPS(models.Model):
     gps_id = models.AutoField(primary_key=True)
     device_id = models.CharField(max_length=30, null=True, blank=True)
-    body_no = models.ForeignKey(Car,  related_name='gps', on_delete=models.CASCADE)
+    body_no = models.ForeignKey(Car, null=True, blank=True,  related_name='gps', on_delete=models.CASCADE)
 
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
+
     def __str__(self):
         return self.deviced_id
 
@@ -51,5 +52,6 @@ class Record(models.Model):
 
     date_updated = models.DateField(auto_now=True)
     date_created = models.DateField(auto_now_add=True)
+
     def __str__(self):
-        return f'{self.device_id.deviced_id}'
+        return f'{self.record_id}'

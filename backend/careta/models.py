@@ -21,7 +21,6 @@ class UserInfo(models.Model):  # User Info Model
     company = models.CharField(max_length=50, null=True, blank=True)
     position = models.CharField(max_length=20, null=True, blank=True)
     gender = models.CharField(max_length=1, choices=Gender_List, null=True)
-    birthday = models.DateField(auto_now=False, auto_now_add=False, null=True)
     phone = PhoneField(blank=True, help_text='Contact phone number')
     address = models.CharField(max_length=100, null=True, blank=True)
     date_created = models.DateField(auto_now_add=True)
