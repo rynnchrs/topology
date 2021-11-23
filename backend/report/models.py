@@ -400,6 +400,8 @@ class FieldInspection(models.Model):
     suspension_performance = models.CharField(max_length=1, choices=Choice_List, default="G")
     suspension_performance_note = models.TextField(null=True, blank=True)
 
+    user = models.ForeignKey(User, related_name='user_checklist', on_delete=models.CASCADE, null=True, blank=True)
+    operational = models.BooleanField(default=False, null=True, blank=True)
     summary = models.TextField(null=True, blank=False)
     inspection_date = models.DateField(default=datetime.date.today)
 

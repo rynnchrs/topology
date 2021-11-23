@@ -36,8 +36,8 @@ from .serializers import (CheckListListSerializer, CheckListPartsSerializer,
                           InspectionListSerializer, InspectionSerializer,
                           RepairListSerializer, RepairSerializer)
 from .utils import (analysis, checklist_reversion, fi_report_reversion,
-                    fi_report_serialized, field_inspection_image, repair_reversion, reversion,
-                    user_permission)
+                    fi_report_serialized, field_inspection_image,
+                    repair_reversion, reversion, user_permission)
 
 
 class InspectionView(viewsets.ViewSet):  # inspection report Form
@@ -555,6 +555,9 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
     def create(self, request):
         user = self.request.user
         if user_permission(user, 'can_add_checklist'): 
+            request.POST._mutable = True
+            request.data['user'] = user.id
+
             serializer = FieldInspectionSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 car = Car.objects.get(body_no=request.data['body_no'])
@@ -590,6 +593,9 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
     def update(self, request, pk=None):
         user = self.request.user
         if user_permission(user, 'can_edit_checklist'): 
+            request.POST._mutable = True
+            request.data['user'] = user.id
+
             queryset = self.filter_queryset(self.get_queryset())
             inspection = get_object_or_404(queryset, pk=pk) 
             serializer = FieldInspectionSerializer(instance=inspection, data=request.data)

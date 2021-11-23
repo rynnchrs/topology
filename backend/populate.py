@@ -37,7 +37,6 @@ def populate():
                 company = "Careta",
                 position = "Admin",
                 gender = "M",
-                birthday = "2000-01-01",
                 phone = "09123456789",
                 address = "Makati"
                 )
