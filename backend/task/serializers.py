@@ -29,7 +29,7 @@ class JobOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JobOrder
-        fields = ['job_id','job_no','type']
+        fields = ['job_id','job_no','type','field_inspection']
 
     def to_representation(self, instance):
         representation = super(JobOrderSerializer, self).to_representation(instance)
