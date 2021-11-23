@@ -16,6 +16,8 @@ import Resizer from "react-image-file-resizer";
 
 export default function FieldInspectionReport() {
 
+    const conditionOptions = [{name: 'Operational', val: true}, {name: 'Non-Operational', val: false}];
+
     const [fieldInspectionNotCreatedList, setFieldInspectionNotCreatedList] = useState([]);
     const [fieldInspectionData, setFieldInspectionData] = useState([]);
     const [notes, setNotes] = useState("");
@@ -37,7 +39,7 @@ export default function FieldInspectionReport() {
     const [location, setLocation] = useState("");
     const [exteriorColor, setExteriorColor] = useState("");
     const [doorCount, setDoorCount] = useState("");
-    const [condition, setCondition] = useState("");
+    const [condition, setCondition] = useState([]);
     const refImageUpload = useRef(null);
 
     const toast = useRef(null);
@@ -362,6 +364,7 @@ export default function FieldInspectionReport() {
                 formData.append("body_style", bodyStyle === "" ? null : bodyStyle);
                 formData.append("drive_type", driverType === "" ? null : driverType);
                 formData.append("door_count", doorCount);
+                formData.append("operation", condition.val);
                 formData.append("hood", exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F");
                 formData.append("hood_note", exterior[0].notes);
                 formData.append("front", exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F");
@@ -644,17 +647,7 @@ export default function FieldInspectionReport() {
         setLocation("");
         setExteriorColor("");
         setDoorCount("");
-        setCondition("");
-
-        
-        // setExterior(initialExterior);
-        // setGlass(initialGlass);
-        // setTiresWheels(initialTiresWheels);
-        // setUnderbody(initialUnderbody);
-        // setUnderhood(initialUnderhood);
-        // setInterior(initialInterior);
-        // setElectricalSystem(initialElectricalSystem);
-        // setRoadTestFindings(initialRoadTestFindings);
+        setCondition([]);
 
         window.scrollTo({top: 0, left: 0, behavior:'smooth'});
         refImageUpload.current.clear();
@@ -828,10 +821,9 @@ export default function FieldInspectionReport() {
         setLocation(value.body_no.current_loc);
         setExteriorColor(value.body_no.color);
         // setDoorCount(0);
-        setCondition(value.body_no.operational);
-
+        // setCondition(value.body_no.operational);
+        setCondition(condition.find(x => x.name === value.body_no.operational));
     }
-
 
     const dialogFuncMap = {
         'displayNotes': setDisplayNotes,
@@ -904,6 +896,11 @@ export default function FieldInspectionReport() {
                                     <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => setDoorCount(e.target.value)}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                    <h6><b>CONDITION:</b></h6>
+                                    <Dropdown value={condition} options={conditionOptions} optionLabel="name" placeholder="Select Condition" 
+                                    onChange={event => setCondition(event.target.value)} />
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>YEAR:</b></h6>
                                     <InputText placeholder="Input Year" value={year} disabled/>
                                 </div>
@@ -935,11 +932,7 @@ export default function FieldInspectionReport() {
                                     <h6><b>EXTERIOR COLOR:</b></h6>
                                     <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                    <h6><b>CONDITION:</b></h6>
-                                    <InputText placeholder="Input Condition" value={condition} disabled/>
-                                </div>
-
+                                
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{borderTop:'2px solid blue', borderBottom:'2px solid blue', marginBottom:'1px'}}>
                                     <center><b>G=Good F=Fair P=Poor</b></center>
                                 </div>
