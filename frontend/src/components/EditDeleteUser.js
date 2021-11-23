@@ -199,14 +199,16 @@ export const EditDeleteUser = () => {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Address is required.', life: 3000 });
         } else if (phone === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 3000 });
-        } else if (birthday === "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 3000 });
-        } else {
+        } 
+        // else if (birthday === "") {
+        //     toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 3000 });
+        // } 
+        else {
             let token = localStorage.getItem("token");
             let usernames = selectedUser.username;
 
             const gender = mygender.val;
-            const user_info = { company, position, gender, birthday, phone, address };
+            const user_info = { company, position, gender, /* birthday, */ phone, address };
 
             const config = {
                 headers: {
@@ -259,10 +261,11 @@ export const EditDeleteUser = () => {
                         toast.current.show({ severity: 'error', summary: 'Password', detail: `${err.response.data.password.join()}`, life: 3000 });
                     } else if (err.response.data.phone) {
                         toast.current.show({ severity: 'error', summary: 'Phone', detail: `${err.response.data.phone.join()}`, life: 5000 });
-                    } else if (err.response.data.user_info.birthday) {
-                        //toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
-                        toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 3000 });
-                    }
+                    } 
+                    // else if (err.response.data.user_info.birthday) {
+                    //     //toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
+                    //     toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 3000 });
+                    // }
                 });
         }
     }
@@ -294,7 +297,7 @@ export const EditDeleteUser = () => {
                     setPosition(res.data.user_info.position);
                     setAddress(res.data.user_info.address);
                     setPhone(res.data.user_info.phone);
-                    setBirthday(res.data.user_info.birthday);
+                    // setBirthday(res.data.user_info.birthday);
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/user-image/' + username +'/', config)
                     .then((res) => {
                         if (res.data === "No image") {
@@ -874,14 +877,14 @@ export const EditDeleteUser = () => {
                         </div>
 
                         <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                                 <h6><b>PHONE NUMBER:</b></h6>
                                 <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
                             </div>
-                            <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                            {/* <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                                 <h6><b>BIRTHDAY: </b><i>(e.g. 1990-12-30)</i></h6>
                                 <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>

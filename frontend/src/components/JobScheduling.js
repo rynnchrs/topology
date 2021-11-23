@@ -63,7 +63,6 @@ export const JobScheduling = () => {
     const [holdData, setHoldData] = useState([]);
     const [holdTaskType, setHoldTaskType] = useState('');
     const [disabledData, setDisabledData] = useState(false);
-    const [disabledApproval, setDisabledApproval] = useState(false);
     const [fieldmanList, setFieldmanList] = useState([]);
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
@@ -117,6 +116,7 @@ export const JobScheduling = () => {
     const [status, setStatus] = useState('');
     const [statusColor, setStatusColor] = useState('');
     const [jobTypeColor, setJobTypeColor] = useState('');
+    const [statusBtn, setStatusBtn] = useState('');
 
     const [fullCalendarList, setFullCalendarList] = useState([]);
 
@@ -329,9 +329,9 @@ export const JobScheduling = () => {
 
             } else {
                 try {
-                    setSuggestions(fieldmanList.filter(item => item.full_name.toLowerCase().startsWith(event.query)));
+                    setSuggestions(fieldmanList.filter(item => item.full_name.toLowerCase().startsWith(event.query.toLowerCase())));
                 } catch (err){
-
+                    
                 }
             }
         }, 100);
@@ -355,7 +355,7 @@ export const JobScheduling = () => {
         updateFieldman(id, event.value.username, event.value.full_name);
     }
 
-    const autoCompleteSelectEdit = (id, event) => {
+    const autoCompleteSelectEdit = (id, event ) => {
         updateEditFieldman(id, event.value.username, event.value.full_name);
     }
 
@@ -486,10 +486,13 @@ export const JobScheduling = () => {
         let gmtEndDate = new Date(+splitEndDate[0], splitEndDate[1] - 1, +splitEndDate[2] + 1);
         let status1 = "";
         let statusColor1 = "";
-        if (jobList.task_status_fm === false && jobList.task_status_mn === false) {
+        if (jobList.task_status_fm === false && jobList.task_status_mn === false && jobList.start_date_actual === null && jobList.end_date_actual === null) {
             status1 = "PENDING";
             statusColor1 = "red";
-        } else if (jobList.task_status_fm === true && jobList.task_status_mn === false) {
+        } else if (jobList.task_status_fm === false && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null) {
+            status1 = "PENDING";
+            statusColor1 = "red";
+        } else if (jobList.task_status_fm === true && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null) {
             status1 = "FOR APPROVAL";
             statusColor1 = "orange";
         } else {
@@ -578,18 +581,9 @@ export const JobScheduling = () => {
             };
 
             axios
-                .get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/' + type.toLowerCase() + '_not_created/', config)
-                .then((res) => {
-                    let b = res.data.filter(item => item.job_id === value);
-                    b.length <= 0 ? setDisabledApproval(false) : setDisabledApproval(true);
-            })
-            .catch((err) => {
-                
-            });
-
-            axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
                 .then((res) => {
+                    console.log(res.data)
                     btnJobData(res.data);
                 })
                 .catch((err) => {
@@ -615,6 +609,7 @@ export const JobScheduling = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + apiValue + value + '/', config)
                 .then((res) => {
+                    
                     setJobData(res.data);
                 })
                 .catch((err) => {
@@ -626,15 +621,27 @@ export const JobScheduling = () => {
     }
 
     const btnJobData = (value) => {
+        console.log(value)
         if (value !== null) {
             setJobData(value);
-            if (value.task_status_fm === false && value.task_status_mn === false) {
+            if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual === null && value.end_date_actual === null) {
                 setStatus("PENDING")
                 setStatusColor("red");
-            } else if (value.task_status_fm === true && value.task_status_mn === false) {
+                setStatusBtn('disable')
+            } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null) {
+                setStatus("PENDING");
+                setStatusColor("red");
+                setStatusBtn('enable')
+            } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null) {
                 setStatus("FOR APPROVAL");
                 setStatusColor("orange");
-            } else {
+                setStatusBtn('disable')
+            } 
+            // else if (value.task_status_fm === true && value.task_status_mn === false) {
+            //     setStatus("FOR APPROVAL");
+            //     setStatusColor("orange");
+            // } 
+            else {
                 setStatus("DONE");
                 setStatusColor("green");
             }
@@ -1811,7 +1818,7 @@ export const JobScheduling = () => {
                             onClick={() => onClick('displayConfirmMN')} disabled={status !== "FOR APPROVAL"}/> 
                             :
                             <Button icon="pi pi-check-circle" label="APPROVAL" className="p-button-rounded p-button-warning"
-                            onClick={() => onClick('displayConfirmFM')} disabled={status !== "PENDING" || disabledApproval}/>
+                            onClick={() => onClick('displayConfirmFM')} disabled={statusBtn !== "enable"}/>
                         }
                     </div>
                     <div className="p-col-12 p-lg-6">

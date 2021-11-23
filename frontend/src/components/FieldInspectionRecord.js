@@ -56,7 +56,7 @@ export default function FieldInspectionReport() {
 
     //emails
     const [email, setEmail] = useState('');
-    const [emailAcc, setEmailAcc] = useState([]);
+    const [emailList, setEmailList] = useState([]);
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
@@ -241,6 +241,10 @@ export default function FieldInspectionReport() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         arrRoadTestFindings = roadTestFindings.slice();
     }, [roadTestFindings]);
+
+    useEffect(() => {
+        getEmail();
+    }, []);
 
     //for pagination
     useEffect(() => {
@@ -932,6 +936,28 @@ export default function FieldInspectionReport() {
         onClick('displayMessage');
     }
 
+    const submitEmail = () => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.put(process.env.REACT_APP_SERVER_NAME + 'emails/email/', {
+            "email_add": email,
+        }, config)
+        .then((res) => {
+            setMessage({title:"UPDATE", content:"Successfully updated."});
+            onClick('displayMessage');
+            getEmail();
+        })
+        .catch((err) => {
+            
+        })
+    }
+
     const getEmail = () => {
         let token = localStorage.getItem("token");
         const config = {
@@ -941,13 +967,48 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/emails/email/', config)
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'emails/email/', config)
             .then((res) => {
-                console.log(res.data)
+                setEmailList(res.data.results)
+                if (res.data.next === null) {
+                
+                } else {
+                    nextPageEmail(res.data.next);
+                }
             })
             .catch((err) => {
                 
             });
+    }
+
+    const nextPageEmail = (valueURL) => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios
+            .get(valueURL, config)
+            .then((res) => {
+                appendEmail(res.data.results, res.data.next);
+            })
+            .catch((err) => {
+                
+            });
+    };
+
+    const appendEmail = (valueResults, valueURL) => {
+        valueResults.map((i) => {
+            return setEmailList(emailList => [...emailList, i]);
+        });
+        if (valueURL === null){
+                
+        } else {
+            nextPageEmail(valueURL);
+        }
     }
 
     const submitDeleteFieldInspection = () => {
@@ -1262,11 +1323,11 @@ export default function FieldInspectionReport() {
         return (
             <div>
                 <center>
-                    <Button style={{marginRight: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
-                    <Button style={{marginRight: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); onClick('displayConfirmDelete')}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); onClick('displayConfirmDelete')}}/>
                     {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
-                    <Button style={{marginRight: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
-                    <Button icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => onClick('displayEmail')}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => onClick('displayEmail')}/>
                 </center>
             </div>
         );
@@ -1370,39 +1431,39 @@ export default function FieldInspectionReport() {
                                             <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>YEAR:</b></h6>
                                             <InputText placeholder="Input Year" value={year} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>MAKE:</b></h6>
                                             <InputText placeholder="Input Make" value={make} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>MODEL:</b></h6>
                                             <InputText placeholder="Input Make" value={model} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>TRANSMISSION:</b></h6>
                                             <InputText placeholder="Input Transmisison" value={transmission} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>ENGINE:</b></h6>
                                             <InputText placeholder="Input Body No." value={engine} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>INSPECTOR:</b></h6>
                                             <InputText placeholder="Input Inspector" value={inspector} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>LOCATION:</b></h6>
                                             <InputText placeholder="Input Location" value={location} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>EXTERIOR COLOR:</b></h6>
                                             <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>CONDITION:</b></h6>
                                             <InputText placeholder="Input Condition" value={condition} disabled/>
                                         </div>
@@ -1648,7 +1709,7 @@ export default function FieldInspectionReport() {
                                             <h6><b>REPORT No.:</b></h6>
                                             {/* <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                             onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/> */}
-                                            <InputText placeholder="Input Report No." value={fieldInspectionID} disabled/>
+                                            <InputText placeholder="Input Report No." value={fieldInspectionJobID} disabled/>
                                         </div>
                                         <div className={"p-col-4 required-asterisk " + reviseColor[0]}>
                                             <h6><b>INSPECTION DATE:</b></h6>
@@ -1960,7 +2021,7 @@ export default function FieldInspectionReport() {
                         </div>
                         
                         <div className="p-col-12">
-                            <DataTable ref={dt} /* header={renderHeader()} */ /*  value={repairRecordList} */ className="p-datatable-sm" 
+                            <DataTable ref={dt} /* header={renderHeader()} */  value={emailList} className="p-datatable-sm" 
                                 resizableColumns columnResizeMode="expand" scrollable scrollHeight="250px" emptyMessage="No emails">
                                 <Column field="repair_id" header="Email" style={{ paddingLeft: '3%' }}></Column>
                                 <Column body={actionBody}></Column>
