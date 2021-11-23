@@ -261,7 +261,7 @@ class TaskView(viewsets.ModelViewSet):
                     task.task_status_mn = True;
                     report.noted_by = user
                     car = Car.objects.get(body_no=task.body_no.body_no)
-                    if report.operational == "Operational":
+                    if report.operational:
                         car.operational = True
                     else:
                         car.operational = False
