@@ -21,7 +21,6 @@ class RegistrationTestCase(APITestCase):
                     "company": "test",
                     "position": "test",
                     "gender": "M",
-                    "birthday": "1998-02-07",
                     "phone": "123",
                     "address": "test"
                 }
