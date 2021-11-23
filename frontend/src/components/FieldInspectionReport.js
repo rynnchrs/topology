@@ -16,7 +16,7 @@ import Resizer from "react-image-file-resizer";
 
 export default function FieldInspectionReport() {
 
-    const conditionOptions = [{name: 'Operational', val: true}, {name: 'Non-Operational', val: false}];
+    const conditionOptions = [{name: 'Operational', val: "True"}, {name: 'Non-Operational', val: "False"}];
 
     const [fieldInspectionNotCreatedList, setFieldInspectionNotCreatedList] = useState([]);
     const [fieldInspectionData, setFieldInspectionData] = useState([]);
@@ -364,7 +364,7 @@ export default function FieldInspectionReport() {
                 formData.append("body_style", bodyStyle === "" ? null : bodyStyle);
                 formData.append("drive_type", driverType === "" ? null : driverType);
                 formData.append("door_count", doorCount);
-                formData.append("operation", condition.val);
+                formData.append("operational", condition.val);
                 formData.append("hood", exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F");
                 formData.append("hood_note", exterior[0].notes);
                 formData.append("front", exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F");
@@ -808,6 +808,7 @@ export default function FieldInspectionReport() {
     }
 
     const handleSelectReportNo = (value) => {
+        console.log(value)
         setYear(value.body_no.release_year);
         setMake(value.body_no.brand);
         setModel(value.body_no.make);
@@ -822,7 +823,7 @@ export default function FieldInspectionReport() {
         setExteriorColor(value.body_no.color);
         // setDoorCount(0);
         // setCondition(value.body_no.operational);
-        setCondition(condition.find(x => x.name === value.body_no.operational));
+        setCondition(conditionOptions.find(x => x.name === value.body_no.operational));
     }
 
     const dialogFuncMap = {
