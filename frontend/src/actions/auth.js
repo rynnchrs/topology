@@ -64,6 +64,16 @@ export const login = (username, password) => (dispatch) => {
                     res.data.can_edit_task ? localStorage.setItem('editTask', "true") : localStorage.setItem('editTask', "false")
                     res.data.can_delete_task ? localStorage.setItem('deleteTask', "true") : localStorage.setItem('deleteTask', "false")
 
+                    res.data.can_view_ir ? localStorage.setItem('viewIR', "true") : localStorage.setItem('viewIR', "false")
+                    res.data.can_add_ir ? localStorage.setItem('addIR', "true") : localStorage.setItem('addIR', "false")
+                    res.data.can_edit_ir ? localStorage.setItem('editIR', "true") : localStorage.setItem('editIR', "false")
+                    res.data.can_delete_ir ? localStorage.setItem('deleteIR', "true") : localStorage.setItem('deleteIR', "false")
+
+                    res.data.can_view_checklist ? localStorage.setItem('viewChecklist', "true") : localStorage.setItem('viewChecklist', "false")
+                    res.data.can_add_checklist ? localStorage.setItem('addChecklist', "true") : localStorage.setItem('addChecklist', "false")
+                    res.data.can_edit_checklist ? localStorage.setItem('editChecklist', "true") : localStorage.setItem('editChecklist', "false")
+                    res.data.can_delete_checklist ? localStorage.setItem('deleteChecklist', "true") : localStorage.setItem('deleteChecklist', "false")
+
                 })
                 .catch((err) => {
 

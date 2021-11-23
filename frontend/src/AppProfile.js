@@ -74,6 +74,10 @@ export const AppProfile = () => {
                 localStorage.removeItem("editRepairReport"); localStorage.removeItem("deleteRepairReport");
                 localStorage.removeItem("viewTask"); localStorage.removeItem("addTask");
                 localStorage.removeItem("editTask"); localStorage.removeItem("deleteTask");
+                localStorage.removeItem("viewIR"); localStorage.removeItem("addIR");
+                localStorage.removeItem("editIR"); localStorage.removeItem("deleteIR");
+                localStorage.removeItem("viewChecklist"); localStorage.removeItem("addChecklist");
+                localStorage.removeItem("editChecklist"); localStorage.removeItem("deleteChecklist");
                 toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
                 setTimeout(() => {
                     window.location.href = '/';
@@ -101,6 +105,10 @@ export const AppProfile = () => {
         localStorage.removeItem("editRepairReport"); localStorage.removeItem("deleteRepairReport");
         localStorage.removeItem("viewTask"); localStorage.removeItem("addTask");
         localStorage.removeItem("editTask"); localStorage.removeItem("deleteTask");
+        localStorage.removeItem("viewIR"); localStorage.removeItem("addIR");
+        localStorage.removeItem("editIR"); localStorage.removeItem("deleteIR");
+        localStorage.removeItem("viewChecklist"); localStorage.removeItem("addChecklist");
+        localStorage.removeItem("editChecklist"); localStorage.removeItem("deleteChecklist");
         // toast.current.show({ severity: 'success', summary: 'Logout Successful', detail: 'You are now logged out.', life: 3000 });
         setTimeout(() => {
             window.location.href = '/';

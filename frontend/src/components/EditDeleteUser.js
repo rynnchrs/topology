@@ -56,6 +56,14 @@ export const EditDeleteUser = () => {
     const [addTask, setAddTask] = useState(false);
     const [editTask, setEditTask] = useState(false);
     const [delTask, setDelTask] = useState(false);
+    const [viewIR, setViewIR] = useState(false);
+    const [addIR, setAddIR] = useState(false);
+    const [editIR, setEditIR] = useState(false);
+    const [delIR, setDelIR] = useState(false);
+    const [viewChecklist, setViewChecklist] = useState(false);
+    const [addChecklist, setAddChecklist] = useState(false);
+    const [editChecklist, setEditChecklist] = useState(false);
+    const [delChecklist, setDelChecklist] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
     const refImageUpload = useRef(null);
@@ -353,6 +361,15 @@ export const EditDeleteUser = () => {
                 setAddTask(res.data.can_add_task);
                 setEditTask(res.data.can_edit_task);
                 setDelTask(res.data.can_delete_task);
+                setViewIR(res.data.can_view_ir);
+                setAddIR(res.data.can_add_ir);
+                setEditIR(res.data.can_edit_ir);
+                setDelIR(res.data.can_delete_ir);
+                setViewChecklist(res.data.can_view_checklist);
+                setAddChecklist(res.data.can_add_checklist);
+                setEditChecklist(res.data.can_edit_checklist);
+                setDelChecklist(res.data.can_delete_checklist);
+
                 if (res.data.can_view_users === true && res.data.can_view_inventory === true  && res.data.can_view_inspection_reports === true 
                     && res.data.can_add_inspection_reports === true
                     && res.data.can_edit_inspection_reports === true && res.data.can_show_all_inspection_reports === true){
@@ -403,6 +420,14 @@ export const EditDeleteUser = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+            setViewIR(true);
+            setAddIR(true);
+            setEditIR(true);
+            setDelIR(true);
+            setViewChecklist(true);
+            setAddChecklist(true);
+            setEditChecklist(true);
+            setDelChecklist(true);
         } else if (value === "technician") {
             setUserLevel("technician");
             setViewUsers(false);
@@ -424,10 +449,21 @@ export const EditDeleteUser = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(false);
             setAddTask(false);
             setEditTask(false);
             setDelTask(false);
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+
+            setViewChecklist(true);
+            setAddChecklist(true);
+            setEditChecklist(true);
+            setDelChecklist(true);
         } else if (value === "driver") {
             setUserLevel("driver");
             setViewUsers(false);
@@ -449,10 +485,21 @@ export const EditDeleteUser = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(true);
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+            
+            setViewChecklist(true);
+            setAddChecklist(false);
+            setEditChecklist(false);
+            setDelChecklist(false);
         } else if (value === "viewer") {
             setUserLevel("viewer");
             setViewUsers(false);
@@ -474,10 +521,21 @@ export const EditDeleteUser = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(true);
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+            
+            setViewChecklist(true);
+            setAddChecklist(false);
+            setEditChecklist(false);
+            setDelChecklist(false);
         }
     }
 
@@ -527,6 +585,17 @@ export const EditDeleteUser = () => {
                     res.data.can_add_task ? localStorage.setItem('addTask', "true") : localStorage.setItem('addTask', "false")
                     res.data.can_edit_task ? localStorage.setItem('editTask', "true") : localStorage.setItem('editTask', "false")
                     res.data.can_delete_task ? localStorage.setItem('deleteTask', "true") : localStorage.setItem('deleteTask', "false")
+
+                    res.data.can_view_ir ? localStorage.setItem('viewIR', "true") : localStorage.setItem('viewIR', "false")
+                    res.data.can_add_ir ? localStorage.setItem('addIR', "true") : localStorage.setItem('addIR', "false")
+                    res.data.can_edit_ir ? localStorage.setItem('editIR', "true") : localStorage.setItem('editIR', "false")
+                    res.data.can_delete_ir ? localStorage.setItem('deleteIR', "true") : localStorage.setItem('deleteIR', "false")
+
+                    res.data.can_view_checklist ? localStorage.setItem('viewChecklist', "true") : localStorage.setItem('viewChecklist', "false")
+                    res.data.can_add_checklist ? localStorage.setItem('addChecklist', "true") : localStorage.setItem('addChecklist', "false")
+                    res.data.can_edit_checklist ? localStorage.setItem('editChecklist', "true") : localStorage.setItem('editChecklist', "false")
+                    res.data.can_delete_checklist ? localStorage.setItem('deleteChecklist', "true") : localStorage.setItem('deleteChecklist', "false")
+
                     setIsChanged(true);
                 })
                 .catch((err) => {
@@ -667,6 +736,62 @@ export const EditDeleteUser = () => {
         
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/task/', body, config)
+            .then((res) => {
+                updatePermissionIR();
+            })
+            .catch((err) => {
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
+            });
+    }
+
+    const updatePermissionIR = event => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        // Request Body
+        const body = JSON.stringify({
+            "user": username,
+            "can_view_ir": viewIR,
+            "can_add_ir": addIR,
+            "can_edit_ir": editIR,
+            "can_delete_ir": delIR
+        });
+        
+        axios
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/ir/', body, config)
+            .then((res) => {
+                updatePermissionChecklist();
+            })
+            .catch((err) => {
+                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
+            });
+    }
+
+    const updatePermissionChecklist = event => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        // Request Body
+        const body = JSON.stringify({
+            "user": username,
+            "can_view_checklist": viewChecklist,
+            "can_add_checklist": addChecklist,
+            "can_edit_checklist": editChecklist,
+            "can_delete_checklist": delChecklist
+        });
+        
+        axios
+            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/checklist/', body, config)
             .then((res) => {
                 onHide('displayBasic')
                 toast.current.show({ severity: 'success', summary: 'Update Successfully', detail: 'User details updated.', life: 3000 });

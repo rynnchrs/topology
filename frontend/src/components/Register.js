@@ -44,6 +44,14 @@ export const Register = () => {
     const [addTask, setAddTask] = useState(false);
     const [editTask, setEditTask] = useState(false);
     const [delTask, setDelTask] = useState(false);
+    const [viewIR, setViewIR] = useState(false);
+    const [addIR, setAddIR] = useState(false);
+    const [editIR, setEditIR] = useState(false);
+    const [delIR, setDelIR] = useState(false);
+    const [viewChecklist, setViewChecklist] = useState(false);
+    const [addChecklist, setAddChecklist] = useState(false);
+    const [editChecklist, setEditChecklist] = useState(false);
+    const [delChecklist, setDelChecklist] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
     const refImageUpload = useRef(null);
@@ -159,6 +167,14 @@ export const Register = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+            setViewIR(true);
+            setAddIR(true);
+            setEditIR(true);
+            setDelIR(true);
+            setViewChecklist(true);
+            setAddChecklist(true);
+            setEditChecklist(true);
+            setDelChecklist(true);
         } else if (value === "technician") {
             setUserLevel("technician");
             setViewUsers(false);
@@ -180,11 +196,21 @@ export const Register = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(false);
             setAddTask(false);
             setEditTask(false);
             setDelTask(false);
-            
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+
+            setViewChecklist(true);
+            setAddChecklist(true);
+            setEditChecklist(true);
+            setDelChecklist(true);
         } else if (value === "driver") {
             setUserLevel("driver");
             setViewUsers(false);
@@ -206,11 +232,21 @@ export const Register = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(true);
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
-           
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+            
+            setViewChecklist(true);
+            setAddChecklist(false);
+            setEditChecklist(false);
+            setDelChecklist(false);
         } else if (value === "viewer") {
             setUserLevel("viewer");
             setViewUsers(false);
@@ -232,10 +268,21 @@ export const Register = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(true);
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+            
+            setViewChecklist(true);
+            setAddChecklist(false);
+            setEditChecklist(false);
+            setDelChecklist(false);
         }
     }
 
@@ -271,7 +318,15 @@ export const Register = () => {
             "can_view_task": viewTask,
             "can_add_task": addTask,
             "can_edit_task": editTask,
-            "can_delete_task": delTask
+            "can_delete_task": delTask,
+            "can_view_ir": viewIR,
+            "can_add_ir": addIR,
+            "can_edit_ir": editIR,
+            "can_delete_ir": delIR,
+            "can_view_checklist": viewChecklist,
+            "can_add_checklist": addChecklist,
+            "can_edit_checklist": editChecklist,
+            "can_delete_checklist": delChecklist
         });
 
         axios
