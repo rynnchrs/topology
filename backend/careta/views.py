@@ -14,7 +14,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .filters import UserFilter
 from .models import DashboardPermission, Permission
-from .serializers import (DashboardPermissionSerializer, MyTokenObtainPairSerializer,
+from .serializers import (DashboardPermissionSerializer,
+                          MyTokenObtainPairSerializer,
+                          PermissionChecklistSerializer,
                           PermissionInspectionReportSerializer,
                           PermissionInventorySerializer,
                           PermissionRepairReportSerializer,
@@ -206,6 +208,19 @@ class PermissionView(viewsets.ViewSet):  # permission ViewSet
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+    @action(detail=True, methods=['put'])
+    def checklist(self, request, pk=None):     # update report permission
+        user = self.request.user
+        if user_permission(user, 'can_edit_users'): # permission
+            queryset = Permission.objects.all()
+            users = get_object_or_404(queryset, user__username=pk) # get user
+            serializer = PermissionChecklistSerializer(instance=users, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)       
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            
     @action(detail=True, methods=['put'])
     def repair(self, request, pk=None):     # update report permission
         user = self.request.user
