@@ -122,7 +122,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):  # user update serializ
         user_info.company = user_data.get('company', user_info.company)
         user_info.position = user_data.get('position', user_info.position)
         user_info.gender = user_data.get('gender', user_info.gender)
-        user_info.birthday = user_data.get('birthday', user_info.birthday)
         user_info.phone = user_data.get('phone', user_info.phone)
         user_info.address = user_data.get('address', user_info.address)
         user_info.save()
