@@ -397,7 +397,15 @@ class FieldInspectionSerializer(serializers.ModelSerializer): # Inspection seria
     def to_representation(self, instance): # instance of vin_no
         self.fields['body_no'] =  CarFieldInspectionSerializer(read_only=True)
         self.fields['user'] = serializers.CharField(source='user.user_info.full_name', read_only=True)
+        self.fields['operational'] =  serializers.SerializerMethodField(read_only=True)
         return super(FieldInspectionSerializer, self).to_representation(instance)
+
+
+    def get_operational(self, obj):
+        if obj.operational:
+            return "Operational"
+        else:
+            return "Non-Operational"
 
 
 class FieldInspectionListSerializer(serializers.ModelSerializer): # list of all repair
