@@ -486,18 +486,15 @@ export const JobScheduling = () => {
         let gmtEndDate = new Date(+splitEndDate[0], splitEndDate[1] - 1, +splitEndDate[2] + 1);
         let status1 = "";
         let statusColor1 = "";
-        if (jobList.task_status_fm === false && jobList.task_status_mn === false && jobList.start_date_actual === null && jobList.end_date_actual === null) {
-            status1 = "PENDING";
-            statusColor1 = "red";
-        } else if (jobList.task_status_fm === false && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null) {
-            status1 = "PENDING";
-            statusColor1 = "red";
-        } else if (jobList.task_status_fm === true && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null) {
-            status1 = "FOR APPROVAL";
-            statusColor1 = "orange";
-        } else {
+        if (jobList.task_status_fm === true && jobList.task_status_mn === true) {
             status1 = "DONE";
             statusColor1 = "green";
+        } else if (jobList.task_status_fm === true && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null && jobList.job_order.field_inspection !== null) {
+            status1 = "FOR APPROVAL";
+            statusColor1 = "orange";
+        } else  {
+            status1 = "PENDING";
+            statusColor1 = "red";
         }
         let jobTypeColor = jobList.job_order.type === "Repair" ? 'blue' : jobList.job_order.type === "Inspection" ? 'green' : ''; 
 
@@ -624,27 +621,43 @@ export const JobScheduling = () => {
         console.log(value)
         if (value !== null) {
             setJobData(value);
-            if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual === null && value.end_date_actual === null) {
-                setStatus("PENDING")
-                setStatusColor("red");
-                setStatusBtn('disable')
-            } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null) {
+            if (value.task_status_fm === true && value.task_status_mn === true) {
+                setStatus("DONE");
+                setStatusColor("green");
+                setStatusBtn('disable');
+            } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
                 setStatus("PENDING");
                 setStatusColor("red");
                 setStatusBtn('enable')
-            } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null) {
+            } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
                 setStatus("FOR APPROVAL");
                 setStatusColor("orange");
                 setStatusBtn('disable')
-            } 
-            // else if (value.task_status_fm === true && value.task_status_mn === false) {
+            } else  {
+                setStatus("PENDING")
+                setStatusColor("red");
+                setStatusBtn('disable')
+            }
+            // if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual === null && value.end_date_actual === null) {
+            //     setStatus("PENDING")
+            //     setStatusColor("red");
+            //     setStatusBtn('disable')
+            // } else if (value.task_status_fm === false && value.task_status_mn === false && value.job_order.field_inspection !== null) {
+            //     setStatus("PENDING");
+            //     setStatusColor("red");
+            //     setStatusBtn('disable')
+            // } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
+            //     setStatus("PENDING");
+            //     setStatusColor("red");
+            //     setStatusBtn('enable')
+            // } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null) {
             //     setStatus("FOR APPROVAL");
             //     setStatusColor("orange");
-            // } 
-            else {
-                setStatus("DONE");
-                setStatusColor("green");
-            }
+            //     setStatusBtn('disable')
+            // } else if (value.task_status_fm === true && value.task_status_mn === true){
+            //     setStatus("DONE");
+            //     setStatusColor("green");
+            // }
             let jobTypeColor = value.job_order.type === "Repair" ? 'blue' : value.job_order.type === "Inspection" ? 'green' : '';
             setJobTypeColor(jobTypeColor);
             onClick('displayJobDetails')

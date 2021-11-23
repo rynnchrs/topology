@@ -737,40 +737,40 @@ export const EditDeleteUser = () => {
         axios
             .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/task/', body, config)
             .then((res) => {
-                updatePermissionIR();
-            })
-            .catch((err) => {
-                toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
-            });
-    }
-
-    const updatePermissionIR = event => {
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json',
-            },
-        };
-
-        // Request Body
-        const body = JSON.stringify({
-            "user": username,
-            "can_view_ir": viewIR,
-            "can_add_ir": addIR,
-            "can_edit_ir": editIR,
-            "can_delete_ir": delIR
-        });
-        
-        axios
-            .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/ir/', body, config)
-            .then((res) => {
                 updatePermissionChecklist();
             })
             .catch((err) => {
                 toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
             });
     }
+
+    // const updatePermissionIR = event => {
+    //     let token = localStorage.getItem("token");
+    //     const config = {
+    //         headers: {
+    //             'Authorization': 'Bearer ' + token,
+    //             'Content-Type': 'application/json',
+    //         },
+    //     };
+
+    //     // Request Body
+    //     const body = JSON.stringify({
+    //         "user": username,
+    //         "can_view_ir": viewIR,
+    //         "can_add_ir": addIR,
+    //         "can_edit_ir": editIR,
+    //         "can_delete_ir": delIR
+    //     });
+        
+    //     axios
+    //         .put(process.env.REACT_APP_SERVER_NAME + 'careta/permission/' + username + '/ir/', body, config)
+    //         .then((res) => {
+    //             updatePermissionChecklist();
+    //         })
+    //         .catch((err) => {
+    //             toast.current.show({ severity: 'error', summary: 'Permission Fatal Repair Report', detail: 'Something went wrong.', life: 3000 });
+    //         });
+    // }
 
     const updatePermissionChecklist = event => {
         let token = localStorage.getItem("token");
