@@ -167,7 +167,7 @@ class PermissionInspectionReportSerializer(serializers.ModelSerializer):    # in
 class PermissionRepairReportSerializer(serializers.ModelSerializer):    # repair permission serializer
     class Meta:
         model = Permission
-        fields = ['id','slug','can_view`_repair_reports`','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports']
+        fields = ['id','slug','can_view_repair_reports','can_add_repair_reports','can_edit_repair_reports','can_delete_repair_reports']
         extra_kwargs = {'slug': {'read_only': True},}
 
 
