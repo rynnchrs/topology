@@ -12,7 +12,11 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import axios from "axios";
 import { format } from 'date-fns';
 
+import Resizer from "react-image-file-resizer";
+
 export default function FieldInspectionReport() {
+
+    const conditionOptions = [{name: 'Operational', val: "True"}, {name: 'Non-Operational', val: "False"}];
 
     const [fieldInspectionNotCreatedList, setFieldInspectionNotCreatedList] = useState([]);
     const [fieldInspectionData, setFieldInspectionData] = useState([]);
@@ -35,7 +39,7 @@ export default function FieldInspectionReport() {
     const [location, setLocation] = useState("");
     const [exteriorColor, setExteriorColor] = useState("");
     const [doorCount, setDoorCount] = useState("");
-    const [condition, setCondition] = useState("");
+    const [condition, setCondition] = useState([]);
     const refImageUpload = useRef(null);
 
     const toast = useRef(null);
@@ -247,6 +251,7 @@ export default function FieldInspectionReport() {
     ]);
 
     const submitFieldInspection = () => {
+    
         let flagChecking = true;
 
         if (flagChecking === true) {
@@ -359,6 +364,7 @@ export default function FieldInspectionReport() {
                 formData.append("body_style", bodyStyle === "" ? null : bodyStyle);
                 formData.append("drive_type", driverType === "" ? null : driverType);
                 formData.append("door_count", doorCount);
+                formData.append("operational", condition.val);
                 formData.append("hood", exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F");
                 formData.append("hood_note", exterior[0].notes);
                 formData.append("front", exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F");
@@ -506,10 +512,51 @@ export default function FieldInspectionReport() {
 
                     });
                 } else {
-                    refImageUpload.current.state.files.map((f, index) => {
-                        formData.append("images[" + index + "]image", f);
-                        return null;
-                    })
+                       refImageUpload.current.state.files.map((f, index) => {
+                            // const image = resizeFile(f);
+                            // console.log("fileupload: ",image)
+                            formData.append("images[" + index + "]image", f);
+
+                            // console.log("f: ", f);
+                            // console.log("fblob: ", f.objectURL);
+                            // try {
+                            //     Resizer.imageFileResizer(
+                            //     f,
+                            //     300,
+                            //     300,
+                            //     "JPEG",
+                            //     100,
+                            //     0,
+                            //     (uri) => {
+                            //         console.log("uri: ", uri);
+                            //         console.log("bloburi: ", dataURItoBlob(uri));
+                            //         console.log("done1", index)
+                            //         formData.append("images[" + index + "]image", dataURItoBlob(uri));
+
+                            //         if (refImageUpload.current.state.files.length == index + 1) {
+                            //             console.log("send request")
+                            //             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                            //                                 .then((res) => {
+                            //                                     submitFieldInspectionAfter();
+                            //                                 })
+                            //                                 .catch((err) => {
+                                        
+                            //                                 });
+                            //                                 }
+                            //     },
+                            //     "base64",
+                            //     200,
+                            //     200
+                            //     );
+                            // } catch (err) {
+                            //     console.log("err: ", err);
+                            // }
+                           
+                            // formData.append("images[" + index + "]image", f);
+                            return null;
+                    });
+                    console.log("chk resize")
+                    console.log("fd: ", formData)
                     axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
                     .then((res) => {
                         submitFieldInspectionAfter();
@@ -520,6 +567,68 @@ export default function FieldInspectionReport() {
                 }
             }
         }
+    }
+
+//     const getData = () => {
+//         refImageUpload.current.state.files.map((f, index) => {
+//             console.log("f: ", f);
+//             console.log("fblob: ", f.objectURL);
+//             try {
+//                 Resizer.imageFileResizer(
+//                 f,
+//                 300,
+//                 300,
+//                 "JPEG",
+//                 100,
+//                 0,
+//                 (uri) => {
+//                     console.log("uri: ", uri);
+//                     console.log("bloburi: ", dataURItoBlob(uri));
+//                     console.log("done1", index)
+//                     formData.append("images[" + index + "]image", dataURItoBlob(uri));
+//                     if (refImageUpload.current.state.files.length == index + 1) {
+// console.log("send request")
+// axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+//                     .then((res) => {
+//                         submitFieldInspectionAfter();
+//                     })
+//                     .catch((err) => {
+
+//                     });
+//                     }
+//                 },
+//                 "base64",
+//                 200,
+//                 200
+//                 );
+//             }
+
+//              catch (err) {
+//                 console.log("err: ", err);
+//             }
+//     })
+// console.log("done")}
+
+
+
+    const dataURItoBlob = (dataURI) =>  {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
+    
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    
+        // write the bytes of the string to a typed array
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+    
+        return new Blob([ia], {type:mimeString});
     }
 
     const submitFieldInspectionAfter = () => {
@@ -538,17 +647,7 @@ export default function FieldInspectionReport() {
         setLocation("");
         setExteriorColor("");
         setDoorCount("");
-        setCondition("");
-
-        
-        // setExterior(initialExterior);
-        // setGlass(initialGlass);
-        // setTiresWheels(initialTiresWheels);
-        // setUnderbody(initialUnderbody);
-        // setUnderhood(initialUnderhood);
-        // setInterior(initialInterior);
-        // setElectricalSystem(initialElectricalSystem);
-        // setRoadTestFindings(initialRoadTestFindings);
+        setCondition([]);
 
         window.scrollTo({top: 0, left: 0, behavior:'smooth'});
         refImageUpload.current.clear();
@@ -709,6 +808,7 @@ export default function FieldInspectionReport() {
     }
 
     const handleSelectReportNo = (value) => {
+        console.log(value)
         setYear(value.body_no.release_year);
         setMake(value.body_no.brand);
         setModel(value.body_no.make);
@@ -722,10 +822,9 @@ export default function FieldInspectionReport() {
         setLocation(value.body_no.current_loc);
         setExteriorColor(value.body_no.color);
         // setDoorCount(0);
-        setCondition(value.body_no.operational);
-
+        // setCondition(value.body_no.operational);
+        setCondition(conditionOptions.find(x => x.name === value.body_no.operational));
     }
-
 
     const dialogFuncMap = {
         'displayNotes': setDisplayNotes,
@@ -798,6 +897,11 @@ export default function FieldInspectionReport() {
                                     <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => setDoorCount(e.target.value)}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                    <h6><b>CONDITION:</b></h6>
+                                    <Dropdown value={condition} options={conditionOptions} optionLabel="name" placeholder="Select Condition" 
+                                    onChange={event => setCondition(event.target.value)} />
+                                </div>
+                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                     <h6><b>YEAR:</b></h6>
                                     <InputText placeholder="Input Year" value={year} disabled/>
                                 </div>
@@ -829,11 +933,7 @@ export default function FieldInspectionReport() {
                                     <h6><b>EXTERIOR COLOR:</b></h6>
                                     <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                 </div>
-                                <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
-                                    <h6><b>CONDITION:</b></h6>
-                                    <InputText placeholder="Input Condition" value={condition} disabled/>
-                                </div>
-
+                                
                                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{borderTop:'2px solid blue', borderBottom:'2px solid blue', marginBottom:'1px'}}>
                                     <center><b>G=Good F=Fair P=Poor</b></center>
                                 </div>

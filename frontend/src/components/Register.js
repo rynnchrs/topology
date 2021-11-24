@@ -22,7 +22,7 @@ export const Register = () => {
     const [position, setPosition] = useState('');
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
-    const [birthday, setBirthday] = useState('');
+    // const [birthday, setBirthday] = useState('');
     const [passwordShown, setPasswordShown] = useState(true);
     const [viewUsers, setViewUsers] = useState(false);
     const [addUsers, setAddUsers] = useState(false);
@@ -44,6 +44,14 @@ export const Register = () => {
     const [addTask, setAddTask] = useState(false);
     const [editTask, setEditTask] = useState(false);
     const [delTask, setDelTask] = useState(false);
+    const [viewIR, setViewIR] = useState(false);
+    const [addIR, setAddIR] = useState(false);
+    const [editIR, setEditIR] = useState(false);
+    const [delIR, setDelIR] = useState(false);
+    const [viewChecklist, setViewChecklist] = useState(false);
+    const [addChecklist, setAddChecklist] = useState(false);
+    const [editChecklist, setEditChecklist] = useState(false);
+    const [delChecklist, setDelChecklist] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
     const refImageUpload = useRef(null);
@@ -69,13 +77,15 @@ export const Register = () => {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Address is required.', life: 5000 });
         } else if (phone === "") {
             toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Phone Number is required.', life: 5000 });
-        } else if (birthday === "") {
-            toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
-        } else {
+        } 
+        // else if (birthday === "") {
+        //     toast.current.show({ severity: 'warn', summary: 'Empty Field', detail: 'Birthday is required.', life: 5000 });
+        // } 
+        else {
             let token = localStorage.getItem("token");
             
             const gender = mygender.val;
-            const user_info = { company, position, gender, birthday, phone, address };
+            const user_info = { company, position, gender,/*  birthday, */ phone, address };
 
             const config = {
                 headers: {
@@ -125,10 +135,11 @@ export const Register = () => {
                         toast.current.show({ severity: 'error', summary: 'Password', detail: `${err.response.data.password.join()}`, life: 5000 });
                     } else if (err.response.data.phone) {
                         toast.current.show({ severity: 'error', summary: 'Phone', detail: `${err.response.data.phone.join()}`, life: 5000 });
-                    } else if (err.response.data.user_info.birthday) {
-                        //toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
-                        toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 5000 });
-                    }
+                    } 
+                    // else if (err.response.data.user_info.birthday) {
+                    //     //toast.current.show({ severity: 'error', summary: 'Birthday', detail: "Invalid Birthday", life: 3000 });
+                    //     toast.current.show({ severity: 'error', summary: 'Birthday', detail: `${err.response.data.user_info.birthday.join()}`, life: 5000 });
+                    // }
                 });
         }
     }
@@ -156,6 +167,14 @@ export const Register = () => {
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+            setViewIR(true);
+            setAddIR(true);
+            setEditIR(true);
+            setDelIR(true);
+            setViewChecklist(true);
+            setAddChecklist(true);
+            setEditChecklist(true);
+            setDelChecklist(true);
         } else if (value === "technician") {
             setUserLevel("technician");
             setViewUsers(false);
@@ -177,11 +196,21 @@ export const Register = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(false);
             setAddTask(false);
             setEditTask(false);
             setDelTask(false);
-            
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+
+            setViewChecklist(true);
+            setAddChecklist(true);
+            setEditChecklist(true);
+            setDelChecklist(true);
         } else if (value === "driver") {
             setUserLevel("driver");
             setViewUsers(false);
@@ -203,11 +232,21 @@ export const Register = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(true);
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
-           
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+            
+            setViewChecklist(true);
+            setAddChecklist(false);
+            setEditChecklist(false);
+            setDelChecklist(false);
         } else if (value === "viewer") {
             setUserLevel("viewer");
             setViewUsers(false);
@@ -229,10 +268,21 @@ export const Register = () => {
             setAddRepairReport(true);
             setEditRepairReport(true);
             setDelRepairReport(true);
+
             setViewTask(true);
             setAddTask(true);
             setEditTask(true);
             setDelTask(true);
+
+            setViewIR(false);
+            setAddIR(false);
+            setEditIR(false);
+            setDelIR(false);
+            
+            setViewChecklist(true);
+            setAddChecklist(false);
+            setEditChecklist(false);
+            setDelChecklist(false);
         }
     }
 
@@ -268,7 +318,15 @@ export const Register = () => {
             "can_view_task": viewTask,
             "can_add_task": addTask,
             "can_edit_task": editTask,
-            "can_delete_task": delTask
+            "can_delete_task": delTask,
+            "can_view_ir": viewIR,
+            "can_add_ir": addIR,
+            "can_edit_ir": editIR,
+            "can_delete_ir": delIR,
+            "can_view_checklist": viewChecklist,
+            "can_add_checklist": addChecklist,
+            "can_edit_checklist": editChecklist,
+            "can_delete_checklist": delChecklist
         });
 
         axios
@@ -284,7 +342,7 @@ export const Register = () => {
                 setPosition('');
                 setAddress('');
                 setPhone('');
-                setBirthday('');
+                // setBirthday('');
                 setUserLevel("");
                 window.scrollTo({top: 0, left: 0, behavior:'smooth'});
                 refImageUpload.current.clear();
@@ -374,14 +432,14 @@ export const Register = () => {
                     </div>
 
                     <div className="p-grid p-fluid">
-                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                        <div className="p-col-12 p-md-12" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>PHONE NUMBER:</b></h6>
                             <InputText placeholder="Phone Number" value={phone} onChange={event => setPhone(event.target.value)} />
                         </div>
-                        <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
+                        {/* <div className="p-col-12 p-md-6" style={{ paddingLeft: '5%', paddingRight: '5%', marginTop: '2%' }}>
                             <h6><b>BIRTHDAY: </b><i>(e.g. 1990-12-30)</i></h6>
                             <InputMask mask="9999-99-99" placeholder="YYYY-MM-DD" value={birthday} onChange={event => setBirthday(event.target.value)} />
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="p-grid p-fluid" style={{ paddingLeft: '4%', paddingRight: '4%', marginTop: '2%' }}>
