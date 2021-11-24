@@ -41,6 +41,7 @@ export default function FieldInspectionReport() {
     const [flagFieldInspectionRecordList, setFlagFieldInspectionRecordList] = useState(false);
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
     const [delFieldInspectionID, setDelFieldInspectionID] = useState('');
+    const [delFieldInspectionJobNo, setDelFieldInspectionJobNo] = useState('');
     const [flagFieldInspectionRecordMethod, setFlagFieldInspectionRecordMethod] = useState('');
     const [qrResult, setQrResult] = useState('No Result');
 
@@ -59,6 +60,10 @@ export default function FieldInspectionReport() {
     //emails
     const [email, setEmail] = useState('');
     const [emailList, setEmailList] = useState([]);
+    const [emailInput, setEmailInput] = useState([]);
+    const [emailSelect, setEmailSelect] = useState([]);
+    const [suggestions, setSuggestions] = useState(null);
+    const [emailReportID, setEmailReportID] = useState('');
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
@@ -294,6 +299,25 @@ export default function FieldInspectionReport() {
         }          
     }
 
+    const searchList = (event) => {
+        setTimeout(() => {
+            if (!event.query.trim().length) {
+
+            } else {
+                try {
+                    setSuggestions(emailList.filter(item => item.email_add.toLowerCase().startsWith(event.query.toLowerCase())));
+                } catch (err){
+                    
+                }
+            }
+        }, 100);
+    };
+
+    const autoCompleteSelectEmail = (value) => {
+        console.log("auto: ", value)
+        setEmailSelect(emailSelect => [...emailSelect, value]);
+    }
+
     const getFieldInspectionRecordDetails = (value) => {
         setIsLoading(true);
         let token = localStorage.getItem("token");
@@ -323,7 +347,6 @@ export default function FieldInspectionReport() {
     }
 
     const assignFieldInspectionRecordEdit = (value) => {
-        console.log(value)
         try {
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);
@@ -949,13 +972,45 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios.put(process.env.REACT_APP_SERVER_NAME + 'emails/email/', {
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email/', {
             "email_add": email,
         }, config)
         .then((res) => {
-            setMessage({title:"UPDATE", content:"Successfully updated."});
+            onHide('displayAddEmail');
+            setEmail('');
+            setMessage({title:"EMAIL", content:"Successfully added."});
             onClick('displayMessage');
             getEmail();
+        })
+        .catch((err) => {
+            
+        })
+    }
+
+    const submitSendEmail = () => {
+        let sendEmailList = [];
+        emailSelect.map((x) =>
+            sendEmailList.push(x.email_add)
+        )
+        console.log("sendEmail: ", sendEmailList)
+        
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/', {
+            "fi_report_id": emailReportID,
+            "email": sendEmailList
+        }, config)
+        .then((res) => {
+            onHide('displayEmail');
+            setEmailReportID('');
+            setMessage({title:"EMAIL", content:"Email sent."});
+            onClick('displayMessage');
         })
         .catch((err) => {
             
@@ -972,17 +1027,17 @@ export default function FieldInspectionReport() {
         };
 
         axios.get(process.env.REACT_APP_SERVER_NAME + 'emails/email/', config)
-            .then((res) => {
-                setEmailList(res.data.results)
-                if (res.data.next === null) {
-                
-                } else {
-                    nextPageEmail(res.data.next);
-                }
-            })
-            .catch((err) => {
-                
-            });
+        .then((res) => {
+            setEmailList(res.data.results)
+            if (res.data.next === null) {
+            
+            } else {
+                nextPageEmail(res.data.next);
+            }
+        })
+        .catch((err) => {
+            
+        });
     }
 
     const nextPageEmail = (valueURL) => {
@@ -994,14 +1049,13 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios
-            .get(valueURL, config)
-            .then((res) => {
-                appendEmail(res.data.results, res.data.next);
-            })
-            .catch((err) => {
-                
-            });
+        axios.get(valueURL, config)
+        .then((res) => {
+            appendEmail(res.data.results, res.data.next);
+        })
+        .catch((err) => {
+            
+        });
     };
 
     const appendEmail = (valueResults, valueURL) => {
@@ -1025,19 +1079,18 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios
-            .delete(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + delFieldInspectionID + '/', config)
-            .then((res) => {
-                getFieldInspectionRecord();
-                setIsLoading(false);
-                setMessage({title:"DELETE", content:"Successfully deleted."});
-                onHide('displayConfirmDelete');
-                onClick('displayMessage');
-            })
-            .catch((err) => {
-                toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
-                setIsLoading(false);
-            });
+        axios.delete(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + delFieldInspectionID + '/', config)
+        .then((res) => {
+            getFieldInspectionRecord();
+            setIsLoading(false);
+            setMessage({title:"DELETE", content:"Successfully deleted."});
+            onHide('displayConfirmDelete');
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
+            setIsLoading(false);
+        });
     }
 
     const getFieldInspectionRecord = () => {
@@ -1049,15 +1102,14 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
-            .then((res) => {
-                setTotalCount(res.data.count);
-                setFieldInspectionRecordList(res.data.results);
-            })
-            .catch((err) => {
-                
-            });
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
+        .then((res) => {
+            setTotalCount(res.data.count);
+            setFieldInspectionRecordList(res.data.results);
+        })
+        .catch((err) => {
+            
+        });
     }
 
     const gfpExterior = (index, value) => {
@@ -1328,10 +1380,20 @@ export default function FieldInspectionReport() {
             <div>
                 <center>
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); onClick('displayConfirmDelete')}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
                     {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => onClick('displayEmail')}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailReportID(rowData.fi_report_id); onClick('displayEmail')}}/>
+                </center>
+            </div>
+        );
+    }
+
+    const actionBodyEmail = (rowData) => {
+        return (
+            <div>
+                <center>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
                 </center>
             </div>
         );
@@ -2016,8 +2078,8 @@ export default function FieldInspectionReport() {
                             {/* <h6><b>SELECT EMAIL:</b></h6> */}
                             <div className="p-grid p-fluid">
                                 <div className="p-col-9">
-                                    <AutoComplete forceSelection field="full_name" placeholder="Search Email" /* suggestions={suggestions} completeMethod={searchList} */ 
-                                    /* value={x.fullname} onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)} *//>
+                                    <AutoComplete forceSelection field="email_add" placeholder="Search Email" suggestions={suggestions} completeMethod={searchList} 
+                                    value={emailInput} onSelect={event => autoCompleteSelectEmail(event.value)} onChange={(e) => setEmailInput(e.target.value)}/>
                                 </div>
                                 <div className="p-col-3">
                                     <Button label="+" onClick={() => onClick('displayAddEmail')}/> 
@@ -2026,15 +2088,14 @@ export default function FieldInspectionReport() {
                         </div>
                         
                         <div className="p-col-12">
-                            <DataTable ref={dt} /* header={renderHeader()} */  value={emailList} className="p-datatable-sm" 
+                            <DataTable ref={dt} /* header={renderHeader()} */  value={emailSelect} className="p-datatable-sm" 
                                 resizableColumns columnResizeMode="expand" scrollable scrollHeight="250px" emptyMessage="No emails">
-                                <Column field="repair_id" header="Email" style={{ paddingLeft: '3%' }}></Column>
-                                <Column body={actionBody}></Column>
+                                <Column field="email_add" header="Email"></Column>
+                                <Column body={actionBodyEmail}></Column>
                             </DataTable>
-                            
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                            <Button label="SEND" onClick={() => saveNotes(theType, theIndex, notes)}/>
+                            <Button label="SEND" onClick={() => submitSendEmail()}/>
                         </div>
                     </div>
                 </Dialog>
@@ -2046,7 +2107,7 @@ export default function FieldInspectionReport() {
                             <InputText placeholder="Input Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                            <Button label="ADD" /* onClick={() => submitEmail()} *//>
+                            <Button label="ADD" onClick={() => submitEmail()}/>
                         </div>
                     </div>
                 </Dialog>
@@ -2070,7 +2131,7 @@ export default function FieldInspectionReport() {
                         </div>
                         <div className="p-col">
                             <h5><b>Delete Record</b></h5>
-                            <div style={{fontSize: '16px'}}>Are you sure to delete this record no. {delFieldInspectionID}?</div>
+                            <div style={{fontSize: '16px'}}>Are you sure to delete this record no. {delFieldInspectionJobNo}?</div>
                         </div>
                     </div>
                 </Dialog>
