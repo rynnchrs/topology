@@ -347,6 +347,7 @@ export default function FieldInspectionReport() {
     }
 
     const assignFieldInspectionRecordEdit = (value) => {
+        console.log(value)
         try {
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);
@@ -1056,6 +1057,36 @@ export default function FieldInspectionReport() {
         .catch((err) => {
             
         });
+    };
+
+    const appendEmail = (valueResults, valueURL) => {
+        valueResults.map((i) => {
+            return setEmailList(emailList => [...emailList, i]);
+        });
+        if (valueURL === null){
+                
+        } else {
+            nextPageEmail(valueURL);
+        }
+    }
+
+    const nextPageEmail = (valueURL) => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios
+            .get(valueURL, config)
+            .then((res) => {
+                appendEmail(res.data.results, res.data.next);
+            })
+            .catch((err) => {
+                
+            });
     };
 
     const appendEmail = (valueResults, valueURL) => {
