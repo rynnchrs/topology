@@ -595,7 +595,6 @@ class FieldInspectionView(viewsets.ModelViewSet):  # add this
         if user_permission(user, 'can_edit_checklist'): 
             request.POST._mutable = True
             request.data['user'] = user.id
-
             queryset = self.filter_queryset(self.get_queryset())
             inspection = get_object_or_404(queryset, pk=pk) 
             serializer = FieldInspectionSerializer(instance=inspection, data=request.data)
