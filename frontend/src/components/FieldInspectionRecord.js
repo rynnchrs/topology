@@ -314,7 +314,6 @@ export default function FieldInspectionReport() {
     };
 
     const autoCompleteSelectEmail = (value) => {
-        console.log("auto: ", value)
         setEmailSelect(emailSelect => [...emailSelect, value]);
     }
 
@@ -347,7 +346,6 @@ export default function FieldInspectionReport() {
     }
 
     const assignFieldInspectionRecordEdit = (value) => {
-        console.log(value)
         try {
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);
@@ -965,6 +963,7 @@ export default function FieldInspectionReport() {
     }
 
     const submitEmail = () => {
+        setIsLoading(true);
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -979,12 +978,13 @@ export default function FieldInspectionReport() {
         .then((res) => {
             onHide('displayAddEmail');
             setEmail('');
+            setIsLoading(false);
             setMessage({title:"EMAIL", content:"Successfully added."});
             onClick('displayMessage');
             getEmail();
         })
         .catch((err) => {
-            
+            setIsLoading(false);
         })
     }
 
@@ -993,8 +993,7 @@ export default function FieldInspectionReport() {
         emailSelect.map((x) =>
             sendEmailList.push(x.email_add)
         )
-        console.log("sendEmail: ", sendEmailList)
-        
+        setIsLoading(true);
         let token = localStorage.getItem("token");
         const config = {
             headers: {
@@ -1010,10 +1009,12 @@ export default function FieldInspectionReport() {
         .then((res) => {
             onHide('displayEmail');
             setEmailReportID('');
+            setIsLoading(false);
             setMessage({title:"EMAIL", content:"Email sent."});
             onClick('displayMessage');
         })
         .catch((err) => {
+            setIsLoading(false);
             
         })
     }
@@ -1057,36 +1058,6 @@ export default function FieldInspectionReport() {
         .catch((err) => {
             
         });
-    };
-
-    const appendEmail = (valueResults, valueURL) => {
-        valueResults.map((i) => {
-            return setEmailList(emailList => [...emailList, i]);
-        });
-        if (valueURL === null){
-                
-        } else {
-            nextPageEmail(valueURL);
-        }
-    }
-
-    const nextPageEmail = (valueURL) => {
-        let token = localStorage.getItem("token");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
-
-        axios
-            .get(valueURL, config)
-            .then((res) => {
-                appendEmail(res.data.results, res.data.next);
-            })
-            .catch((err) => {
-                
-            });
     };
 
     const appendEmail = (valueResults, valueURL) => {
