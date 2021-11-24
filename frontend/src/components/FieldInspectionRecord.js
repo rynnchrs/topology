@@ -64,6 +64,7 @@ export default function FieldInspectionReport() {
     const [emailSelect, setEmailSelect] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
     const [emailReportID, setEmailReportID] = useState('');
+    const [emailMode, setEmailMode] = useState('');
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
@@ -1002,21 +1003,37 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/', {
-            "fi_report_id": emailReportID,
-            "email": sendEmailList
-        }, config)
-        .then((res) => {
-            onHide('displayEmail');
-            setEmailReportID('');
-            setIsLoading(false);
-            setMessage({title:"EMAIL", content:"Email sent."});
-            onClick('displayMessage');
-        })
-        .catch((err) => {
-            setIsLoading(false);
-            
-        })
+        if (emailMode === 'bulk') {
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/bulk/', {
+                "fi_report_id": "",
+                "email": sendEmailList
+            }, config)
+            .then((res) => {
+                onHide('displayEmail');
+                setEmailReportID('');
+                setIsLoading(false);
+                setMessage({title:"EMAIL", content:"Email sent."});
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                setIsLoading(false);
+            })
+        } else {
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/', {
+                "fi_report_id": emailReportID,
+                "email": sendEmailList
+            }, config)
+            .then((res) => {
+                onHide('displayEmail');
+                setEmailReportID('');
+                setIsLoading(false);
+                setMessage({title:"EMAIL", content:"Email sent."});
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                setIsLoading(false);
+            })
+        }
     }
 
     const getEmail = () => {
@@ -1385,7 +1402,7 @@ export default function FieldInspectionReport() {
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
                     {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailReportID(rowData.fi_report_id); onClick('displayEmail')}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailMode('bulk'); onClick('displayEmail')}}/>
                 </center>
             </div>
         );
@@ -1415,25 +1432,26 @@ export default function FieldInspectionReport() {
                 <div className="p-col-12">
                     <div className="card card-w-title">
                         <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
                                     <InputText placeholder="Search Report No." value={searchFieldInspectionNumber} onChange={(event) => setSearchFieldInspectionNumber(event.target.value)}/>
                                 </span>
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
                                     <InputText placeholder="Search Body No." value={searchBodyNo} onChange={(event) => setSearchBodyNo(event.target.value)}/>
                                 </span>
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <Calendar placeholder="Select Date" value={searchDateInspection} onChange={(e) => setSearchDateInspection(e.value)} showIcon />
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-5 p-md-5 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
                                     <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
+                                    <div className="p-mr-3"><Button label="BULK" icon="pi pi-google" onClick={() => onClick('displayEmail')}/></div>
                                 </div>
                             </div>
                         </div>
@@ -1774,77 +1792,78 @@ export default function FieldInspectionReport() {
                             <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                                 <div className="card card-w-title">
                                     <div className="p-grid p-fluid">
-                                        <div className="p-col-4 required-asterisk">
+                                    <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>REPORT No.:</b></h6>
                                             {/* <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                             onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/> */}
-                                            <InputText placeholder="Input Report No." value={fieldInspectionJobID} disabled/>
+                                            <InputText placeholder="Input Report No." value={fieldInspectionID} disabled/>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[0]}>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                            <h6><b>BODY No.:</b></h6>
+                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
+                                        </div>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[0]}>
                                             <h6><b>INSPECTION DATE:</b></h6>
                                             {/* <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => setDateInspection(e.value)} showIcon readOnlyInput/> */}
                                             <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
                                             <small className="p-invalid p-d-block">{reviseText[0]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>YEAR:</b></h6>
-                                            <InputText placeholder="Input Year" value={year} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>MAKE:</b></h6>
-                                            <InputText placeholder="Input Make" value={make} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>MODEL:</b></h6>
-                                            <InputText placeholder="Input Make" value={model} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[1]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[1]}>
                                             <h6><b>MILEAGE:</b></h6>
                                             <InputText placeholder="Input Mileage" value={mileage} onChange={(e) => onChangeValue('f1', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[1]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>BODY No.:</b></h6>
-                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[2]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[2]}>
                                             <h6><b>BODY STYLE:</b></h6>
                                             <InputText placeholder="Input Body Style" value={bodyStyle} onChange={(e) => onChangeValue('f2', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[2]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>TRANSMISSION:</b></h6>
-                                            <InputText placeholder="Input Transmisison" value={transmission} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>ENGINE:</b></h6>
-                                            <InputText placeholder="Input Body No." value={engine} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[3]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[3]}>
                                             <h6><b>DRIVER TYPE:</b></h6>
                                             <InputText placeholder="Input Driver Type" value={driverType} onChange={(e) => onChangeValue('f3', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[3]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>INSPECTOR:</b></h6>
-                                            <InputText placeholder="Input Inspector" value={inspector} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>LOCATION:</b></h6>
-                                            <InputText placeholder="Input Location" value={location} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>EXTERIOR COLOR:</b></h6>
-                                            <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[4]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[4]}>
                                             <h6><b>DOOR COUNT:</b></h6>
                                             <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>CONDITION:</b></h6>
-                                            <InputText placeholder="Input Condition" value={condition} disabled/>
+                                            <Dropdown value={condition} options={conditionOptions} optionLabel="name" placeholder="Select Condition" 
+                                            onChange={event => setCondition(event.target.value)} />
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>YEAR:</b></h6>
+                                            <InputText placeholder="Input Year" value={year} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>MAKE:</b></h6>
+                                            <InputText placeholder="Input Make" value={make} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>MODEL:</b></h6>
+                                            <InputText placeholder="Input Make" value={model} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>TRANSMISSION:</b></h6>
+                                            <InputText placeholder="Input Transmisison" value={transmission} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>ENGINE:</b></h6>
+                                            <InputText placeholder="Input Body No." value={engine} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>INSPECTOR:</b></h6>
+                                            <InputText placeholder="Input Inspector" value={inspector} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>LOCATION:</b></h6>
+                                            <InputText placeholder="Input Location" value={location} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>EXTERIOR COLOR:</b></h6>
+                                            <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                         </div>
 
                                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{borderTop:'2px solid blue', borderBottom:'2px solid blue', marginBottom:'1px'}}>
@@ -2100,6 +2119,9 @@ export default function FieldInspectionReport() {
                             <Button label="SEND" onClick={() => submitSendEmail()}/>
                         </div>
                     </div>
+                    <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                        <ProgressSpinner />
+                    </div>
                 </Dialog>
 
                 <Dialog header="ADD EMAIL" visible={displayAddEmail} style={{ width: '290px' }} onHide={() => onHide('displayAddEmail')} blockScroll={true}>
@@ -2111,6 +2133,9 @@ export default function FieldInspectionReport() {
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                             <Button label="ADD" onClick={() => submitEmail()}/>
                         </div>
+                    </div>
+                    <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                        <ProgressSpinner />
                     </div>
                 </Dialog>
 
