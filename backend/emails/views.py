@@ -23,7 +23,7 @@ class PDFtoEmail(viewsets.ViewSet):
             queryset = FieldInspection.objects.all()
             inspection = get_object_or_404(queryset, pk=request.data['fi_report_id'])
             subject =  f"Inspection Report for {inspection.body_no.body_no}"
-            body = f"Click the url to generate pdf file of this report. \n http://localhost:3000/#/pdfget/?id={inspection}"
+            body = f"{request.data['body']} \n\n http://localhost:3000/#/pdfget/?id={inspection}"
             to = request.data['email']
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
@@ -44,12 +44,12 @@ class PDFtoEmail(viewsets.ViewSet):
         if serializer.is_valid(raise_exception=True):
             subject =  "Inspection Report for"
 
-            body = "Click the url to generate pdf file for this report.\n"
+            body = f"{request.data['body']} \n\n"
             to = request.data['email']
 
             for report in reports:
                 subject += f' {report.body_no.body_no},'
-                body += f'http://localhost:3000/#/pdfget/?id={report}'
+                body += f'http://localhost:3000/#/pdfget/?id={report}\n'
             subject = subject[:-1] + '.'
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
