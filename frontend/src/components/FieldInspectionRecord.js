@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import QrReader from 'react-qr-reader'
+import Resizer from "react-image-file-resizer";
 
 export default function FieldInspectionReport() {
 
@@ -65,6 +66,7 @@ export default function FieldInspectionReport() {
     const [suggestions, setSuggestions] = useState(null);
     const [emailReportID, setEmailReportID] = useState('');
     const [emailMode, setEmailMode] = useState('');
+    const [emailBody, setEmailBody] = useState('');
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
@@ -767,6 +769,8 @@ export default function FieldInspectionReport() {
                 toast.current.show({ severity: 'error', summary: 'DRIVER TYPE', detail: 'This field is required.', life: 3000 });
             }  else if (doorCount === "") { 
                 toast.current.show({ severity: 'error', summary: 'DOOR COUNT', detail: 'This field is required.', life: 3000 });
+            } else if (refImageUpload.current.state.files.length > 10) { 
+                toast.current.show({ severity: 'error', summary: 'IMAGES', detail: 'Maximum images count is reached.', life: 3000 });
             } else {
                 setIsLoading(true);
                 let token = localStorage.getItem("token");
@@ -932,27 +936,109 @@ export default function FieldInspectionReport() {
                     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
                     .then((res) => {
                         submitFieldInspectionAfter();
-                        
                     })
                     .catch((err) => {
-
+                        setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                     });
                 } else {
                     refImageUpload.current.state.files.map((f, index) => {
-                        formData.append("images[" + index + "]image", f);
-                        return null;
-                    })
-                    axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
-                    .then((res) => {
-                        submitFieldInspectionAfter();
-                        
-                    })
-                    .catch((err) => {
+                        //below code for not resizing before upload
+                        // formData.append("images[" + index + "]image", f);
+                        // axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                        // .then((res) => {
+                        //     submitFieldInspectionAfter();
+                        // })
+                        // .catch((err) => {
+                        //     setIsLoading(false);
+                        //     toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                        // });
 
+                        //below code is for resizing image before upload
+                        try {
+                            Resizer.imageFileResizer(
+                            f,
+                            1024,
+                            720,
+                            "JPEG",
+                            100,
+                            0,
+                            (uri) => {
+                                // console.log("uri: ", uri);
+                                // console.log("bloburi: ", dataURItoBlob(uri));
+                                // console.log("done1", index)
+                                let file = new File([dataURItoBlob(uri)], "name.jpg");
+                                // console.log("files: ", file)
+                                formData.append("images[" + index + "]image", file);
+
+                                if (refImageUpload.current.state.files.length == index + 1) {
+                                    console.log("send request")
+                                    axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                                    .then((res) => {
+                                        submitFieldInspectionAfter();
+                                    })
+                                    .catch((err) => {
+                                        setIsLoading(false);
+                                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                                    });
+                                }
+                            },
+                            "base64",
+                            1024,
+                            720
+                            );
+                        } catch (err) {
+                            console.log("err: ", err);
+                        }
+                        return null;
                     });
                 }
+
+                // if (refImageUpload.current.state.files.length <= 0) {
+                //     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                //     .then((res) => {
+                //         submitFieldInspectionAfter();
+                        
+                //     })
+                //     .catch((err) => {
+
+                //     });
+                // } else {
+                //     refImageUpload.current.state.files.map((f, index) => {
+                //         formData.append("images[" + index + "]image", f);
+                //         return null;
+                //     })
+                //     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                //     .then((res) => {
+                //         submitFieldInspectionAfter();
+                        
+                //     })
+                //     .catch((err) => {
+
+                //     });
+                // }
             }
         }
+    }
+
+    const dataURItoBlob = (dataURI) =>  {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
+    
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    
+        // write the bytes of the string to a typed array
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+    
+        return new Blob([ia], {type:mimeString});
     }
 
     const submitFieldInspectionAfter = () => {
@@ -1034,6 +1120,15 @@ export default function FieldInspectionReport() {
                 setIsLoading(false);
             })
         }
+    }
+
+    const deleteSelectedEmail = (value) => {
+        console.log("delEmail: ", value)
+        let theEmails = [...emailSelect];
+        var index = theEmails.indexOf(value);
+        theEmails.splice(index, 1);
+        console.log(theEmails);
+        setEmailSelect(theEmails);
     }
 
     const getEmail = () => {
@@ -1362,6 +1457,17 @@ export default function FieldInspectionReport() {
         setFlagFieldInspectionRecordList(false);
         setReviseColor(Array(30).fill(""));
         setReviseText(Array(30).fill(""));
+        if (name === 'displayEmail') {
+            setEmail('');
+            setEmailInput([]);
+            setEmailSelect([]);
+            setEmailMode('');
+            setEmailBody('');
+        }
+        if (name === 'displayAddEmail') {
+            setEmail('');
+        }
+        
     }
 
     const renderFooter = (name) => {
@@ -1402,7 +1508,7 @@ export default function FieldInspectionReport() {
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
                     {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailMode('bulk'); onClick('displayEmail')}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailReportID(rowData.fi_report_id); onClick('displayEmail')}}/>
                 </center>
             </div>
         );
@@ -1412,7 +1518,7 @@ export default function FieldInspectionReport() {
         return (
             <div>
                 <center>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {deleteSelectedEmail(rowData.email_add)}}/>
                 </center>
             </div>
         );
@@ -1447,13 +1553,22 @@ export default function FieldInspectionReport() {
                             <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <Calendar placeholder="Select Date" value={searchDateInspection} onChange={(e) => setSearchDateInspection(e.value)} showIcon />
                             </div>
-                            <div className="p-col-12 p-lg-5 p-md-5 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <div><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                            </div>
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <div><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
+                            </div>
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <div><Button label="BULK" icon="pi pi-google" onClick={() => {setEmailMode('bulk'); onClick('displayEmail')}}/></div>
+                            </div>
+                            {/* <div className="p-col-12 p-lg-5 p-md-5 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
                                     <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
-                                    <div className="p-mr-3"><Button label="BULK" icon="pi pi-google" onClick={() => onClick('displayEmail')}/></div>
+                                    <div className="p-mr-3"><Button label="BULK" icon="pi pi-google" onClick={() => {setEmailMode('bulk'); onClick('displayEmail')}}/></div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -2110,10 +2225,14 @@ export default function FieldInspectionReport() {
                         
                         <div className="p-col-12">
                             <DataTable ref={dt} /* header={renderHeader()} */  value={emailSelect} className="p-datatable-sm" 
-                                resizableColumns columnResizeMode="expand" scrollable scrollHeight="250px" emptyMessage="No emails">
+                                resizableColumns columnResizeMode="expand" scrollable scrollHeight="200px" emptyMessage="No emails">
                                 <Column field="email_add" header="Email"></Column>
                                 <Column body={actionBodyEmail}></Column>
                             </DataTable>
+                        </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <InputTextarea placeholder="Imput Email Message" rows={5} cols={30} autoResize
+                            value={emailBody} onChange={(e) => setEmailBody(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                             <Button label="SEND" onClick={() => submitSendEmail()}/>

@@ -254,85 +254,85 @@ export default function FieldInspectionReport() {
     
         let flagChecking = true;
 
-        if (flagChecking === true) {
-            for (var i = 0; i < exterior.length; i++) {
-                if (exterior[i].g === false && exterior[i].f === false && exterior[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'EXTERIOR', detail: 'Please check one: ' + exterior[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < exterior.length; i++) {
+        //         if (exterior[i].g === false && exterior[i].f === false && exterior[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'EXTERIOR', detail: 'Please check one: ' + exterior[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if (flagChecking === true) {
-            for (var i = 0; i < glass.length; i++) {
-                if (glass[i].g === false && glass[i].f === false && glass[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'GLASS', detail: 'Please check one: ' + glass[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < glass.length; i++) {
+        //         if (glass[i].g === false && glass[i].f === false && glass[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'GLASS', detail: 'Please check one: ' + glass[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if (flagChecking === true) {
-            for (var i = 0; i < tiresWheels.length; i++) {
-                if (tiresWheels[i].g === false && tiresWheels[i].f === false && tiresWheels[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'TIRES AND WHEELS', detail: 'Please check one: ' + tiresWheels[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < tiresWheels.length; i++) {
+        //         if (tiresWheels[i].g === false && tiresWheels[i].f === false && tiresWheels[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'TIRES AND WHEELS', detail: 'Please check one: ' + tiresWheels[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
         
-        if (flagChecking === true) {
-            for (var i = 0; i < underbody.length; i++) {
-                if (underbody[i].g === false && underbody[i].f === false && underbody[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underbody[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < underbody.length; i++) {
+        //         if (underbody[i].g === false && underbody[i].f === false && underbody[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underbody[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if (flagChecking === true) {
-            for (var i = 0; i < underhood.length; i++) {
-                if (underhood[i].g === false && underhood[i].f === false && underhood[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underhood[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < underhood.length; i++) {
+        //         if (underhood[i].g === false && underhood[i].f === false && underhood[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underhood[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if (flagChecking === true) {
-            for (var i = 0; i < interior.length; i++) {
-                if (interior[i].g === false && interior[i].f === false && interior[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'INTERIOR', detail: 'Please check one: ' + interior[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < interior.length; i++) {
+        //         if (interior[i].g === false && interior[i].f === false && interior[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'INTERIOR', detail: 'Please check one: ' + interior[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if (flagChecking === true) {
-            for (var i = 0; i < electricalSystem.length; i++) {
-                if (electricalSystem[i].g === false && electricalSystem[i].f === false && electricalSystem[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'ELECTRICAL SYSTEM', detail: 'Please check one: ' + electricalSystem[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < electricalSystem.length; i++) {
+        //         if (electricalSystem[i].g === false && electricalSystem[i].f === false && electricalSystem[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'ELECTRICAL SYSTEM', detail: 'Please check one: ' + electricalSystem[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
-        if (flagChecking === true) {
-            for (var i = 0; i < roadTestFindings.length; i++) {
-                if (roadTestFindings[i].g === false && roadTestFindings[i].f === false && roadTestFindings[i].p === false) {
-                    toast.current.show({severity: 'error', summary: 'road test findings', detail: 'Please check one: ' + roadTestFindings[i].label, life: 3000});
-                    flagChecking = false;
-                    break;
-                }
-            }
-        }
+        // if (flagChecking === true) {
+        //     for (var i = 0; i < roadTestFindings.length; i++) {
+        //         if (roadTestFindings[i].g === false && roadTestFindings[i].f === false && roadTestFindings[i].p === false) {
+        //             toast.current.show({severity: 'error', summary: 'road test findings', detail: 'Please check one: ' + roadTestFindings[i].label, life: 3000});
+        //             flagChecking = false;
+        //             break;
+        //         }
+        //     }
+        // }
 
         if (flagChecking === true) {
             if (typeof(fieldInspectionData.job_id) === "undefined") {
@@ -343,6 +343,8 @@ export default function FieldInspectionReport() {
                 toast.current.show({ severity: 'error', summary: 'MILEAGE', detail: 'This field is required.', life: 3000 });
             } else if (doorCount === "") { 
                 toast.current.show({ severity: 'error', summary: 'DOOR COUNT', detail: 'This field is required.', life: 3000 });
+            } else if (refImageUpload.current.state.files.length > 10) { 
+                toast.current.show({ severity: 'error', summary: 'IMAGES', detail: 'Maximum images count is reached.', life: 3000 });
             } else {
                 setIsLoading(true);
                 let token = localStorage.getItem("token");
@@ -509,107 +511,64 @@ export default function FieldInspectionReport() {
                         submitFieldInspectionAfter();
                     })
                     .catch((err) => {
-
+                        setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                     });
                 } else {
-                       refImageUpload.current.state.files.map((f, index) => {
-                            // const image = resizeFile(f);
-                            // console.log("fileupload: ",image)
-                            formData.append("images[" + index + "]image", f);
+                    refImageUpload.current.state.files.map((f, index) => {
+                        //below code for not resizing before upload
+                        // formData.append("images[" + index + "]image", f);
+                        // axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                        // .then((res) => {
+                        //     submitFieldInspectionAfter();
+                        // })
+                        // .catch((err) => {
+                        //     setIsLoading(false);
+                        //     toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                        // });
 
-                            // console.log("f: ", f);
-                            // console.log("fblob: ", f.objectURL);
-                            // try {
-                            //     Resizer.imageFileResizer(
-                            //     f,
-                            //     300,
-                            //     300,
-                            //     "JPEG",
-                            //     100,
-                            //     0,
-                            //     (uri) => {
-                            //         console.log("uri: ", uri);
-                            //         console.log("bloburi: ", dataURItoBlob(uri));
-                            //         console.log("done1", index)
-                            //         formData.append("images[" + index + "]image", dataURItoBlob(uri));
+                        //below code is for resizing image before upload
+                        try {
+                            Resizer.imageFileResizer(
+                            f,
+                            1024,
+                            720,
+                            "JPEG",
+                            100,
+                            0,
+                            (uri) => {
+                                // console.log("uri: ", uri);
+                                // console.log("bloburi: ", dataURItoBlob(uri));
+                                // console.log("done1", index)
+                                let file = new File([dataURItoBlob(uri)], "name.jpg");
+                                // console.log("files: ", file)
+                                formData.append("images[" + index + "]image", file);
 
-                            //         if (refImageUpload.current.state.files.length == index + 1) {
-                            //             console.log("send request")
-                            //             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
-                            //                                 .then((res) => {
-                            //                                     submitFieldInspectionAfter();
-                            //                                 })
-                            //                                 .catch((err) => {
-                                        
-                            //                                 });
-                            //                                 }
-                            //     },
-                            //     "base64",
-                            //     200,
-                            //     200
-                            //     );
-                            // } catch (err) {
-                            //     console.log("err: ", err);
-                            // }
-                           
-                            // formData.append("images[" + index + "]image", f);
-                            return null;
-                    });
-                    console.log("chk resize")
-                    console.log("fd: ", formData)
-                    axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
-                    .then((res) => {
-                        submitFieldInspectionAfter();
-                    })
-                    .catch((err) => {
-
+                                if (refImageUpload.current.state.files.length == index + 1) {
+                                    console.log("send request")
+                                    axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                                    .then((res) => {
+                                        submitFieldInspectionAfter();
+                                    })
+                                    .catch((err) => {
+                                        setIsLoading(false);
+                                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                                    });
+                                }
+                            },
+                            "base64",
+                            1024,
+                            720
+                            );
+                        } catch (err) {
+                            console.log("err: ", err);
+                        }
+                        return null;
                     });
                 }
             }
         }
     }
-
-//     const getData = () => {
-//         refImageUpload.current.state.files.map((f, index) => {
-//             console.log("f: ", f);
-//             console.log("fblob: ", f.objectURL);
-//             try {
-//                 Resizer.imageFileResizer(
-//                 f,
-//                 300,
-//                 300,
-//                 "JPEG",
-//                 100,
-//                 0,
-//                 (uri) => {
-//                     console.log("uri: ", uri);
-//                     console.log("bloburi: ", dataURItoBlob(uri));
-//                     console.log("done1", index)
-//                     formData.append("images[" + index + "]image", dataURItoBlob(uri));
-//                     if (refImageUpload.current.state.files.length == index + 1) {
-// console.log("send request")
-// axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
-//                     .then((res) => {
-//                         submitFieldInspectionAfter();
-//                     })
-//                     .catch((err) => {
-
-//                     });
-//                     }
-//                 },
-//                 "base64",
-//                 200,
-//                 200
-//                 );
-//             }
-
-//              catch (err) {
-//                 console.log("err: ", err);
-//             }
-//     })
-// console.log("done")}
-
-
 
     const dataURItoBlob = (dataURI) =>  {
         // convert base64/URLEncoded data component to raw binary data held in a string
