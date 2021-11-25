@@ -49,7 +49,7 @@ class PDFtoEmail(viewsets.ViewSet):
 
             for report in reports:
                 subject += f' {report.body_no.body_no},'
-                body += f'http://localhost:3000/#/pdfget/?id={report}'
+                body += f'http://localhost:3000/#/pdfget/?id={report}\n'
             subject = subject[:-1] + '.'
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
