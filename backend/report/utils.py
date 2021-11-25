@@ -275,34 +275,34 @@ def fi_report_serialized(data):
         del data[key]
     
     good = {
-        'exterior':[],
-        'glass':[],
-        'tires_wheels': [],
-        'under_body': [],
-        'under_hood': [],
-        'interior': [],
-        'electrical_system': [],
-        'road_test_findings': [],
+        'Exterior':[],
+        'Glass':[],
+        'Tires and wheels': [],
+        'Under Body': [],
+        'Under Hood': [],
+        'Interior': [],
+        'Electrical System': [],
+        'Road Test Findings': [],
     }
     fair = {
-        'exterior':[],
-        'glass':[],
-        'tires_wheels': [],
-        'under_body': [],
-        'under_hood': [],
-        'interior': [],
-        'electrical_system': [],
-        'road_test_findings': [],
+        'Exterior':[],
+        'Glass':[],
+        'Tires and wheels': [],
+        'Under Body': [],
+        'Under Hood': [],
+        'Interior': [],
+        'Electrical System': [],
+        'Road Test Findings': [],
     }
     poor = {
-        'exterior':[],
-        'glass':[],
-        'tires_wheels': [],
-        'under_body': [],
-        'under_hood': [],
-        'interior': [],
-        'electrical_system': [],
-        'road_test_findings': [],
+        'Exterior':[],
+        'Glass':[],
+        'Tires and wheels': [],
+        'Under Body': [],
+        'Under Hood': [],
+        'Interior': [],
+        'Electrical System': [],
+        'Road Test Findings': [],
     }
 
     for key, value in data.items():
@@ -318,45 +318,45 @@ def fi_report_serialized(data):
             ele = [string for string in electrical_system if real in string]
             roa = [string for string in road_test_findings if real in string]
             if ext:
-                good['exterior'].append(listToString(ext))
+                good['Exterior'].append(listToString(ext))
             else:
                 if index <= 11:
-                    good['exterior'].append(real)
+                    good['Exterior'].append(real)
             if gla:
-                good['glass'].append(listToString(gla))
+                good['Glass'].append(listToString(gla))
             else:
                 if index <= 15 and index >= 12:
-                    good['glass'].append(real)
+                    good['Glass'].append(real)
             if tir:
-                good['tires_wheels'].append(listToString(tir))
+                good['Tires and wheels'].append(listToString(tir))
             else:
                 if index <= 18 and index >= 16:
-                    good['tires_wheels'].append(real)
+                    good['Tires and wheels'].append(real)
             if bod:
-                good['under_body'].append(listToString(bod))
+                good['Under Body'].append(listToString(bod))
             else:
                 if index <= 24 and index >= 19:
-                    good['under_body'].append(real)
+                    good['Under Body'].append(real)
             if hoo:
-                good['under_hood'].append(listToString(hoo))
+                good['Under Hood'].append(listToString(hoo))
             else:
                 if index <= 32 and index >= 25:
-                    good['under_hood'].append(real)
+                    good['Under Hood'].append(real)
             if inte:
-                good['interior'].append(listToString(inte))
+                good['Interior'].append(listToString(inte))
             else:
                 if index <= 44 and index >= 33:
-                    good['interior'].append(real)
+                    good['Interior'].append(real)
             if ele:
-                good['electrical_system'].append(listToString(ele))
+                good['Electrical System'].append(listToString(ele))
             else:
                 if index <= 56 and index >= 45:
-                    good['electrical_system'].append(real)
+                    good['Electrical System'].append(real)
             if roa:
-                good['road_test_findings'].append(listToString(roa))
+                good['Road Test Findings'].append(listToString(roa))
             else:
                 if index <= 64 and index >= 57:
-                    good['road_test_findings'].append(real)
+                    good['Road Test Findings'].append(real)
         elif value == "F":
             index = parts.index(key)
             real = field[index]
@@ -369,45 +369,45 @@ def fi_report_serialized(data):
             ele = [string for string in electrical_system if real in string]
             roa = [string for string in road_test_findings if real in string]
             if ext:
-                fair['exterior'].append(listToString(ext))
+                fair['Exterior'].append(listToString(ext))
             else:
                 if index <= 11:
-                    fair['exterior'].append(real)
+                    fair['Exterior'].append(real)
             if gla:
-                fair['glass'].append(listToString(gla))
+                fair['Glass'].append(listToString(gla))
             else:
                 if index <= 15 and index >= 12:
-                    fair['glass'].append(real)
+                    fair['Glass'].append(real)
             if tir:
-                fair['tires_wheels'].append(listToString(tir))
+                fair['Tires and wheels'].append(listToString(tir))
             else:
                 if index <= 18 and index >= 16:
-                    fair['tires_wheels'].append(real)
+                    fair['Tires and wheels'].append(real)
             if bod:
-                fair['under_body'].append(listToString(bod))
+                fair['Under Body'].append(listToString(bod))
             else:
                 if index <= 24 and index >= 19:
-                    fair['under_body'].append(real)
+                    fair['Under Body'].append(real)
             if hoo:
-                fair['under_hood'].append(listToString(hoo))
+                fair['Under Hood'].append(listToString(hoo))
             else:
                 if index <= 32 and index >= 25:
-                    fair['under_hood'].append(real)
+                    fair['Under Hood'].append(real)
             if inte:
-                fair['interior'].append(listToString(inte))
+                fair['Interior'].append(listToString(inte))
             else:
                 if index <= 44 and index >= 33:
-                    fair['interior'].append(real)
+                    fair['Interior'].append(real)
             if ele:
-                fair['electrical_system'].append(listToString(ele))
+                fair['Electrical System'].append(listToString(ele))
             else:
                 if index <= 56 and index >= 45:
-                    fair['electrical_system'].append(real)
+                    fair['Electrical System'].append(real)
             if roa:
-                fair['road_test_findings'].append(listToString(roa))
+                fair['Road Test Findings'].append(listToString(roa))
             else:
                 if index <= 64 and index >= 57:
-                    fair['road_test_findings'].append(real)
+                    fair['Road Test Findings'].append(real)
         elif value == "P":
             index = parts.index(key)
             real = field[index]
@@ -420,97 +420,97 @@ def fi_report_serialized(data):
             ele = [string for string in electrical_system if real in string]
             roa = [string for string in road_test_findings if real in string]
             if ext:
-                poor['exterior'].append(listToString(ext))
+                poor['Exterior'].append(listToString(ext))
             else:
                 if index <= 11:
-                    poor['exterior'].append(real)
+                    poor['Exterior'].append(real)
             if gla:
-                poor['glass'].append(listToString(gla))
+                poor['Glass'].append(listToString(gla))
             else:
                 if index <= 15 and index >= 12:
-                    poor['glass'].append(real)
+                    poor['Glass'].append(real)
             if tir:
-                poor['tires_wheels'].append(listToString(tir))
+                poor['Tires and wheels'].append(listToString(tir))
             else:
                 if index <= 18 and index >= 16:
-                    poor['tires_wheels'].append(real)
+                    poor['Tires and wheels'].append(real)
             if bod:
-                poor['under_body'].append(listToString(bod))
+                poor['Under Body'].append(listToString(bod))
             else:
                 if index <= 24 and index >= 19:
-                    poor['under_body'].append(real)
+                    poor['Under Body'].append(real)
             if hoo:
-                poor['under_hood'].append(listToString(hoo))
+                poor['Under Hood'].append(listToString(hoo))
             else:
                 if index <= 32 and index >= 25:
-                    poor['under_hood'].append(real)
+                    poor['Under Hood'].append(real)
             if inte:
-                poor['interior'].append(listToString(inte))
+                poor['Interior'].append(listToString(inte))
             else:
                 if index <= 44 and index >= 33:
-                    poor['interior'].append(real)
+                    poor['Interior'].append(real)
             if ele:
-                poor['electrical_system'].append(listToString(ele))
+                poor['Electrical System'].append(listToString(ele))
             else:
                 if index <= 56 and index >= 45:
-                    poor['electrical_system'].append(real)
+                    poor['Electrical System'].append(real)
             if roa:
-                poor['road_test_findings'].append(listToString(roa))
+                poor['Road Test Findings'].append(listToString(roa))
             else:
                 if index <= 64 and index >= 57:
-                    poor['road_test_findings'].append(real)
+                    poor['Road Test Findings'].append(real)
 
     
-    if not good['exterior']:
-        del good['exterior']
-    if not good['glass']:
-        del good['glass']
-    if not good['tires_wheels']:
-        del good['tires_wheels']
-    if not good['under_body']:
-        del good['under_body']
-    if not good['under_hood']:
-        del good['under_hood']
-    if not good['interior']:
-        del good['interior']
-    if not good['electrical_system']:
-        del good['electrical_system']
-    if not good['road_test_findings']:
-        del good['road_test_findings']
+    if not good['Exterior']:
+        del good['Exterior']
+    if not good['Glass']:
+        del good['Glass']
+    if not good['Tires and wheels']:
+        del good['Tires and wheels']
+    if not good['Under Body']:
+        del good['Under Body']
+    if not good['Under Hood']:
+        del good['Under Hood']
+    if not good['Interior']:
+        del good['Interior']
+    if not good['Electrical System']:
+        del good['Electrical System']
+    if not good['Road Test Findings']:
+        del good['Road Test Findings']
+    
+    if not fair['Exterior']:
+        del fair['Exterior']
+    if not fair['Glass']:
+        del fair['Glass']
+    if not fair['Tires and wheels']:
+        del fair['Tires and wheels']
+    if not fair['Under Body']:
+        del fair['Under Body']
+    if not fair['Under Hood']:
+        del fair['Under Hood']
+    if not fair['Interior']:
+        del fair['Interior']
+    if not fair['Electrical System']:
+        del fair['Electrical System']
+    if not fair['Road Test Findings']:
+        del fair['Road Test Findings']
         
-    if not fair['exterior']:
-        del fair['exterior']
-    if not fair['glass']:
-        del fair['glass']
-    if not fair['tires_wheels']:
-        del fair['tires_wheels']
-    if not fair['under_body']:
-        del fair['under_body']
-    if not fair['under_hood']:
-        del fair['under_hood']
-    if not fair['interior']:
-        del fair['interior']
-    if not fair['electrical_system']:
-        del fair['electrical_system']
-    if not fair['road_test_findings']:
-        del fair['road_test_findings']
-        
-    if not poor['exterior']:
-        del poor['exterior']
-    if not poor['glass']:
-        del poor['glass']
-    if not poor['tires_wheels']:
-        del poor['tires_wheels']
-    if not poor['under_body']:
-        del poor['under_body']
-    if not poor['under_hood']:
-        del poor['under_hood']
-    if not poor['interior']:
-        del poor['interior']
-    if not poor['electrical_system']:
-        del poor['electrical_system']
-    if not poor['road_test_findings']:
-        del poor['road_test_findings']
+    if not poor['Exterior']:
+        del poor['Exterior']
+    if not poor['Glass']:
+        del poor['Glass']
+    if not poor['Tires and wheels']:
+        del poor['Tires and wheels']
+    if not poor['Under Body']:
+        del poor['Under Body']
+    if not poor['Under Hood']:
+        del poor['Under Hood']
+    if not poor['Interior']:
+        del poor['Interior']
+    if not poor['Electrical System']:
+        del poor['Electrical System']
+    if not poor['Road Test Findings']:
+        del poor['Road Test Findings']
      
     context = {
         'good': good,
