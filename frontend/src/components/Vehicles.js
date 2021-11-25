@@ -3953,7 +3953,7 @@ export class Vehicles extends Component {
                                     <div className="p-col-12 p-lg-12 p-md-12 p-sm-12"> 
                                         <div className="card card-w-title">
                                             <div className="p-grid p-fluid">
-                                                <div id="toPdf" className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                                                <div id="toPdf" className="p-col-12">
                                                     <div className="p-grid p-fluid">
                                                         {
                                                             this.state.qrList.map((x, index) =>

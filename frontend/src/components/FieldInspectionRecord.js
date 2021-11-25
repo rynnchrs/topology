@@ -211,9 +211,13 @@ export default function FieldInspectionReport() {
         if (flagFieldInspectionRecordList) {
             assignFieldInspectionRecordEdit(fieldInspectionRecordDetails); 
             setFieldInspectionRecordDetailsPDF(fieldInspectionRecordDetailsPDF);
-            setGoodSummary(fieldInspectionRecordDetailsPDF.summary.good);
-            setFairSummary(fieldInspectionRecordDetailsPDF.summary.fair);
-            setPoorSummary(fieldInspectionRecordDetailsPDF.summary.poor);
+            if (flagFieldInspectionRecordMethod === 'pdf') {
+                setGoodSummary(fieldInspectionRecordDetailsPDF.summary.good);
+                console.log("nu: ", fieldInspectionRecordDetailsPDF.summary.good)
+                setFairSummary(fieldInspectionRecordDetailsPDF.summary.fair);
+                setPoorSummary(fieldInspectionRecordDetailsPDF.summary.poor);
+            }
+            
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flagFieldInspectionRecordList]);
@@ -383,6 +387,7 @@ export default function FieldInspectionReport() {
                 axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
                 .then((res) => {
                     setReportImage(res.data);
+                    console.log("img: ", res.data)
                     setFlagFieldInspectionRecordList(true);
                     flagFieldInspectionRecordList ? setIsLoading(false) : '';
                 })
@@ -810,6 +815,7 @@ export default function FieldInspectionReport() {
         try {
             var quotes = document.getElementById('toPdf');
             var quotes1 = document.getElementById('toPdfSummary');
+            var quotes2 = document.getElementById('toPdfImage');
             var pdf = new jsPDF('p', 'pt', 'letter');
 
             html2canvas(quotes)
@@ -844,9 +850,6 @@ export default function FieldInspectionReport() {
                 }
                 pdf.addPage();
                 
-                // window.open(pdf.output('bloburl'));
-                // onHide('displayPDF');
-                // setIsLoading(false);
                 html2canvas(quotes1)
                 .then((canvas) => {
                     // var pdf = new jsPDF('p', 'pt', 'letter');
@@ -877,10 +880,50 @@ export default function FieldInspectionReport() {
                         }
                         pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
                     }
-                    window.open(pdf.output('bloburl'));
-                    onHide('displayPDF');
-                    setIsLoading(false);
+                    pdf.addPage();
+
+                    html2canvas(quotes2, {allowTaint: true, useCORS: true})
+                    .then((canvas) => {
+                        // var pdf = new jsPDF('p', 'pt', 'letter');
+
+                        var srcImg  = canvas;
+                        var sX      = 0;
+                        var sY      = 0; // start 980 pixels down for every new page
+                        var sWidth  = 1075;
+                        var sHeight = 1100;
+                        var dX      = 0;
+                        var dY      = 0;
+                        var dWidth  = 900;
+                        var dHeight = 1100;
+
+                        for (var i = 0; i < quotes2.clientHeight/1100; i++) {
+                            sY = 1100*i;
+                            var onePageCanvas = document.createElement("canvas");
+                            onePageCanvas.setAttribute('width', 900);
+                            onePageCanvas.setAttribute('height', 1100);
+                            var ctx = onePageCanvas.getContext('2d');
+                            ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                            var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                            var width         = onePageCanvas.width;
+                            var height        = onePageCanvas.clientHeight;
+
+                            if (i > 0) {
+                                pdf.addPage();
+                            }
+                            pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                        }
+
+                        window.open(pdf.output('bloburl'));
+                        onHide('displayPDF');
+                        setIsLoading(false);
+                    });
+                    // window.open(pdf.output('bloburl'));
+                    // onHide('displayPDF');
+                    // setIsLoading(false);
                 });
+                // pdf.addPage();
+
+                
             });
             
         } catch (err){
@@ -2511,58 +2554,86 @@ export default function FieldInspectionReport() {
                         </div>
 
                         <div id="toPdfSummary" className="p-grid p-fluid">
-                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-table">
+                            <div className="p-col-12">
+                                <h2><b>SUMMARY</b></h2>
                                 <ul>
-                                    <h4><li> <b>Good</b>
+                                    <li><b>Good</b>
                                         <ul>
                                             {
-                                                Object.entries(goodSummary).map(([key, val]) => 
-                                                    // <li key={key}>{key}: {val}</li>
-                                                    <h5><li key={key}><b>{key}</b>
+                                                goodSummary === undefined ? '' :
+                                                Object.entries(goodSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
                                                         <ul>
-                                                        <h5><li><b>{val+','}</b></li></h5>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
                                                         </ul>
-                                                    </li></h5>
+                                                    </li>
                                                 )
                                             }
                                         </ul>
-                                    </li></h4> 
+                                    </li>
                                 </ul>
                                 <ul>
-                                    <h4><li> <b>Fair</b>
+                                    <li><b>Fair</b>
                                         <ul>
                                             {
-                                                Object.entries(fairSummary).map(([key, val]) => 
-                                                    // <li key={key}>{key}: {val}</li>
-                                                    <h5><li key={key}><b>{key}</b>
+                                                fairSummary === undefined ? '' :
+                                                Object.entries(fairSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
                                                         <ul>
-                                                        <h5><li><b>{val+','}</b></li></h5>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
                                                         </ul>
-                                                    </li></h5>
+                                                    </li>
                                                 )
                                             }
                                         </ul>
-                                    </li></h4> 
+                                    </li>
                                 </ul>
                                 <ul>
-                                    <h4><li> <b>Poor</b>
+                                    <li><b>Poor</b>
                                         <ul>
                                             {
-                                                Object.entries(poorSummary).map(([key, val]) => 
-                                                    // <li key={key}>{key}: {val}</li>
-                                                    <h5><li key={key}><b>{key}</b>
+                                                poorSummary === undefined ? '' :
+                                                Object.entries(poorSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
                                                         <ul>
-                                                        <h5><li><b>{val+','}</b></li></h5>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
                                                         </ul>
-                                                    </li></h5>
+                                                    </li>
                                                 )
                                             }
                                         </ul>
-                                    </li></h4> 
+                                    </li>
                                 </ul>
                             </div>
+                        </div>
 
-
+                        <div id="toPdfImage" className="p-col-12">
+                            <div className="p-grid p-fluid">
+                                {
+                                    reportImage.map((x, index) =>
+                                            <div className="p-col-4" key={index}>
+                                                <div className="p-grid p-fluid">
+                                                    <center><img src={process.env.REACT_APP_SERVER_NAME + x.image.substring(1)} alt="" style={{width:'320px', height: '230px'}}/><br></br></center>
+                                                </div>
+                                            </div>
+                                    )
+                                }
+                            </div>
                         </div>
                         <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
                             <ProgressSpinner />
