@@ -7,8 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 import requests
 
-from gps.serializer import GpsRecordSerializer
-from gps.models import GPS
+from gps.models import GPS, Record
 
 url = "https://www.gps51.com:8443"
 #url = "http://localhost:4444"
@@ -27,7 +26,6 @@ pars = {"username":"swseansw"}
 resp = requests.post(url+"/webapi?action=querymonitorlist&token="+token, data=pars)
 
 res = resp.json()
-
 # pars = '{"deviceid":"19171897963"}'
 # resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
 # resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
@@ -36,60 +34,59 @@ res = resp.json()
 # print(f'odb: {records_obd["record"]}')
 # print(" ")
 # print(f'mileage: {records_mileage["records"]}')
+devices = GPS.objects.all()
 
-for group in res["groups"]:
-        if "devices" in group:
-                for device in group["devices"]:
-                        print(device["deviceid"])
-                        pars = '{"devices":["'+device["deviceid"]+'"]}'
-                                                
-                        resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
-                        resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
-                        records_obd = resp_odb.json()
-                        records_mileage = resp_mileage.json()
-                        print(f'odb: {records_obd["record"]}')
-                        print(" ")
-                        print(f'mileage: {records_mileage["records"]}')
-                        recordobd = records_obd["record"]
-                        recordmileage = records_obd["record"]
+for device in devices:
+    
+    print(device.device_id)
+    
+    pars = '{"deviceid":"'+device.device_id+'"}'                        
+    resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
+    resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
+    records_obd = resp_odb.json()
+    records_mileage = resp_mileage.json()
+    recordobd = records_obd['record']
+    recordmileage = records_mileage['records'][0]
+    print(recordobd)
+    print("")
+    print(recordmileage)
+    if recordobd:
+        record_data = {
+            'obedrecord_id': recordobd['obdrecordid'],
+            'device_id': device,
+            # 'updatetime': recordobd['updatetime'],
+            'mileage': recordobd['mileage'],
+            'gasolineconsumptionperhour': recordobd['gasolineconsumptionperhour'],
+            'gasolineconsumptionperhunkm': recordobd['gasolineconsumptionperhunkm'],
+            'overloadcalculate': recordobd['overloadcalculate'],
+            'coolanttemperature': recordobd['coolanttemperature'],
+            'oilpressure': recordobd['oilpressure'],
+            'inletbranchpressure': recordobd['inletbranchpressure'],
+            'inlettemperature': recordobd['inlettemperature'],
+            'airmassflow': recordobd['airmassflow'],
+            'throttleposition': recordobd['throttleposition'],
+            'oilvalue': recordobd['oilvalue'],
+            # 'faultcodetime': recordobd['faultcodetime'],
+            # 'faultcodes': recordobd['faultcodes'],
+            'totaldistance': recordobd['totaldistance'],
 
-                        if recordobd:
-                            record_data = {
-                                'obdrecordid': recordobd.obdrecordid,
-                                'deviceid': recordobd.deviceid,
-                                'updatetime': recordobd.updatetime,
-                                'mileage': recordobd.mileage,
-                                'gasolineconsumptionperhour': recordobd.gasolineconsumptionperhour,
-                                'gasolineconsumptionperhunkm': recordobd.gasolineconsumptionperhunkm,
-                                'overloaalculate': recordobd.overloaalculate,
-                                'coolanttemperature': recordobd.coolanttemperature,
-                                'oilpressure': recordobd.oilpressure,
-                                'inletbranchpressure': recordobd.inletbranchpressure,
-                                'inttemperature': recordobd.inttemperature,
-                                'airmassflow': recordobd.airmassflow,
-                                'throttleposition': recordobd.throttleposition,
-                                'oilvalue': recordobd.oilvalue,
-                                'faultcodeti': recordobd.faultcodeti,
-                                'faultcodes': recordobd.faultcodes,
-                                'totaldistance': recordobd.totaldistance,
+            # === MILEAGE === 
 
-                                # === MILEAGE === 
-
-                                'statisticsday': recordmileage.statisticsday,
-                                'beginoil': recordmileage.beginoil,
-                                'endoil': recordmileage.endoil,
-                                'addoil': recordmileage.addoil,
-                                'leakoil': recordmileage.leakoil,
-                                'idleoil': recordmileage.idleoil,
-                                'totaloil': recordmileage.totaloil,
-                                'totalnotrunningad': recordmileage.totalnotrunningad,
-                                'beginnotrunningad': recordmileage.beginnotrunningad,
-                                'endnotrunningad': recordmileage.endnotrunningad,
-                                'addnotrunningad': recordmileage.addnotrunningad,
-                                'leaknotrunningad': recordmileage.leaknotrunningad,
-                                'idlenotrunningad': recordmileage.idlenotrunningad,
-                            }
-                                    
-                            serializer = GpsRecordSerializer(data=record_data)
-                            if serializer.is_valid(raise_exception=True):
-                                serializer.save()
+            'statisticsday': recordmileage['statisticsday'],
+            'beginoil': recordmileage['beginoil'],
+            'endoil': recordmileage['endoil'],
+            'addoil': recordmileage['addoil'],
+            'leakoil': recordmileage['leakoil'],
+            'idleoil': recordmileage['idleoil'],
+            'totaloil': recordmileage['totaloil'],
+            'totalnotrunningad': recordmileage['totalnotrunningad'],
+            'beginnotrunningad': recordmileage['beginnotrunningad'],
+            'endnotrunningad': recordmileage['endnotrunningad'],
+            'addnotrunningad': recordmileage['addnotrunningad'],
+            'leaknotrunningad': recordmileage['leaknotrunningad'],
+            'idlenotrunningad': recordmileage['idlenotrunningad'],
+        }
+        try:
+            Record.objects.create(**record_data) 
+        except Exception as e:
+            raise e

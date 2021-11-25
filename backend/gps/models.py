@@ -1,6 +1,9 @@
+from datetime import datetime
+
+from car.models import Car
 from django.db import models
 from django.db.models.fields import AutoField
-from car.models import Car
+
 
 # Create your models here.
 class GPS(models.Model):
@@ -23,20 +26,20 @@ class Record(models.Model):
     mileage = models.CharField(max_length=20, null=True, blank=True)
     gasolineconsumptionperhour = models.FloatField(default=0)
     gasolineconsumptionperhunkm = models.FloatField(default=0)
-    overloaalculate = models.IntegerField(default=0)
+    overloadcalculate = models.IntegerField(default=0)
     coolanttemperature = models.IntegerField(default=0)
     oilpressure = models.IntegerField(default=0)
     inletbranchpressure = models.IntegerField(default=0)
-    inttemperature = models.IntegerField(default=0)
+    inlettemperature = models.IntegerField(default=0)
     airmassflow = models.IntegerField(default=0)
     throttleposition = models.IntegerField(default=0)
     oilvalue = models.IntegerField(default=0)
-    faultcodeti = models.IntegerField(default=0)
+    faultcodetime = models.IntegerField(default=0)
     faultcodes = models.IntegerField(default=0)
     totaldistance = models.IntegerField(default=0)
 
     # === MILEAGE ===
-    statisticsday = models.DateTimeField(blank=True, null=True)
+    statisticsday = models.DateField(blank=True, null=True)
     beginoil = models.IntegerField(default=0)
     endoil = models.IntegerField(default=0)
     addoil = models.IntegerField(default=0)
