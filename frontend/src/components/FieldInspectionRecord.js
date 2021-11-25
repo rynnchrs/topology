@@ -40,7 +40,12 @@ export default function FieldInspectionReport() {
 
     const [fieldInspectionRecordList, setFieldInspectionRecordList] = useState([]);
     const [flagFieldInspectionRecordList, setFlagFieldInspectionRecordList] = useState(false);
+    const [flagFieldInspectionRecordListPDF, setFlagFieldInspectionRecordListPDF] = useState(false);
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
+    const [fieldInspectionRecordDetailsPDF, setFieldInspectionRecordDetailsPDF] = useState([]);
+    const [goodSummary, setGoodSummary] = useState([]);
+    const [fairSummary, setFairSummary] = useState([]);
+    const [poorSummary, setPoorSummary] = useState([]);
     const [delFieldInspectionID, setDelFieldInspectionID] = useState('');
     const [delFieldInspectionJobNo, setDelFieldInspectionJobNo] = useState('');
     const [flagFieldInspectionRecordMethod, setFlagFieldInspectionRecordMethod] = useState('');
@@ -203,9 +208,21 @@ export default function FieldInspectionReport() {
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
-        flagFieldInspectionRecordList ? assignFieldInspectionRecordEdit(fieldInspectionRecordDetails) : '';
+        if (flagFieldInspectionRecordList) {
+            assignFieldInspectionRecordEdit(fieldInspectionRecordDetails); 
+            setFieldInspectionRecordDetailsPDF(fieldInspectionRecordDetailsPDF);
+            setGoodSummary(fieldInspectionRecordDetailsPDF.summary.good);
+            setFairSummary(fieldInspectionRecordDetailsPDF.summary.fair);
+            setPoorSummary(fieldInspectionRecordDetailsPDF.summary.poor);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flagFieldInspectionRecordList]);
+
+    // useEffect(() => {
+    //     /* eslint-disable no-unused-expressions */
+    //     flagFieldInspectionRecordListPDF ? assignFieldInspectionRecordEditPDF(fieldInspectionRecordDetails) : '';
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [flagFieldInspectionRecordListPDF]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,7 +337,7 @@ export default function FieldInspectionReport() {
         setEmailSelect(emailSelect => [...emailSelect, value]);
     }
 
-    const getFieldInspectionRecordDetails = (value) => {
+    const getFieldInspectionRecordDetails = (value, mode) => {
         setIsLoading(true);
         let token = localStorage.getItem("token");
         const config = {
@@ -330,10 +347,15 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/', config)
+        if (mode === 'pdf') {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/', config)
             .then((res) => {
                 setFieldInspectionRecordDetails(res.data);
-                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
+                .then((res) => {
+                    setFieldInspectionRecordDetailsPDF(res.data);
+                    console.log("respdf: ", res.data)
+                    axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagFieldInspectionRecordList(true);
@@ -341,14 +363,45 @@ export default function FieldInspectionReport() {
                     })
                     .catch((err) => {
                         setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
                     });
+                })
+                .catch((err) => {
+                    setIsLoading(false);
+                    toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+                });
             })
             .catch((err) => {
                 setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
             });
+
+        } else {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/', config)
+            .then((res) => {
+                setFieldInspectionRecordDetails(res.data);
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+                .then((res) => {
+                    setReportImage(res.data);
+                    setFlagFieldInspectionRecordList(true);
+                    flagFieldInspectionRecordList ? setIsLoading(false) : '';
+                })
+                .catch((err) => {
+                    setIsLoading(false);
+                    toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+                });
+            })
+            .catch((err) => {
+                setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+            });
+        }
+
+        
     }
 
     const assignFieldInspectionRecordEdit = (value) => {
+        console.log("pdfdata: ", fieldInspectionRecordDetailsPDF);
         try {
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);
@@ -526,17 +579,242 @@ export default function FieldInspectionReport() {
             }, 1500);
 
         } catch(err) {
-
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+            console.log(err)
         }
     }
+
+    // const getFieldInspectionRecordDetailsPDF = (value) => {
+    //     console.log("im in pdf: ", value)
+    //     setIsLoading(true);
+    //     let token = localStorage.getItem("token");
+    //     const config = {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + token,
+    //         },
+    //     };
+
+    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
+    //         .then((res) => {
+    //             setFieldInspectionRecordDetails(res.data);
+    //             axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+    //                 .then((res) => {
+    //                     setReportImage(res.data);
+    //                     setFlagFieldInspectionRecordListPDF(true);
+    //                     flagFieldInspectionRecordListPDF ? setIsLoading(false) : '';
+    //                 })
+    //                 .catch((err) => {
+    //                     setIsLoading(false);
+    //                     toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+    //                 });
+    //         })
+    //         .catch((err) => {
+    //             setIsLoading(false);
+    //             toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+    //         });
+    // }
+
+    // const assignFieldInspectionRecordEditPDF = (value) => {
+    //     console.log(value);
+    //     try {
+    //         setFieldInspectionID(value.fi_report_id);
+    //         setFieldInspectionTaskID(value.task);
+    //         setFieldInspectionJobID(value.job_order);
+    //         console.log('inspdate: ', value.inspection_date);
+    //         console.log(value.inspection_date);
+    //         console.log(value.job_order);
+    //         Object.keys(value).filter(f => f === "inspection_date").map(x => {
+                
+    //             let dtx = value[x];
+    //             console.log("x: ", dtx);
+    //             console.log("xgmt: ", convertDatetoGMT(dtx));
+    //             onChangeValue('f0', convertDatetoGMT(dtx));
+                
+    //         })
+            
+
+    //         setYear(value.body_no.release_year);
+    //         setMake(value.body_no.brand);
+    //         setModel(value.body_no.make);
+
+    //         // onChangeValue('f1', value.mileage);
+
+    //         setBodyNo(value.body_no.body_no);
+
+    //         // onChangeValue('f2', value.body_style);
+
+    //         setTransmission(value.body_no.transmission);
+    //         setEngine(value.body_no.cylinder + " cylinder");
+
+    //         // onChangeValue('f3', value.drive_type);
+    //         // setInspector("");
+    //         setLocation(value.body_no.current_loc);
+    //         setExteriorColor(value.body_no.color);
+
+    //         // onChangeValue('f4', value.door_count);
+
+    //         setCondition(conditionOptions.find(x => x.name === value.operational));
+    //         let i;
+
+    //         arrExterior = exterior.slice();
+    //         let syntaxExterior = ["hood", "front", "front_bumper", "fenders", "doors", "roof", "rear", "rear_bumper", "trunk", "trim", "fuel_door", "pait_condition"];
+    //         // let syntaxExteriorNote = ["hood_note", "front_note", "front_bumper_note", "fenders_note", "doors_note", "roof_note", "rear_note", "rear_bumper_note", "trunk_note", "trim_note", "fuel_door_note", "pait_condition_note"];
+    //         for (i = 0; i < syntaxExterior.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrExterior[i] = {...arrExterior[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrExterior[i] = {...arrExterior[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrExterior[i] = {...arrExterior[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrExterior[i] = {...arrExterior[i], notes: value[syntaxExteriorNote[i]] === null ? "" : value[syntaxExteriorNote[i]]};
+    //                 setExterior(arrExterior);
+    //             })
+    //         }
+
+    //         arrGlass = glass.slice();
+    //         let syntaxGlass = ["windshield", "windows", "mirrors", "rear_window"];
+    //         // let syntaxGlassNote = ["windshield_note", "windows_note", "mirrors_note", "rear_window_note"];
+    //         for (i = 0; i < syntaxGlass.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxGlass[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrGlass[i] = {...arrGlass[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrGlass[i] = {...arrGlass[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrGlass[i] = {...arrGlass[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrGlass[i] = {...arrGlass[i], notes: value[syntaxGlassNote[i]] === null ? "" : value[syntaxGlassNote[i]]};
+    //                 setGlass(arrGlass);
+    //             })
+    //         }
+
+    //         arrTiresWheels = tiresWheels.slice();
+    //         let syntaxTiresWheels = ["tires_condition", "wheels_condition", "spare_tire"];
+    //         // let syntaxTiresWheelsNote = ["tires_condition_note", "wheels_condition_note", "spare_tire_note"];
+    //         for (i = 0; i < syntaxTiresWheels.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxTiresWheels[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrTiresWheels[i] = {...arrTiresWheels[i], notes: value[syntaxTiresWheelsNote[i]] === null ? "" : value[syntaxTiresWheelsNote[i]]};
+    //                 setTiresWheels(arrTiresWheels);
+    //             })
+    //         }
+
+    //         arrUnderBody = underbody.slice();
+    //         let syntaxUnderBody = ["frame", "exhaust_system", "transmission", "drive_axle", "suspension", "breake_system"];
+    //         // let syntaxUnderBodyNote = ["frame_note", "exhaust_system_note", "transmission_note", "drive_axle_note", "suspension_note", "breake_system_note"];
+    //         for (i = 0; i < syntaxUnderBody.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxUnderBody[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrUnderBody[i] = {...arrUnderBody[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrUnderBody[i] = {...arrUnderBody[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrUnderBody[i] = {...arrUnderBody[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrUnderBody[i] = {...arrUnderBody[i], notes: value[syntaxUnderBodyNote[i]] === null ? "" : value[syntaxUnderBodyNote[i]]};
+    //                 setUnderbody(arrUnderBody);
+    //             })
+    //         }
+
+    //         arrUnderHood = underhood.slice();
+    //         let syntaxUnderHood = ["engine_compartment", "battery", "oil", "fluids", "wiring", "belts", "hoses", "non_stock_modif"];
+    //         // let syntaxUnderHoodNote = ["engine_compartment_note", "battery_note", "oil_note", "fluids_note", "wiring_note", "belts_note", "hoses_note", "non_stock_modif_note"];
+    //         for (i = 0; i < syntaxUnderHood.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxUnderHood[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrUnderHood[i] = {...arrUnderHood[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrUnderHood[i] = {...arrUnderHood[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrUnderHood[i] = {...arrUnderHood[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrUnderHood[i] = {...arrUnderHood[i], notes: value[syntaxUnderHoodNote[i]] === null ? "" : value[syntaxUnderHoodNote[i]]};
+    //                 setUnderhood(arrUnderHood);
+    //             })
+    //         }
+
+    //         arrInterior = interior.slice();
+    //         let syntaxInterior = ["seats", "headliner", "carpet", "door_panels", "glove_box", "vanity_mirrors", "interioir_trim", "dashboard", "dashboard_gauges", "air_conditioning", "heater", "defroster"];
+    //         // let syntaxInteriorNote = ["seats_note", "headliner_note", "carpet_note", "door_panels_note", "glove_box_note", "vanity_mirrors_note", "interioir_trim_note", "dashboard_note", "dashboard_gauges_note", "air_conditioning_note", "heater_note", "defroster_note"];
+    //         for (i = 0; i < syntaxInterior.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxInterior[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrInterior[i] = {...arrInterior[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrInterior[i] = {...arrInterior[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrInterior[i] = {...arrInterior[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrInterior[i] = {...arrInterior[i], notes: value[syntaxInteriorNote[i]] === null ? "" : value[syntaxInteriorNote[i]]};
+    //                 setInterior(arrInterior);
+    //             })
+    //         }
+
+    //         arrElectricalSystem = electricalSystem.slice();
+    //         let syntaxElectricalSystem = ["power_locks", "power_seats", "power_steering", "power_windows", "power_mirrors", "audio_system", "onboard_computer", "headlights", "taillights", "signal_lights", "brake_lights", "parking_lights"];
+    //         // let syntaxElectricalSystemNote = ["power_locks_note", "power_seats_note", "power_steering_note", "power_windows_note", "power_mirrors_note", "audio_system_note", "onboard_computer_note", "headlights_note", "taillights_note", "signal_lights_note", "brake_lights_note", "parking_lights_note"];
+    //         for (i = 0; i < syntaxElectricalSystem.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxElectricalSystem[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrElectricalSystem[i] = {...arrElectricalSystem[i], notes: value[syntaxElectricalSystemNote[i]] === null ? "" : value[syntaxElectricalSystemNote[i]]};
+    //                 setElectricalSystem(arrElectricalSystem);
+    //             })
+    //         }
+
+    //         arrRoadTestFindings= roadTestFindings.slice();
+    //         let syntaxRoadTestFindings = ["starting", "idling", "engine_performance", "acceleration", "trans_shift_quality", "steering", "braking", "suspension_performance"];
+    //         // let syntaxRoadTestFindingsNote = ["starting_note", "idling_note", "engine_performance_note", "acceleration_note", "trans_shift_quality_note", "steering_note", "braking_note", "suspension_performance_note"];
+    //         for (i= 0; i < syntaxRoadTestFindings.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxRoadTestFindings[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrRoadTestFindings[i] = {...arrRoadTestFindings[i], notes: value[syntaxRoadTestFindingsNote[i]] === null ? "" : value[syntaxRoadTestFindingsNote[i]]};
+    //                 setRoadTestFindings(arrRoadTestFindings);
+    //             })
+    //         }
+
+    //         setTimeout(() => {
+    //             onClick('displayPDF');
+    //             convertPDF();
+    //         }, 1500);
+
+    //     } catch(err) {
+    //         setIsLoading(false);
+    //         toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+    //         console.log(err)
+    //     }
+    // }
 
     const convertPDF = () => {
         try {
             var quotes = document.getElementById('toPdf');
+            var quotes1 = document.getElementById('toPdfSummary');
+            var pdf = new jsPDF('p', 'pt', 'letter');
 
             html2canvas(quotes)
             .then((canvas) => {
-                var pdf = new jsPDF('p', 'pt', 'letter');
+                // var pdf = new jsPDF('p', 'pt', 'letter');
 
                 var srcImg  = canvas;
                 var sX      = 0;
@@ -564,12 +842,50 @@ export default function FieldInspectionReport() {
                     }
                     pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
                 }
-                window.open(pdf.output('bloburl'));
-                onHide('displayPDF');
-                setIsLoading(false);
-            });
-        } catch (err){
+                pdf.addPage();
+                
+                // window.open(pdf.output('bloburl'));
+                // onHide('displayPDF');
+                // setIsLoading(false);
+                html2canvas(quotes1)
+                .then((canvas) => {
+                    // var pdf = new jsPDF('p', 'pt', 'letter');
 
+                    var srcImg  = canvas;
+                    var sX      = 0;
+                    var sY      = 0; // start 980 pixels down for every new page
+                    var sWidth  = 1075;
+                    var sHeight = 1100;
+                    var dX      = 0;
+                    var dY      = 0;
+                    var dWidth  = 900;
+                    var dHeight = 1100;
+
+                    for (var i = 0; i < quotes1.clientHeight/1100; i++) {
+                        sY = 1100*i;
+                        var onePageCanvas = document.createElement("canvas");
+                        onePageCanvas.setAttribute('width', 900);
+                        onePageCanvas.setAttribute('height', 1100);
+                        var ctx = onePageCanvas.getContext('2d');
+                        ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                        var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                        var width         = onePageCanvas.width;
+                        var height        = onePageCanvas.clientHeight;
+
+                        if (i > 0) {
+                            pdf.addPage();
+                        }
+                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                    }
+                    window.open(pdf.output('bloburl'));
+                    onHide('displayPDF');
+                    setIsLoading(false);
+                });
+            });
+            
+        } catch (err){
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         }
     }
 
@@ -604,7 +920,7 @@ export default function FieldInspectionReport() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ fieldInspectionID +'/?mode=fi&id=' + holdImageID, config)
             .then((res) => {
-                getFieldInspectionRecordDetails(fieldInspectionID);
+                getFieldInspectionRecordDetails(fieldInspectionID, '');
                 setMessage({title:"DELETE", content:"Successfully deleted."});
                 onHide('displayConfirmDeleteImage');
                 onClick('displayMessage');
@@ -1072,6 +1388,7 @@ export default function FieldInspectionReport() {
         })
         .catch((err) => {
             setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         })
     }
 
@@ -1092,6 +1409,7 @@ export default function FieldInspectionReport() {
         if (emailMode === 'bulk') {
             axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/bulk/', {
                 "fi_report_id": "",
+                "body": emailBody,
                 "email": sendEmailList
             }, config)
             .then((res) => {
@@ -1103,10 +1421,12 @@ export default function FieldInspectionReport() {
             })
             .catch((err) => {
                 setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
             })
         } else {
             axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/', {
                 "fi_report_id": emailReportID,
+                "body": emailBody,
                 "email": sendEmailList
             }, config)
             .then((res) => {
@@ -1118,6 +1438,7 @@ export default function FieldInspectionReport() {
             })
             .catch((err) => {
                 setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
             })
         }
     }
@@ -1202,8 +1523,8 @@ export default function FieldInspectionReport() {
             onClick('displayMessage');
         })
         .catch((err) => {
-            toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
             setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         });
     }
 
@@ -1504,10 +1825,10 @@ export default function FieldInspectionReport() {
         return (
             <div>
                 <center>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id, '')}/>
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
                     {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id, 'pdf')}}/>
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailReportID(rowData.fi_report_id); onClick('displayEmail')}}/>
                 </center>
             </div>
@@ -2188,6 +2509,61 @@ export default function FieldInspectionReport() {
                             </div>
                         </div>
                         </div>
+
+                        <div id="toPdfSummary" className="p-grid p-fluid">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 repair-table">
+                                <ul>
+                                    <h4><li> <b>Good</b>
+                                        <ul>
+                                            {
+                                                Object.entries(goodSummary).map(([key, val]) => 
+                                                    // <li key={key}>{key}: {val}</li>
+                                                    <h5><li key={key}><b>{key}</b>
+                                                        <ul>
+                                                        <h5><li><b>{val+','}</b></li></h5>
+                                                        </ul>
+                                                    </li></h5>
+                                                )
+                                            }
+                                        </ul>
+                                    </li></h4> 
+                                </ul>
+                                <ul>
+                                    <h4><li> <b>Fair</b>
+                                        <ul>
+                                            {
+                                                Object.entries(fairSummary).map(([key, val]) => 
+                                                    // <li key={key}>{key}: {val}</li>
+                                                    <h5><li key={key}><b>{key}</b>
+                                                        <ul>
+                                                        <h5><li><b>{val+','}</b></li></h5>
+                                                        </ul>
+                                                    </li></h5>
+                                                )
+                                            }
+                                        </ul>
+                                    </li></h4> 
+                                </ul>
+                                <ul>
+                                    <h4><li> <b>Poor</b>
+                                        <ul>
+                                            {
+                                                Object.entries(poorSummary).map(([key, val]) => 
+                                                    // <li key={key}>{key}: {val}</li>
+                                                    <h5><li key={key}><b>{key}</b>
+                                                        <ul>
+                                                        <h5><li><b>{val+','}</b></li></h5>
+                                                        </ul>
+                                                    </li></h5>
+                                                )
+                                            }
+                                        </ul>
+                                    </li></h4> 
+                                </ul>
+                            </div>
+
+
+                        </div>
                         <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
                             <ProgressSpinner />
                         </div>
@@ -2231,7 +2607,7 @@ export default function FieldInspectionReport() {
                             </DataTable>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                            <InputTextarea placeholder="Imput Email Message" rows={5} cols={30} autoResize
+                            <InputTextarea placeholder="Input Email Message" rows={5} cols={30} autoResize
                             value={emailBody} onChange={(e) => setEmailBody(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
