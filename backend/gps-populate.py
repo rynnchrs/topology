@@ -1,7 +1,11 @@
+import os
 from datetime import datetime
 
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
 import requests
-from backend.gps.serializer import GpsRecordSerializer
 
 from gps.models import GPS
 
@@ -36,6 +40,10 @@ for group in res["groups"]:
         if "devices" in group:
                 for device in group["devices"]:
                         print(device["deviceid"])
-                        GPS.object.create(
-                            device_id = device["deviceid"]
-                        )
+                        try:
+                                GPS.objects.create(
+                                device_id = device["deviceid"]
+                                )
+                        except Exception as e:
+                                print("Oops!", e.__class__, "occurred.")
+

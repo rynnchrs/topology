@@ -1,8 +1,13 @@
+import os
 from datetime import datetime
 
-import requests
-from backend.gps.serializer import GpsRecordSerializer
+import django
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+import requests
+
+from gps.serializer import GpsRecordSerializer
 from gps.models import GPS
 
 url = "https://www.gps51.com:8443"
@@ -48,43 +53,43 @@ for group in res["groups"]:
                         recordobd = records_obd["record"]
                         recordmileage = records_obd["record"]
 
-                        record_data = {
-                            'obdrecordid': recordobd.obdrecordid,
-                            'deviceid': recordobd.deviceid,
-                            'updatetime': recordobd.updatetime,
-                            'mileage': recordobd.mileage,
-                            'gasolineconsumptionperhour': recordobd.gasolineconsumptionperhour,
-                            'gasolineconsumptionperhunkm': recordobd.gasolineconsumptionperhunkm,
-                            'overloaalculate': recordobd.overloaalculate,
-                            'coolanttemperature': recordobd.coolanttemperature,
-                            'oilpressure': recordobd.oilpressure,
-                            'inletbranchpressure': recordobd.inletbranchpressure,
-                            'inttemperature': recordobd.inttemperature,
-                            'airmassflow': recordobd.airmassflow,
-                            'throttleposition': recordobd.throttleposition,
-                            'oilvalue': recordobd.oilvalue,
-                            'faultcodeti': recordobd.faultcodeti,
-                            'faultcodes': recordobd.faultcodes,
-                            'totaldistance': recordobd.totaldistance,
-
-                            # === MILEAGE === 
-
-                            'statisticsday': recordmileage.statisticsday,
-                            'beginoil': recordmileage.beginoil,
-                            'endoil': recordmileage.endoil,
-                            'addoil': recordmileage.addoil,
-                            'leakoil': recordmileage.leakoil,
-                            'idleoil': recordmileage.idleoil,
-                            'totaloil': recordmileage.totaloil,
-                            'totalnotrunningad': recordmileage.totalnotrunningad,
-                            'beginnotrunningad': recordmileage.beginnotrunningad,
-                            'endnotrunningad': recordmileage.endnotrunningad,
-                            'addnotrunningad': recordmileage.addnotrunningad,
-                            'leaknotrunningad': recordmileage.leaknotrunningad,
-                            'idlenotrunningad': recordmileage.idlenotrunningad,
-                        }
-                                
                         if recordobd:
+                            record_data = {
+                                'obdrecordid': recordobd.obdrecordid,
+                                'deviceid': recordobd.deviceid,
+                                'updatetime': recordobd.updatetime,
+                                'mileage': recordobd.mileage,
+                                'gasolineconsumptionperhour': recordobd.gasolineconsumptionperhour,
+                                'gasolineconsumptionperhunkm': recordobd.gasolineconsumptionperhunkm,
+                                'overloaalculate': recordobd.overloaalculate,
+                                'coolanttemperature': recordobd.coolanttemperature,
+                                'oilpressure': recordobd.oilpressure,
+                                'inletbranchpressure': recordobd.inletbranchpressure,
+                                'inttemperature': recordobd.inttemperature,
+                                'airmassflow': recordobd.airmassflow,
+                                'throttleposition': recordobd.throttleposition,
+                                'oilvalue': recordobd.oilvalue,
+                                'faultcodeti': recordobd.faultcodeti,
+                                'faultcodes': recordobd.faultcodes,
+                                'totaldistance': recordobd.totaldistance,
+
+                                # === MILEAGE === 
+
+                                'statisticsday': recordmileage.statisticsday,
+                                'beginoil': recordmileage.beginoil,
+                                'endoil': recordmileage.endoil,
+                                'addoil': recordmileage.addoil,
+                                'leakoil': recordmileage.leakoil,
+                                'idleoil': recordmileage.idleoil,
+                                'totaloil': recordmileage.totaloil,
+                                'totalnotrunningad': recordmileage.totalnotrunningad,
+                                'beginnotrunningad': recordmileage.beginnotrunningad,
+                                'endnotrunningad': recordmileage.endnotrunningad,
+                                'addnotrunningad': recordmileage.addnotrunningad,
+                                'leaknotrunningad': recordmileage.leaknotrunningad,
+                                'idlenotrunningad': recordmileage.idlenotrunningad,
+                            }
+                                    
                             serializer = GpsRecordSerializer(data=record_data)
                             if serializer.is_valid(raise_exception=True):
                                 serializer.save()

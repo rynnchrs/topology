@@ -12,7 +12,7 @@ class GPS(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.deviced_id
+        return self.device_id
 
 class Record(models.Model):
     # === OBD ===
