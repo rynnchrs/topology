@@ -23,10 +23,11 @@ class PDFtoEmail(viewsets.ViewSet):
             queryset = FieldInspection.objects.all()
             inspection = get_object_or_404(queryset, pk=request.data['fi_report_id'])
             subject =  f"Inspection Report for {inspection.body_no.body_no}"
-            body = f"{request.data['body']} \n\n http://localhost:3000/#/pdfget/?id={inspection}"
+            body = f"{request.data['body']}<br><br>Please see the attached url.<br>http://localhost:3000/#/pdfget/?id={inspection}"
             to = request.data['email']
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
+                email.content_subtype = "html"
                 email.send()
             except:
                 return Response("Failed", status=status.HTTP_400_BAD_REQUEST)
@@ -44,15 +45,17 @@ class PDFtoEmail(viewsets.ViewSet):
         if serializer.is_valid(raise_exception=True):
             subject =  "Inspection Report for"
 
-            body = f"{request.data['body']} \n\n"
+            body =  f"{request.data['body']}<br><br>"
+            body += "Please see the attached url.<br>"
             to = request.data['email']
 
             for report in reports:
                 subject += f' {report.body_no.body_no},'
-                body += f'http://localhost:3000/#/pdfget/?id={report}\n'
+                body += f'http://localhost:3000/#/pdfget/?id={report}<br>'
             subject = subject[:-1] + '.'
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
+                email.content_subtype = "html"
                 email.send()
             except:
                 return Response("Failed", status=status.HTTP_400_BAD_REQUEST)
