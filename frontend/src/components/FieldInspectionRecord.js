@@ -213,7 +213,6 @@ export default function FieldInspectionReport() {
             setFieldInspectionRecordDetailsPDF(fieldInspectionRecordDetailsPDF);
             if (flagFieldInspectionRecordMethod === 'pdf') {
                 setGoodSummary(fieldInspectionRecordDetailsPDF.summary.good);
-                console.log("nu: ", fieldInspectionRecordDetailsPDF.summary.good)
                 setFairSummary(fieldInspectionRecordDetailsPDF.summary.fair);
                 setPoorSummary(fieldInspectionRecordDetailsPDF.summary.poor);
             }
@@ -358,7 +357,6 @@ export default function FieldInspectionReport() {
                 axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
                 .then((res) => {
                     setFieldInspectionRecordDetailsPDF(res.data);
-                    console.log("respdf: ", res.data)
                     axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
                     .then((res) => {
                         setReportImage(res.data);
@@ -406,7 +404,6 @@ export default function FieldInspectionReport() {
     }
 
     const assignFieldInspectionRecordEdit = (value) => {
-        console.log("pdfdata: ", fieldInspectionRecordDetailsPDF);
         try {
             setFieldInspectionID(value.fi_report_id);
             setFieldInspectionTaskID(value.task);

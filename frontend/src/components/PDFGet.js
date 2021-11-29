@@ -19,6 +19,10 @@ export default function PDFget() {
 
     const [flagFieldInspectionRecordList, setFlagFieldInspectionRecordList] = useState(false);
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
+    const [fieldInspectionRecordDetailsPDF, setFieldInspectionRecordDetailsPDF] = useState([]);
+    const [goodSummary, setGoodSummary] = useState([]);
+    const [fairSummary, setFairSummary] = useState([]);
+    const [poorSummary, setPoorSummary] = useState([]);
 
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
@@ -152,7 +156,13 @@ export default function PDFget() {
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
-        flagFieldInspectionRecordList ? assignFieldInspectionRecordEdit(fieldInspectionRecordDetails) : '';
+        if (flagFieldInspectionRecordList) {
+            assignFieldInspectionRecordEdit(fieldInspectionRecordDetails); 
+            setFieldInspectionRecordDetailsPDF(fieldInspectionRecordDetailsPDF);
+            setGoodSummary(fieldInspectionRecordDetailsPDF.summary.good);
+            setFairSummary(fieldInspectionRecordDetailsPDF.summary.fair);
+            setPoorSummary(fieldInspectionRecordDetailsPDF.summary.poor);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flagFieldInspectionRecordList]);
 
@@ -225,7 +235,10 @@ export default function PDFget() {
             .then((res) => {
                 setFieldInspectionRecordDetails(res.data);
                 setHoldPDFName("field-inspection-report-" + res.data.body_no.body_no);
-                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
+                .then((res) => {
+                    setFieldInspectionRecordDetailsPDF(res.data);
+                    axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagFieldInspectionRecordList(true);
@@ -234,6 +247,11 @@ export default function PDFget() {
                     .catch((err) => {
                         setIsLoading(false);
                     });
+                })
+                .catch((err) => {
+                    setIsLoading(false);
+                    toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+                });
             })
             .catch((err) => {
                 setIsLoading(false);
@@ -421,10 +439,13 @@ export default function PDFget() {
     const convertPDF = () => {
         try {
             var quotes = document.getElementById('toPdf');
+            var quotes1 = document.getElementById('toPdfSummary');
+            var quotes2 = document.getElementById('toPdfImage');
+            var pdf = new jsPDF('p', 'pt', 'letter');
 
             html2canvas(quotes)
             .then((canvas) => {
-                var pdf = new jsPDF('p', 'pt', 'letter');
+                // var pdf = new jsPDF('p', 'pt', 'letter');
 
                 var srcImg  = canvas;
                 var sX      = 0;
@@ -452,17 +473,84 @@ export default function PDFget() {
                     }
                     pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
                 }
-                // window.open(pdf.output('bloburl'));
-                pdf.save(holdPDFName + ".pdf");
-                setTimeout(() => {
-                    onHide('displayPDF');
-                    setIsLoading(false);
-                    window.close();
-                }, 1000);
+                pdf.addPage();
+                
+                html2canvas(quotes1)
+                .then((canvas) => {
+                    // var pdf = new jsPDF('p', 'pt', 'letter');
+
+                    var srcImg  = canvas;
+                    var sX      = 0;
+                    var sY      = 0; // start 980 pixels down for every new page
+                    var sWidth  = 1075;
+                    var sHeight = 1100;
+                    var dX      = 0;
+                    var dY      = 0;
+                    var dWidth  = 900;
+                    var dHeight = 1100;
+
+                    for (var i = 0; i < quotes1.clientHeight/1100; i++) {
+                        sY = 1100*i;
+                        var onePageCanvas = document.createElement("canvas");
+                        onePageCanvas.setAttribute('width', 900);
+                        onePageCanvas.setAttribute('height', 1100);
+                        var ctx = onePageCanvas.getContext('2d');
+                        ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                        var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                        var width         = onePageCanvas.width;
+                        var height        = onePageCanvas.clientHeight;
+
+                        if (i > 0) {
+                            pdf.addPage();
+                        }
+                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                    }
+                    pdf.addPage();
+
+                    html2canvas(quotes2, {allowTaint: true, useCORS: true})
+                    .then((canvas) => {
+                        // var pdf = new jsPDF('p', 'pt', 'letter');
+
+                        var srcImg  = canvas;
+                        var sX      = 0;
+                        var sY      = 0; // start 980 pixels down for every new page
+                        var sWidth  = 1075;
+                        var sHeight = 1100;
+                        var dX      = 0;
+                        var dY      = 0;
+                        var dWidth  = 900;
+                        var dHeight = 1100;
+
+                        for (var i = 0; i < quotes2.clientHeight/1100; i++) {
+                            sY = 1100*i;
+                            var onePageCanvas = document.createElement("canvas");
+                            onePageCanvas.setAttribute('width', 900);
+                            onePageCanvas.setAttribute('height', 1100);
+                            var ctx = onePageCanvas.getContext('2d');
+                            ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                            var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                            var width         = onePageCanvas.width;
+                            var height        = onePageCanvas.clientHeight;
+
+                            if (i > 0) {
+                                pdf.addPage();
+                            }
+                            pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                        }
+                        pdf.save(holdPDFName + ".pdf");
+                        // window.open(pdf.output('bloburl'));
+                        setTimeout(() => {
+                            onHide('displayPDF');
+                            setIsLoading(false);
+                            window.close();
+                        }, 1000);
+                    });
+                });
             });
             
         } catch (err){
-
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         }
     }
 
@@ -659,7 +747,7 @@ export default function PDFget() {
             </div>
             
             <div className="p-grid p-fluid">
-                <div className="dialog-display-pdf" >
+            <div className="dialog-display-pdf" >
                     <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
                         <div id="toPdf" className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
@@ -949,6 +1037,89 @@ export default function PDFget() {
                                 </div>
                             </div>
                         </div>
+                        </div>
+
+                        <div id="toPdfSummary" className="p-grid p-fluid">
+                            <div className="p-col-12">
+                                <h2><b>SUMMARY</b></h2>
+                                <ul>
+                                    <li><b>Good</b>
+                                        <ul>
+                                            {
+                                                goodSummary === undefined ? '' :
+                                                Object.entries(goodSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
+                                                        <ul>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li><b>Fair</b>
+                                        <ul>
+                                            {
+                                                fairSummary === undefined ? '' :
+                                                Object.entries(fairSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
+                                                        <ul>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li><b>Poor</b>
+                                        <ul>
+                                            {
+                                                poorSummary === undefined ? '' :
+                                                Object.entries(poorSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
+                                                        <ul>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="toPdfImage" className="p-col-12">
+                            <div className="p-grid p-fluid">
+                                {
+                                    reportImage.map((x, index) =>
+                                            <div className="p-col-4" key={index}>
+                                                <div className="p-grid p-fluid">
+                                                    <center><img src={process.env.REACT_APP_SERVER_NAME + x.image.substring(1)} alt="" style={{width:'320px', height: '230px'}}/><br></br></center>
+                                                </div>
+                                            </div>
+                                    )
+                                }
+                            </div>
                         </div>
                         <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
                             <ProgressSpinner />
