@@ -181,6 +181,7 @@ const App = () => {
     // sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
     sidebarSubMenu4.push({label: 'Field Inspection Report', icon: 'pi pi-th-large', to: '/fieldinspectionreport'});
     sidebarSubMenu4.push({label: 'Field Inspection Record', icon: 'pi pi-th-large', to: '/fieldinspectionrecord'});
+    // sidebarSubMenu4.push({label: 'PDFGET', icon: 'pi pi-th-large', to: '/pdfget'});
     sidebarMenu.push({label: 'CSR Management', icon: 'pi pi-th-large', items: sidebarSubMenu4});
 
     const onInputStyleChange = (inputStyle) => {

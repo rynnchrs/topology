@@ -438,7 +438,7 @@ export const JobScheduling = () => {
             let f = v.fieldman.map((x) =>
                 x.field_man
             )
-            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFIELDMAN: " + f + "\nLOCATION: " + v.current_loc,
+            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_no + "\nFIELDMAN: " + f + "\nLOCATION: " + v.current_loc,
             "start": v.start_date, "end": String(endDate)}]);
         });
     }
@@ -580,7 +580,6 @@ export const JobScheduling = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
                 .then((res) => {
-                    console.log(res.data)
                     btnJobData(res.data);
                 })
                 .catch((err) => {
@@ -618,7 +617,6 @@ export const JobScheduling = () => {
     }
 
     const btnJobData = (value) => {
-        console.log(value)
         if (value !== null) {
             setJobData(value);
             if (value.task_status_fm === true && value.task_status_mn === true) {

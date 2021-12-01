@@ -343,6 +343,8 @@ export default function FieldInspectionReport() {
                 toast.current.show({ severity: 'error', summary: 'MILEAGE', detail: 'This field is required.', life: 3000 });
             } else if (doorCount === "") { 
                 toast.current.show({ severity: 'error', summary: 'DOOR COUNT', detail: 'This field is required.', life: 3000 });
+            } else if (refImageUpload.current.state.files.length > 12) { 
+                toast.current.show({ severity: 'error', summary: 'IMAGES', detail: 'Maximum images count is reached.', life: 3000 });
             } else {
                 setIsLoading(true);
                 let token = localStorage.getItem("token");
@@ -509,107 +511,64 @@ export default function FieldInspectionReport() {
                         submitFieldInspectionAfter();
                     })
                     .catch((err) => {
-
+                        setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                     });
                 } else {
-                       refImageUpload.current.state.files.map((f, index) => {
-                            // const image = resizeFile(f);
-                            // console.log("fileupload: ",image)
-                            formData.append("images[" + index + "]image", f);
+                    refImageUpload.current.state.files.map((f, index) => {
+                        //below code for not resizing before upload
+                        // formData.append("images[" + index + "]image", f);
+                        // axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                        // .then((res) => {
+                        //     submitFieldInspectionAfter();
+                        // })
+                        // .catch((err) => {
+                        //     setIsLoading(false);
+                        //     toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                        // });
 
-                            // console.log("f: ", f);
-                            // console.log("fblob: ", f.objectURL);
-                            // try {
-                            //     Resizer.imageFileResizer(
-                            //     f,
-                            //     300,
-                            //     300,
-                            //     "JPEG",
-                            //     100,
-                            //     0,
-                            //     (uri) => {
-                            //         console.log("uri: ", uri);
-                            //         console.log("bloburi: ", dataURItoBlob(uri));
-                            //         console.log("done1", index)
-                            //         formData.append("images[" + index + "]image", dataURItoBlob(uri));
+                        //below code is for resizing image before upload
+                        try {
+                            Resizer.imageFileResizer(
+                            f,
+                            1024,
+                            720,
+                            "JPEG",
+                            100,
+                            0,
+                            (uri) => {
+                                // console.log("uri: ", uri);
+                                // console.log("bloburi: ", dataURItoBlob(uri));
+                                // console.log("done1", index)
+                                let file = new File([dataURItoBlob(uri)], "name.jpg");
+                                // console.log("files: ", file)
+                                formData.append("images[" + index + "]image", file);
 
-                            //         if (refImageUpload.current.state.files.length == index + 1) {
-                            //             console.log("send request")
-                            //             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
-                            //                                 .then((res) => {
-                            //                                     submitFieldInspectionAfter();
-                            //                                 })
-                            //                                 .catch((err) => {
-                                        
-                            //                                 });
-                            //                                 }
-                            //     },
-                            //     "base64",
-                            //     200,
-                            //     200
-                            //     );
-                            // } catch (err) {
-                            //     console.log("err: ", err);
-                            // }
-                           
-                            // formData.append("images[" + index + "]image", f);
-                            return null;
-                    });
-                    console.log("chk resize")
-                    console.log("fd: ", formData)
-                    axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
-                    .then((res) => {
-                        submitFieldInspectionAfter();
-                    })
-                    .catch((err) => {
-
+                                if (refImageUpload.current.state.files.length == index + 1) {
+                                    console.log("send request")
+                                    axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
+                                    .then((res) => {
+                                        submitFieldInspectionAfter();
+                                    })
+                                    .catch((err) => {
+                                        setIsLoading(false);
+                                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                                    });
+                                }
+                            },
+                            "base64",
+                            1024,
+                            720
+                            );
+                        } catch (err) {
+                            console.log("err: ", err);
+                        }
+                        return null;
                     });
                 }
             }
         }
     }
-
-//     const getData = () => {
-//         refImageUpload.current.state.files.map((f, index) => {
-//             console.log("f: ", f);
-//             console.log("fblob: ", f.objectURL);
-//             try {
-//                 Resizer.imageFileResizer(
-//                 f,
-//                 300,
-//                 300,
-//                 "JPEG",
-//                 100,
-//                 0,
-//                 (uri) => {
-//                     console.log("uri: ", uri);
-//                     console.log("bloburi: ", dataURItoBlob(uri));
-//                     console.log("done1", index)
-//                     formData.append("images[" + index + "]image", dataURItoBlob(uri));
-//                     if (refImageUpload.current.state.files.length == index + 1) {
-// console.log("send request")
-// axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
-//                     .then((res) => {
-//                         submitFieldInspectionAfter();
-//                     })
-//                     .catch((err) => {
-
-//                     });
-//                     }
-//                 },
-//                 "base64",
-//                 200,
-//                 200
-//                 );
-//             }
-
-//              catch (err) {
-//                 console.log("err: ", err);
-//             }
-//     })
-// console.log("done")}
-
-
 
     const dataURItoBlob = (dataURI) =>  {
         // convert base64/URLEncoded data component to raw binary data held in a string
