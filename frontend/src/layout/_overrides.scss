@@ -483,10 +483,10 @@
 
 .disable-btn {
   @media only screen and (max-width : 499px) { 
-    // .p-button {
-      background-color: red;
+    .p-button:first-child + .p-button + .p-button {
+      background-color: gray;
       pointer-events: none;
-    // }
+    }
   }
 }
 
