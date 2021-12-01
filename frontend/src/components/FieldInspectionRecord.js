@@ -827,6 +827,9 @@ export default function FieldInspectionReport() {
                 var dWidth  = 900;
                 var dHeight = 1100;
 
+                console.log("qH: ", quotes.clientHeight)
+                console.log("qW: ", quotes.clientWidth)
+
                 for (var i = 0; i < quotes.clientHeight/1100; i++) {
                     sY = 1100*i;
                     var onePageCanvas = document.createElement("canvas");
@@ -2260,7 +2263,7 @@ export default function FieldInspectionReport() {
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                 <h4>FIELD INSPECTION REPORT</h4>
                             </div>
-                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <div className="p-col-12">
                                 <div className="card card-w-title">
                                     <div className="p-grid p-fluid">
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
@@ -2676,6 +2679,9 @@ export default function FieldInspectionReport() {
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                             <Button label="SEND" onClick={() => submitSendEmail()}/>
                         </div>
+                    </div>
+                    <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                        <ProgressSpinner />
                     </div>
                     <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
                         <ProgressSpinner />
