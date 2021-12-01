@@ -385,7 +385,6 @@ export default function FieldInspectionReport() {
                 axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
                 .then((res) => {
                     setReportImage(res.data);
-                    console.log("img: ", res.data)
                     setFlagFieldInspectionRecordList(true);
                     flagFieldInspectionRecordList ? setIsLoading(false) : '';
                 })
@@ -583,7 +582,6 @@ export default function FieldInspectionReport() {
         } catch(err) {
             setIsLoading(false);
             toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
-            console.log(err)
         }
     }
 
@@ -828,9 +826,6 @@ export default function FieldInspectionReport() {
                 var dY      = 0;
                 var dWidth  = 900;
                 var dHeight = 1100;
-
-                console.log("qH: ", quotes.clientHeight)
-                console.log("qW: ", quotes.clientWidth)
 
                 for (var i = 0; i < quotes.clientHeight/1100; i++) {
                     sY = 1100*i;
@@ -1331,7 +1326,6 @@ export default function FieldInspectionReport() {
                                 formData.append("images[" + index + "]image", file);
 
                                 if (refImageUpload.current.state.files.length == index + 1) {
-                                    console.log("send request")
                                     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
                                     .then((res) => {
                                         submitFieldInspectionAfter();
@@ -1347,7 +1341,7 @@ export default function FieldInspectionReport() {
                             720
                             );
                         } catch (err) {
-                            console.log("err: ", err);
+                            
                         }
                         return null;
                     });
@@ -1487,11 +1481,9 @@ export default function FieldInspectionReport() {
     }
 
     const deleteSelectedEmail = (value) => {
-        console.log("delEmail: ", value)
         let theEmails = [...emailSelect];
         var index = theEmails.indexOf(value);
         theEmails.splice(index, 1);
-        console.log(theEmails);
         setEmailSelect(theEmails);
     }
 
@@ -2261,86 +2253,86 @@ export default function FieldInspectionReport() {
                     </Dialog>
                 </div>
 
-                <div /* className="dialog-display-pdf" */ >
-                    <Dialog header="GENERATING PDF..." visible={displayPDF} style={{minWidth: '1120px', maxWidth:'1120px'}} onHide={() => onHide('displayPDF')} blockScroll={true}>
-                        <div id="toPdf" className="p-grid p-fluid" style={{minWidth: '1120px', maxWidth:'1120px'}}>
-                        <div className="p-col-12 p-nogutter">
-                            <div className="p-col-12 report-title">
+                <div className="dialog-display-pdf" >
+                    <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
+                        <div id="toPdf" className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                 <h4>FIELD INSPECTION REPORT</h4>
                             </div>
-                            <div className="p-col-12">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                                 <div className="card card-w-title">
                                     <div className="p-grid p-fluid">
-                                        <div className="p-col-4 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>REPORT No.:</b></h6>
                                             {/* <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                             onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/> */}
                                             <InputText placeholder="Input Report No." value={fieldInspectionID} disabled/>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>BODY No.:</b></h6>
                                             <InputText placeholder="Input Body No." value={bodyNo} disabled/>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[0]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[0]}>
                                             <h6><b>INSPECTION DATE:</b></h6>
                                             {/* <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => setDateInspection(e.value)} showIcon readOnlyInput/> */}
                                             <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
                                             <small className="p-invalid p-d-block">{reviseText[0]}</small>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[1]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[1]}>
                                             <h6><b>MILEAGE:</b></h6>
                                             <InputText placeholder="Input Mileage" value={mileage} onChange={(e) => onChangeValue('f1', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[1]}</small>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[2]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[2]}>
                                             <h6><b>BODY STYLE:</b></h6>
                                             <InputText placeholder="Input Body Style" value={bodyStyle} onChange={(e) => onChangeValue('f2', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[2]}</small>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[3]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[3]}>
                                             <h6><b>DRIVER TYPE:</b></h6>
                                             <InputText placeholder="Input Driver Type" value={driverType} onChange={(e) => onChangeValue('f3', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[3]}</small>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[4]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[4]}>
                                             <h6><b>DOOR COUNT:</b></h6>
                                             <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>CONDITION:</b></h6>
                                             <Dropdown value={condition} options={conditionOptions} optionLabel="name" placeholder="Select Condition" 
                                             onChange={event => setCondition(event.target.value)} />
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>YEAR:</b></h6>
                                             <InputText placeholder="Input Year" value={year} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>MAKE:</b></h6>
                                             <InputText placeholder="Input Make" value={make} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>MODEL:</b></h6>
                                             <InputText placeholder="Input Make" value={model} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>TRANSMISSION:</b></h6>
                                             <InputText placeholder="Input Transmisison" value={transmission} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>ENGINE:</b></h6>
                                             <InputText placeholder="Input Body No." value={engine} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>INSPECTOR:</b></h6>
                                             <InputText placeholder="Input Inspector" value={inspector} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>LOCATION:</b></h6>
                                             <InputText placeholder="Input Location" value={location} disabled/>
                                         </div>
-                                        <div className="p-col-4">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>EXTERIOR COLOR:</b></h6>
                                             <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                         </div>
