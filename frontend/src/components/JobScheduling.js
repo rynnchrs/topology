@@ -438,7 +438,7 @@ export const JobScheduling = () => {
             let f = v.fieldman.map((x) =>
                 x.field_man
             )
-            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_id + "\nFIELDMAN: " + f + "\nLOCATION: " + v.current_loc,
+            return setFullCalendarList(fullCalendarList => [...fullCalendarList, {"title": "ID: " + v.job_order.job_no + "\nFIELDMAN: " + f + "\nLOCATION: " + v.current_loc,
             "start": v.start_date, "end": String(endDate)}]);
         });
     }
