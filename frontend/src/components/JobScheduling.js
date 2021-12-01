@@ -81,7 +81,7 @@ export const JobScheduling = () => {
 
     //paginator
     const [first, setFirst] = useState(0);
-    const rows = 10;
+    const rows = 20;
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 

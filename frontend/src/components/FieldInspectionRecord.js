@@ -187,7 +187,7 @@ export default function FieldInspectionReport() {
 
     //paginator
     const [first, setFirst] = useState(0);
-    const rows = 10;
+    const rows = 20;
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 
@@ -295,15 +295,30 @@ export default function FieldInspectionReport() {
 
             axios
                 // .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
-                .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?fi_report_id=' + sFINumber 
+                .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?job_no=' + sFINumber 
                 + '&body_no=' + sBodyNo
-                + '&inspection_date=' + sDateInspection, config)
+                + '&inspection_date=' + sDateInspection
+                + '&page=' + sentPage, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
                     setFieldInspectionRecordList(res.data.results);
                 })
                 .catch((err) => {
-                    
+                    axios
+                        // .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
+                        .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?job_no=' + sFINumber 
+                        + '&body_no=' + sBodyNo
+                        + '&inspection_date=' + sDateInspection
+                        + '&page=1', config)
+                        .then((res) => {
+                            setTotalCount(res.data.count);
+                            setFieldInspectionRecordList(res.data.results);
+                            setFirst(0);
+                            setFlagPages(1);
+                        })
+                        .catch((err) => {
+                            
+                        });
                 });
         } catch (err) {
 
@@ -1015,14 +1030,17 @@ export default function FieldInspectionReport() {
         let sDateInspection = searchDateInspection === null ? "" : format(searchDateInspection, 'yyyy-MM-dd');
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?fi_report_id=' + sFINumber 
+            .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?job_no=' + sFINumber 
             + '&body_no=' + sBodyNo
-            + '&inspection_date=' + sDateInspection, config)
+            + '&inspection_date=' + sDateInspection
+            + '&page=1', config)
             .then((res) => {
                 setTotalCount(res.data.count);
                 setFieldInspectionRecordList(res.data.results);
                 onHide('displayQR');
                 setQrResult('No Result');
+                setFirst(0);
+                setFlagPages(1);
             })
             .catch((err) => {
                 onHide('displayQR');
