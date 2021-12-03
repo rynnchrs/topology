@@ -1,5 +1,7 @@
+import os
 from datetime import date
 
+import environ
 from django.conf import settings
 from django.core.mail import EmailMessage, send_mail
 from report.models import FieldInspection
@@ -13,6 +15,8 @@ from .models import Email
 from .serializer import EmailSerializer, SendEmailSerializer
 from .utils import user_permission
 
+env = environ.Env()
+environ.Env.read_env(os.path.join('backend/.env'))
 
 class PDFtoEmail(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -23,7 +27,8 @@ class PDFtoEmail(viewsets.ViewSet):
             queryset = FieldInspection.objects.all()
             inspection = get_object_or_404(queryset, pk=request.data['fi_report_id'])
             subject =  f"Inspection Report for {inspection.body_no.body_no}"
-            body = f"{request.data['body']}<br><br>Please see the attached url.<br>http://localhost:3000/#/pdfget/?id={inspection}"
+            print("asd")
+            body = f"{request.data['body']}<br><br>Please see the attached url.<br>{env.str('FRONTEND_URL')}/#/pdfget/?id={inspection}"
             to = request.data['email']
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
@@ -50,8 +55,8 @@ class PDFtoEmail(viewsets.ViewSet):
             to = request.data['email']
 
             for report in reports:
-                subject += f' {report.body_no.body_no},'
-                body += f'http://localhost:3000/#/pdfget/?id={report}<br>'
+                subject += f" {report.body_no.body_no},"
+                body += f"{report.body_no.body_no} - {env.str('FRONTEND_URL')}/#/pdfget/?id={report}<br>"
             subject = subject[:-1] + '.'
             try:
                 email = EmailMessage(subject, body, settings.EMAIL_HOST_USER, to)
