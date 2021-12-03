@@ -1,10 +1,12 @@
 import os
-from datetime import datetime
+import sys
 
 import django
 
+sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
+
 import requests
 
 from gps.models import GPS, Record
@@ -47,14 +49,11 @@ for device in devices:
     records_mileage = resp_mileage.json()
     recordobd = records_obd['record']
     recordmileage = records_mileage['records'][0]
-    print(recordobd)
-    print("")
-    print(recordmileage)
     if recordobd:
         record_data = {
             'obedrecord_id': recordobd['obdrecordid'],
             'device_id': device,
-            # 'updatetime': recordobd['updatetime'],
+            'updatetime': recordobd['updatetime'],
             'mileage': recordobd['mileage'],
             'gasolineconsumptionperhour': recordobd['gasolineconsumptionperhour'],
             'gasolineconsumptionperhunkm': recordobd['gasolineconsumptionperhunkm'],
@@ -66,8 +65,8 @@ for device in devices:
             'airmassflow': recordobd['airmassflow'],
             'throttleposition': recordobd['throttleposition'],
             'oilvalue': recordobd['oilvalue'],
-            # 'faultcodetime': recordobd['faultcodetime'],
-            # 'faultcodes': recordobd['faultcodes'],
+            'faultcodetime': recordobd['faultcodetime'],
+            'faultcodes': recordobd['faultcodes'],
             'totaldistance': recordobd['totaldistance'],
 
             # === MILEAGE === 
@@ -90,3 +89,5 @@ for device in devices:
             Record.objects.create(**record_data) 
         except Exception as e:
             raise e
+            
+print("successfully created")

@@ -9,41 +9,12 @@ import requests
 
 from gps.models import GPS
 
-url = "https://www.gps51.com:8443"
-#url = "http://localhost:4444"
-pars = '{"type":"USER","from":"web","username":"swseansw","password":"e10adc3949ba59abbe56e057f20f883e", "browser":"Firefox/87.0"}'
-resp = requests.post(url+"/webapi?action=login", data=pars)
+devices = ["13808357791","13808357842","13808358057","13808358052","15866669094","19171897950","19171897963",
+        "19171897997","19171897955","19171898037","19171897962","19171897988","19171897968","19171898024",
+        "19171897989","19171898032","19171898033","19171897995","19171898013","19171897979","19171897984",
+        "19171898031","19171898049","19171897978","19171897981","19171898030","19171898005","19171949970",
+        "19171949973","19171949905","19171949932","19171949569","19171949538","19171949535","19171898029",
+        "19171898014"]
 
-#print(resp)
-#print(resp.content)
-#print(resp.headers)
-
-res = resp.json()
-token = res['token']
-
-
-pars = {"username":"swseansw"}
-resp = requests.post(url+"/webapi?action=querymonitorlist&token="+token, data=pars)
-
-res = resp.json()
-
-# pars = '{"deviceid":"19171897963"}'
-# resp_odb = requests.post(url+"/webapi?action=queryobdinfo&token="+token, data=pars)
-# resp_mileage = requests.post(url+"/webapi?action=reportmileagedetail&token="+token, data=pars)
-# records_obd = resp_odb.json()
-# records_mileage = resp_mileage.json()
-# print(f'odb: {records_obd["record"]}')
-# print(" ")
-# print(f'mileage: {records_mileage["records"]}')
-
-for group in res["groups"]:
-        if "devices" in group:
-                for device in group["devices"]:
-                        print(device["deviceid"])
-                        try:
-                                GPS.objects.create(
-                                device_id = device["deviceid"]
-                                )
-                        except Exception as e:
-                                print("Oops!", e.__class__, "occurred.")
-
+for device in devices:
+        GPS.objects.create(device_id=device)

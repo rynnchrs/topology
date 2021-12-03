@@ -9,5 +9,5 @@ admin.site.register(GPS, GPSAdmin)
 
 
 class RecordAdmin(admin.ModelAdmin):
-    list_display = ('record_id','obedrecord_id','device_id')
+    list_display = ('record_id','obedrecord_id','device_id','date_created')
 admin.site.register(Record, RecordAdmin)

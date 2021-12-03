@@ -22,7 +22,7 @@ class Record(models.Model):
     record_id = models.AutoField(primary_key=True)
     obedrecord_id = models.CharField(max_length=20, null=True, blank=True)
     device_id = models.ForeignKey(GPS,  related_name='records', on_delete=models.CASCADE)
-    updatetime = models.DateTimeField(blank=True, null=True)
+    updatetime = models.CharField(max_length=20, null=True, blank=True)
     mileage = models.CharField(max_length=20, null=True, blank=True)
     gasolineconsumptionperhour = models.FloatField(default=0)
     gasolineconsumptionperhunkm = models.FloatField(default=0)
@@ -34,8 +34,8 @@ class Record(models.Model):
     airmassflow = models.IntegerField(default=0)
     throttleposition = models.IntegerField(default=0)
     oilvalue = models.IntegerField(default=0)
-    faultcodetime = models.IntegerField(default=0)
-    faultcodes = models.IntegerField(default=0)
+    faultcodetime = models.CharField(max_length=20, null=True, blank=True)
+    faultcodes = models.CharField(max_length=20, null=True, blank=True)
     totaldistance = models.IntegerField(default=0)
 
     # === MILEAGE ===

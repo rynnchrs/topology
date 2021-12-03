@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'reversion',
     'multiselectfield',
     'notifications',
+    'django_celery_beat',
+    'django_celery_results',
 
     #app
     'careta',
@@ -208,6 +210,15 @@ GOOGLE_API_KEY=[]
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'syd.frisco@gmail.com'
-EMAIL_HOST_PASSWORD = 'pxadcgbeplpmfynj'
+EMAIL_HOST_USER = 'info@rentcar.ph'
+EMAIL_HOST_PASSWORD = 'cbxehhkkrobqsqax'
 EMAIL_USE_TLS = True
+
+CELERY_BROKER_URL = 'redis://localhost:6379' 
+result_backend = 'redis://localhost:6379'
+accept_content = ['application/json']
+task_serializer = 'json'
+result_serializer = 'json'
+timezone = 'Asia/Manila' 
+imports = ['gps.tasks']
+beat_schedule  = 'django_celery_beat.schedulers:DatabaseScheduler'
