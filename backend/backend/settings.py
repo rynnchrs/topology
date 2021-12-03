@@ -18,7 +18,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -213,4 +213,4 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@rentcar.ph'
 EMAIL_HOST_PASSWORD = 'cbxehhkkrobqsqax'
 EMAIL_USE_TLS = True
-FRONTEND_URL = env.str('FRONTEND_URL')
+FRONTEND_URL = env('FRONTEND_URL')
