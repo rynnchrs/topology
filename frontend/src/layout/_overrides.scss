@@ -481,6 +481,15 @@
   }
 }
 
+.disable-btn {
+  @media only screen and (max-width : 499px) { 
+    .p-button:first-child + .p-button + .p-button {
+      background-color: gray;
+      pointer-events: none;
+    }
+  }
+}
+
 
 /* end global */
 

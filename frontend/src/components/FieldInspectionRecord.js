@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import QrReader from 'react-qr-reader'
+import Resizer from "react-image-file-resizer";
 
 export default function FieldInspectionReport() {
 
@@ -35,10 +36,18 @@ export default function FieldInspectionReport() {
     const [theIndex, setTheIndex] = useState('');
     const [theType, setTheType] = useState('');
 
+    const conditionOptions = [{name: 'Operational', val: "True"}, {name: 'Non-Operational', val: "False"}];
+
     const [fieldInspectionRecordList, setFieldInspectionRecordList] = useState([]);
     const [flagFieldInspectionRecordList, setFlagFieldInspectionRecordList] = useState(false);
+    const [flagFieldInspectionRecordListPDF, setFlagFieldInspectionRecordListPDF] = useState(false);
     const [fieldInspectionRecordDetails, setFieldInspectionRecordDetails] = useState([]);
+    const [fieldInspectionRecordDetailsPDF, setFieldInspectionRecordDetailsPDF] = useState([]);
+    const [goodSummary, setGoodSummary] = useState([]);
+    const [fairSummary, setFairSummary] = useState([]);
+    const [poorSummary, setPoorSummary] = useState([]);
     const [delFieldInspectionID, setDelFieldInspectionID] = useState('');
+    const [delFieldInspectionJobNo, setDelFieldInspectionJobNo] = useState('');
     const [flagFieldInspectionRecordMethod, setFlagFieldInspectionRecordMethod] = useState('');
     const [qrResult, setQrResult] = useState('No Result');
 
@@ -56,7 +65,13 @@ export default function FieldInspectionReport() {
 
     //emails
     const [email, setEmail] = useState('');
-    const [emailAcc, setEmailAcc] = useState([]);
+    const [emailList, setEmailList] = useState([]);
+    const [emailInput, setEmailInput] = useState([]);
+    const [emailSelect, setEmailSelect] = useState([]);
+    const [suggestions, setSuggestions] = useState(null);
+    const [emailReportID, setEmailReportID] = useState('');
+    const [emailMode, setEmailMode] = useState('');
+    const [emailBody, setEmailBody] = useState('');
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
@@ -76,7 +91,7 @@ export default function FieldInspectionReport() {
     const [location, setLocation] = useState('');
     const [exteriorColor, setExteriorColor] = useState('');
     const [doorCount, setDoorCount] = useState('');
-    const [condition, setCondition] = useState('');
+    const [condition, setCondition] = useState([]);
     const refImageUpload = useRef(null);
     const [reportImage, setReportImage] = useState([{id: '', image: ''}]);
     const [holdImageID, setHoldImageID] = useState('');
@@ -172,7 +187,7 @@ export default function FieldInspectionReport() {
 
     //paginator
     const [first, setFirst] = useState(0);
-    const rows = 10;
+    const rows = 20;
     const [flagPages, setFlagPages] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 
@@ -193,9 +208,24 @@ export default function FieldInspectionReport() {
 
     useEffect(() => {
         /* eslint-disable no-unused-expressions */
-        flagFieldInspectionRecordList ? assignFieldInspectionRecordEdit(fieldInspectionRecordDetails) : '';
+        if (flagFieldInspectionRecordList) {
+            assignFieldInspectionRecordEdit(fieldInspectionRecordDetails); 
+            setFieldInspectionRecordDetailsPDF(fieldInspectionRecordDetailsPDF);
+            if (flagFieldInspectionRecordMethod === 'pdf') {
+                setGoodSummary(fieldInspectionRecordDetailsPDF.summary.good);
+                setFairSummary(fieldInspectionRecordDetailsPDF.summary.fair);
+                setPoorSummary(fieldInspectionRecordDetailsPDF.summary.poor);
+            }
+            
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flagFieldInspectionRecordList]);
+
+    // useEffect(() => {
+    //     /* eslint-disable no-unused-expressions */
+    //     flagFieldInspectionRecordListPDF ? assignFieldInspectionRecordEditPDF(fieldInspectionRecordDetails) : '';
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [flagFieldInspectionRecordListPDF]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,6 +272,10 @@ export default function FieldInspectionReport() {
         arrRoadTestFindings = roadTestFindings.slice();
     }, [roadTestFindings]);
 
+    useEffect(() => {
+        getEmail();
+    }, []);
+
     //for pagination
     useEffect(() => {
         try {
@@ -261,15 +295,30 @@ export default function FieldInspectionReport() {
 
             axios
                 // .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
-                .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?fi_report_id=' + sFINumber 
+                .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?job_no=' + sFINumber 
                 + '&body_no=' + sBodyNo
-                + '&inspection_date=' + sDateInspection, config)
+                + '&inspection_date=' + sDateInspection
+                + '&page=' + sentPage, config)
                 .then((res) => {
                     setTotalCount(res.data.count);
                     setFieldInspectionRecordList(res.data.results);
                 })
                 .catch((err) => {
-                    
+                    axios
+                        // .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
+                        .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?job_no=' + sFINumber 
+                        + '&body_no=' + sBodyNo
+                        + '&inspection_date=' + sDateInspection
+                        + '&page=1', config)
+                        .then((res) => {
+                            setTotalCount(res.data.count);
+                            setFieldInspectionRecordList(res.data.results);
+                            setFirst(0);
+                            setFlagPages(1);
+                        })
+                        .catch((err) => {
+                            
+                        });
                 });
         } catch (err) {
 
@@ -288,7 +337,25 @@ export default function FieldInspectionReport() {
         }          
     }
 
-    const getFieldInspectionRecordDetails = (value) => {
+    const searchList = (event) => {
+        setTimeout(() => {
+            if (!event.query.trim().length) {
+
+            } else {
+                try {
+                    setSuggestions(emailList.filter(item => item.email_add.toLowerCase().startsWith(event.query.toLowerCase())));
+                } catch (err){
+                    
+                }
+            }
+        }, 100);
+    };
+
+    const autoCompleteSelectEmail = (value) => {
+        setEmailSelect(emailSelect => [...emailSelect, value]);
+    }
+
+    const getFieldInspectionRecordDetails = (value, mode) => {
         setIsLoading(true);
         let token = localStorage.getItem("token");
         const config = {
@@ -298,10 +365,14 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/', config)
+        if (mode === 'pdf') {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/', config)
             .then((res) => {
                 setFieldInspectionRecordDetails(res.data);
-                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
+                .then((res) => {
+                    setFieldInspectionRecordDetailsPDF(res.data);
+                    axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
                     .then((res) => {
                         setReportImage(res.data);
                         setFlagFieldInspectionRecordList(true);
@@ -309,11 +380,41 @@ export default function FieldInspectionReport() {
                     })
                     .catch((err) => {
                         setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
                     });
+                })
+                .catch((err) => {
+                    setIsLoading(false);
+                    toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+                });
             })
             .catch((err) => {
                 setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
             });
+
+        } else {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/', config)
+            .then((res) => {
+                setFieldInspectionRecordDetails(res.data);
+                axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+                .then((res) => {
+                    setReportImage(res.data);
+                    setFlagFieldInspectionRecordList(true);
+                    flagFieldInspectionRecordList ? setIsLoading(false) : '';
+                })
+                .catch((err) => {
+                    setIsLoading(false);
+                    toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+                });
+            })
+            .catch((err) => {
+                setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+            });
+        }
+
+        
     }
 
     const assignFieldInspectionRecordEdit = (value) => {
@@ -344,7 +445,7 @@ export default function FieldInspectionReport() {
 
             onChangeValue('f4', value.door_count);
 
-            setCondition(value.body_no.operational);
+            setCondition(conditionOptions.find(x => x.name === value.operational));
             let i;
 
             arrExterior = exterior.slice();
@@ -494,17 +595,242 @@ export default function FieldInspectionReport() {
             }, 1500);
 
         } catch(err) {
-
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         }
     }
+
+    // const getFieldInspectionRecordDetailsPDF = (value) => {
+    //     console.log("im in pdf: ", value)
+    //     setIsLoading(true);
+    //     let token = localStorage.getItem("token");
+    //     const config = {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + token,
+    //         },
+    //     };
+
+    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
+    //         .then((res) => {
+    //             setFieldInspectionRecordDetails(res.data);
+    //             axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
+    //                 .then((res) => {
+    //                     setReportImage(res.data);
+    //                     setFlagFieldInspectionRecordListPDF(true);
+    //                     flagFieldInspectionRecordListPDF ? setIsLoading(false) : '';
+    //                 })
+    //                 .catch((err) => {
+    //                     setIsLoading(false);
+    //                     toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+    //                 });
+    //         })
+    //         .catch((err) => {
+    //             setIsLoading(false);
+    //             toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+    //         });
+    // }
+
+    // const assignFieldInspectionRecordEditPDF = (value) => {
+    //     console.log(value);
+    //     try {
+    //         setFieldInspectionID(value.fi_report_id);
+    //         setFieldInspectionTaskID(value.task);
+    //         setFieldInspectionJobID(value.job_order);
+    //         console.log('inspdate: ', value.inspection_date);
+    //         console.log(value.inspection_date);
+    //         console.log(value.job_order);
+    //         Object.keys(value).filter(f => f === "inspection_date").map(x => {
+                
+    //             let dtx = value[x];
+    //             console.log("x: ", dtx);
+    //             console.log("xgmt: ", convertDatetoGMT(dtx));
+    //             onChangeValue('f0', convertDatetoGMT(dtx));
+                
+    //         })
+            
+
+    //         setYear(value.body_no.release_year);
+    //         setMake(value.body_no.brand);
+    //         setModel(value.body_no.make);
+
+    //         // onChangeValue('f1', value.mileage);
+
+    //         setBodyNo(value.body_no.body_no);
+
+    //         // onChangeValue('f2', value.body_style);
+
+    //         setTransmission(value.body_no.transmission);
+    //         setEngine(value.body_no.cylinder + " cylinder");
+
+    //         // onChangeValue('f3', value.drive_type);
+    //         // setInspector("");
+    //         setLocation(value.body_no.current_loc);
+    //         setExteriorColor(value.body_no.color);
+
+    //         // onChangeValue('f4', value.door_count);
+
+    //         setCondition(conditionOptions.find(x => x.name === value.operational));
+    //         let i;
+
+    //         arrExterior = exterior.slice();
+    //         let syntaxExterior = ["hood", "front", "front_bumper", "fenders", "doors", "roof", "rear", "rear_bumper", "trunk", "trim", "fuel_door", "pait_condition"];
+    //         // let syntaxExteriorNote = ["hood_note", "front_note", "front_bumper_note", "fenders_note", "doors_note", "roof_note", "rear_note", "rear_bumper_note", "trunk_note", "trim_note", "fuel_door_note", "pait_condition_note"];
+    //         for (i = 0; i < syntaxExterior.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrExterior[i] = {...arrExterior[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrExterior[i] = {...arrExterior[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrExterior[i] = {...arrExterior[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrExterior[i] = {...arrExterior[i], notes: value[syntaxExteriorNote[i]] === null ? "" : value[syntaxExteriorNote[i]]};
+    //                 setExterior(arrExterior);
+    //             })
+    //         }
+
+    //         arrGlass = glass.slice();
+    //         let syntaxGlass = ["windshield", "windows", "mirrors", "rear_window"];
+    //         // let syntaxGlassNote = ["windshield_note", "windows_note", "mirrors_note", "rear_window_note"];
+    //         for (i = 0; i < syntaxGlass.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxGlass[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrGlass[i] = {...arrGlass[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrGlass[i] = {...arrGlass[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrGlass[i] = {...arrGlass[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrGlass[i] = {...arrGlass[i], notes: value[syntaxGlassNote[i]] === null ? "" : value[syntaxGlassNote[i]]};
+    //                 setGlass(arrGlass);
+    //             })
+    //         }
+
+    //         arrTiresWheels = tiresWheels.slice();
+    //         let syntaxTiresWheels = ["tires_condition", "wheels_condition", "spare_tire"];
+    //         // let syntaxTiresWheelsNote = ["tires_condition_note", "wheels_condition_note", "spare_tire_note"];
+    //         for (i = 0; i < syntaxTiresWheels.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxTiresWheels[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrTiresWheels[i] = {...arrTiresWheels[i], notes: value[syntaxTiresWheelsNote[i]] === null ? "" : value[syntaxTiresWheelsNote[i]]};
+    //                 setTiresWheels(arrTiresWheels);
+    //             })
+    //         }
+
+    //         arrUnderBody = underbody.slice();
+    //         let syntaxUnderBody = ["frame", "exhaust_system", "transmission", "drive_axle", "suspension", "breake_system"];
+    //         // let syntaxUnderBodyNote = ["frame_note", "exhaust_system_note", "transmission_note", "drive_axle_note", "suspension_note", "breake_system_note"];
+    //         for (i = 0; i < syntaxUnderBody.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxUnderBody[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrUnderBody[i] = {...arrUnderBody[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrUnderBody[i] = {...arrUnderBody[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrUnderBody[i] = {...arrUnderBody[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrUnderBody[i] = {...arrUnderBody[i], notes: value[syntaxUnderBodyNote[i]] === null ? "" : value[syntaxUnderBodyNote[i]]};
+    //                 setUnderbody(arrUnderBody);
+    //             })
+    //         }
+
+    //         arrUnderHood = underhood.slice();
+    //         let syntaxUnderHood = ["engine_compartment", "battery", "oil", "fluids", "wiring", "belts", "hoses", "non_stock_modif"];
+    //         // let syntaxUnderHoodNote = ["engine_compartment_note", "battery_note", "oil_note", "fluids_note", "wiring_note", "belts_note", "hoses_note", "non_stock_modif_note"];
+    //         for (i = 0; i < syntaxUnderHood.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxUnderHood[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrUnderHood[i] = {...arrUnderHood[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrUnderHood[i] = {...arrUnderHood[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrUnderHood[i] = {...arrUnderHood[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrUnderHood[i] = {...arrUnderHood[i], notes: value[syntaxUnderHoodNote[i]] === null ? "" : value[syntaxUnderHoodNote[i]]};
+    //                 setUnderhood(arrUnderHood);
+    //             })
+    //         }
+
+    //         arrInterior = interior.slice();
+    //         let syntaxInterior = ["seats", "headliner", "carpet", "door_panels", "glove_box", "vanity_mirrors", "interioir_trim", "dashboard", "dashboard_gauges", "air_conditioning", "heater", "defroster"];
+    //         // let syntaxInteriorNote = ["seats_note", "headliner_note", "carpet_note", "door_panels_note", "glove_box_note", "vanity_mirrors_note", "interioir_trim_note", "dashboard_note", "dashboard_gauges_note", "air_conditioning_note", "heater_note", "defroster_note"];
+    //         for (i = 0; i < syntaxInterior.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxInterior[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrInterior[i] = {...arrInterior[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrInterior[i] = {...arrInterior[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrInterior[i] = {...arrInterior[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrInterior[i] = {...arrInterior[i], notes: value[syntaxInteriorNote[i]] === null ? "" : value[syntaxInteriorNote[i]]};
+    //                 setInterior(arrInterior);
+    //             })
+    //         }
+
+    //         arrElectricalSystem = electricalSystem.slice();
+    //         let syntaxElectricalSystem = ["power_locks", "power_seats", "power_steering", "power_windows", "power_mirrors", "audio_system", "onboard_computer", "headlights", "taillights", "signal_lights", "brake_lights", "parking_lights"];
+    //         // let syntaxElectricalSystemNote = ["power_locks_note", "power_seats_note", "power_steering_note", "power_windows_note", "power_mirrors_note", "audio_system_note", "onboard_computer_note", "headlights_note", "taillights_note", "signal_lights_note", "brake_lights_note", "parking_lights_note"];
+    //         for (i = 0; i < syntaxElectricalSystem.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxElectricalSystem[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrElectricalSystem[i] = {...arrElectricalSystem[i], notes: value[syntaxElectricalSystemNote[i]] === null ? "" : value[syntaxElectricalSystemNote[i]]};
+    //                 setElectricalSystem(arrElectricalSystem);
+    //             })
+    //         }
+
+    //         arrRoadTestFindings= roadTestFindings.slice();
+    //         let syntaxRoadTestFindings = ["starting", "idling", "engine_performance", "acceleration", "trans_shift_quality", "steering", "braking", "suspension_performance"];
+    //         // let syntaxRoadTestFindingsNote = ["starting_note", "idling_note", "engine_performance_note", "acceleration_note", "trans_shift_quality_note", "steering_note", "braking_note", "suspension_performance_note"];
+    //         for (i= 0; i < syntaxRoadTestFindings.length; i++) {
+    //             Object.keys(value).filter(f => f === syntaxRoadTestFindings[i]).map(x => {
+    //                 if (value[x].toLowerCase() === "g") {
+    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: true, f: false, p: false};
+    //                 } else if (value[x].toLowerCase() === "f") {
+    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: true, p: false};
+    //                 } else if (value[x].toLowerCase() === "p") {
+    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: false, p: true};
+    //                 }
+    //                 // arrRoadTestFindings[i] = {...arrRoadTestFindings[i], notes: value[syntaxRoadTestFindingsNote[i]] === null ? "" : value[syntaxRoadTestFindingsNote[i]]};
+    //                 setRoadTestFindings(arrRoadTestFindings);
+    //             })
+    //         }
+
+    //         setTimeout(() => {
+    //             onClick('displayPDF');
+    //             convertPDF();
+    //         }, 1500);
+
+    //     } catch(err) {
+    //         setIsLoading(false);
+    //         toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+    //         console.log(err)
+    //     }
+    // }
 
     const convertPDF = () => {
         try {
             var quotes = document.getElementById('toPdf');
+            var quotes1 = document.getElementById('toPdfSummary');
+            var quotes2 = document.getElementById('toPdfImage');
+            var pdf = new jsPDF('p', 'pt', 'letter');
 
             html2canvas(quotes)
             .then((canvas) => {
-                var pdf = new jsPDF('p', 'pt', 'letter');
+                // var pdf = new jsPDF('p', 'pt', 'letter');
 
                 var srcImg  = canvas;
                 var sX      = 0;
@@ -515,6 +841,9 @@ export default function FieldInspectionReport() {
                 var dY      = 0;
                 var dWidth  = 900;
                 var dHeight = 1100;
+
+                console.log("qH: ", quotes.clientHeight)
+                console.log("qW: ", quotes.clientWidth)
 
                 for (var i = 0; i < quotes.clientHeight/1100; i++) {
                     sY = 1100*i;
@@ -532,12 +861,87 @@ export default function FieldInspectionReport() {
                     }
                     pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
                 }
-                window.open(pdf.output('bloburl'));
-                onHide('displayPDF');
-                setIsLoading(false);
-            });
-        } catch (err){
+                pdf.addPage();
+                
+                html2canvas(quotes1)
+                .then((canvas) => {
+                    // var pdf = new jsPDF('p', 'pt', 'letter');
 
+                    var srcImg  = canvas;
+                    var sX      = 0;
+                    var sY      = 0; // start 980 pixels down for every new page
+                    var sWidth  = 1075;
+                    var sHeight = 1100;
+                    var dX      = 0;
+                    var dY      = 0;
+                    var dWidth  = 900;
+                    var dHeight = 1100;
+
+                    for (var i = 0; i < quotes1.clientHeight/1100; i++) {
+                        sY = 1100*i;
+                        var onePageCanvas = document.createElement("canvas");
+                        onePageCanvas.setAttribute('width', 900);
+                        onePageCanvas.setAttribute('height', 1100);
+                        var ctx = onePageCanvas.getContext('2d');
+                        ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                        var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                        var width         = onePageCanvas.width;
+                        var height        = onePageCanvas.clientHeight;
+
+                        if (i > 0) {
+                            pdf.addPage();
+                        }
+                        pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                    }
+                    pdf.addPage();
+
+                    html2canvas(quotes2, {allowTaint: true, useCORS: true})
+                    .then((canvas) => {
+                        // var pdf = new jsPDF('p', 'pt', 'letter');
+
+                        var srcImg  = canvas;
+                        var sX      = 0;
+                        var sY      = 0; // start 980 pixels down for every new page
+                        var sWidth  = 1075;
+                        var sHeight = 1100;
+                        var dX      = 0;
+                        var dY      = 0;
+                        var dWidth  = 900;
+                        var dHeight = 1100;
+
+                        for (var i = 0; i < quotes2.clientHeight/1100; i++) {
+                            sY = 1100*i;
+                            var onePageCanvas = document.createElement("canvas");
+                            onePageCanvas.setAttribute('width', 900);
+                            onePageCanvas.setAttribute('height', 1100);
+                            var ctx = onePageCanvas.getContext('2d');
+                            ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                            var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                            var width         = onePageCanvas.width;
+                            var height        = onePageCanvas.clientHeight;
+
+                            if (i > 0) {
+                                pdf.addPage();
+                            }
+                            pdf.addImage(canvasDataURL, 'PNG', 22, 40, (width*.62), (height*.62));
+                        }
+
+                        window.open(pdf.output('bloburl'));
+                        onHide('displayPDF');
+                        setIsLoading(false);
+                    });
+                    // window.open(pdf.output('bloburl'));
+                    // onHide('displayPDF');
+                    // setIsLoading(false);
+                });
+                // pdf.addPage();
+
+                
+            });
+            
+        } catch (err){
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         }
     }
 
@@ -572,7 +976,7 @@ export default function FieldInspectionReport() {
         axios
             .delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ fieldInspectionID +'/?mode=fi&id=' + holdImageID, config)
             .then((res) => {
-                getFieldInspectionRecordDetails(fieldInspectionID);
+                getFieldInspectionRecordDetails(fieldInspectionID, '');
                 setMessage({title:"DELETE", content:"Successfully deleted."});
                 onHide('displayConfirmDeleteImage');
                 onClick('displayMessage');
@@ -626,14 +1030,17 @@ export default function FieldInspectionReport() {
         let sDateInspection = searchDateInspection === null ? "" : format(searchDateInspection, 'yyyy-MM-dd');
 
         axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?fi_report_id=' + sFINumber 
+            .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/?job_no=' + sFINumber 
             + '&body_no=' + sBodyNo
-            + '&inspection_date=' + sDateInspection, config)
+            + '&inspection_date=' + sDateInspection
+            + '&page=1', config)
             .then((res) => {
                 setTotalCount(res.data.count);
                 setFieldInspectionRecordList(res.data.results);
                 onHide('displayQR');
                 setQrResult('No Result');
+                setFirst(0);
+                setFlagPages(1);
             })
             .catch((err) => {
                 onHide('displayQR');
@@ -737,6 +1144,8 @@ export default function FieldInspectionReport() {
                 toast.current.show({ severity: 'error', summary: 'DRIVER TYPE', detail: 'This field is required.', life: 3000 });
             }  else if (doorCount === "") { 
                 toast.current.show({ severity: 'error', summary: 'DOOR COUNT', detail: 'This field is required.', life: 3000 });
+            } else if (refImageUpload.current.state.files.length > 12) { 
+                toast.current.show({ severity: 'error', summary: 'IMAGES', detail: 'Maximum images count is reached.', life: 3000 });
             } else {
                 setIsLoading(true);
                 let token = localStorage.getItem("token");
@@ -759,6 +1168,7 @@ export default function FieldInspectionReport() {
                 formData.append("body_style", bodyStyle === "" ? null : bodyStyle);
                 formData.append("drive_type", driverType === "" ? null : driverType);
                 formData.append("door_count", doorCount);
+                formData.append("operational", condition.val);
                 formData.append("hood", exterior[0].g === true ? "G" : exterior[0].p === true ? "P" : "F");
                 formData.append("hood_note", exterior[0].notes);
                 formData.append("front", exterior[1].g === true ? "G" : exterior[1].p === true ? "P" : "F");
@@ -901,27 +1311,108 @@ export default function FieldInspectionReport() {
                     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
                     .then((res) => {
                         submitFieldInspectionAfter();
-                        
                     })
                     .catch((err) => {
-
+                        setIsLoading(false);
+                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
                     });
                 } else {
                     refImageUpload.current.state.files.map((f, index) => {
-                        formData.append("images[" + index + "]image", f);
-                        return null;
-                    })
-                    axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
-                    .then((res) => {
-                        submitFieldInspectionAfter();
-                        
-                    })
-                    .catch((err) => {
+                        //below code for not resizing before upload
+                        // formData.append("images[" + index + "]image", f);
+                        // axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                        // .then((res) => {
+                        //     submitFieldInspectionAfter();
+                        // })
+                        // .catch((err) => {
+                        //     setIsLoading(false);
+                        //     toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                        // });
 
+                        //below code is for resizing image before upload
+                        try {
+                            Resizer.imageFileResizer(
+                            f,
+                            1024,
+                            720,
+                            "JPEG",
+                            100,
+                            0,
+                            (uri) => {
+                                // console.log("uri: ", uri);
+                                // console.log("bloburi: ", dataURItoBlob(uri));
+                                // console.log("done1", index)
+                                let file = new File([dataURItoBlob(uri)], "name.jpg");
+                                // console.log("files: ", file)
+                                formData.append("images[" + index + "]image", file);
+
+                                if (refImageUpload.current.state.files.length == index + 1) {
+                                    axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                                    .then((res) => {
+                                        submitFieldInspectionAfter();
+                                    })
+                                    .catch((err) => {
+                                        setIsLoading(false);
+                                        toast.current.show({ severity: 'error', summary: 'NETWORK ERROR', detail: 'Please check internet connection.', life: 3000 });
+                                    });
+                                }
+                            },
+                            "base64",
+                            1024,
+                            720
+                            );
+                        } catch (err) {
+                            
+                        }
+                        return null;
                     });
                 }
+
+                // if (refImageUpload.current.state.files.length <= 0) {
+                //     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                //     .then((res) => {
+                //         submitFieldInspectionAfter();
+                        
+                //     })
+                //     .catch((err) => {
+
+                //     });
+                // } else {
+                //     refImageUpload.current.state.files.map((f, index) => {
+                //         formData.append("images[" + index + "]image", f);
+                //         return null;
+                //     })
+                //     axios.put(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + fieldInspectionID + '/', formData, config)
+                //     .then((res) => {
+                //         submitFieldInspectionAfter();
+                        
+                //     })
+                //     .catch((err) => {
+
+                //     });
+                // }
             }
         }
+    }
+
+    const dataURItoBlob = (dataURI) =>  {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
+    
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    
+        // write the bytes of the string to a typed array
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+    
+        return new Blob([ia], {type:mimeString});
     }
 
     const submitFieldInspectionAfter = () => {
@@ -930,6 +1421,91 @@ export default function FieldInspectionReport() {
         setIsLoading(false);
         setMessage({title:"UPDATE", content:"Successfully updated."});
         onClick('displayMessage');
+    }
+
+    const submitEmail = () => {
+        setIsLoading(true);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email/', {
+            "email_add": email,
+        }, config)
+        .then((res) => {
+            onHide('displayAddEmail');
+            setEmail('');
+            setIsLoading(false);
+            setMessage({title:"EMAIL", content:"Successfully added."});
+            onClick('displayMessage');
+            getEmail();
+        })
+        .catch((err) => {
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+        })
+    }
+
+    const submitSendEmail = () => {
+        let sendEmailList = [];
+        emailSelect.map((x) =>
+            sendEmailList.push(x.email_add)
+        )
+        setIsLoading(true);
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        if (emailMode === 'bulk') {
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/bulk/', {
+                "fi_report_id": "",
+                "body": emailBody,
+                "email": sendEmailList
+            }, config)
+            .then((res) => {
+                onHide('displayEmail');
+                setEmailReportID('');
+                setIsLoading(false);
+                setMessage({title:"EMAIL", content:"Email sent."});
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+            })
+        } else {
+            axios.post(process.env.REACT_APP_SERVER_NAME + 'emails/email-send/', {
+                "fi_report_id": emailReportID,
+                "body": emailBody,
+                "email": sendEmailList
+            }, config)
+            .then((res) => {
+                onHide('displayEmail');
+                setEmailReportID('');
+                setIsLoading(false);
+                setMessage({title:"EMAIL", content:"Email sent."});
+                onClick('displayMessage');
+            })
+            .catch((err) => {
+                setIsLoading(false);
+                toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+            })
+        }
+    }
+
+    const deleteSelectedEmail = (value) => {
+        let theEmails = [...emailSelect];
+        var index = theEmails.indexOf(value);
+        theEmails.splice(index, 1);
+        setEmailSelect(theEmails);
     }
 
     const getEmail = () => {
@@ -941,13 +1517,47 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/emails/email/', config)
-            .then((res) => {
-                console.log(res.data)
-            })
-            .catch((err) => {
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'emails/email/', config)
+        .then((res) => {
+            setEmailList(res.data.results)
+            if (res.data.next === null) {
+            
+            } else {
+                nextPageEmail(res.data.next);
+            }
+        })
+        .catch((err) => {
+            
+        });
+    }
+
+    const nextPageEmail = (valueURL) => {
+        let token = localStorage.getItem("token");
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
+
+        axios.get(valueURL, config)
+        .then((res) => {
+            appendEmail(res.data.results, res.data.next);
+        })
+        .catch((err) => {
+            
+        });
+    };
+
+    const appendEmail = (valueResults, valueURL) => {
+        valueResults.map((i) => {
+            return setEmailList(emailList => [...emailList, i]);
+        });
+        if (valueURL === null){
                 
-            });
+        } else {
+            nextPageEmail(valueURL);
+        }
     }
 
     const submitDeleteFieldInspection = () => {
@@ -960,19 +1570,18 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios
-            .delete(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + delFieldInspectionID + '/', config)
-            .then((res) => {
-                getFieldInspectionRecord();
-                setIsLoading(false);
-                setMessage({title:"DELETE", content:"Successfully deleted."});
-                onHide('displayConfirmDelete');
-                onClick('displayMessage');
-            })
-            .catch((err) => {
-                toast.current.show({ severity: 'error', summary: 'Delete Record Error', detail: 'Something went wrong.', life: 5000 });
-                setIsLoading(false);
-            });
+        axios.delete(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + delFieldInspectionID + '/', config)
+        .then((res) => {
+            getFieldInspectionRecord();
+            setIsLoading(false);
+            setMessage({title:"DELETE", content:"Successfully deleted."});
+            onHide('displayConfirmDelete');
+            onClick('displayMessage');
+        })
+        .catch((err) => {
+            setIsLoading(false);
+            toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
+        });
     }
 
     const getFieldInspectionRecord = () => {
@@ -984,15 +1593,14 @@ export default function FieldInspectionReport() {
             },
         };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
-            .then((res) => {
-                setTotalCount(res.data.count);
-                setFieldInspectionRecordList(res.data.results);
-            })
-            .catch((err) => {
-                
-            });
+        axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', config)
+        .then((res) => {
+            setTotalCount(res.data.count);
+            setFieldInspectionRecordList(res.data.results);
+        })
+        .catch((err) => {
+            
+        });
     }
 
     const gfpExterior = (index, value) => {
@@ -1226,6 +1834,17 @@ export default function FieldInspectionReport() {
         setFlagFieldInspectionRecordList(false);
         setReviseColor(Array(30).fill(""));
         setReviseText(Array(30).fill(""));
+        if (name === 'displayEmail') {
+            setEmail('');
+            setEmailInput([]);
+            setEmailSelect([]);
+            setEmailMode('');
+            setEmailBody('');
+        }
+        if (name === 'displayAddEmail') {
+            setEmail('');
+        }
+        
     }
 
     const renderFooter = (name) => {
@@ -1260,13 +1879,23 @@ export default function FieldInspectionReport() {
 
     const actionBody = (rowData) => {
         return (
+            <div className="disable-btn">
+                <center>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id, '')}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
+                    {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id, 'pdf')}}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailReportID(rowData.fi_report_id); onClick('displayEmail')}}/>
+                </center>
+            </div>
+        );
+    }
+
+    const actionBodyEmail = (rowData) => {
+        return (
             <div>
                 <center>
-                    <Button style={{marginRight: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id)}/>
-                    <Button style={{marginRight: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); onClick('displayConfirmDelete')}}/>
-                    {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
-                    <Button style={{marginRight: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/>
-                    <Button icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => onClick('displayEmail')}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {deleteSelectedEmail(rowData.email_add)}}/>
                 </center>
             </div>
         );
@@ -1286,27 +1915,37 @@ export default function FieldInspectionReport() {
                 <div className="p-col-12">
                     <div className="card card-w-title">
                         <div className="p-grid p-fluid">
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
                                     <InputText placeholder="Search Report No." value={searchFieldInspectionNumber} onChange={(event) => setSearchFieldInspectionNumber(event.target.value)}/>
                                 </span>
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <span className="p-input-icon-left">
                                     <i className="pi pi-search" />
                                     <InputText placeholder="Search Body No." value={searchBodyNo} onChange={(event) => setSearchBodyNo(event.target.value)}/>
                                 </span>
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
                                 <Calendar placeholder="Select Date" value={searchDateInspection} onChange={(e) => setSearchDateInspection(e.value)} showIcon />
                             </div>
-                            <div className="p-col-12 p-lg-3 p-md-3 p-sm-12">
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <div><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
+                            </div>
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <div><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
+                            </div>
+                            <div className="p-col-12 p-lg-2 p-md-2 p-sm-12">
+                                <div><Button label="BULK" icon="pi pi-google" onClick={() => {setEmailMode('bulk'); onClick('displayEmail')}}/></div>
+                            </div>
+                            {/* <div className="p-col-12 p-lg-5 p-md-5 p-sm-12">
                                 <div className="p-d-flex">
                                     <div className="p-mr-3"><Button label="SEARCH" icon="pi pi-search" onClick={() => submitSearch()}/></div>
                                     <div className="p-mr-3"><Button label="SCAN QR" icon="pi pi-th-large" onClick={() => onClick('displayQR')}/></div>
+                                    <div className="p-mr-3"><Button label="BULK" icon="pi pi-google" onClick={() => {setEmailMode('bulk'); onClick('displayEmail')}}/></div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -1370,43 +2009,44 @@ export default function FieldInspectionReport() {
                                             <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>CONDITION:</b></h6>
+                                            <Dropdown value={condition} options={conditionOptions} optionLabel="name" placeholder="Select Condition" 
+                                            onChange={event => setCondition(event.target.value)} />
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>YEAR:</b></h6>
                                             <InputText placeholder="Input Year" value={year} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>MAKE:</b></h6>
                                             <InputText placeholder="Input Make" value={make} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>MODEL:</b></h6>
                                             <InputText placeholder="Input Make" value={model} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>TRANSMISSION:</b></h6>
                                             <InputText placeholder="Input Transmisison" value={transmission} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>ENGINE:</b></h6>
                                             <InputText placeholder="Input Body No." value={engine} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>INSPECTOR:</b></h6>
                                             <InputText placeholder="Input Inspector" value={inspector} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>LOCATION:</b></h6>
                                             <InputText placeholder="Input Location" value={location} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>EXTERIOR COLOR:</b></h6>
                                             <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                         </div>
-                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
-                                            <h6><b>CONDITION:</b></h6>
-                                            <InputText placeholder="Input Condition" value={condition} disabled/>
-                                        </div>
-
+                                        
                                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{borderTop:'2px solid blue', borderBottom:'2px solid blue', marginBottom:'1px'}}>
                                             <center><b>G=Good F=Fair P=Poor</b></center>
                                         </div>
@@ -1638,83 +2278,84 @@ export default function FieldInspectionReport() {
                     <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
                         <div id="toPdf" className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                 <h4>FIELD INSPECTION REPORT</h4>
                             </div>
-                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <div className="p-col-12">
                                 <div className="card card-w-title">
                                     <div className="p-grid p-fluid">
-                                        <div className="p-col-4 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                             <h6><b>REPORT No.:</b></h6>
                                             {/* <Dropdown value={fieldInspectionData} options={fieldInspectionNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
                                             onChange={event => {setFieldInspectionData(event.target.value); handleSelectReportNo(event.target.value)}}/> */}
                                             <InputText placeholder="Input Report No." value={fieldInspectionID} disabled/>
                                         </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[0]}>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
+                                            <h6><b>BODY No.:</b></h6>
+                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
+                                        </div>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[0]}>
                                             <h6><b>INSPECTION DATE:</b></h6>
                                             {/* <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => setDateInspection(e.value)} showIcon readOnlyInput/> */}
                                             <Calendar placeholder="Select Date" value={dateInspection} onChange={(e) => onChangeValue('f0', e.value)} showIcon readOnlyInput/>
                                             <small className="p-invalid p-d-block">{reviseText[0]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>YEAR:</b></h6>
-                                            <InputText placeholder="Input Year" value={year} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>MAKE:</b></h6>
-                                            <InputText placeholder="Input Make" value={make} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>MODEL:</b></h6>
-                                            <InputText placeholder="Input Make" value={model} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[1]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[1]}>
                                             <h6><b>MILEAGE:</b></h6>
                                             <InputText placeholder="Input Mileage" value={mileage} onChange={(e) => onChangeValue('f1', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[1]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>BODY No.:</b></h6>
-                                            <InputText placeholder="Input Body No." value={bodyNo} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[2]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[2]}>
                                             <h6><b>BODY STYLE:</b></h6>
                                             <InputText placeholder="Input Body Style" value={bodyStyle} onChange={(e) => onChangeValue('f2', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[2]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>TRANSMISSION:</b></h6>
-                                            <InputText placeholder="Input Transmisison" value={transmission} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>ENGINE:</b></h6>
-                                            <InputText placeholder="Input Body No." value={engine} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[3]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[3]}>
                                             <h6><b>DRIVER TYPE:</b></h6>
                                             <InputText placeholder="Input Driver Type" value={driverType} onChange={(e) => onChangeValue('f3', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[3]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>INSPECTOR:</b></h6>
-                                            <InputText placeholder="Input Inspector" value={inspector} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>LOCATION:</b></h6>
-                                            <InputText placeholder="Input Location" value={location} disabled/>
-                                        </div>
-                                        <div className="p-col-4 required-asterisk">
-                                            <h6><b>EXTERIOR COLOR:</b></h6>
-                                            <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
-                                        </div>
-                                        <div className={"p-col-4 required-asterisk " + reviseColor[4]}>
+                                        <div className={"p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk " + reviseColor[4]}>
                                             <h6><b>DOOR COUNT:</b></h6>
                                             <InputText placeholder="Input Door Count" value={doorCount} onChange={(e) => onChangeValue('f4', e.target.value)}/>
                                             <small className="p-invalid p-d-block">{reviseText[4]}</small>
                                         </div>
-                                        <div className="p-col-4 required-asterisk">
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                             <h6><b>CONDITION:</b></h6>
-                                            <InputText placeholder="Input Condition" value={condition} disabled/>
+                                            <Dropdown value={condition} options={conditionOptions} optionLabel="name" placeholder="Select Condition" 
+                                            onChange={event => setCondition(event.target.value)} />
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>YEAR:</b></h6>
+                                            <InputText placeholder="Input Year" value={year} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>MAKE:</b></h6>
+                                            <InputText placeholder="Input Make" value={make} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>MODEL:</b></h6>
+                                            <InputText placeholder="Input Make" value={model} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>TRANSMISSION:</b></h6>
+                                            <InputText placeholder="Input Transmisison" value={transmission} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>ENGINE:</b></h6>
+                                            <InputText placeholder="Input Body No." value={engine} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>INSPECTOR:</b></h6>
+                                            <InputText placeholder="Input Inspector" value={inspector} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>LOCATION:</b></h6>
+                                            <InputText placeholder="Input Location" value={location} disabled/>
+                                        </div>
+                                        <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
+                                            <h6><b>EXTERIOR COLOR:</b></h6>
+                                            <InputText placeholder="Input Exterior Color" value={exteriorColor} disabled/>
                                         </div>
 
                                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12" style={{borderTop:'2px solid blue', borderBottom:'2px solid blue', marginBottom:'1px'}}>
@@ -1924,6 +2565,89 @@ export default function FieldInspectionReport() {
                             </div>
                         </div>
                         </div>
+
+                        <div id="toPdfSummary" className="p-grid p-fluid">
+                            <div className="p-col-12">
+                                <h2><b>SUMMARY</b></h2>
+                                <ul>
+                                    <li><b>Good</b>
+                                        <ul>
+                                            {
+                                                goodSummary === undefined ? '' :
+                                                Object.entries(goodSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
+                                                        <ul>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li><b>Fair</b>
+                                        <ul>
+                                            {
+                                                fairSummary === undefined ? '' :
+                                                Object.entries(fairSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
+                                                        <ul>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li><b>Poor</b>
+                                        <ul>
+                                            {
+                                                poorSummary === undefined ? '' :
+                                                Object.entries(poorSummary).map(([key, val]) =>
+                                                    <li key={key}><b>{key}</b>
+                                                        <ul>
+                                                            {
+                                                                val.map((i) => {
+                                                                    return <p><li><b>{i}</b></li></p>
+                                                                })
+                                                            }
+                                                            
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="toPdfImage" className="p-col-12">
+                            <div className="p-grid p-fluid">
+                                {
+                                    reportImage.map((x, index) =>
+                                            <div className="p-col-4" key={index}>
+                                                <div className="p-grid p-fluid">
+                                                    <center><img src={process.env.REACT_APP_SERVER_NAME + x.image.substring(1)} alt="" style={{width:'320px', height: '230px'}}/><br></br></center>
+                                                </div>
+                                            </div>
+                                    )
+                                }
+                            </div>
+                        </div>
                         <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
                             <ProgressSpinner />
                         </div>
@@ -1950,8 +2674,8 @@ export default function FieldInspectionReport() {
                             {/* <h6><b>SELECT EMAIL:</b></h6> */}
                             <div className="p-grid p-fluid">
                                 <div className="p-col-9">
-                                    <AutoComplete forceSelection field="full_name" placeholder="Search Email" /* suggestions={suggestions} completeMethod={searchList} */ 
-                                    /* value={x.fullname} onSelect={event => autoCompleteSelect(x.id, event)} onChange={(e) => updateFieldman(x.id, e.target.value, e.target.value)} *//>
+                                    <AutoComplete forceSelection field="email_add" placeholder="Search Email" suggestions={suggestions} completeMethod={searchList} 
+                                    value={emailInput} onSelect={event => autoCompleteSelectEmail(event.value)} onChange={(e) => setEmailInput(e.target.value)}/>
                                 </div>
                                 <div className="p-col-3">
                                     <Button label="+" onClick={() => onClick('displayAddEmail')}/> 
@@ -1960,16 +2684,25 @@ export default function FieldInspectionReport() {
                         </div>
                         
                         <div className="p-col-12">
-                            <DataTable ref={dt} /* header={renderHeader()} */ /*  value={repairRecordList} */ className="p-datatable-sm" 
-                                resizableColumns columnResizeMode="expand" scrollable scrollHeight="250px" emptyMessage="No emails">
-                                <Column field="repair_id" header="Email" style={{ paddingLeft: '3%' }}></Column>
-                                <Column body={actionBody}></Column>
+                            <DataTable ref={dt} /* header={renderHeader()} */  value={emailSelect} className="p-datatable-sm" 
+                                resizableColumns columnResizeMode="expand" scrollable scrollHeight="200px" emptyMessage="No emails">
+                                <Column field="email_add" header="Email"></Column>
+                                <Column body={actionBodyEmail}></Column>
                             </DataTable>
-                            
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                            <Button label="SEND" onClick={() => saveNotes(theType, theIndex, notes)}/>
+                            <InputTextarea placeholder="Input Email Message" rows={5} cols={30} autoResize
+                            value={emailBody} onChange={(e) => setEmailBody(e.target.value)}/>
                         </div>
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <Button label="SEND" onClick={() => submitSendEmail()}/>
+                        </div>
+                    </div>
+                    <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                        <ProgressSpinner />
+                    </div>
+                    <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                        <ProgressSpinner />
                     </div>
                 </Dialog>
 
@@ -1980,8 +2713,11 @@ export default function FieldInspectionReport() {
                             <InputText placeholder="Input Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
                         </div>
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
-                            <Button label="ADD" /* onClick={() => submitEmail()} *//>
+                            <Button label="ADD" onClick={() => submitEmail()}/>
                         </div>
+                    </div>
+                    <div className="gray-out" style={{display: isLoading ? "flex" : "none"}}>
+                        <ProgressSpinner />
                     </div>
                 </Dialog>
 
@@ -2004,7 +2740,7 @@ export default function FieldInspectionReport() {
                         </div>
                         <div className="p-col">
                             <h5><b>Delete Record</b></h5>
-                            <div style={{fontSize: '16px'}}>Are you sure to delete this record no. {delFieldInspectionID}?</div>
+                            <div style={{fontSize: '16px'}}>Are you sure to delete this record no. {delFieldInspectionJobNo}?</div>
                         </div>
                     </div>
                 </Dialog>
