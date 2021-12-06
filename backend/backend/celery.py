@@ -16,12 +16,12 @@ app.config_from_object(settings, namespace='CELERY')
 app.autodiscover_tasks()
 
 
-app.conf.beat_schedule = {
-    'get-gps-record': { 
-        'task': 'gps.tasks.gps_record', 
-        'schedule': crontab(minute='*/10')
-    },  
-}
+# app.conf.beat_schedule = {
+#     'get-gps-record': { 
+#         'task': 'gps.tasks.gps_record', 
+#         'schedule': crontab(minute='*/10')
+#     },  
+# }
 
 
 @app.task(bind=True)
