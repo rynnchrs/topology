@@ -6,8 +6,8 @@ from .views import GPSView
 
 router = routers.DefaultRouter() 
 router.register(r'records', views.RecordView, 'records'),
+router.register(r'gps', views.GPSView, 'gps'), 
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('gps-list/', GPSView.as_view(), name='gps-list'), # 
+    path('', include(router.urls)), # 
 ]

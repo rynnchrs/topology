@@ -8,7 +8,7 @@ from django.db.models.fields import AutoField
 # Create your models here.
 class GPS(models.Model):
     gps_id = models.AutoField(primary_key=True)
-    device_id = models.CharField(max_length=30, null=True, blank=True)
+    device_id = models.CharField(unique=True, max_length=30, null=True, blank=True)
     body_no = models.ForeignKey(Car, null=True, blank=True,  related_name='gps', on_delete=models.CASCADE)
 
     date_updated = models.DateField(auto_now=True)
