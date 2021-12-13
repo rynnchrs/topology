@@ -52,6 +52,7 @@ export const Register = () => {
     const [addChecklist, setAddChecklist] = useState(false);
     const [editChecklist, setEditChecklist] = useState(false);
     const [delChecklist, setDelChecklist] = useState(false);
+    const [viewDashboard, setViewDashboard] = useState(false);
     const [userLevel, setUserLevel] = useState("");
     const toast = useRef(null);
     const refImageUpload = useRef(null);
@@ -175,6 +176,7 @@ export const Register = () => {
             setAddChecklist(true);
             setEditChecklist(true);
             setDelChecklist(true);
+            setViewDashboard(true);
         } else if (value === "technician") {
             setUserLevel("technician");
             setViewUsers(false);
@@ -211,6 +213,8 @@ export const Register = () => {
             setAddChecklist(true);
             setEditChecklist(true);
             setDelChecklist(true);
+
+            setViewDashboard(true);
         } else if (value === "driver") {
             setUserLevel("driver");
             setViewUsers(false);
@@ -247,6 +251,8 @@ export const Register = () => {
             setAddChecklist(false);
             setEditChecklist(false);
             setDelChecklist(false);
+
+            setViewDashboard(true);
         } else if (value === "viewer") {
             setUserLevel("viewer");
             setViewUsers(false);
@@ -283,6 +289,8 @@ export const Register = () => {
             setAddChecklist(false);
             setEditChecklist(false);
             setDelChecklist(false);
+
+            setViewDashboard(true);
         }
     }
 
@@ -326,7 +334,8 @@ export const Register = () => {
             "can_view_checklist": viewChecklist,
             "can_add_checklist": addChecklist,
             "can_edit_checklist": editChecklist,
-            "can_delete_checklist": delChecklist
+            "can_delete_checklist": delChecklist,
+            "can_view_dashboard": viewDashboard
         });
 
         axios

@@ -355,6 +355,16 @@ export default function FieldInspectionReport() {
         setEmailSelect(emailSelect => [...emailSelect, value]);
     }
 
+    const checkScreenWidth = (value) => {
+        if (window.innerWidth <= 499) {
+            setMessage({title:"PDF ERROR", content:"Downloading pdf not applicable in mobile."});
+            onClick('displayMessage');
+        } else {
+            setFlagFieldInspectionRecordMethod('pdf');
+            getFieldInspectionRecordDetails(value, 'pdf')
+        }
+    }
+
     const getFieldInspectionRecordDetails = (value, mode) => {
         setIsLoading(true);
         let token = localStorage.getItem("token");
@@ -599,227 +609,6 @@ export default function FieldInspectionReport() {
             toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
         }
     }
-
-    // const getFieldInspectionRecordDetailsPDF = (value) => {
-    //     console.log("im in pdf: ", value)
-    //     setIsLoading(true);
-    //     let token = localStorage.getItem("token");
-    //     const config = {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': 'Bearer ' + token,
-    //         },
-    //     };
-
-    //     axios.get(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/' + value + '/pdf/', config)
-    //         .then((res) => {
-    //             setFieldInspectionRecordDetails(res.data);
-    //             axios.get(process.env.REACT_APP_SERVER_NAME + 'image/report-image/' + res.data.fi_report_id +'/?mode=fi', config)
-    //                 .then((res) => {
-    //                     setReportImage(res.data);
-    //                     setFlagFieldInspectionRecordListPDF(true);
-    //                     flagFieldInspectionRecordListPDF ? setIsLoading(false) : '';
-    //                 })
-    //                 .catch((err) => {
-    //                     setIsLoading(false);
-    //                     toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
-    //                 });
-    //         })
-    //         .catch((err) => {
-    //             setIsLoading(false);
-    //             toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
-    //         });
-    // }
-
-    // const assignFieldInspectionRecordEditPDF = (value) => {
-    //     console.log(value);
-    //     try {
-    //         setFieldInspectionID(value.fi_report_id);
-    //         setFieldInspectionTaskID(value.task);
-    //         setFieldInspectionJobID(value.job_order);
-    //         console.log('inspdate: ', value.inspection_date);
-    //         console.log(value.inspection_date);
-    //         console.log(value.job_order);
-    //         Object.keys(value).filter(f => f === "inspection_date").map(x => {
-                
-    //             let dtx = value[x];
-    //             console.log("x: ", dtx);
-    //             console.log("xgmt: ", convertDatetoGMT(dtx));
-    //             onChangeValue('f0', convertDatetoGMT(dtx));
-                
-    //         })
-            
-
-    //         setYear(value.body_no.release_year);
-    //         setMake(value.body_no.brand);
-    //         setModel(value.body_no.make);
-
-    //         // onChangeValue('f1', value.mileage);
-
-    //         setBodyNo(value.body_no.body_no);
-
-    //         // onChangeValue('f2', value.body_style);
-
-    //         setTransmission(value.body_no.transmission);
-    //         setEngine(value.body_no.cylinder + " cylinder");
-
-    //         // onChangeValue('f3', value.drive_type);
-    //         // setInspector("");
-    //         setLocation(value.body_no.current_loc);
-    //         setExteriorColor(value.body_no.color);
-
-    //         // onChangeValue('f4', value.door_count);
-
-    //         setCondition(conditionOptions.find(x => x.name === value.operational));
-    //         let i;
-
-    //         arrExterior = exterior.slice();
-    //         let syntaxExterior = ["hood", "front", "front_bumper", "fenders", "doors", "roof", "rear", "rear_bumper", "trunk", "trim", "fuel_door", "pait_condition"];
-    //         // let syntaxExteriorNote = ["hood_note", "front_note", "front_bumper_note", "fenders_note", "doors_note", "roof_note", "rear_note", "rear_bumper_note", "trunk_note", "trim_note", "fuel_door_note", "pait_condition_note"];
-    //         for (i = 0; i < syntaxExterior.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrExterior[i] = {...arrExterior[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrExterior[i] = {...arrExterior[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrExterior[i] = {...arrExterior[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrExterior[i] = {...arrExterior[i], notes: value[syntaxExteriorNote[i]] === null ? "" : value[syntaxExteriorNote[i]]};
-    //                 setExterior(arrExterior);
-    //             })
-    //         }
-
-    //         arrGlass = glass.slice();
-    //         let syntaxGlass = ["windshield", "windows", "mirrors", "rear_window"];
-    //         // let syntaxGlassNote = ["windshield_note", "windows_note", "mirrors_note", "rear_window_note"];
-    //         for (i = 0; i < syntaxGlass.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxGlass[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrGlass[i] = {...arrGlass[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrGlass[i] = {...arrGlass[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrGlass[i] = {...arrGlass[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrGlass[i] = {...arrGlass[i], notes: value[syntaxGlassNote[i]] === null ? "" : value[syntaxGlassNote[i]]};
-    //                 setGlass(arrGlass);
-    //             })
-    //         }
-
-    //         arrTiresWheels = tiresWheels.slice();
-    //         let syntaxTiresWheels = ["tires_condition", "wheels_condition", "spare_tire"];
-    //         // let syntaxTiresWheelsNote = ["tires_condition_note", "wheels_condition_note", "spare_tire_note"];
-    //         for (i = 0; i < syntaxTiresWheels.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxTiresWheels[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrTiresWheels[i] = {...arrTiresWheels[i], notes: value[syntaxTiresWheelsNote[i]] === null ? "" : value[syntaxTiresWheelsNote[i]]};
-    //                 setTiresWheels(arrTiresWheels);
-    //             })
-    //         }
-
-    //         arrUnderBody = underbody.slice();
-    //         let syntaxUnderBody = ["frame", "exhaust_system", "transmission", "drive_axle", "suspension", "breake_system"];
-    //         // let syntaxUnderBodyNote = ["frame_note", "exhaust_system_note", "transmission_note", "drive_axle_note", "suspension_note", "breake_system_note"];
-    //         for (i = 0; i < syntaxUnderBody.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxUnderBody[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrUnderBody[i] = {...arrUnderBody[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrUnderBody[i] = {...arrUnderBody[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrUnderBody[i] = {...arrUnderBody[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrUnderBody[i] = {...arrUnderBody[i], notes: value[syntaxUnderBodyNote[i]] === null ? "" : value[syntaxUnderBodyNote[i]]};
-    //                 setUnderbody(arrUnderBody);
-    //             })
-    //         }
-
-    //         arrUnderHood = underhood.slice();
-    //         let syntaxUnderHood = ["engine_compartment", "battery", "oil", "fluids", "wiring", "belts", "hoses", "non_stock_modif"];
-    //         // let syntaxUnderHoodNote = ["engine_compartment_note", "battery_note", "oil_note", "fluids_note", "wiring_note", "belts_note", "hoses_note", "non_stock_modif_note"];
-    //         for (i = 0; i < syntaxUnderHood.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxUnderHood[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrUnderHood[i] = {...arrUnderHood[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrUnderHood[i] = {...arrUnderHood[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrUnderHood[i] = {...arrUnderHood[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrUnderHood[i] = {...arrUnderHood[i], notes: value[syntaxUnderHoodNote[i]] === null ? "" : value[syntaxUnderHoodNote[i]]};
-    //                 setUnderhood(arrUnderHood);
-    //             })
-    //         }
-
-    //         arrInterior = interior.slice();
-    //         let syntaxInterior = ["seats", "headliner", "carpet", "door_panels", "glove_box", "vanity_mirrors", "interioir_trim", "dashboard", "dashboard_gauges", "air_conditioning", "heater", "defroster"];
-    //         // let syntaxInteriorNote = ["seats_note", "headliner_note", "carpet_note", "door_panels_note", "glove_box_note", "vanity_mirrors_note", "interioir_trim_note", "dashboard_note", "dashboard_gauges_note", "air_conditioning_note", "heater_note", "defroster_note"];
-    //         for (i = 0; i < syntaxInterior.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxInterior[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrInterior[i] = {...arrInterior[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrInterior[i] = {...arrInterior[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrInterior[i] = {...arrInterior[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrInterior[i] = {...arrInterior[i], notes: value[syntaxInteriorNote[i]] === null ? "" : value[syntaxInteriorNote[i]]};
-    //                 setInterior(arrInterior);
-    //             })
-    //         }
-
-    //         arrElectricalSystem = electricalSystem.slice();
-    //         let syntaxElectricalSystem = ["power_locks", "power_seats", "power_steering", "power_windows", "power_mirrors", "audio_system", "onboard_computer", "headlights", "taillights", "signal_lights", "brake_lights", "parking_lights"];
-    //         // let syntaxElectricalSystemNote = ["power_locks_note", "power_seats_note", "power_steering_note", "power_windows_note", "power_mirrors_note", "audio_system_note", "onboard_computer_note", "headlights_note", "taillights_note", "signal_lights_note", "brake_lights_note", "parking_lights_note"];
-    //         for (i = 0; i < syntaxElectricalSystem.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxElectricalSystem[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrElectricalSystem[i] = {...arrElectricalSystem[i], notes: value[syntaxElectricalSystemNote[i]] === null ? "" : value[syntaxElectricalSystemNote[i]]};
-    //                 setElectricalSystem(arrElectricalSystem);
-    //             })
-    //         }
-
-    //         arrRoadTestFindings= roadTestFindings.slice();
-    //         let syntaxRoadTestFindings = ["starting", "idling", "engine_performance", "acceleration", "trans_shift_quality", "steering", "braking", "suspension_performance"];
-    //         // let syntaxRoadTestFindingsNote = ["starting_note", "idling_note", "engine_performance_note", "acceleration_note", "trans_shift_quality_note", "steering_note", "braking_note", "suspension_performance_note"];
-    //         for (i= 0; i < syntaxRoadTestFindings.length; i++) {
-    //             Object.keys(value).filter(f => f === syntaxRoadTestFindings[i]).map(x => {
-    //                 if (value[x].toLowerCase() === "g") {
-    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: true, f: false, p: false};
-    //                 } else if (value[x].toLowerCase() === "f") {
-    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: true, p: false};
-    //                 } else if (value[x].toLowerCase() === "p") {
-    //                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: false, p: true};
-    //                 }
-    //                 // arrRoadTestFindings[i] = {...arrRoadTestFindings[i], notes: value[syntaxRoadTestFindingsNote[i]] === null ? "" : value[syntaxRoadTestFindingsNote[i]]};
-    //                 setRoadTestFindings(arrRoadTestFindings);
-    //             })
-    //         }
-
-    //         setTimeout(() => {
-    //             onClick('displayPDF');
-    //             convertPDF();
-    //         }, 1500);
-
-    //     } catch(err) {
-    //         setIsLoading(false);
-    //         toast.current.show({ severity: 'error', summary: 'ERROR', detail: 'Something went wrong.', life: 3000 });
-    //         console.log(err)
-    //     }
-    // }
 
     const convertPDF = () => {
         try {
@@ -1339,11 +1128,7 @@ export default function FieldInspectionReport() {
                             100,
                             0,
                             (uri) => {
-                                // console.log("uri: ", uri);
-                                // console.log("bloburi: ", dataURItoBlob(uri));
-                                // console.log("done1", index)
                                 let file = new File([dataURItoBlob(uri)], "name.jpg");
-                                // console.log("files: ", file)
                                 formData.append("images[" + index + "]image", file);
 
                                 if (refImageUpload.current.state.files.length == index + 1) {
@@ -1881,10 +1666,11 @@ export default function FieldInspectionReport() {
         return (
             <div className="disable-btn">
                 <center>
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id, '')}/>
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-pencil" className="p-button-rounded" onClick={() => getFieldInspectionRecordDetails(rowData.fi_report_id, '') }/>
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => {setDelFieldInspectionID(rowData.fi_report_id); setDelFieldInspectionJobNo(rowData.job_order); onClick('displayConfirmDelete')}}/>
                     {/* <Button icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id)}}/> */}
-                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id, 'pdf')}}/>
+                    {/* <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => {setFlagFieldInspectionRecordMethod('pdf'); getFieldInspectionRecordDetails(rowData.fi_report_id, 'pdf')}}/> */}
+                    <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-download" className="p-button-rounded p-button-success" onClick={() => checkScreenWidth(rowData.fi_report_id)}/>
                     <Button style={{marginRight: '3%', marginBottom: '3%'}} icon="pi pi-google" className="p-button-rounded p-button-success" onClick={() => {setEmailReportID(rowData.fi_report_id); onClick('displayEmail')}}/>
                 </center>
             </div>
@@ -2278,10 +2064,10 @@ export default function FieldInspectionReport() {
                     <Dialog header="GENERATING PDF..." visible={displayPDF} onHide={() => onHide('displayPDF')} blockScroll={true}>
                         <div id="toPdf" className="p-grid p-fluid">
                         <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 p-nogutter">
-                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 report-title" style={{borderBottom: '5px solid blue', padding: '0px'}}>
                                 <h4>FIELD INSPECTION REPORT</h4>
                             </div>
-                            <div className="p-col-12">
+                            <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
                                 <div className="card card-w-title">
                                     <div className="p-grid p-fluid">
                                         <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
