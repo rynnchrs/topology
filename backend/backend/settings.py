@@ -223,5 +223,5 @@ task_serializer = 'json'
 result_serializer = 'json'
 timezone = 'Asia/Manila' 
 # imports = ['gps.tasks']
-# beat_schedule  = 'django_celery_beat.schedulers:DatabaseScheduler'
+# beat_schedule  = 'django_celery_beat.schedulers:DatabaseScheduler
 FRONTEND_URL = env('FRONTEND_URL')
