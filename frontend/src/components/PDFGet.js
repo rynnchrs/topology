@@ -1180,15 +1180,14 @@ export default function PDFget() {
                                         <ul>
                                             {
                                                 goodSummary === undefined ? '' :
-                                                Object.entries(goodSummary).map(([key, val]) =>
-                                                    <li key={key}><b>{key}</b>
+                                                Object.entries(goodSummary).map(([key, val], index) =>
+                                                    <li key={index}><b>{key}</b>
                                                         <ul>
                                                             {
-                                                                val.map((i) => {
-                                                                    return <p><li><b>{i}</b></li></p>
+                                                                val.map((i, idx) => {
+                                                                    return <p key={idx}><li><b>{i}</b></li></p>
                                                                 })
                                                             }
-                                                            
                                                         </ul>
                                                     </li>
                                                 )
@@ -1201,15 +1200,14 @@ export default function PDFget() {
                                         <ul>
                                             {
                                                 fairSummary === undefined ? '' :
-                                                Object.entries(fairSummary).map(([key, val]) =>
-                                                    <li key={key}><b>{key}</b>
+                                                Object.entries(fairSummary).map(([key, val], index) =>
+                                                    <li key={index}><b>{key}</b>
                                                         <ul>
                                                             {
-                                                                val.map((i) => {
-                                                                    return <p><li><b>{i}</b></li></p>
+                                                                val.map((i, idx) => {
+                                                                    return <p key={idx}><li><b>{i}</b></li></p>
                                                                 })
                                                             }
-                                                            
                                                         </ul>
                                                     </li>
                                                 )
@@ -1222,15 +1220,14 @@ export default function PDFget() {
                                         <ul>
                                             {
                                                 poorSummary === undefined ? '' :
-                                                Object.entries(poorSummary).map(([key, val]) =>
-                                                    <li key={key}><b>{key}</b>
+                                                Object.entries(poorSummary).map(([key, val], index) =>
+                                                    <li key={index}><b>{key}</b>
                                                         <ul>
                                                             {
-                                                                val.map((i) => {
-                                                                    return <p><li><b>{i}</b></li></p>
+                                                                val.map((i, idx) => {
+                                                                    return <p key={idx}><li><b>{i}</b></li></p>
                                                                 })
                                                             }
-                                                            
                                                         </ul>
                                                     </li>
                                                 )
