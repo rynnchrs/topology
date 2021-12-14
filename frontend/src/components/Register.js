@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { InputMask } from 'primereact/inputmask';
+// import { InputMask } from 'primereact/inputmask';
 import { Checkbox } from 'primereact/checkbox';
 import { Panel } from 'primereact/panel';
 import { FileUpload } from 'primereact/fileupload';

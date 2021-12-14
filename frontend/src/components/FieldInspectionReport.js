@@ -30,7 +30,7 @@ export default function FieldInspectionReport() {
     const [make, setMake] = useState("");
     const [model, setModel] = useState("");
     const [mileage, setMileage] = useState("");
-    const [bodyNo, setBodyNo] = useState("");
+    const [/* bodyNo */, setBodyNo] = useState("");
     const [bodyStyle, setBodyStyle] = useState("");
     const [transmission, setTransmission] = useState("");
     const [engine, setEngine] = useState("");
@@ -255,7 +255,7 @@ export default function FieldInspectionReport() {
         let flagChecking = true;
 
         if (flagChecking === true) {
-            for (var i = 0; i < exterior.length; i++) {
+            for (let i = 0; i < exterior.length; i++) {
                 if (exterior[i].g === false && exterior[i].f === false && exterior[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'EXTERIOR', detail: 'Please check one: ' + exterior[i].label, life: 3000});
                     flagChecking = false;
@@ -265,7 +265,7 @@ export default function FieldInspectionReport() {
         }
 
         if (flagChecking === true) {
-            for (var i = 0; i < glass.length; i++) {
+            for (let i = 0; i < glass.length; i++) {
                 if (glass[i].g === false && glass[i].f === false && glass[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'GLASS', detail: 'Please check one: ' + glass[i].label, life: 3000});
                     flagChecking = false;
@@ -275,7 +275,7 @@ export default function FieldInspectionReport() {
         }
 
         if (flagChecking === true) {
-            for (var i = 0; i < tiresWheels.length; i++) {
+            for (let i = 0; i < tiresWheels.length; i++) {
                 if (tiresWheels[i].g === false && tiresWheels[i].f === false && tiresWheels[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'TIRES AND WHEELS', detail: 'Please check one: ' + tiresWheels[i].label, life: 3000});
                     flagChecking = false;
@@ -285,7 +285,7 @@ export default function FieldInspectionReport() {
         }
         
         if (flagChecking === true) {
-            for (var i = 0; i < underbody.length; i++) {
+            for (let i = 0; i < underbody.length; i++) {
                 if (underbody[i].g === false && underbody[i].f === false && underbody[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underbody[i].label, life: 3000});
                     flagChecking = false;
@@ -295,7 +295,7 @@ export default function FieldInspectionReport() {
         }
 
         if (flagChecking === true) {
-            for (var i = 0; i < underhood.length; i++) {
+            for (let i = 0; i < underhood.length; i++) {
                 if (underhood[i].g === false && underhood[i].f === false && underhood[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'UNDERBODY', detail: 'Please check one: ' + underhood[i].label, life: 3000});
                     flagChecking = false;
@@ -305,7 +305,7 @@ export default function FieldInspectionReport() {
         }
 
         if (flagChecking === true) {
-            for (var i = 0; i < interior.length; i++) {
+            for (let i = 0; i < interior.length; i++) {
                 if (interior[i].g === false && interior[i].f === false && interior[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'INTERIOR', detail: 'Please check one: ' + interior[i].label, life: 3000});
                     flagChecking = false;
@@ -315,7 +315,7 @@ export default function FieldInspectionReport() {
         }
 
         if (flagChecking === true) {
-            for (var i = 0; i < electricalSystem.length; i++) {
+            for (let i = 0; i < electricalSystem.length; i++) {
                 if (electricalSystem[i].g === false && electricalSystem[i].f === false && electricalSystem[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'ELECTRICAL SYSTEM', detail: 'Please check one: ' + electricalSystem[i].label, life: 3000});
                     flagChecking = false;
@@ -325,7 +325,7 @@ export default function FieldInspectionReport() {
         }
 
         if (flagChecking === true) {
-            for (var i = 0; i < roadTestFindings.length; i++) {
+            for (let i = 0; i < roadTestFindings.length; i++) {
                 if (roadTestFindings[i].g === false && roadTestFindings[i].f === false && roadTestFindings[i].p === false) {
                     toast.current.show({severity: 'error', summary: 'road test findings', detail: 'Please check one: ' + roadTestFindings[i].label, life: 3000});
                     flagChecking = false;
@@ -544,7 +544,7 @@ export default function FieldInspectionReport() {
                                 // console.log("files: ", file)
                                 formData.append("images[" + index + "]image", file);
 
-                                if (refImageUpload.current.state.files.length == index + 1) {
+                                if (refImageUpload.current.state.files.length === index + 1) {
                                     console.log("send request")
                                     axios.post(process.env.REACT_APP_SERVER_NAME + 'report/field-inspection/', formData, config)
                                     .then((res) => {

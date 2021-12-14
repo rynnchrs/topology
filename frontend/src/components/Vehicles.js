@@ -1217,6 +1217,7 @@ export class Vehicles extends Component {
                             res.data.map((x) => {
                                 imageIDs += x.id;
                                 imageIDs += ",";
+                                return null;
                             })
                             axios.delete(process.env.REACT_APP_SERVER_NAME + 'image/report-image/'+ this.state.vehicleData.car_id +'/?mode=cr&id=' + imageIDs.substring(0, imageIDs.length - 1), config)
                             .then((res) => {

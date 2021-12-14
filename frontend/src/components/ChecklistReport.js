@@ -92,6 +92,7 @@ export default function ChecklistReport() {
                 let p = [];
                 res.data.map((i) => {
                     p.push({partsId: i.id, name: i.name, quantity: 0});
+                    return null;
                 })
                 setChecklistParts(p);
             })
@@ -199,6 +200,7 @@ export default function ChecklistReport() {
             // })
             checklistParts.filter(f => f.quantity !== 0).map((x) => {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
+                return null;
             })
 
             axios.post(process.env.REACT_APP_SERVER_NAME + 'report/checklist/', {

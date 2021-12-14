@@ -917,6 +917,7 @@ export const JobScheduling = () => {
                 // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
                 fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
                     setEditFieldman(editFieldman => [...editFieldman, {id: index, val: i.username, fullname: i.full_name}])
+                    return null;
                 })
             )
             
@@ -961,6 +962,7 @@ export const JobScheduling = () => {
                 // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
                 fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
                     setEditFieldman(editFieldman => [...editFieldman, {id: index, val: i.username, fullname: i.full_name}])
+                    return null;
                 })
             )
             
@@ -1250,6 +1252,7 @@ export const JobScheduling = () => {
                     setReportList(res.data);
                     res.data.filter(i => i.ir_no === ro).map((i) => {
                         setEditReportNo(i);
+                        return null;
                     });
                     // if (res.data.next === null) {
                         
@@ -1266,6 +1269,7 @@ export const JobScheduling = () => {
                     setReportList(res.data);
                     res.data.results.filter(i => i.check_list_id === ro).map((i) => {
                         setEditReportNo(i);
+                        return null;
                     });
                     // if (res.data.next === null) {
                         
@@ -1294,6 +1298,7 @@ export const JobScheduling = () => {
                 appendReportList(res.data.results, res.data.next, ro);
                 res.data.results.filter(i => i.ir_no === ro).map((i) => {
                     setEditReportNo(i);
+                    return null;
                 });
             })
             .catch((err) => {

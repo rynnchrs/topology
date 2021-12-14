@@ -67,7 +67,7 @@ export default function ChecklistRecord() {
     const [vehicleStatus, setVehicleStatus] = useState('');
     const [partsIncluded, setPartsIncluded] = useState([]);
     const [checklistParts, setChecklistParts] = useState([]);
-    const [saveChecklistParts, setSaveChecklistParts] = useState([]);
+    // const [saveChecklistParts, setSaveChecklistParts] = useState([]);
     const [partsName, setPartsName] = useState('');
     const refImageUpload = useRef(null);
     const [reportImage, setReportImage] = useState([{ id: "", image: "" }]);
@@ -101,7 +101,7 @@ export default function ChecklistRecord() {
     //for pagination
     useEffect(() => {
         try {
-            const sentPage = (first / rows) + 1;
+            // const sentPage = (first / rows) + 1;
 
             let token = localStorage.getItem("token");
             const config = {
@@ -162,6 +162,7 @@ export default function ChecklistRecord() {
                     } else {
                         p.push({partsId: i.id, name: i.name, quantity: chck[0].quantity});
                     }
+                    return null;
                 })
                 setChecklistParts(p);
                 setTimeout(() => {
@@ -275,8 +276,9 @@ export default function ChecklistRecord() {
         let getParts = [];
         value.parts.map((i) => {
             getParts.push({partsId: i.id, name: i.check_list_parts, quantity: i.quantity});
+            return null;
         })
-        setSaveChecklistParts(getParts);
+        // setSaveChecklistParts(getParts);
         getChecklistParts(getParts);
     }
 
@@ -457,6 +459,7 @@ export default function ChecklistRecord() {
             let partsSubmit = [];
             checklistParts.filter(f => f.quantity !== 0).map((x) => {
                 partsSubmit.push({quantity: x.quantity, check_list_parts: x.name});
+                return null;
             })
 
             // console.log("bsp: ",bodyNoSpareTire )
@@ -675,13 +678,9 @@ export default function ChecklistRecord() {
                 //     unit: "mm",
                 //     format: [210, 297],
                 // });
-
-                var width = pdf.internal.pageSize.getWidth();
-                var height = pdf.internal.pageSize.getHeight();
-
                 let position = 10;
                 var heightLeft = imgHeight;
-                var appendHeight = pageheight;
+                // var appendHeight = pageheight;
 
                 pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
                 // pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, appendHeight);
@@ -693,12 +692,9 @@ export default function ChecklistRecord() {
                     width = pdf.internal.pageSize.getWidth();
                     height = pdf.internal.pageSize.getHeight();
 
-
-                    
-                    
                     position = heightLeft - imgHeight;
                     console.log("pos: ", position)
-                    appendHeight = position + 280;
+                    // appendHeight = position + 280;
                     pdf.addPage();
                     pdf.addImage(imgData, 'PNG', 14, position, imgWidth-32, imgHeight);
                     heightLeft -= pageheight;
@@ -803,7 +799,7 @@ export default function ChecklistRecord() {
         let arrIndex = id.substring(1);
         let r = "red";
         let e = "";
-        let dt = "";
+        // let dt = "";
         switch (id) {
             case 'f0':
                 setEmail(value);

@@ -44,7 +44,7 @@ export default function IncidentReport() {
     const [damagedParts, setDamagedParts] = useState('');
     const [locationIncident, setLocationIncident] = useState('');
     const [dateDetails, setDateDetails] = useState(null);
-    const [timeDetails, setTimeDetails] = useState(null);
+    const [/* timeDetails */, setTimeDetails] = useState(null);
     const [problemObserved, setProblemObserved] = useState('');
     const [recommendation, setRecommendation] = useState('');
     const [remarks, setRemarks] = useState('');
