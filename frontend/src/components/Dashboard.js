@@ -1,11 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
 import { TabView, TabPanel } from 'primereact/tabview';
 // import axios from "axios";
 
 
 export const Dashboard = () => {
+
+    const modeOptions = [{name: 'DAY', val: 'day'}, {name: 'WEEK', val: 'week'}, {name: 'MONTH', val: 'month'}];
 
     const [totalTable, setTotalTable] = useState([]);
 
@@ -62,6 +66,28 @@ export const Dashboard = () => {
 
     return (
         <div className="p-grid p-fluid" >
+            <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                <div className="card card-w-title" style={{borderTop: '5px solid blue'}}>
+                    <div className="p-grid p-fluid">
+                        <div className="p-col-12 p-lg-12 p-md-12 p-sm-12">
+                            <div className="p-grid p-fluid">
+                                <div className="p-col-12 p-xl-7 p-lg-6 p-md-5 p-sm-12">
+                                    <div style={{float: 'left'}}>
+                                        <b style={{fontSize: '20px', color:'gray'}}>Total Inspection</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <Dropdown /* value={searchJobType} */ options={modeOptions} optionLabel="name" placeholder="Select Mode" /* onChange={event => setSearchJobType(event.target.value)} *//>
+                        </div>
+                        <div className="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <Calendar id="icon" placeholder="Select Date" /* value={searchEndDate} */ /* onChange={(e) => setSearchEndDate(e.value)} */ showIcon />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="p-col-12">
                 <div className="p-col-12 p-lg-12 p-md-12 p-sm-12 ">
                 <h2>DATA</h2>

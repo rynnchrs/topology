@@ -173,12 +173,12 @@ const App = () => {
         
     // }
 
-    // sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-th-large', to: '/repairreport' });
-    // sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-th-large', to: '/repairrecords'});
+    sidebarSubMenu4.push({label: 'Careta Report', icon: 'pi pi-th-large', to: '/repairreport' });
+    sidebarSubMenu4.push({label: 'Careta Records', icon: 'pi pi-th-large', to: '/repairrecords'});
     // sidebarSubMenu4.push({label: 'Checklist Report', icon: 'pi pi-th-large', to: '/checklistreport'});
     // sidebarSubMenu4.push({label: 'Checklist Record', icon: 'pi pi-th-large', to: '/checklistrecord'});
-    // sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
-    // sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
+    sidebarSubMenu4.push({label: 'Incident Report', icon: 'pi pi-th-large', to: '/incidentreport'});
+    sidebarSubMenu4.push({label: 'Incident Record', icon: 'pi pi-th-large', to: '/incidentrecord'});
     sidebarSubMenu4.push({label: 'Field Inspection Report', icon: 'pi pi-th-large', to: '/fieldinspectionreport'});
     sidebarSubMenu4.push({label: 'Field Inspection Record', icon: 'pi pi-th-large', to: '/fieldinspectionrecord'});
     // sidebarSubMenu4.push({label: 'PDFGET', icon: 'pi pi-th-large', to: '/pdfget'});
