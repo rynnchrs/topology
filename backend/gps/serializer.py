@@ -1,19 +1,33 @@
-from .models import GPS, Record
+from car.models import Car
 from rest_framework import serializers
 
+from .models import GPS, Record
 
-class GpsRecordSerializer(serializers.ModelSerializer):
-    
+
+class RecordSerializer(serializers.ModelSerializer):
+    device_id = serializers.CharField(source='device_id.device_id')
     class Meta:
         model = Record
-        field = '__all__'
+        fields = '__all__'
 
-    def validate(self, obj): # validate if vin_no input is vin_no
+
+class GPSSerializer(serializers.ModelSerializer):
+    body_no = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = GPS
+        fields = '__all__'
+
+    def validate(self, obj): # validate input in foreign keys
         errors = []
         try:
-            obj['device_id'] = GPS.objects.get(device_id=obj['device_id'])
+            obj['body_no'] = Car.objects.get(body_no=obj['body_no'])
         except:
-           errors.append({"device_id": 'Invalid Device ID.'})
+           errors.append({"body_no": 'Invalid Body No.'})
         if errors:
             raise serializers.ValidationError({'errors':errors})
         return obj
+ 
+    def to_representation(self, instance): 
+        self.fields['body_no'] = serializers.CharField(read_only=True, source='body_no.body_no')
+        return super(GPSSerializer, self).to_representation(instance)
