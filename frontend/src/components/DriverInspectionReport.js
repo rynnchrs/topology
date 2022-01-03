@@ -640,7 +640,7 @@ export class DriverInspectionReport extends Component {
 
     render() {
         return (
-            <div className="p-grid p-fluid">
+            <div className="p-grid p-fluid resize-label">
                 <div className="p-col-12 p-lg-12">
                     <div className="card card-w-title">
                         <center><h1><b>Fleet Vehicle Inspection Checklist</b></h1></center>

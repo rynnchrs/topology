@@ -27,19 +27,29 @@ export default function PDFget() {
     const [reviseColor, setReviseColor] = useState(Array(30).fill(""));
     const [reviseText, setReviseText] = useState(Array(30).fill(""));
 
-    let arrExterior = useRef([]);
-    let arrGlass = useRef([]);
-    let arrTiresWheels = useRef([]);
-    let arrUnderBody = useRef([]);
-    let arrUnderHood = useRef([]);
-    let arrInterior = useRef([]);
-    let arrElectricalSystem = useRef([]);
-    let arrRoadTestFindings = useRef([]);
+    // let arrExterior = useRef([]);
+    // let arrGlass = useRef([]);
+    // let arrTiresWheels = useRef([]);
+    // let arrUnderBody = useRef([]);
+    // let arrUnderHood = useRef([]);
+    // let arrInterior = useRef([]);
+    // let arrElectricalSystem = useRef([]);
+    // let arrRoadTestFindings = useRef([]);
+
+    const [arrExterior, setArrExterior] = useState([]);
+    const [arrGlass, setArrGlass] = useState([]);
+    const [arrTiresWheels, setArrTiresWheels] = useState([]);
+    const [arrUnderBody, setArrUnderBody] = useState([]);
+    const [arrUnderHood, setArrUnderHood] = useState([]);
+    const [arrInterior, setArrInterior] = useState([]);
+    const [arrElectricalSystem, setArrElectricalSystem] = useState([]);
+    const [arrRoadTestFindings, setArrRoadTestFindings] = useState([]);
+
 
     //variables to be save
     const [fieldInspectionID, setFieldInspectionID] =  useState('');
-    const [fieldInspectionTaskID, setFieldInspectionTaskID] =  useState('');
-    const [fieldInspectionJobID, setFieldInspectionJobID] =  useState('');
+    const [/* fieldInspectionTaskID */, setFieldInspectionTaskID] =  useState('');
+    const [/* fieldInspectionJobID */, setFieldInspectionJobID] =  useState('');
     const [dateInspection, setDateInspection] = useState(null);
     const [year, setYear] = useState('');
     const [make, setMake] = useState('');
@@ -50,14 +60,14 @@ export default function PDFget() {
     const [transmission, setTransmission] = useState('');
     const [engine, setEngine] = useState('');
     const [driverType, setDriverType] = useState('');
-    const [inspector, setInspector] = useState("CARETA");
+    const [inspector, /* setInspector */] = useState("CARETA");
     const [location, setLocation] = useState('');
     const [exteriorColor, setExteriorColor] = useState('');
     const [doorCount, setDoorCount] = useState('');
     const [condition, setCondition] = useState([]);
-    const refImageUpload = useRef(null);
+    // const refImageUpload = useRef(null);
     const [reportImage, setReportImage] = useState([{id: '', image: ''}]);
-    const [holdImageID, setHoldImageID] = useState('');
+    // const [holdImageID, setHoldImageID] = useState('');
     const [holdPDFName, setHoldPDFName] = useState('');
 
     const [exterior, setExterior] = useState([
@@ -168,52 +178,55 @@ export default function PDFget() {
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrExterior = exterior.slice();
+        setArrExterior(exterior.slice());
+        // arrExterior = exterior.slice();
     }, [exterior]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrGlass = glass.slice();
+        setArrGlass(glass.slice());
+        // arrGlass = glass.slice();
     }, [glass]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrTiresWheels = tiresWheels.slice();
+        setArrTiresWheels(tiresWheels.slice());
+        // arrTiresWheels = tiresWheels.slice();
     }, [tiresWheels]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrUnderBody = underbody.slice();
+        setArrUnderBody(underbody.slice());
+        // arrUnderBody = underbody.slice();
     }, [underbody]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrUnderHood = underhood.slice();
+        setArrUnderHood(underhood.slice());
+        // arrUnderHood = underhood.slice();
     }, [underhood]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrUnderHood = underhood.slice();
-    }, [underhood]);
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrInterior = interior.slice();
+        setArrInterior(interior.slice());
+        // arrInterior = interior.slice();
     }, [interior]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrElectricalSystem = electricalSystem.slice();
+        setArrElectricalSystem(electricalSystem.slice());
+        // arrElectricalSystem = electricalSystem.slice();
     }, [electricalSystem]);
     
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        arrRoadTestFindings = roadTestFindings.slice();
+        setArrRoadTestFindings(roadTestFindings.slice());
+        // arrRoadTestFindings = roadTestFindings.slice();
     }, [roadTestFindings]);
 
     useEffect(() => {
         doPDF();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const doPDF = () => {
         const windowUrl = window.location.href;
@@ -288,13 +301,27 @@ export default function PDFget() {
             onChangeValue('f4', value.door_count);
 
             setCondition(conditionOptions.find(x => x.name === value.operational));
-            let i;
+            // let i;
 
-            arrExterior = exterior.slice();
+            // arrExterior = exterior.slice();
             let syntaxExterior = ["hood", "front", "front_bumper", "fenders", "doors", "roof", "rear", "rear_bumper", "trunk", "trim", "fuel_door", "pait_condition"];
             let syntaxExteriorNote = ["hood_note", "front_note", "front_bumper_note", "fenders_note", "doors_note", "roof_note", "rear_note", "rear_bumper_note", "trunk_note", "trim_note", "fuel_door_note", "pait_condition_note"];
-            for (i = 0; i < syntaxExterior.length; i++) {
-                Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
+            // for (i = 0; i < syntaxExterior.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxExterior[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrExterior[i] = {...arrExterior[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrExterior[i] = {...arrExterior[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrExterior[i] = {...arrExterior[i], g: false, f: false, p: true};
+            //         }
+            //         arrExterior[i] = {...arrExterior[i], notes: value[syntaxExteriorNote[i]] === null ? "" : value[syntaxExteriorNote[i]]};
+            //         setExterior(arrExterior);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxExterior.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrExterior[i] = {...arrExterior[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -304,14 +331,29 @@ export default function PDFget() {
                     }
                     arrExterior[i] = {...arrExterior[i], notes: value[syntaxExteriorNote[i]] === null ? "" : value[syntaxExteriorNote[i]]};
                     setExterior(arrExterior);
+                    return null;
                 })
             }
 
-            arrGlass = glass.slice();
+            // arrGlass = glass.slice();
             let syntaxGlass = ["windshield", "windows", "mirrors", "rear_window"];
             let syntaxGlassNote = ["windshield_note", "windows_note", "mirrors_note", "rear_window_note"];
-            for (i = 0; i < syntaxGlass.length; i++) {
-                Object.keys(value).filter(f => f === syntaxGlass[i]).map(x => {
+            // for (i = 0; i < syntaxGlass.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxGlass[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrGlass[i] = {...arrGlass[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrGlass[i] = {...arrGlass[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrGlass[i] = {...arrGlass[i], g: false, f: false, p: true};
+            //         }
+            //         arrGlass[i] = {...arrGlass[i], notes: value[syntaxGlassNote[i]] === null ? "" : value[syntaxGlassNote[i]]};
+            //         setGlass(arrGlass);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxGlass.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrGlass[i] = {...arrGlass[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -321,14 +363,29 @@ export default function PDFget() {
                     }
                     arrGlass[i] = {...arrGlass[i], notes: value[syntaxGlassNote[i]] === null ? "" : value[syntaxGlassNote[i]]};
                     setGlass(arrGlass);
+                    return null;
                 })
             }
 
-            arrTiresWheels = tiresWheels.slice();
+            // arrTiresWheels = tiresWheels.slice();
             let syntaxTiresWheels = ["tires_condition", "wheels_condition", "spare_tire"];
             let syntaxTiresWheelsNote = ["tires_condition_note", "wheels_condition_note", "spare_tire_note"];
-            for (i = 0; i < syntaxTiresWheels.length; i++) {
-                Object.keys(value).filter(f => f === syntaxTiresWheels[i]).map(x => {
+            // for (i = 0; i < syntaxTiresWheels.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxTiresWheels[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrTiresWheels[i] = {...arrTiresWheels[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrTiresWheels[i] = {...arrTiresWheels[i], g: false, f: false, p: true};
+            //         }
+            //         arrTiresWheels[i] = {...arrTiresWheels[i], notes: value[syntaxTiresWheelsNote[i]] === null ? "" : value[syntaxTiresWheelsNote[i]]};
+            //         setTiresWheels(arrTiresWheels);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxTiresWheels.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrTiresWheels[i] = {...arrTiresWheels[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -338,14 +395,29 @@ export default function PDFget() {
                     }
                     arrTiresWheels[i] = {...arrTiresWheels[i], notes: value[syntaxTiresWheelsNote[i]] === null ? "" : value[syntaxTiresWheelsNote[i]]};
                     setTiresWheels(arrTiresWheels);
+                    return null;
                 })
             }
 
-            arrUnderBody = underbody.slice();
+            // arrUnderBody = underbody.slice();
             let syntaxUnderBody = ["frame", "exhaust_system", "transmission", "drive_axle", "suspension", "breake_system"];
             let syntaxUnderBodyNote = ["frame_note", "exhaust_system_note", "transmission_note", "drive_axle_note", "suspension_note", "breake_system_note"];
-            for (i = 0; i < syntaxUnderBody.length; i++) {
-                Object.keys(value).filter(f => f === syntaxUnderBody[i]).map(x => {
+            // for (i = 0; i < syntaxUnderBody.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxUnderBody[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrUnderBody[i] = {...arrUnderBody[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrUnderBody[i] = {...arrUnderBody[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrUnderBody[i] = {...arrUnderBody[i], g: false, f: false, p: true};
+            //         }
+            //         arrUnderBody[i] = {...arrUnderBody[i], notes: value[syntaxUnderBodyNote[i]] === null ? "" : value[syntaxUnderBodyNote[i]]};
+            //         setUnderbody(arrUnderBody);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxUnderBody.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrUnderBody[i] = {...arrUnderBody[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -355,14 +427,29 @@ export default function PDFget() {
                     }
                     arrUnderBody[i] = {...arrUnderBody[i], notes: value[syntaxUnderBodyNote[i]] === null ? "" : value[syntaxUnderBodyNote[i]]};
                     setUnderbody(arrUnderBody);
+                    return null;
                 })
             }
 
-            arrUnderHood = underhood.slice();
+            // arrUnderHood = underhood.slice();
             let syntaxUnderHood = ["engine_compartment", "battery", "oil", "fluids", "wiring", "belts", "hoses", "non_stock_modif"];
             let syntaxUnderHoodNote = ["engine_compartment_note", "battery_note", "oil_note", "fluids_note", "wiring_note", "belts_note", "hoses_note", "non_stock_modif_note"];
-            for (i = 0; i < syntaxUnderHood.length; i++) {
-                Object.keys(value).filter(f => f === syntaxUnderHood[i]).map(x => {
+            // for (i = 0; i < syntaxUnderHood.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxUnderHood[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrUnderHood[i] = {...arrUnderHood[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrUnderHood[i] = {...arrUnderHood[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrUnderHood[i] = {...arrUnderHood[i], g: false, f: false, p: true};
+            //         }
+            //         arrUnderHood[i] = {...arrUnderHood[i], notes: value[syntaxUnderHoodNote[i]] === null ? "" : value[syntaxUnderHoodNote[i]]};
+            //         setUnderhood(arrUnderHood);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxUnderHood.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrUnderHood[i] = {...arrUnderHood[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -372,14 +459,29 @@ export default function PDFget() {
                     }
                     arrUnderHood[i] = {...arrUnderHood[i], notes: value[syntaxUnderHoodNote[i]] === null ? "" : value[syntaxUnderHoodNote[i]]};
                     setUnderhood(arrUnderHood);
+                    return null;
                 })
             }
 
-            arrInterior = interior.slice();
+            // arrInterior = interior.slice();
             let syntaxInterior = ["seats", "headliner", "carpet", "door_panels", "glove_box", "vanity_mirrors", "interioir_trim", "dashboard", "dashboard_gauges", "air_conditioning", "heater", "defroster"];
             let syntaxInteriorNote = ["seats_note", "headliner_note", "carpet_note", "door_panels_note", "glove_box_note", "vanity_mirrors_note", "interioir_trim_note", "dashboard_note", "dashboard_gauges_note", "air_conditioning_note", "heater_note", "defroster_note"];
-            for (i = 0; i < syntaxInterior.length; i++) {
-                Object.keys(value).filter(f => f === syntaxInterior[i]).map(x => {
+            // for (i = 0; i < syntaxInterior.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxInterior[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrInterior[i] = {...arrInterior[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrInterior[i] = {...arrInterior[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrInterior[i] = {...arrInterior[i], g: false, f: false, p: true};
+            //         }
+            //         arrInterior[i] = {...arrInterior[i], notes: value[syntaxInteriorNote[i]] === null ? "" : value[syntaxInteriorNote[i]]};
+            //         setInterior(arrInterior);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxInterior.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrInterior[i] = {...arrInterior[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -389,14 +491,29 @@ export default function PDFget() {
                     }
                     arrInterior[i] = {...arrInterior[i], notes: value[syntaxInteriorNote[i]] === null ? "" : value[syntaxInteriorNote[i]]};
                     setInterior(arrInterior);
+                    return null;
                 })
             }
 
-            arrElectricalSystem = electricalSystem.slice();
+            // arrElectricalSystem = electricalSystem.slice();
             let syntaxElectricalSystem = ["power_locks", "power_seats", "power_steering", "power_windows", "power_mirrors", "audio_system", "onboard_computer", "headlights", "taillights", "signal_lights", "brake_lights", "parking_lights"];
             let syntaxElectricalSystemNote = ["power_locks_note", "power_seats_note", "power_steering_note", "power_windows_note", "power_mirrors_note", "audio_system_note", "onboard_computer_note", "headlights_note", "taillights_note", "signal_lights_note", "brake_lights_note", "parking_lights_note"];
-            for (i = 0; i < syntaxElectricalSystem.length; i++) {
-                Object.keys(value).filter(f => f === syntaxElectricalSystem[i]).map(x => {
+            // for (i = 0; i < syntaxElectricalSystem.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxElectricalSystem[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrElectricalSystem[i] = {...arrElectricalSystem[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrElectricalSystem[i] = {...arrElectricalSystem[i], g: false, f: false, p: true};
+            //         }
+            //         arrElectricalSystem[i] = {...arrElectricalSystem[i], notes: value[syntaxElectricalSystemNote[i]] === null ? "" : value[syntaxElectricalSystemNote[i]]};
+            //         setElectricalSystem(arrElectricalSystem);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxElectricalSystem.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrElectricalSystem[i] = {...arrElectricalSystem[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -406,14 +523,29 @@ export default function PDFget() {
                     }
                     arrElectricalSystem[i] = {...arrElectricalSystem[i], notes: value[syntaxElectricalSystemNote[i]] === null ? "" : value[syntaxElectricalSystemNote[i]]};
                     setElectricalSystem(arrElectricalSystem);
+                    return null;
                 })
             }
 
-            arrRoadTestFindings= roadTestFindings.slice();
+            // arrRoadTestFindings= roadTestFindings.slice();
             let syntaxRoadTestFindings = ["starting", "idling", "engine_performance", "acceleration", "trans_shift_quality", "steering", "braking", "suspension_performance"];
             let syntaxRoadTestFindingsNote = ["starting_note", "idling_note", "engine_performance_note", "acceleration_note", "trans_shift_quality_note", "steering_note", "braking_note", "suspension_performance_note"];
-            for (i= 0; i < syntaxRoadTestFindings.length; i++) {
-                Object.keys(value).filter(f => f === syntaxRoadTestFindings[i]).map(x => {
+            // for (i= 0; i < syntaxRoadTestFindings.length; i++) {
+            //     Object.keys(value).filter(f => f === syntaxRoadTestFindings[i]).map(x => {
+            //         if (value[x].toLowerCase() === "g") {
+            //             arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: true, f: false, p: false};
+            //         } else if (value[x].toLowerCase() === "f") {
+            //             arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: true, p: false};
+            //         } else if (value[x].toLowerCase() === "p") {
+            //             arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: false, f: false, p: true};
+            //         }
+            //         arrRoadTestFindings[i] = {...arrRoadTestFindings[i], notes: value[syntaxRoadTestFindingsNote[i]] === null ? "" : value[syntaxRoadTestFindingsNote[i]]};
+            //         setRoadTestFindings(arrRoadTestFindings);
+            //     })
+            // }
+
+            for (const [i, obkeys] of syntaxRoadTestFindings.entries()) {
+                Object.keys(value).filter(f => f === obkeys).map((x) => {
                     if (value[x].toLowerCase() === "g") {
                         arrRoadTestFindings[i] = {...arrRoadTestFindings[i], g: true, f: false, p: false};
                     } else if (value[x].toLowerCase() === "f") {
@@ -423,6 +555,7 @@ export default function PDFget() {
                     }
                     arrRoadTestFindings[i] = {...arrRoadTestFindings[i], notes: value[syntaxRoadTestFindingsNote[i]] === null ? "" : value[syntaxRoadTestFindingsNote[i]]};
                     setRoadTestFindings(arrRoadTestFindings);
+                    return null;
                 })
             }
 
@@ -1047,15 +1180,14 @@ export default function PDFget() {
                                         <ul>
                                             {
                                                 goodSummary === undefined ? '' :
-                                                Object.entries(goodSummary).map(([key, val]) =>
-                                                    <li key={key}><b>{key}</b>
+                                                Object.entries(goodSummary).map(([key, val], index) =>
+                                                    <li key={index}><b>{key}</b>
                                                         <ul>
                                                             {
-                                                                val.map((i) => {
-                                                                    return <p><li><b>{i}</b></li></p>
+                                                                val.map((i, idx) => {
+                                                                    return <p key={idx}><li><b>{i}</b></li></p>
                                                                 })
                                                             }
-                                                            
                                                         </ul>
                                                     </li>
                                                 )
@@ -1068,15 +1200,14 @@ export default function PDFget() {
                                         <ul>
                                             {
                                                 fairSummary === undefined ? '' :
-                                                Object.entries(fairSummary).map(([key, val]) =>
-                                                    <li key={key}><b>{key}</b>
+                                                Object.entries(fairSummary).map(([key, val], index) =>
+                                                    <li key={index}><b>{key}</b>
                                                         <ul>
                                                             {
-                                                                val.map((i) => {
-                                                                    return <p><li><b>{i}</b></li></p>
+                                                                val.map((i, idx) => {
+                                                                    return <p key={idx}><li><b>{i}</b></li></p>
                                                                 })
                                                             }
-                                                            
                                                         </ul>
                                                     </li>
                                                 )
@@ -1089,15 +1220,14 @@ export default function PDFget() {
                                         <ul>
                                             {
                                                 poorSummary === undefined ? '' :
-                                                Object.entries(poorSummary).map(([key, val]) =>
-                                                    <li key={key}><b>{key}</b>
+                                                Object.entries(poorSummary).map(([key, val], index) =>
+                                                    <li key={index}><b>{key}</b>
                                                         <ul>
                                                             {
-                                                                val.map((i) => {
-                                                                    return <p><li><b>{i}</b></li></p>
+                                                                val.map((i, idx) => {
+                                                                    return <p key={idx}><li><b>{i}</b></li></p>
                                                                 })
                                                             }
-                                                            
                                                         </ul>
                                                     </li>
                                                 )
