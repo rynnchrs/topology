@@ -67,7 +67,7 @@ export const JobScheduling = () => {
     const [bodyNoList, setBodyNoList] = useState([]);
     const [suggestions, setSuggestions] = useState(null);
     const [suggestionsBodyNo, setSuggestionsBodyNo] = useState(null);
-    const reportTypeOptions = [{ name: 'CHECKLIST', val: 'checklist' }, { name: 'INCIDENT', val: 'incident' }];
+    const reportTypeOptions = [/* { name: 'CHECKLIST', val: 'checklist' }, */ { name: 'INCIDENT', val: 'incident' }];
     const [reportList, setReportList] = useState([]);
     const [locationList, setLocationList] = useState([]);
     
@@ -917,6 +917,7 @@ export const JobScheduling = () => {
                 // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
                 fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
                     setEditFieldman(editFieldman => [...editFieldman, {id: index, val: i.username, fullname: i.full_name}])
+                    return null;
                 })
             )
             
@@ -961,6 +962,7 @@ export const JobScheduling = () => {
                 // setEditFieldman(editFieldman => [...editFieldman, {id: index, fullname: x.field_man}])
                 fieldmanList.filter(i => i.full_name === x.field_man).map((i) => {
                     setEditFieldman(editFieldman => [...editFieldman, {id: index, val: i.username, fullname: i.full_name}])
+                    return null;
                 })
             )
             
@@ -1250,6 +1252,7 @@ export const JobScheduling = () => {
                     setReportList(res.data);
                     res.data.filter(i => i.ir_no === ro).map((i) => {
                         setEditReportNo(i);
+                        return null;
                     });
                     // if (res.data.next === null) {
                         
@@ -1266,6 +1269,7 @@ export const JobScheduling = () => {
                     setReportList(res.data);
                     res.data.results.filter(i => i.check_list_id === ro).map((i) => {
                         setEditReportNo(i);
+                        return null;
                     });
                     // if (res.data.next === null) {
                         
@@ -1294,6 +1298,7 @@ export const JobScheduling = () => {
                 appendReportList(res.data.results, res.data.next, ro);
                 res.data.results.filter(i => i.ir_no === ro).map((i) => {
                     setEditReportNo(i);
+                    return null;
                 });
             })
             .catch((err) => {
@@ -1429,11 +1434,11 @@ export const JobScheduling = () => {
                                         localStorage.getItem("viewUsers") === "true" ? 
                                                 <div className="p-grid p-fluid">
                                                     <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
-                                                        {/* <Button style={{minWidth:'max-content'}} className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/> */}
+                                                        <Button style={{minWidth:'max-content'}} className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
                                                     </div>
                                                     <div className="p-col-12 p-lg-6 p-md-6 p-sm-12" style={{paddingLeft: '0px'}}>
-                                                        {/* <Button label="CREATE REPAIR" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/> */}
-                                                        <Button className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/>
+                                                        <Button label="CREATE REPAIR" icon="pi pi-cog" onClick={() => onClick('displayJobCreate')}/>
+                                                        {/* <Button className="p-button-success" label="CREATE INSPECTION" icon="pi pi-file" onClick={() => onClick('displayJobCreateInspection')}/> */}
                                                     </div>
                                                 </div>
                                         : ''
