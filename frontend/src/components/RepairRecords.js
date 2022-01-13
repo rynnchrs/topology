@@ -56,6 +56,7 @@ export default function RepairRecords() {
 
     const [repairID, setRepairID] = useState("");
     const [jobOrder, setJobOrder] = useState("");
+    const [reportNo, setReportNo] = useState("");
     const [taskID, setTaskID] = useState('');
     const [jobType, setJobType] = useState("");
     const [scheduleDate, setScheduleDate] = useState("");
@@ -246,9 +247,11 @@ export default function RepairRecords() {
 
     const assignRepairRecordEdit = (value) => {
         /* eslint-disable no-unused-expressions */
+        console.log("val: ", value)
         setRepairID(value.repair_id);
         setJobType(value.job_order.type.toUpperCase());
         setJobOrder(value.job_order.job_id);
+        setReportNo(value.job_order.job_no);
         setTaskID(value.job_order.task.task_id);
         // let splitScheduleDate = value.job_order.task.schedule_date.split("-");
         // let gmtScheduleDate = new Date(+splitScheduleDate[0], splitScheduleDate[1] - 1, +splitScheduleDate[2]);
@@ -1144,7 +1147,7 @@ export default function RepairRecords() {
                 <div className="p-col-12">
                     <DataTable ref={dt} header={renderHeader()} value={repairRecordList} className="p-datatable-sm" 
                         resizableColumns columnResizeMode="expand" emptyMessage="No records found">
-                        <Column field="repair_id" header="Repair No." style={{ paddingLeft: '3%' }}></Column>
+                        <Column field="job_order" header="Repair No." style={{ paddingLeft: '3%' }}></Column>
                         <Column body={actionBody}></Column>
                     </DataTable>
                     <Paginator first={first} rows={rows} totalRecords={totalCount} onPageChange={onPageChange}></Paginator>
@@ -1164,7 +1167,7 @@ export default function RepairRecords() {
                                         <div className="p-grid p-fluid">
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT No.:</b></h6>
-                                                <InputText placeholder="Input Report No." value={jobOrder} disabled/>
+                                                <InputText placeholder="Input Report No." value={reportNo} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT TYPE:</b></h6>
@@ -1452,7 +1455,7 @@ export default function RepairRecords() {
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                                 <h6><b>REPORT No.:</b></h6>
-                                                <InputText placeholder="Input Report No." value={jobOrder} disabled/>
+                                                <InputText placeholder="Input Report No." value={reportNo} disabled/>
                                             </div>
                                             <div className="p-col-12 p-lg-4 p-md-4 p-sm-12">
                                                 <h6><b>SCHEDULE DATE:</b></h6>

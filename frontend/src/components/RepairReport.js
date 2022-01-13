@@ -417,7 +417,7 @@ export default function RepairReport() {
                             <div className="p-grid p-fluid">
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
                                     <h6><b>REPORT No.:</b></h6>
-                                    <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_id" placeholder="Select Job Number" 
+                                    <Dropdown value={jobID} options={jobNotCreatedList} optionLabel="job_no" placeholder="Select Job Number" 
                                     onChange={event => {setJobID(event.target.value); handleSelectReportNo(event)}}/>
                                 </div>
                                 <div className="p-col-12 p-lg-4 p-md-4 p-sm-12 required-asterisk">
