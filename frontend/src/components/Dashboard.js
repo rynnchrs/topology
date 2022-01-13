@@ -165,7 +165,7 @@ export const Dashboard = () => {
         let tDate = new Date(getTDate.getFullYear(), getTDate.getMonth(), getTDate.getDate());
         let dt = format(tDate, 'yyyy-MM-dd');
 
-        let sMode = searchTotalInspectionMode.length <= 0 ? "" : searchTotalInspectionMode.val;
+        let sMode = searchTotalInspectionMode.length <= 0 ? "day" : searchTotalInspectionMode.val;
         let sDate = searchTotalInspectionDate === null ? dt : format(searchTotalInspectionDate, 'yyyy-MM-dd');
 
         let token = localStorage.getItem("token");
@@ -187,7 +187,7 @@ export const Dashboard = () => {
                 setTotalInspection(tempData);
             })
             .catch((err) => {
-                // toast.current.show({ severity: 'error', summary: 'SEARCH ERROR', detail: 'Something went wrong.', life: 3000 });
+                toast.current.show({ severity: 'error', summary: 'SEARCH ERROR', detail: 'Something went wrong.', life: 3000 });
             });
     }
 
