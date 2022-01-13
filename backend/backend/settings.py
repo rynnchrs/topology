@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'reversion',
     'multiselectfield',
     'notifications',
+    'django_celery_beat',
+    'django_celery_results',
 
     #app
     'careta',
@@ -213,4 +215,13 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@rentcar.ph'
 EMAIL_HOST_PASSWORD = 'cbxehhkkrobqsqax'
 EMAIL_USE_TLS = True
+
+CELERY_BROKER_URL = 'redis://localhost:6379' 
+result_backend = 'redis://localhost:6379'
+accept_content = ['application/json']
+task_serializer = 'json'
+result_serializer = 'json'
+timezone = 'Asia/Manila' 
+# imports = ['gps.tasks']
+# beat_schedule  = 'django_celery_beat.schedulers:DatabaseScheduler
 FRONTEND_URL = env('FRONTEND_URL')
