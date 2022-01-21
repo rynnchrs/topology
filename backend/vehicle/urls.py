@@ -4,10 +4,9 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter() 
-
+router.register(r'deployment', views.VehicleDeploymentView, 'deployment') 
+router.register(r'quantity', views.VehicleQuantityView, 'quantity') 
 
 urlpatterns = [
     path('', include(router.urls)),
-    
-    path('quantity/', views.VehicleQuantityView.as_view(), name='quantity'),
 ]
