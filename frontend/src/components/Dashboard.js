@@ -145,18 +145,22 @@ export const Dashboard = () => {
 
     const [timeOutId, setTimeOutId] = useState(null);
     useEffect(() => {
-        clearTimeout(timeOutId);
-        setTimeOutId(setTimeout(() => {
-            searchTotalInspection();
-        }, 1000));
+        if (localStorage.getItem("username") !== 'admin') {
+            clearTimeout(timeOutId);
+            setTimeOutId(setTimeout(() => {
+                searchTotalInspection();
+            }, 1000));
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[searchTotalInspectionMode]);
 
     useEffect(() => {
-        clearTimeout(timeOutId);
-        setTimeOutId(setTimeout(() => {
-            searchTotalInspection();
-        }, 1000));
+        if (localStorage.getItem("username") !== 'admin') {
+            clearTimeout(timeOutId);
+            setTimeOutId(setTimeout(() => {
+                searchTotalInspection();
+            }, 1000));
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[searchTotalInspectionDate]);
 

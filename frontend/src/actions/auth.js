@@ -87,6 +87,15 @@ export const login = (username, password) => (dispatch) => {
                 .catch((err) => {
                     localStorage.setItem('myimage', "assets/layout/images/avatar.jpg");
                 });
+
+                axios
+                .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
+                .then((res) => {
+                    localStorage.setItem('myfirst', res.data.user_info.full_name);
+                })
+                .catch((err) => {
+                    
+                });
             } catch (e){
 
             }
