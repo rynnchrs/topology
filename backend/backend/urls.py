@@ -36,6 +36,7 @@ urlpatterns = [
     path('dashboard/',  include('dashboard.urls')),
     path('image/',  include('image.urls')),
     path('emails/',  include('emails.urls')),
+    path('vehicle/',  include('vehicle.urls')),
     path('gps/',  include('gps.urls')),
     path('docs/', include_docs_urls(title=API_TITLE,
                                     description=API_DESCRIPTION)),
