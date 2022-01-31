@@ -136,24 +136,28 @@ export const JobScheduling = () => {
 
     useEffect(() => {
         let token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token,
-                },
-            };
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        };
 
-        axios.get(process.env.REACT_APP_SERVER_NAME + 'task/location-list/', config)
-            .then((res) => {
-                let loc = [...locationList];
-                for (var i = 0; i < Object.keys(res.data).length; i++) {
-                    loc.push({"location": res.data[i]})
-                }
-                setLocationList(loc);
-            })
-            .catch((err) => {
-                
-            });
+        if (localStorage.getItem("viewUsers") === "true") {
+            axios.get(process.env.REACT_APP_SERVER_NAME + 'task/location-list/', config)
+                .then((res) => {
+                    let loc = [...locationList];
+                    for (var i = 0; i < Object.keys(res.data).length; i++) {
+                        loc.push({"location": res.data[i]})
+                    }
+                    setLocationList(loc);
+                })
+                .catch((err) => {
+                    
+                });
+            } else {
+
+            }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -486,16 +490,30 @@ export const JobScheduling = () => {
         let gmtEndDate = new Date(+splitEndDate[0], splitEndDate[1] - 1, +splitEndDate[2] + 1);
         let status1 = "";
         let statusColor1 = "";
-        if (jobList.task_status_fm === true && jobList.task_status_mn === true) {
-            status1 = "DONE";
-            statusColor1 = "green";
-        } else if (jobList.task_status_fm === true && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null && jobList.job_order.field_inspection !== null) {
-            status1 = "FOR APPROVAL";
-            statusColor1 = "orange";
-        } else  {
-            status1 = "PENDING";
-            statusColor1 = "red";
+        if (jobList.job_order.type === "Repair") {
+            if (jobList.task_status_fm === true && jobList.task_status_mn === true) {
+                status1 = "DONE";
+                statusColor1 = "green";
+            } else if (jobList.task_status_fm === true && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null) {
+                status1 = "FOR APPROVAL";
+                statusColor1 = "orange";
+            } else  {
+                status1 = "PENDING";
+                statusColor1 = "red";
+            }
+        } else {
+            if (jobList.task_status_fm === true && jobList.task_status_mn === true) {
+                status1 = "DONE";
+                statusColor1 = "green";
+            } else if (jobList.task_status_fm === true && jobList.task_status_mn === false && jobList.start_date_actual !== null && jobList.end_date_actual !== null && jobList.job_order.field_inspection !== null) {
+                status1 = "FOR APPROVAL";
+                statusColor1 = "orange";
+            } else  {
+                status1 = "PENDING";
+                statusColor1 = "red";
+            }
         }
+        
         let jobTypeColor = jobList.job_order.type === "Repair" ? 'blue' : jobList.job_order.type === "Inspection" ? 'green' : ''; 
 
         return (
@@ -580,7 +598,25 @@ export const JobScheduling = () => {
             axios
                 .get(process.env.REACT_APP_SERVER_NAME + 'task/task-scheduling/' + value + '/', config)
                 .then((res) => {
-                    btnJobData(res.data);
+                    let holdJobNo = res.data.job_order.job_no;
+                    let resdata = res.data;
+                    if (res.data.job_order.type === "Repair") {
+                        axios
+                            .get(process.env.REACT_APP_SERVER_NAME + 'task/job-order/repair_not_created/', config)
+                            .then((res) => {
+                                let chck = res.data.filter(item => item.job_no === holdJobNo);
+                                if (chck.length <= 0) {
+                                    btnJobData(resdata, 'Repair', true);
+                                } else {
+                                    btnJobData(resdata, 'Repair', false);
+                                }
+                            })
+                            .catch((err) => {
+                                
+                            });
+                    } else {
+                        btnJobData(resdata, 'Inspection', false);
+                    }
                 })
                 .catch((err) => {
                     
@@ -616,46 +652,47 @@ export const JobScheduling = () => {
         }
     }
 
-    const btnJobData = (value) => {
+    const btnJobData = (value, jobType, boolValue) => {
         if (value !== null) {
             setJobData(value);
-            if (value.task_status_fm === true && value.task_status_mn === true) {
-                setStatus("DONE");
-                setStatusColor("green");
-                setStatusBtn('disable');
-            } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
-                setStatus("PENDING");
-                setStatusColor("red");
-                setStatusBtn('enable')
-            } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
-                setStatus("FOR APPROVAL");
-                setStatusColor("orange");
-                setStatusBtn('disable')
-            } else  {
-                setStatus("PENDING")
-                setStatusColor("red");
-                setStatusBtn('disable')
+            if (jobType === 'Repair') {
+                if (value.task_status_fm === true && value.task_status_mn === true) {
+                    setStatus("DONE");
+                    setStatusColor("green");
+                    setStatusBtn('disable');
+                } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && boolValue !== false) {
+                    setStatus("PENDING");
+                    setStatusColor("red");
+                    setStatusBtn('enable')
+                } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && boolValue !== false) {
+                    setStatus("FOR APPROVAL");
+                    setStatusColor("orange");
+                    setStatusBtn('disable')
+                } else  {
+                    setStatus("PENDING")
+                    setStatusColor("red");
+                    setStatusBtn('disable')
+                }
+            } else {
+                if (value.task_status_fm === true && value.task_status_mn === true) {
+                    setStatus("DONE");
+                    setStatusColor("green");
+                    setStatusBtn('disable');
+                } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
+                    setStatus("PENDING");
+                    setStatusColor("red");
+                    setStatusBtn('enable')
+                } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
+                    setStatus("FOR APPROVAL");
+                    setStatusColor("orange");
+                    setStatusBtn('disable')
+                } else  {
+                    setStatus("PENDING")
+                    setStatusColor("red");
+                    setStatusBtn('disable')
+                }
             }
-            // if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual === null && value.end_date_actual === null) {
-            //     setStatus("PENDING")
-            //     setStatusColor("red");
-            //     setStatusBtn('disable')
-            // } else if (value.task_status_fm === false && value.task_status_mn === false && value.job_order.field_inspection !== null) {
-            //     setStatus("PENDING");
-            //     setStatusColor("red");
-            //     setStatusBtn('disable')
-            // } else if (value.task_status_fm === false && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null && value.job_order.field_inspection !== null) {
-            //     setStatus("PENDING");
-            //     setStatusColor("red");
-            //     setStatusBtn('enable')
-            // } else if (value.task_status_fm === true && value.task_status_mn === false && value.start_date_actual !== null && value.end_date_actual !== null) {
-            //     setStatus("FOR APPROVAL");
-            //     setStatusColor("orange");
-            //     setStatusBtn('disable')
-            // } else if (value.task_status_fm === true && value.task_status_mn === true){
-            //     setStatus("DONE");
-            //     setStatusColor("green");
-            // }
+            
             let jobTypeColor = value.job_order.type === "Repair" ? 'blue' : value.job_order.type === "Inspection" ? 'green' : '';
             setJobTypeColor(jobTypeColor);
             onClick('displayJobDetails')
