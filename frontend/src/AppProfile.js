@@ -11,27 +11,27 @@ export const AppProfile = () => {
     
     const [userData, setUserData] = useState();
 
-    useEffect(() => {
-        let token = localStorage.getItem("token");
-        let username = localStorage.getItem("username");
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
+    // useEffect(() => {
+    //     let token = localStorage.getItem("token");
+    //     let username = localStorage.getItem("username");
+    //     const config = {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + token,
+    //         },
+    //     };
 
-        axios
-            .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
-            .then((res) => {
-                localStorage.setItem('myfirst', res.data.user_info.full_name);
-                setUserData(localStorage.getItem("myfirst"))
-            })
-            .catch((err) => {
-                console.log("get users err:")
-                console.log(err.response);
-            });
-    },[]);
+    //     axios
+    //         .get(process.env.REACT_APP_SERVER_NAME + 'careta/users/' + username + '/', config)
+    //         .then((res) => {
+    //             localStorage.setItem('myfirst', res.data.user_info.full_name);
+    //             setUserData(localStorage.getItem("myfirst"))
+    //         })
+    //         .catch((err) => {
+    //             console.log("get users err:")
+    //             console.log(err.response);
+    //         });
+    // },[]);
     
     const onClick = (event) => {
         setExpanded(prevState => !prevState);
@@ -123,7 +123,8 @@ export const AppProfile = () => {
                 <img src={localStorage.getItem("myimage")} alt="Profile" />
             </div>
             <div>
-                <h5 style={{color:'white'}}>{userData}</h5>
+                {/* <h5 style={{color:'white'}}>{userData}</h5> */}
+                <h5 style={{color:'white'}}>{localStorage.getItem("myfirst")}</h5>
             </div>
             <button className="p-link layout-profile-link pi pi-fw pi-cog" onClick={onClick}></button>
             <CSSTransition classNames="p-toggleable-content" timeout={{ enter: 1000, exit: 450 }} in={expanded} unmountOnExit>
